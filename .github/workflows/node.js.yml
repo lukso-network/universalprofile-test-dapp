@@ -30,4 +30,3 @@ jobs:
       - run: yarn
       - run: yarn run build --if-present
       - run: yarn run test:unit
-      - run: yarn run test:e2e
