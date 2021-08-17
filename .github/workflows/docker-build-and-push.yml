@@ -27,7 +27,8 @@ jobs:
 
       - name: Bump version
         run: |-
-          echo "APP_VERSION=$(git describe --tags --abbrev=0 | awk -F. '{OFS="."; $NF+=1; print $0}' | sed 's/v//')" >> $GITHUB_ENV
+          APP_VERSION=$(git describe --tags --abbrev=0 | awk -F. '{OFS="."; $NF+=1; print $0}' | sed 's/v//')
+          export APP_VERSION=$APP_VERSION" >> $GITHUB_ENV
           git config --global user.email "release@lukso.network"
           git config --global user.name "Release Bot"
           git tag -a ${{ env.APP_VERSION }} -m "Release Version ${{ env.APP_VERSION }}"
