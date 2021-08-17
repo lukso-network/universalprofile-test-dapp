@@ -27,7 +27,7 @@ jobs:
 
       - name: Bump version
         run: |-
-          APP_VERSION=$(git describe --tags --abbrev=0 | awk -F. '{OFS="."; $NF+=1; print $0}' | sed 's/v//')
+          APP_VERSION=$(node -pe "require('./package.json').version")
           echo "APP_VERSION=$APP_VERSION" >> $GITHUB_ENV
           git config --global user.email "release@lukso.network"
           git config --global user.name "Release Bot"
