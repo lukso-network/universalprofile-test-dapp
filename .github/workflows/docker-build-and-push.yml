@@ -30,22 +30,22 @@ jobs:
           echo "APP_VERSION=$(git describe --tags --abbrev=0 | awk -F. '{OFS="."; $NF+=1; print $0}' | sed 's/v//')" >> $GITHUB_ENV
           git config --global user.email "release@lukso.network"
           git config --global user.name "Release Bot"
-          git tag -a $APP_VERSION -m "Release Version $APP_VERSION"
+          git tag -a ${{ env.APP_VERSION }} -m "Release Version ${{ env.APP_VERSION }}"
 
       - name: Build
         run: |-
           docker build \
-            --tag "eu.gcr.io/$GCR_PROJECT/$REPO_NAME:$APP_VERSION" \
+            --tag "eu.gcr.io/$GCR_PROJECT/$REPO_NAME:${{ env.APP_VERSION }}" \
             .
 
       - name: Publish Image
         run: |-
-          docker push "eu.gcr.io/$GCR_PROJECT/$REPO_NAME:$APP_VERSION"
+          docker push "eu.gcr.io/$GCR_PROJECT/$REPO_NAME:${{ env.APP_VERSION }}"
 
       - name: Publish Helm Chart
         run: |
-          cd charts/identity-provider && helm package . --app-version $APP_VERSION --version $APP_VERSION
-          curl -L --data-binary "@identity-provider-$APP_VERSION.tgz" -u charts:${{ secrets.CHARTMUSEUM_PASSWORD_STAGING }} http://chartmuseum.staging.lukso.dev/api/charts
+          cd charts/identity-provider && helm package . --app-version ${{ env.APP_VERSION }} --version ${{ env.APP_VERSION }}
+          curl -L --data-binary "@identity-provider-${{ env.APP_VERSION }}.tgz" -u charts:${{ secrets.CHARTMUSEUM_PASSWORD_STAGING }} http://chartmuseum.staging.lukso.dev/api/charts
           cd ../..
           git push --set-upstream origin main
           git push --tags
