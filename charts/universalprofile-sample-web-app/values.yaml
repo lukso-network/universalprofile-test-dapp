@@ -6,7 +6,6 @@ replicaCount: 1
 
 image:
   repository: eu.gcr.io/lukso-infrastructure-dev/universalprofile-sample-web-app
-  tag: latest
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
