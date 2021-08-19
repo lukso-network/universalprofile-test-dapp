@@ -45,8 +45,8 @@ jobs:
 
       - name: Publish Helm Chart
         run: |
-          cd charts/${{ $REPO_NAME }} && helm package . --app-version ${{ env.APP_VERSION }} --version ${{ env.APP_VERSION }}
-          curl -L --data-binary "@${{ $REPO_NAME }}-${{ env.APP_VERSION }}.tgz" -u charts:${{ secrets.CHARTMUSEUM_PASSWORD_STAGING }} http://chartmuseum.staging.lukso.dev/api/charts
+          cd charts/$REPO_NAME && helm package . --app-version ${{ env.APP_VERSION }} --version ${{ env.APP_VERSION }}
+          curl -L --data-binary "@$REPO_NAME-${{ env.APP_VERSION }}.tgz" -u charts:${{ secrets.CHARTMUSEUM_PASSWORD_STAGING }} http://chartmuseum.staging.lukso.dev/api/charts
           cd ../..
           git push --set-upstream origin main
           git push --tags
