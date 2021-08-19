@@ -27,11 +27,11 @@ jobs:
 
       - name: Bump version
         run: |-
+          npm version patch -m ":arrow_up: v%s [skip ci]"
           APP_VERSION=$(node -pe "require('./package.json').version")
           echo "APP_VERSION=$APP_VERSION" >> $GITHUB_ENV
           git config --global user.email "release@lukso.network"
           git config --global user.name "Release Bot"
-          git tag -a $APP_VERSION -m "Release Version $APP_VERSION"
 
       - name: Build
         run: |-
