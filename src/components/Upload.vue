@@ -341,26 +341,25 @@ export default defineComponent({
     };
   },
   methods: {
-    async upload(event: any) {
+    async upload(event: Event) {
       event.preventDefault();
 
-      const file = document.querySelector("input") as HTMLInputElement;
       if (
         this.profileImage &&
         this.backgroundImage &&
         this.name &&
         this.description
       ) {
-        const a = await LSP3UniversalProfile.uploadProfileData({
+        const { url, profile } = await LSP3UniversalProfile.uploadProfileData({
           profileImage: this.profileImage as unknown as File,
           backgroundImage: this.backgroundImage as unknown as File,
           name: this.name,
           description: this.description,
           links: [],
-          tags: [],
+          tags: this.tags,
         });
 
-        console.log(a);
+        localStorage.setItem(url, JSON.stringify(profile));
       } else {
         this.showError = true;
       }
