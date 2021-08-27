@@ -1,8 +1,31 @@
 <template>
-  <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/profile">Profile</router-link>
-  </div>
+  <nav class="navbar is-light" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://bulma.io">
+        <img src="./assets/lukso.png" height="28" />
+      </a>
+
+      <a
+        role="button"
+        class="navbar-burger"
+        aria-label="menu"
+        aria-expanded="false"
+        data-target="navbarBasicExample"
+      >
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </a>
+    </div>
+
+    <div id="navbarBasicExample" class="navbar-menu">
+      <div class="navbar-start">
+        <router-link class="navbar-item" to="/">Home</router-link>
+        <router-link class="navbar-item" to="/profile">Profile</router-link>
+      </div>
+    </div>
+  </nav>
+
   <router-view />
 </template>
 
