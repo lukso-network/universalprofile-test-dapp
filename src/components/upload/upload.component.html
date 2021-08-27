@@ -30,11 +30,22 @@
     </div>
   </article>
 
+  <article class="message is-danger" v-if="showError">
+    <div class="message-header">
+      <p>Error</p>
+      <button class="delete" aria-label="delete"></button>
+    </div>
+    <div class="message-body">
+      The property
+      <strong>name</strong> is mandatory.
+    </div>
+  </article>
+
   <div class="columns">
     <div class="column">
       <section class="upload-form has-background-info-light">
-        <div class="file has-name field">
-          <label class="file-label">
+        <div class="file is-boxed has-name mb-5">
+          <label class="file-label" v-if="!profileImageUrl">
             <input
               class="file-input"
               type="file"
@@ -42,36 +53,61 @@
               @change="handleProfileImage"
             />
             <span class="file-cta">
-              <span class="file-icon">
-                <i class="fas fa-upload"></i>
-              </span>
-              <span class="file-label"> Choose a Profile Image… </span>
+              <span class="file-label"> Browse... </span>
             </span>
-            <span class="file-name"
-              ><span v-if="profileImageUrl"> {{ profileImageUrl }} </span
-              ><span v-if="!profileImageUrl"> Profile Image </span></span
-            >
+
+            <span class="file-name"> Profile Image </span>
           </label>
+          <div v-if="profileImageUrl" class="columns">
+            <div class="column">
+              <p class="has-text-weight-bold">Profile Image</p>
+
+              <img
+                :src="profileImageUrl"
+                :alt="profileImage.name"
+                style="display: flex; background: red; max-height: 200px"
+              />
+            </div>
+            <div class="column">
+              <p>{{ getFileSize(profileImage) }}</p>
+              <button @click="removeProfileImage" class="button is-danger">
+                Delete
+              </button>
+            </div>
+          </div>
         </div>
-        <div class="file has-name field">
-          <label class="file-label">
+
+        <div class="file is-boxed has-name mb-5">
+          <label class="file-label" v-if="!backgroundImageUrl">
             <input
               class="file-input"
               type="file"
-              name="background-image"
+              name="backgroundImage"
               @change="handleBackgroundImage"
             />
             <span class="file-cta">
-              <span class="file-icon">
-                <i class="fas fa-upload"></i>
-              </span>
-              <span class="file-label">Choose a Background Image...</span>
+              <span class="file-label"> Browse... </span>
             </span>
-            <span class="file-name"
-              ><span v-if="backgroundImageUrl"> {{ backgroundImageUrl }} </span
-              ><span v-if="!backgroundImageUrl"> Background Image </span>
-            </span>
+
+            <span class="file-name"> Background Image </span>
           </label>
+          <div v-if="backgroundImageUrl" class="columns">
+            <div class="column">
+              <p class="has-text-weight-bold">Background Image</p>
+
+              <img
+                :src="backgroundImageUrl"
+                :alt="backgroundImage.name"
+                style="display: flex; background: red; max-height: 200px"
+              />
+            </div>
+            <div class="column">
+              <p>{{ getFileSize(backgroundImage) }}</p>
+              <button @click="removeBackgroundImage" class="button is-danger">
+                Delete
+              </button>
+            </div>
+          </div>
         </div>
 
         <div class="field">
@@ -187,7 +223,10 @@
         <pre v-if="uploadResult.profile">{{ uploadResult.profile }}</pre>
       </section>
 
-      <section class="has-background-success-light p-5">
+      <section
+        class="has-background-success-light p-5"
+        v-if="uploadedProfiles.length > 0"
+      >
         <h2 class="title is-size-4">Previously Uploaded Profiles</h2>
         <table
           class="

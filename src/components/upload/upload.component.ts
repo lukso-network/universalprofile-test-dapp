@@ -1,7 +1,12 @@
 import { defineComponent } from "vue";
-import { LSP3ProfileLink, LSP3UniversalProfile } from "@lukso/lsp-factory.js";
+import {
+  LSP3ProfileJSON,
+  LSP3ProfileLink,
+  LSP3UniversalProfile,
+} from "@lukso/lsp-factory.js";
 import { HTMLInputEvent } from "@/interfaces/html-input-event";
 import { getAllItems } from "@/helpers/localstorage";
+import fileSize from "filesize";
 
 export default defineComponent({
   name: "Upload",
@@ -12,16 +17,16 @@ export default defineComponent({
     return {
       isUploading: false,
       showError: false,
-      profileImage: {},
+      profileImage: {} as File,
       profileImageUrl: "",
-      backgroundImage: {},
+      backgroundImage: {} as File,
       backgroundImageUrl: "",
       name: "",
       description: "",
       links: [] as LSP3ProfileLink[],
       tags: [] as string[],
       uploadTarget: "https://api.ipfs.lukso.network",
-      uploadResult: {},
+      uploadResult: {} as { profile: LSP3ProfileJSON; url: string },
       uploadedProfiles: getAllItems(),
     };
   },
@@ -30,30 +35,24 @@ export default defineComponent({
       event.preventDefault();
       this.isUploading = true;
 
-      if (
-        this.profileImage &&
-        this.backgroundImage &&
-        this.name &&
-        this.description
-      ) {
-        const { url, profile } = await LSP3UniversalProfile.uploadProfileData({
-          profileImage: this.profileImage as unknown as File,
-          backgroundImage: this.backgroundImage as unknown as File,
+      if (!this.name) {
+        this.showError = true;
+        this.isUploading = false;
+      } else {
+        this.uploadResult = await LSP3UniversalProfile.uploadProfileData({
           name: this.name,
           description: this.description,
           links: this.links,
           tags: this.tags,
+          profileImage: this.profileImage,
+          backgroundImage: this.backgroundImage,
         });
 
-        this.uploadResult = {
-          profile,
-          url,
-        };
-
         this.isUploading = false;
-        localStorage.setItem(url, JSON.stringify(profile));
-      } else {
-        this.showError = true;
+        localStorage.setItem(
+          this.uploadResult.url,
+          JSON.stringify(this.uploadResult.profile)
+        );
       }
     },
 
@@ -86,6 +85,22 @@ export default defineComponent({
 
     removeTag(index: number) {
       this.tags.splice(index, 1);
+    },
+
+    getFileSize(file: File) {
+      if (file.size) {
+        return fileSize(file.size);
+      }
+    },
+
+    removeProfileImage() {
+      this.profileImage = {} as any;
+      this.profileImageUrl = null as any;
+    },
+
+    removeBackgroundImage() {
+      this.backgroundImage = {} as any;
+      this.backgroundImageUrl = null as any;
     },
   },
 });
