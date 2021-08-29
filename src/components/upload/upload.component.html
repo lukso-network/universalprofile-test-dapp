@@ -248,12 +248,7 @@
                 :href="uploadedProfile.url"
                 target="_blank"
                 rel="noopener noreferrer"
-                >{{
-                  uploadedProfile.url.replace(
-                    "https://ipfs.lukso.network/ipfs/",
-                    ""
-                  )
-                }}</a
+                >{{ uploadedProfile.url.replace(uploadTarget, "") }}</a
               >
             </td>
           </tr>

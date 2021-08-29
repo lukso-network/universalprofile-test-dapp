@@ -5,8 +5,9 @@ import {
   LSP3UniversalProfile,
 } from "@lukso/lsp-factory.js";
 import { HTMLInputEvent } from "@/interfaces/html-input-event";
-import { getAllItems } from "@/helpers/localstorage";
+import { getAndPrepareAllIpfsItems } from "@/helpers/localstorage";
 import fileSize from "filesize";
+import { DEFAULT_IPFS_URL } from "@/helpers/config";
 
 export default defineComponent({
   name: "Upload",
@@ -25,9 +26,9 @@ export default defineComponent({
       description: "",
       links: [] as LSP3ProfileLink[],
       tags: [] as string[],
-      uploadTarget: "https://api.ipfs.lukso.network",
+      uploadTarget: DEFAULT_IPFS_URL,
       uploadResult: {} as { profile: LSP3ProfileJSON; url: string },
-      uploadedProfiles: getAllItems(),
+      uploadedProfiles: getAndPrepareAllIpfsItems(),
     };
   },
   methods: {
