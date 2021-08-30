@@ -1,0 +1,77 @@
+<section class="section">
+  <h1 class="title">Profile Detail for {{ $route.params.address }}</h1>
+
+  <div v-if="loading">Loading...</div>
+  <table
+    v-if="!loading"
+    class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
+  >
+    <tr>
+      <th>Property</th>
+      <th>Value</th>
+    </tr>
+    <tr>
+      <td>Name</td>
+      <td>{{ post.LSP3Profile.name }}</td>
+    </tr>
+
+    <tr>
+      <td>Description</td>
+      <td>{{ post.LSP3Profile.description }}</td>
+    </tr>
+
+    <tr>
+      <td>Links</td>
+      <td>
+        <ul class="list">
+          <li v-for="link in post.LSP3Profile.links" v-bind:key="link">
+            <a
+              v-bind:href="link.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              >{{ link.title ? link.title : link.url }}</a
+            >
+          </li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td>Tags</td>
+      <td>
+        <span
+          class="tag"
+          v-for="tag in post.LSP3Profile.tags"
+          v-bind:key="tag"
+          >{{ tag }}</span
+        >
+      </td>
+    </tr>
+
+    <tr>
+      <td>ProfileImage(s)</td>
+      <td>
+        <div v-for="image in post.LSP3Profile.profileImage" v-bind:key="image">
+          <pre
+            >{{ image }}
+              </pre
+          >
+          <img v-bind:src="image.url.replace('ipfs://', uploadTarget)" alt="" />
+        </div>
+      </td>
+    </tr>
+
+    <tr>
+      <td>BackgroundImage(s)</td>
+      <div v-for="image in post.LSP3Profile.backgroundImage" v-bind:key="image">
+        <pre
+          >{{ image }}
+              </pre
+        >
+        <img v-bind:src="image.url.replace('ipfs://', uploadTarget)" alt="" />
+      </div>
+    </tr>
+  </table>
+  {{ error }}
+</section>
+

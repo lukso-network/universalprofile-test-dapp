@@ -21,7 +21,16 @@
     <div id="navbarBasicExample" class="navbar-menu">
       <div class="navbar-start">
         <router-link class="navbar-item" to="/">Home</router-link>
-        <router-link class="navbar-item" to="/profile">Profile</router-link>
+
+        <div class="navbar-item has-dropdown is-hoverable">
+          <router-link class="navbar-item" to="/profiles">Profiles</router-link>
+
+          <div class="navbar-dropdown">
+            <router-link class="navbar-item" to="/profiles/upload"
+              >Upload</router-link
+            >
+          </div>
+        </div>
       </div>
     </div>
   </nav>
