@@ -1,0 +1,259 @@
+<section class="section">
+  <h1 class="title">Profile Upload</h1>
+
+  <article class="message is-info">
+    <div class="message-header">
+      <p>Info</p>
+      <button class="delete" aria-label="delete"></button>
+    </div>
+    <div class="message-body">
+      <div class="content">
+        <p>
+          This page allows you to generate and upload your
+          <strong>LSP3Profile</strong> data including the profile- and
+          background-image, as per
+          <a
+            href="https://github.com/lukso-network/LIPs/blob/master/LSPs/LSP-3-UniversalProfile.md"
+            >LSP-3-UniversalProfile</a
+          >
+          standard.
+        </p>
+        <p>
+          Each image will be compressed and resized into five variants with a
+          <code>max-width</code> of <code>1800px</code>, <code>1024px</code>,
+          <code>640px</code>, <code>320px</code> and <code>180px</code>.
+        </p>
+        <p class="has-text-weight-bold">
+          This will not perform any operation on the blockchain.
+        </p>
+      </div>
+    </div>
+  </article>
+
+  <article class="message is-danger" v-if="showError">
+    <div class="message-header">
+      <p>Error</p>
+      <button class="delete" aria-label="delete"></button>
+    </div>
+    <div class="message-body">
+      The property
+      <strong>name</strong> is mandatory.
+    </div>
+  </article>
+
+  <div class="columns">
+    <div class="column">
+      <section class="upload-form has-background-info-light">
+        <div class="file is-boxed has-name mb-5">
+          <label class="file-label" v-if="!profileImageUrl">
+            <input
+              class="file-input"
+              type="file"
+              name="profileImage"
+              @change="handleProfileImage"
+            />
+            <span class="file-cta">
+              <span class="file-label"> Browse... </span>
+            </span>
+
+            <span class="file-name"> Profile Image </span>
+          </label>
+          <div v-if="profileImageUrl" class="columns">
+            <div class="column">
+              <p class="has-text-weight-bold">Profile Image</p>
+
+              <img
+                :src="profileImageUrl"
+                :alt="profileImage.name"
+                style="display: flex; background: red; max-height: 200px"
+              />
+            </div>
+            <div class="column">
+              <p>{{ getFileSize(profileImage) }}</p>
+              <button @click="removeProfileImage" class="button is-danger">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="file is-boxed has-name mb-5">
+          <label class="file-label" v-if="!backgroundImageUrl">
+            <input
+              class="file-input"
+              type="file"
+              name="backgroundImage"
+              @change="handleBackgroundImage"
+            />
+            <span class="file-cta">
+              <span class="file-label"> Browse... </span>
+            </span>
+
+            <span class="file-name"> Background Image </span>
+          </label>
+          <div v-if="backgroundImageUrl" class="columns">
+            <div class="column">
+              <p class="has-text-weight-bold">Background Image</p>
+
+              <img
+                :src="backgroundImageUrl"
+                :alt="backgroundImage.name"
+                style="display: flex; background: red; max-height: 200px"
+              />
+            </div>
+            <div class="column">
+              <p>{{ getFileSize(backgroundImage) }}</p>
+              <button @click="removeBackgroundImage" class="button is-danger">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Name</label>
+          <div class="control">
+            <input
+              v-model="name"
+              class="input"
+              type="text"
+              placeholder="Knock knock who's there?"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Description</label>
+          <div class="control">
+            <textarea
+              v-model="description"
+              class="textarea"
+              placeholder="Once upon a time..."
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Links</label>
+          <div v-for="(link, index) in links">
+            <div class="field-body">
+              <div class="field">
+                <p class="control is-expanded">
+                  <input
+                    class="input"
+                    type="text"
+                    v-model="links[index].title"
+                    placeholder="Title"
+                  />
+                </p>
+              </div>
+              <div class="field has-addons">
+                <p class="control">
+                  <a class="button is-static"> https:// </a>
+                </p>
+                <p class="control">
+                  <input
+                    class="input"
+                    type="text"
+                    v-model="link.url"
+                    placeholder="example.com"
+                  />
+                </p>
+              </div>
+              <div class="block">
+                <button @click="removeLink(index)" class="button is-danger">
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <button @click="addNewLink" class="button is-info">Add Link</button>
+        </div>
+
+        <div class="field">
+          <label class="label">Tags</label>
+          <div v-for="(tag, index) in tags">
+            <div class="field-body">
+              <div class="field">
+                <p class="control is-expanded">
+                  <input
+                    class="input"
+                    type="text"
+                    v-model="tags[index]"
+                    placeholder="Tagname"
+                  />
+                </p>
+              </div>
+              <div class="block">
+                <button @click="removeTag(index)" class="button is-danger">
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <button @click="addNewTag" class="button is-info">Add Tag</button>
+        </div>
+      </section>
+      <div class="field is-grouped is-grouped-right">
+        <p class="control">
+          <button
+            type="submit"
+            @click="upload"
+            class="button is-success"
+            :class="{ 'is-loading': isUploading }"
+            :disabled="isUploading"
+          >
+            Upload Profile
+          </button>
+        </p>
+      </div>
+    </div>
+    <div class="column">
+      <section v-if="uploadResult.url" class="has-background-success p-5 mb-5">
+        <h2 class="title is-size-4">Uploaded Profile:</h2>
+        <a
+          href="{{ uploadResult.url }}"
+          target="_blank"
+          rel="noopener noreferrer"
+          >{{ uploadResult.url }}</a
+        >
+        <pre v-if="uploadResult.profile">{{ uploadResult.profile }}</pre>
+      </section>
+
+      <section
+        class="has-background-success-light p-5"
+        v-if="uploadedProfiles.length > 0"
+      >
+        <h2 class="title is-size-4">Previously Uploaded Profiles</h2>
+        <table
+          class="
+            table
+            is-bordered is-striped is-narrow is-hoverable is-fullwidth
+          "
+        >
+          <tr>
+            <th>Name</th>
+            <th>Identifier</th>
+          </tr>
+          <tr v-for="(uploadedProfile, index) in uploadedProfiles">
+            <td>
+              {{ uploadedProfile.profile.LSP3Profile.name }}
+            </td>
+            <td>
+              <a
+                v-if="uploadedProfile.url"
+                :href="uploadedProfile.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                >{{ uploadedProfile.url.replace(uploadTarget, "") }}</a
+              >
+            </td>
+          </tr>
+        </table>
+      </section>
+    </div>
+  </div>
+</section>
