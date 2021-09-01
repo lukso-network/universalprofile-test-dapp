@@ -1,5 +1,6 @@
 import { defineComponent } from "vue";
 import { request } from "graphql-request";
+import { isAddress } from "ethers/lib/utils";
 import { DEFAULT_IPFS_URL } from "@/helpers/config";
 import { getLSP3ProfileQuery } from "@/helpers/graphql";
 
@@ -10,8 +11,9 @@ export default defineComponent({
   },
   data() {
     return {
+      dataSource: "",
       loading: false,
-      post: null,
+      profileData: null,
       error: null,
       uploadTarget: DEFAULT_IPFS_URL,
     };
@@ -27,10 +29,19 @@ export default defineComponent({
   },
   methods: {
     fetchData() {
-      this.error = this.post = null;
+      this.error = this.profileData = null;
       this.loading = true;
-      const fetchedAddress = this.$route.params.address;
 
+      const addressOrHash = this.$route.params.address as string;
+
+      if (isAddress(addressOrHash)) {
+        this.getProfileDataFromERC725Cache(addressOrHash);
+      } else {
+        this.getProfileDataFromIPFS(addressOrHash);
+      }
+    },
+
+    getProfileDataFromERC725Cache(fetchedAddress: string) {
       request(
         "https://erc725cache.l14.lukso.network/graphql",
         getLSP3ProfileQuery(this.$route.params.address as string)
@@ -38,8 +49,21 @@ export default defineComponent({
         .then((result) => {
           console.log(result);
           if (this.$route.params.address !== fetchedAddress) return;
+          this.dataSource = "ERC725-Cache";
+          this.profileData = result.LSP3UniversalProfiles[0];
           this.loading = false;
-          this.post = result.LSP3UniversalProfiles[0];
+        })
+        .catch((err) => {
+          this.error = err.toString();
+        });
+    },
+
+    getProfileDataFromIPFS(ipfsHash: string) {
+      fetch("https://ipfs.lukso.network/ipfs/" + ipfsHash)
+        .then(async (result) => {
+          this.dataSource = "IPFS";
+          this.profileData = await result.json();
+          this.loading = false;
         })
         .catch((err) => {
           this.error = err.toString();

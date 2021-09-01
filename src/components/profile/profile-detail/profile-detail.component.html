@@ -1,5 +1,5 @@
 <section class="section">
-  <h1 class="title">Profile Detail for {{ $route.params.address }}</h1>
+  <h1 class="title">{{ dataSource }}: {{ $route.params.address }}</h1>
 
   <div v-if="loading">Loading...</div>
   <table
@@ -12,19 +12,19 @@
     </tr>
     <tr>
       <td>Name</td>
-      <td>{{ post.LSP3Profile.name }}</td>
+      <td>{{ profileData.LSP3Profile.name }}</td>
     </tr>
 
     <tr>
       <td>Description</td>
-      <td>{{ post.LSP3Profile.description }}</td>
+      <td>{{ profileData.LSP3Profile.description }}</td>
     </tr>
 
     <tr>
       <td>Links</td>
       <td>
         <ul class="list">
-          <li v-for="link in post.LSP3Profile.links" v-bind:key="link">
+          <li v-for="link in profileData.LSP3Profile.links" v-bind:key="link">
             <a
               v-bind:href="link.url"
               target="_blank"
@@ -41,7 +41,7 @@
       <td>
         <span
           class="tag"
-          v-for="tag in post.LSP3Profile.tags"
+          v-for="tag in profileData.LSP3Profile.tags"
           v-bind:key="tag"
           >{{ tag }}</span
         >
@@ -51,7 +51,10 @@
     <tr>
       <td>ProfileImage(s)</td>
       <td>
-        <div v-for="image in post.LSP3Profile.profileImage" v-bind:key="image">
+        <div
+          v-for="image in profileData.LSP3Profile.profileImage"
+          v-bind:key="image"
+        >
           <pre
             >{{ image }}
               </pre
@@ -63,7 +66,10 @@
 
     <tr>
       <td>BackgroundImage(s)</td>
-      <div v-for="image in post.LSP3Profile.backgroundImage" v-bind:key="image">
+      <div
+        v-for="image in profileData.LSP3Profile.backgroundImage"
+        v-bind:key="image"
+      >
         <pre
           >{{ image }}
               </pre
@@ -74,4 +80,3 @@
   </table>
   {{ error }}
 </section>
-
