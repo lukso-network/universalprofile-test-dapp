@@ -3,7 +3,8 @@ import { request } from "graphql-request";
 import { isAddress } from "ethers/lib/utils";
 import { DEFAULT_IPFS_URL } from "@/helpers/config";
 import { getLSP3ProfileQuery } from "@/helpers/graphql";
-
+import { LSP3Account__factory, LSP3Account } from "@lukso/lspfactory.js";
+import { getSigner } from "@/services/provider.service";
 export default defineComponent({
   name: "ProfileDetail",
   props: {
@@ -11,6 +12,7 @@ export default defineComponent({
   },
   data() {
     return {
+      account: {} as LSP3Account,
       dataSource: "",
       loading: false,
       profileData: null,
@@ -18,9 +20,14 @@ export default defineComponent({
       uploadTarget: DEFAULT_IPFS_URL,
     };
   },
-  created() {
+  async created() {
     // fetch the data when the view is created and the data is
     // already being observed
+    const result = await getSigner();
+    this.account = new LSP3Account__factory(result.signer).attach(
+      this.$route.params.address as string
+    );
+    console.log(await this.account.owner());
     this.fetchData();
   },
   watch: {
@@ -35,6 +42,8 @@ export default defineComponent({
       const addressOrHash = this.$route.params.address as string;
 
       if (isAddress(addressOrHash)) {
+        // const a = this.account.attach(addressOrHash);
+        // console.log(a);
         this.getProfileDataFromERC725Cache(addressOrHash);
       } else {
         this.getProfileDataFromIPFS(addressOrHash);

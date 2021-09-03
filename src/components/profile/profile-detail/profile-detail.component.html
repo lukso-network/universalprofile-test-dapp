@@ -1,5 +1,7 @@
 <section class="section">
-  <h1 class="title">{{ dataSource }}: {{ $route.params.address }}</h1>
+  <h1 class="title" v-if="!loading">
+    {{ dataSource ? dataSource : "" }}: {{ $route.params.address }}
+  </h1>
 
   <div v-if="loading">Loading...</div>
   <table
@@ -57,7 +59,7 @@
         >
           <pre
             >{{ image }}
-              </pre
+                </pre
           >
           <img v-bind:src="image.url.replace('ipfs://', uploadTarget)" alt="" />
         </div>
@@ -72,7 +74,7 @@
       >
         <pre
           >{{ image }}
-              </pre
+                </pre
         >
         <img v-bind:src="image.url.replace('ipfs://', uploadTarget)" alt="" />
       </div>
