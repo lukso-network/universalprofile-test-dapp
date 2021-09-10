@@ -1653,9 +1653,9 @@
     "@types/istanbul-reports" "^1.1.1"
     "@types/yargs" "^13.0.0"
 
-"@lukso/lspfactory.js@1.0.2-alpha.2":
+"@lukso/lsp-factory.js@1.0.2-alpha.2":
   version "1.0.2-alpha.2"
-  resolved "https://registry.yarnpkg.com/@lukso/lspfactory.js/-/lspfactory.js-1.0.2-alpha.2.tgz#0eb46fc48b07a438c07ebecd9f42edbd7298ee99"
+  resolved "https://registry.yarnpkg.com/@lukso/lsp-factory.js/-/lspfactory.js-1.0.2-alpha.2.tgz#0eb46fc48b07a438c07ebecd9f42edbd7298ee99"
   integrity sha512-FE1V2PTTLEmGkxNCXMMLkmTvIyh62EVie2mhx/3mflVmNtFhjJHhidjZZMVzWrNSVdULShePudQXWJQ058M3/g==
   dependencies:
     "@erc725/erc725.js" "^0.6.2-beta.4"

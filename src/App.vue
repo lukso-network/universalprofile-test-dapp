@@ -39,6 +39,10 @@
             >
           </div>
         </div>
+
+        <router-link class="navbar-item" to="/deployment"
+          >Deployment</router-link
+        >
       </div>
 
       <div class="navbar-end">
@@ -53,7 +57,9 @@
     </div>
   </nav>
 
-  <router-view />
+  <Suspense>
+    <router-view></router-view>
+  </Suspense>
 </template>
 
 <style lang="scss">

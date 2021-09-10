@@ -3,7 +3,7 @@ import { request } from "graphql-request";
 import { isAddress } from "ethers/lib/utils";
 import { DEFAULT_IPFS_URL } from "@/helpers/config";
 import { getLSP3ProfileQuery } from "@/helpers/graphql";
-import { LSP3Account__factory, LSP3Account } from "@lukso/lspfactory.js";
+import { LSP3Account__factory, LSP3Account } from "@lukso/lsp-factory.js";
 import { getSigner } from "@/services/provider.service";
 export default defineComponent({
   name: "ProfileDetail",
@@ -14,7 +14,7 @@ export default defineComponent({
     return {
       account: {} as LSP3Account,
       dataSource: "",
-      loading: false,
+      loading: true,
       profileData: null,
       error: null,
       uploadTarget: DEFAULT_IPFS_URL,
@@ -24,10 +24,11 @@ export default defineComponent({
     // fetch the data when the view is created and the data is
     // already being observed
     const result = await getSigner();
-    this.account = new LSP3Account__factory(result.signer).attach(
-      this.$route.params.address as string
-    );
-    console.log(await this.account.owner());
+    if (this.$route.params.address) {
+      this.account = new LSP3Account__factory(result.signer).attach(
+        this.$route.params.address as string
+      );
+    }
     this.fetchData();
   },
   watch: {
@@ -68,6 +69,10 @@ export default defineComponent({
     },
 
     getProfileDataFromIPFS(ipfsHash: string) {
+      if (!ipfsHash) {
+        return false;
+      }
+
       fetch("https://ipfs.lukso.network/ipfs/" + ipfsHash)
         .then(async (result) => {
           this.dataSource = "IPFS";

@@ -1,0 +1,28 @@
+{
+  "22": {
+    "name": "Lukso L14",
+    "chainId": 22,
+    "networkId": 22,
+    "baseContracts": {
+      "LSP3Account": {
+        "0.0.1": "0xc6e7DF5E7b4f2A278906862b61205850344D4e7d"
+      },
+      "UniversalReceiverAddressStore": {
+        "0.0.1": "0x59b670e9fA9D0A427751Af201D676719a970857b"
+      }
+    }
+  },
+  "31337": {
+    "name": "Hardhat (Local)",
+    "chainId": 31337,
+    "networkId": 31337,
+    "baseContracts": {
+      "LSP3Account": {
+        "0.0.1": "0x663F3ad617193148711d28f5334eE4Ed07016602"
+      },
+      "UniversalReceiverAddressStore": {
+        "0.0.1": "0x2E983A1Ba5e8b38AAAeC4B440B9dDcFBf72E15d1"
+      }
+    }
+  }
+}

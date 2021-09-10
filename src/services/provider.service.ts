@@ -14,7 +14,10 @@ export async function getSigner(): Promise<{
   };
 }> {
   if (!provider) {
-    provider = new ethers.providers.JsonRpcProvider("http://localhost:8545");
+    console.log(process.env);
+    provider = new ethers.providers.JsonRpcProvider(
+      process.env.VUE_APP_JSON_RPC_PROVIDER
+    );
     // provider = new ethers.providers.Web3Provider((window as any).ethereum);
   }
 

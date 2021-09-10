@@ -4,6 +4,8 @@ import Profile from "../views/Profile.vue";
 import ProfileUpload from "../components/profile/profile-upload/ProfileUpload.vue";
 import ProfileDetail from "../components/profile/profile-detail/ProfileDetail.vue";
 import ProfileDeploy from "../components/profile/profile-deploy/ProfileDeploy.vue";
+import ProfileEdit from "../components/profile/profile-edit/ProfileEdit.vue";
+import Deployment from "../components/deployment/Deployment.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -29,6 +31,11 @@ const routes: Array<RouteRecordRaw> = [
         component: ProfileUpload,
       },
       {
+        path: ":address/edit",
+        name: "profile-edit",
+        component: ProfileEdit,
+      },
+      {
         path: ":address",
         name: "profile-detail",
         component: ProfileDetail,
@@ -38,6 +45,10 @@ const routes: Array<RouteRecordRaw> = [
         component: ProfileDeploy,
       },
     ],
+  },
+  {
+    path: "/deployment",
+    component: Deployment,
   },
 ];
 

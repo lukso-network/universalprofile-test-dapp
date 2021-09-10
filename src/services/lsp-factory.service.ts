@@ -1,7 +1,9 @@
-import { LSPFactory } from "@lukso/lspfactory.js";
+import { NonceManager } from "@ethersproject/experimental";
+import { LSPFactory } from "@lukso/lsp-factory.js";
 import { getSigner } from "./provider.service";
 
 export async function getLspFactory(): Promise<LSPFactory> {
   const { provider, signer } = await getSigner();
-  return new LSPFactory(signer, provider);
+  const nonceManager = new NonceManager(signer);
+  return new LSPFactory(nonceManager, provider);
 }
