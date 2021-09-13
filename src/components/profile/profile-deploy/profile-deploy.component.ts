@@ -3,7 +3,6 @@ import { getLspFactory } from "@/services/lsp-factory.service";
 import { LSP3ProfileJSON, DeploymentEvent } from "@lukso/lsp-factory.js";
 import { defineComponent } from "vue";
 import ProfileListIpfs from "@/components/profile/profile-list-ipfs/ProfileListIpfs.vue";
-import { Contract } from "ethers";
 import { getDeployedBaseContracts } from "@/helpers/deployment.helper";
 import { getSigner } from "@/services/provider.service";
 
