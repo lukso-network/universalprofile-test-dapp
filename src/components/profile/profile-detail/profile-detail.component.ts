@@ -43,8 +43,6 @@ export default defineComponent({
       const addressOrHash = this.$route.params.address as string;
 
       if (isAddress(addressOrHash)) {
-        // const a = this.account.attach(addressOrHash);
-        // console.log(a);
         this.getProfileDataFromERC725Cache(addressOrHash);
       } else {
         this.getProfileDataFromIPFS(addressOrHash);
@@ -57,7 +55,6 @@ export default defineComponent({
         getLSP3ProfileQuery(this.$route.params.address as string)
       )
         .then((result) => {
-          console.log(result);
           if (this.$route.params.address !== fetchedAddress) return;
           this.dataSource = "ERC725-Cache";
           this.profileData = result.LSP3UniversalProfiles[0];

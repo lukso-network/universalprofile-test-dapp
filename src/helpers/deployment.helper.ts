@@ -1,15 +1,10 @@
 import versions from "./../../versions.json";
 
-export function getDeployedBaseContracts(
-  networkId: number
-): NetworkContractVersions {
+export function getDeployedBaseContracts(networkId: number): NetworkInfo {
   const masterContractVersions = JSON.parse(JSON.stringify(versions));
   return masterContractVersions[networkId];
 }
 
-export interface NetworkContractVersions {
-  [key: string]: NetworkInfo;
-}
 // prettier-ignore
 export interface NetworkInfo {
   name:          string;

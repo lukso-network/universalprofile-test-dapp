@@ -30,12 +30,9 @@ export default defineComponent({
       this.closeModal();
       const signer = await getSigner();
       const network = await signer.provider.getNetwork();
-      const networkDetails: any = await getDeployedBaseContracts(
-        network.chainId
-      );
+      const networkDetails = await getDeployedBaseContracts(network.chainId);
       const lspFactory = await getLspFactory();
 
-      console.log(networkDetails.baseContracts["LSP3Account"]["0.0.1"]);
       this.status.isLoading = true;
       lspFactory.LSP3UniversalProfile.deploy(
         {
@@ -47,10 +44,9 @@ export default defineComponent({
         },
         {
           libAddresses: {
-            lsp3AccountInit:
-              networkDetails.baseContracts["LSP3Account"]["0.0.1"],
+            lsp3AccountInit: networkDetails.baseContracts.LSP3Account["0.0.1"],
             universalReceiverAddressStoreInit:
-              networkDetails.baseContracts["UniversalReceiverAddressStore"][
+              networkDetails.baseContracts.UniversalReceiverAddressStore[
                 "0.0.1"
               ],
           },
@@ -58,10 +54,9 @@ export default defineComponent({
       ).subscribe({
         next: (deploymentEvent: DeploymentEvent) => {
           this.profileDeploymentEvents.push(deploymentEvent);
-          console.log(deploymentEvent);
         },
         error: (error: Error) => {
-          console.log(error);
+          console.error(error);
           this.status.isLoading = false;
         },
         complete: () => {
