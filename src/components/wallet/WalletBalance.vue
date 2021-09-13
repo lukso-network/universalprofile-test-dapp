@@ -16,7 +16,7 @@ export default defineComponent({
   data: () => {
     return {
       balance: 0 as any,
-      address: "0x214be121bB52e6909c5158579b3458f8760f1b2f",
+      address: "",
     };
   },
   watch: {
