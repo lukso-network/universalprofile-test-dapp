@@ -52,14 +52,16 @@
         <td>
           <a
             v-if="deploymentEvent?.receipt"
-            :href="`https://blockscout.com/lukso/l14/tx/${deploymentEvent?.receipt?.transactionHash}/internal-transactions`"
+            :href="
+              createBlockScoutLink(deploymentEvent?.receipt?.transactionHash)
+            "
             class="button is-small mb-1"
           >
             {{ deploymentEvent?.receipt?.transactionHash.substring(0, 16) }}...
           </a>
           <a
             v-if="deploymentEvent?.transaction"
-            :href="`https://blockscout.com/lukso/l14/tx/${deploymentEvent?.receipt?.transactionHash}/internal-transactions`"
+            :href="createBlockScoutLink(deploymentEvent?.transaction?.hash)"
             class="button is-small mb-1"
           >
             {{ deploymentEvent?.transaction?.hash.substring(0, 16) }}...

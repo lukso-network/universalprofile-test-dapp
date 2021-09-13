@@ -95,6 +95,10 @@ export default defineComponent({
         "is-success": status === DeploymentStatus.COMPLETE,
       };
     },
+
+    createBlockScoutLink(hash: string) {
+      return `https://blockscout.com/lukso/l14/tx/${hash}/internal-transactions`;
+    },
   },
   computed: {},
 });
