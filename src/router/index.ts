@@ -3,6 +3,9 @@ import Home from "../views/Home.vue";
 import Profile from "../views/Profile.vue";
 import ProfileUpload from "../components/profile/profile-upload/ProfileUpload.vue";
 import ProfileDetail from "../components/profile/profile-detail/ProfileDetail.vue";
+import ProfileDeploy from "../components/profile/profile-deploy/ProfileDeploy.vue";
+import ProfileEdit from "../components/profile/profile-edit/ProfileEdit.vue";
+import Deployment from "../components/deployment/Deployment.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -24,18 +27,28 @@ const routes: Array<RouteRecordRaw> = [
     component: Profile,
     children: [
       {
-        // UserProfile will be rendered inside User's <router-view>
-        // when /user/:id/profile is matched
         path: "upload",
         component: ProfileUpload,
       },
       {
-        // UserPosts will be rendered inside User's <router-view>
-        // when /user/:id/posts is matched
+        path: ":address/edit",
+        name: "profile-edit",
+        component: ProfileEdit,
+      },
+      {
         path: ":address",
+        name: "profile-detail",
         component: ProfileDetail,
       },
+      {
+        path: "deploy",
+        component: ProfileDeploy,
+      },
     ],
+  },
+  {
+    path: "/deployment",
+    component: Deployment,
   },
 ];
 

@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar is-light" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
-      <a class="navbar-item" href="https://bulma.io">
+      <a class="navbar-item" href="https://lukso.network">
         <img src="./assets/lukso.png" height="28" />
       </a>
 
@@ -29,13 +29,37 @@
             <router-link class="navbar-item" to="/profiles/upload"
               >Upload</router-link
             >
+            <router-link
+              class="navbar-item"
+              to="/profiles/QmaufE68Q6cdnFJk6VQvvkXgqP3x8Hfp8bhqrjijeRHrnh"
+              >Inspect</router-link
+            >
+            <router-link class="navbar-item" to="/profiles/deploy"
+              >Deploy</router-link
+            >
+          </div>
+        </div>
+
+        <!-- <router-link class="navbar-item" to="/deployment"
+          >Deployment</router-link
+        > -->
+      </div>
+
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <div class="buttons">
+            <Suspense>
+              <WalletBalance :msg="'sadf'"></WalletBalance>
+            </Suspense>
           </div>
         </div>
       </div>
     </div>
   </nav>
 
-  <router-view />
+  <Suspense>
+    <router-view></router-view>
+  </Suspense>
 </template>
 
 <style lang="scss">
@@ -59,3 +83,14 @@
   }
 }
 </style>
+
+<script lang="ts">
+import WalletBalance from "@/components/wallet/WalletBalance.vue";
+
+export default {
+  name: "MainFile",
+  components: {
+    WalletBalance,
+  },
+};
+</script>
