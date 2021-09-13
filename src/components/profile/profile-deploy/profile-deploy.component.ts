@@ -1,6 +1,11 @@
 import { formatNumber } from "@/helpers/ethers";
 import { getLspFactory } from "@/services/lsp-factory.service";
-import { LSP3ProfileJSON, DeploymentEvent } from "@lukso/lsp-factory.js";
+import {
+  LSP3ProfileJSON,
+  DeploymentEvent,
+  DeploymentStatus,
+  DeploymentType,
+} from "@lukso/lsp-factory.js";
 import { defineComponent } from "vue";
 import ProfileListIpfs from "@/components/profile/profile-list-ipfs/ProfileListIpfs.vue";
 import { getDeployedBaseContracts } from "@/helpers/deployment.helper";
@@ -63,26 +68,31 @@ export default defineComponent({
           this.status.isLoading = false;
         },
       });
+
       return;
     },
+
     openModal(selectedProfile: { profile: LSP3ProfileJSON; url: string }) {
       this.isModalOpen = true;
       this.selectedProfile = selectedProfile;
     },
+
     closeModal() {
       this.isModalOpen = false;
     },
+
     getTypeClass(type: string) {
       return {
-        "is-primary": type === "PROXY",
-        "is-warning": type === "CONTRACT",
-        "is-info": type === "TRANSACTION",
+        "is-primary": type === DeploymentType.PROXY,
+        "is-warning": type === DeploymentType.CONTRACT,
+        "is-info": type === DeploymentType.TRANSACTION,
       };
     },
+
     getStatusClass(status: string) {
       return {
-        "is-light": status === "PENDING",
-        "is-success": status === "COMPLETE",
+        "is-light": status === DeploymentStatus.PENDING,
+        "is-success": status === DeploymentStatus.COMPLETE,
       };
     },
   },
