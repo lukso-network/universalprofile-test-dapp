@@ -1610,10 +1610,10 @@
     "@types/istanbul-reports" "^1.1.1"
     "@types/yargs" "^13.0.0"
 
-"@lukso/lsp-factory.js@1.0.2-alpha.5":
-  version "1.0.2-alpha.5"
-  resolved "https://registry.yarnpkg.com/@lukso/lsp-factory.js/-/lsp-factory.js-1.0.2-alpha.5.tgz#0caf90983dd01f48878ac0ddf590f5545a55bc42"
-  integrity sha512-xemKMr3RQj5sscO3l45DM2SU3nmQBlA9EX/qdjXq3kjXZFVvo3uoixxw5e3FsuX+9LgrAXF2P559z1e1b0gqSw==
+"@lukso/lsp-factory.js@1.0.2-alpha.6":
+  version "1.0.2-alpha.6"
+  resolved "https://registry.yarnpkg.com/@lukso/lsp-factory.js/-/lsp-factory.js-1.0.2-alpha.6.tgz#c8ef4d9da75d09f2215a2deac51939dc26013e78"
+  integrity sha512-LaTyL8kEWcXxx0h9peMyYISUeZlXeLj4Gl5HrGk7fRj94oECDUUebX/PHxCsRCgyXwE6Wx0u6lHWINCzHbybjA==
   dependencies:
     "@erc725/erc725.js" "^0.6.2-beta.4"
     "@ethersproject/abi" "^5.4.1"
