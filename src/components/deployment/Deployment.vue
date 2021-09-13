@@ -66,16 +66,16 @@ export default defineComponent({
     };
   },
   setup: async function () {
-    const signer = await getSigner();
-    const network = await signer.provider.getNetwork();
+    const { provider } = await getSigner();
+    const { chainId } = await provider.getNetwork();
     const lspFactory = await getLspFactory();
-    const networkDetails = await getDeployedBaseContracts(network.chainId);
+
+    const networkDetails = await getDeployedBaseContracts(chainId);
     const selectOptions = networkDetails
       ? Object.keys(networkDetails.baseContracts).sort().reverse()
       : [];
-
     return {
-      networkId: await signer.provider.getNetwork(),
+      chainId,
       networkDetails,
       selectOptions,
       lspFactory,

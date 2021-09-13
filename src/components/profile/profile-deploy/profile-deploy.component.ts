@@ -14,8 +14,10 @@ export default defineComponent({
   data() {
     return {
       isOwner: false,
+      isModalOpen: false,
+      controllerKey: "",
       balance: "",
-      selectedProfile: {},
+      selectedProfile: { profile: {} as any, url: "" },
       profileDeploymentEvents: [] as DeploymentEvent[],
       profileDeploymentEventsObj: {},
       status: {
@@ -25,11 +27,8 @@ export default defineComponent({
   },
   methods: {
     formatNumber,
-    async createProfileOnChain(selectedProfile: {
-      profile: LSP3ProfileJSON;
-      url: string;
-    }) {
-      this.selectedProfile = selectedProfile;
+    async deploy(controllerKey: string) {
+      this.closeModal();
       const signer = await getSigner();
       const network = await signer.provider.getNetwork();
       const networkDetails: any = await getDeployedBaseContracts(
@@ -41,10 +40,10 @@ export default defineComponent({
       this.status.isLoading = true;
       lspFactory.LSP3UniversalProfile.deploy(
         {
-          controllerAddresses: ["0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266"],
+          controllerAddresses: [controllerKey],
           lsp3Profile: {
-            json: selectedProfile.profile,
-            url: selectedProfile.url,
+            json: this.selectedProfile.profile,
+            url: this.selectedProfile.url,
           },
         },
         {
@@ -72,5 +71,26 @@ export default defineComponent({
       });
       return;
     },
+    openModal(selectedProfile: { profile: LSP3ProfileJSON; url: string }) {
+      this.isModalOpen = true;
+      this.selectedProfile = selectedProfile;
+    },
+    closeModal() {
+      this.isModalOpen = false;
+    },
+    getTypeClass(type: string) {
+      return {
+        "is-primary": type === "PROXY",
+        "is-warning": type === "CONTRACT",
+        "is-info": type === "TRANSACTION",
+      };
+    },
+    getStatusClass(status: string) {
+      return {
+        "is-light": status === "PENDING",
+        "is-success": status === "COMPLETE",
+      };
+    },
   },
+  computed: {},
 });

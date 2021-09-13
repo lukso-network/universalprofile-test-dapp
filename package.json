@@ -10,7 +10,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@lukso/lsp-factory.js": "1.0.2-alpha.4",
+    "@lukso/lsp-factory.js": "1.0.2-alpha.5",
     "@types/node": "^16.7.2",
     "bulma": "^0.9.3",
     "core-js": "^3.16.1",
@@ -41,7 +41,7 @@
     "eslint": "^7.32.0",
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-vue": "^7.16.0",
-    "hardhat": "^2.6.2",
+    "hardhat": "^2.6.4",
     "lint-staged": "^11.1.2",
     "node-sass": "^6.0.1",
     "postcss": "^7.0.36",

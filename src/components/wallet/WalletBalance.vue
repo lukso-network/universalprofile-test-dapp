@@ -28,7 +28,7 @@ export default defineComponent({
     this.balance = await this.getBalance();
   },
   setup: async () => {
-    await (window as any).ethereum.enable();
+    // await (window as any).ethereum.enable();
     const result = await getSigner();
     const { address } = toRefs(result.address);
     return {

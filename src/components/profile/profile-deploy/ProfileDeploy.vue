@@ -2,7 +2,7 @@
   <section class="section">
     <h1 class="title">Deploy Profile</h1>
     <ProfileListIpfs
-      @createProfileOnChain="createProfileOnChain"
+      @createProfileOnChain="openModal"
       :loading="status.isLoading"
     ></ProfileListIpfs>
     <br />
@@ -25,10 +25,14 @@
         :class="deploymentEvent.status"
       >
         <td>
-          <span class="tag">{{ deploymentEvent.type }}</span>
+          <span class="tag" :class="getTypeClass(deploymentEvent.type)">
+            {{ deploymentEvent.type }}
+          </span>
         </td>
         <td>
-          <span class="tag">{{ deploymentEvent.status }}</span>
+          <span class="tag" :class="getStatusClass(deploymentEvent.status)">
+            {{ deploymentEvent.status }}
+          </span>
         </td>
         <td>{{ deploymentEvent.contractName }}</td>
         <td>{{ deploymentEvent.functionName }}</td>
@@ -38,7 +42,7 @@
           </code>
         </td>
 
-        <td>
+        <td class="has-text-right">
           {{
             deploymentEvent?.receipt
               ? formatNumber(deploymentEvent?.receipt.gasUsed)
@@ -55,17 +59,50 @@
           </a>
           <a
             v-if="deploymentEvent?.transaction"
-            :href="`https://blockscout.com/lukso/l14/tx/${deploymentEvent?.transaction?.transactionHash}/internal-transactions`"
+            :href="`https://blockscout.com/lukso/l14/tx/${deploymentEvent?.receipt?.transactionHash}/internal-transactions`"
             class="button is-small mb-1"
           >
-            {{
-              deploymentEvent?.transaction?.transactionHash?.substring(0, 16)
-            }}...
+            {{ deploymentEvent?.transaction?.hash.substring(0, 16) }}...
           </a>
         </td>
       </tr>
     </table>
   </section>
+
+  <div class="modal" :class="isModalOpen ? 'is-active' : ''">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <header class="modal-card-head">
+        <p class="modal-card-title">Deploy LSP3UniversalProfile</p>
+        <button class="delete" aria-label="close" @click="closeModal"></button>
+      </header>
+      <section class="modal-card-body">
+        <form>
+          <div class="field">
+            <label class="label">Controller Key</label>
+            <p class="control">
+              <input
+                v-model="controllerKey"
+                class="input"
+                type="text"
+                placeholder="Address (0x...)"
+                required
+              />
+            </p>
+          </div>
+          <p class="help">
+            Enter the address which will be managing the profile.
+          </p>
+        </form>
+      </section>
+      <footer class="modal-card-foot">
+        <button class="button is-success" @click="deploy(controllerKey)">
+          Deploy
+        </button>
+        <button class="button" @click="closeModal">Cancel</button>
+      </footer>
+    </div>
+  </div>
 </template>
 
 <script src="./profile-deploy.component.ts" lang="ts"></script>

@@ -3,7 +3,7 @@
     <h1>Master Contract Deployment</h1>
     <p>TBD</p>
     <Suspense>
-      <Deployment :msg="'asdf'"></Deployment>
+      <Deployment></Deployment>
     </Suspense>
   </section>
 </template>

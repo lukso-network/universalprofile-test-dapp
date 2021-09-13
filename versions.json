@@ -5,23 +5,23 @@
     "networkId": 22,
     "baseContracts": {
       "LSP3Account": {
-        "0.0.1": "0xc6e7DF5E7b4f2A278906862b61205850344D4e7d"
+        "0.0.1": "0xf5059a5D33d5853360D16C683c16e67980206f36"
       },
       "UniversalReceiverAddressStore": {
-        "0.0.1": "0x59b670e9fA9D0A427751Af201D676719a970857b"
+        "0.0.1": "0x9d4454B023096f34B160D6B654540c56A1F81688"
       }
     }
   },
   "31337": {
-    "name": "Hardhat (Local)",
+    "name": "Hardhat",
     "chainId": 31337,
     "networkId": 31337,
     "baseContracts": {
       "LSP3Account": {
-        "0.0.1": "0x663F3ad617193148711d28f5334eE4Ed07016602"
+        "0.0.1": "0x51A1ceB83B83F1985a81C295d1fF28Afef186E02"
       },
       "UniversalReceiverAddressStore": {
-        "0.0.1": "0x2E983A1Ba5e8b38AAAeC4B440B9dDcFBf72E15d1"
+        "0.0.1": "0x36b58F5C1969B7b6591D752ea6F5486D069010AB"
       }
     }
   }
