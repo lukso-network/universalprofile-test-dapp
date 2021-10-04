@@ -5,6 +5,7 @@ import { DEFAULT_IPFS_URL } from "@/helpers/config";
 import { getLSP3ProfileQuery } from "@/helpers/graphql";
 import { LSP3Account__factory, LSP3Account } from "@lukso/lsp-factory.js";
 import { getSigner } from "@/services/provider.service";
+
 export default defineComponent({
   name: "ProfileDetail",
   props: {
