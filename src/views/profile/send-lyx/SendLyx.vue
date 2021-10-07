@@ -1,3 +1,7 @@
+<template src="./template.html"></template>
+<style src="./style.scss" lang="scss"></style>
+
+<script lang="ts">
 import { defineComponent } from "vue";
 
 export default defineComponent({
@@ -9,3 +13,4 @@ export default defineComponent({
 
   methods: {},
 });
+</script>
