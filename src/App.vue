@@ -1,5 +1,9 @@
 <template>
-  <nav class="navbar is-light" role="navigation" aria-label="main navigation">
+  <nav
+    class="navbar is-white is-fixed-top"
+    role="navigation"
+    aria-label="main navigation"
+  >
     <div class="navbar-brand">
       <a class="navbar-item" href="https://lukso.network">
         <img src="./assets/lukso.png" height="28" />
@@ -66,6 +70,15 @@
 </template>
 
 <style lang="scss">
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  background-color: #f2f2f2;
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -73,12 +86,12 @@
   color: #2c3e50;
 }
 
-#nav {
-  padding: 30px;
+nav {
+  box-shadow: 0 0.5em 1em -0.125em rgb(10 10 10 / 10%),
+    0 0px 0 1px rgb(10 10 10 / 2%);
 
   a {
     font-weight: bold;
-    color: #2c3e50;
 
     &.router-link-exact-active {
       color: #42b983;
