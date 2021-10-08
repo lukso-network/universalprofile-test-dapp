@@ -1,0 +1,57 @@
+<template>
+  <div class="media">
+    <div
+      class="media-left profile-image"
+      :style="{ backgroundImage: `url(${identiconSrc})` }"
+    >
+      <figure class="image is-48x48">
+        <img :src="profileImage" :alt="profile?.name" />
+      </figure>
+    </div>
+    <div class="media-content pt-2">
+      <p class="title is-5" v-if="profile?.name">@{{ profile?.name }}</p>
+      <p class="has-text-grey-light is-5 mt-2" v-else>No profile found</p>
+      <p class="subtitle is-7 has-text-grey-light">
+        {{ profile?.address }}
+      </p>
+    </div>
+  </div>
+</template>
+
+<script lang="ts">
+import { defineComponent } from "vue";
+import { DEFAULT_IPFS_URL } from "@/helpers/config";
+import makeBlockie from "ethereum-blockies-base64";
+
+export default defineComponent({
+  name: "UiProfile",
+  props: {
+    profile: Object,
+  },
+  computed: {
+    profileImage() {
+      if (this.profile?.profileImage) {
+        const profileUrl = this.profile?.profileImage[4]?.url as string;
+        return profileUrl.replace("ipfs://", DEFAULT_IPFS_URL);
+      } else {
+        return "https://bulma.io/images/placeholders/96x96.png";
+      }
+    },
+    identiconSrc() {
+      return this.profile?.address ? makeBlockie(this.profile?.address) : "";
+    },
+  },
+});
+</script>
+
+<style lang="scss">
+.profile-image {
+  padding: 3px;
+  border-radius: 50%;
+}
+
+.profile-image .image img {
+  border-radius: 50%;
+  height: 48px;
+}
+</style>
