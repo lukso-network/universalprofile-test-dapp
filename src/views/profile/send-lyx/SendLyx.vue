@@ -159,8 +159,11 @@ export default defineComponent({
     };
   },
   async created(): Promise<void> {
-    //! TODO detect if there is a browser extension installed
-    this.hasExtension = true;
+    const { ethereum } = window;
+
+    if (ethereum) {
+      this.hasExtension = true;
+    }
 
     //! TODO get own address from extension
     const address = "0x97bEE0617167DFcA08B02C2966cad2b7429c6BAd";
@@ -192,8 +195,7 @@ export default defineComponent({
         profileQuery(address)
       );
       this.queryPending = false;
-      console.log(queryProfile.LSP3UniversalProfiles[0].LSP3Profile);
-      return queryProfile.LSP3UniversalProfiles[0].LSP3Profile;
+      return queryProfile.LSP3UniversalProfiles[0]?.LSP3Profile;
     },
 
     async searchReceiver(): Promise<void> {
