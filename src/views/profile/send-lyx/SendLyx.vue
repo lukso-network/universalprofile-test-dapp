@@ -24,7 +24,6 @@
             :style="{ backgroundImage: `url(${backgroundImageSrc})` }"
             v-if="hasExtension"
           >
-            <br />
             <UiProfile :profile="sender" class="sender"></UiProfile>
           </div>
           <div class="card-content pt-1" v-if="hasExtension">
@@ -114,7 +113,7 @@ import UiProfile from "@/components/ui/Profile.vue";
 import { request } from "graphql-request";
 import { LSP3Profile } from "@lukso/lsp-factory.js";
 import { gql } from "graphql-request";
-import { DEFAULT_IPFS_URL } from "@/helpers/config";
+import { DEFAULT_IPFS_URL, ERC725_CACHE_URL } from "@/helpers/config";
 
 interface Notification {
   message?: string;
@@ -189,7 +188,7 @@ export default defineComponent({
     async queryProfile(address: string): Promise<LSP3Profile> {
       this.queryPending = true;
       const queryProfile = await request(
-        "https://erc725cache.l14.lukso.network/graphql",
+        ERC725_CACHE_URL,
         profileQuery(address)
       );
       this.queryPending = false;
@@ -259,5 +258,7 @@ export default defineComponent({
 .profile-background {
   border-top-left-radius: 4px;
   border-top-right-radius: 4px;
+  height: 90px;
+  background-size: cover;
 }
 </style>

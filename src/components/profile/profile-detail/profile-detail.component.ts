@@ -1,7 +1,7 @@
 import { defineComponent } from "vue";
 import { request } from "graphql-request";
 import { isAddress } from "ethers/lib/utils";
-import { DEFAULT_IPFS_URL } from "@/helpers/config";
+import { DEFAULT_IPFS_URL, ERC725_CACHE_URL } from "@/helpers/config";
 import { getLSP3ProfileQuery } from "@/helpers/graphql";
 import { LSP3Account__factory, LSP3Account } from "@lukso/lsp-factory.js";
 import { getSigner } from "@/services/provider.service";
@@ -52,7 +52,7 @@ export default defineComponent({
 
     getProfileDataFromERC725Cache(fetchedAddress: string) {
       request(
-        "https://erc725cache.l14.lukso.network/graphql",
+        ERC725_CACHE_URL,
         getLSP3ProfileQuery(this.$route.params.address as string)
       )
         .then((result) => {
