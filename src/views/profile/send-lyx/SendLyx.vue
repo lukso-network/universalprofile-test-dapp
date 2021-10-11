@@ -34,22 +34,32 @@
                 <p class="control">
                   <input
                     class="input is-large"
+                    :class="{ 'is-danger': errors.amount }"
                     type="number"
                     placeholder="0"
                     v-model="amount"
+                    @keyup="delete errors.amount"
                   />
+                  <span class="has-text-danger" v-if="errors.amount">{{
+                    errors.amount
+                  }}</span>
                 </p>
                 <p class="control">
-                  <a class="button is-static is-large">LYX</a>
+                  <a
+                    class="button is-static is-large"
+                    :class="{ 'is-danger is-outlined': errors.amount }"
+                    >LYX</a
+                  >
                 </p>
               </div>
               <div
                 class="
                   field
                   nowrap
-                  is-flex is-flex-direction-column is-justify-content-center
+                  is-flex is-flex-direction-column is-justify-content-top
                   subtitle
                   is-6
+                  mt-3
                 "
               >
                 <div>Your balance:</div>
@@ -65,12 +75,16 @@
               >
                 <input
                   class="input is-small"
+                  :class="{ 'is-danger': errors.search }"
                   type="text"
                   placeholder="Search: Universal Profile Address..."
                   v-model="search"
                   @change="searchReceiver"
-                  @keyup="searchReceiver"
+                  @keyup="searchReceiver && delete errors.search"
                 />
+                <span class="has-text-danger" v-if="errors.search">{{
+                  errors.search
+                }}</span>
               </div>
             </div>
             <UiProfile :profile="receiver"></UiProfile>
@@ -114,10 +128,25 @@ import { request } from "graphql-request";
 import { LSP3Profile } from "@lukso/lsp-factory.js";
 import { gql } from "graphql-request";
 import { DEFAULT_IPFS_URL, ERC725_CACHE_URL } from "@/helpers/config";
+import {
+  // getAccounts,
+  getBalance,
+  sendTransaction,
+} from "@/services/browser-extension.service";
+import { formatEther } from "ethers/lib/utils";
 
 interface Notification {
   message?: string;
   type?: string;
+}
+
+interface LSP3ProfileExtended extends LSP3Profile {
+  address: string;
+}
+
+interface FormError {
+  amount?: string;
+  search?: string;
 }
 
 const profileQuery = function (address: string): string {
@@ -149,13 +178,14 @@ export default defineComponent({
   data() {
     return {
       notification: {} as Notification,
-      sender: {} as LSP3Profile,
-      receiver: {} as LSP3Profile,
-      balance: 5 as number,
+      sender: {} as LSP3ProfileExtended,
+      receiver: {} as LSP3ProfileExtended,
+      balance: "" as string,
       amount: "" as string,
       hasExtension: false as boolean,
       search: "" as string,
       queryPending: false as boolean,
+      errors: {} as FormError,
     };
   },
   async created(): Promise<void> {
@@ -165,17 +195,44 @@ export default defineComponent({
       this.hasExtension = true;
     }
 
-    //! TODO get own address from extension
+    //! uncomment once browser extension support this
+    // const accounts = await getAccounts();
+    // console.log(accounts);
+    // const [address] = accounts;
     const address = "0x97bEE0617167DFcA08B02C2966cad2b7429c6BAd";
-
     this.sender = await this.queryProfile(address as string);
+
+    const balance = await getBalance(address);
+    this.balance = formatEther(balance);
   },
 
   methods: {
-    sendLyx(): void {
+    async sendLyx(): Promise<void> {
+      this.notification = {};
+
+      if (!this.validate()) {
+        this.notification = {
+          message: "There was some issue in your form",
+          type: "danger",
+        };
+        return;
+      }
       // ! TODO provide send LYX logic
       // ! update balance
       // ! add validation
+      try {
+        await sendTransaction(
+          this.sender.address,
+          this.receiver.address,
+          this.amount
+        );
+      } catch (error) {
+        this.notification = {
+          message: `Error: ${error.message}`,
+          type: "danger",
+        };
+        throw Error(error);
+      }
 
       this.notification = {
         message: `You successfully send ${this.amount} LYX`,
@@ -188,7 +245,7 @@ export default defineComponent({
       this.notification = {};
     },
 
-    async queryProfile(address: string): Promise<LSP3Profile> {
+    async queryProfile(address: string): Promise<LSP3ProfileExtended> {
       this.queryPending = true;
       const queryProfile = await request(
         ERC725_CACHE_URL,
@@ -211,6 +268,24 @@ export default defineComponent({
 
       if (w) {
         w.focus();
+      }
+
+      return false;
+    },
+
+    validate() {
+      if (this.search && this.sender?.address && this.amount) {
+        return true;
+      }
+
+      this.errors = {};
+
+      if (!this.amount) {
+        this.errors.amount = "Amount is missing";
+      }
+
+      if (!this.search) {
+        this.errors.search = "Receiver is missing";
       }
 
       return false;
