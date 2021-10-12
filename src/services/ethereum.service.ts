@@ -17,27 +17,27 @@ export async function getBalance(address: string): Promise<string> {
   return web3.utils.fromWei(wei, "ether");
 }
 
-// export async function sendTransaction(from: string, to: string, value: string) {
-//   return await web3.eth.sendTransaction({
-//     from,
-//     to,
-//     value,
-//   });
-// }
-
-export async function sendTransaction(
-  from: string,
-  to: string,
-  value: string
-): Promise<void> {
-  return await ethereum.request({
-    method: "eth_sendTransaction",
-    params: [
-      {
-        to,
-        from,
-        value,
-      },
-    ],
+export async function sendTransaction(from: string, to: string, value: string) {
+  return await web3.eth.sendTransaction({
+    from,
+    to,
+    value,
   });
 }
+
+// export async function sendTransaction(
+//   from: string,
+//   to: string,
+//   value: string
+// ): Promise<void> {
+//   return await ethereum.request({
+//     method: "eth_sendTransaction",
+//     params: [
+//       {
+//         to,
+//         from,
+//         value,
+//       },
+//     ],
+//   });
+// }
