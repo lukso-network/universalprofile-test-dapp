@@ -11,8 +11,8 @@
     <div class="media-content pt-2">
       <p class="title is-5" v-if="profile?.name">@{{ profile?.name }}</p>
       <p class="has-text-grey-light is-5 mt-2" v-else>No profile found</p>
-      <p class="subtitle is-7 has-text-grey-light">
-        {{ profile?.address }}
+      <p class="subtitle is-7 has-text-grey-light" v-if="profile?.name">
+        {{ address }}
       </p>
     </div>
   </div>
@@ -27,6 +27,7 @@ export default defineComponent({
   name: "UiProfile",
   props: {
     profile: Object,
+    address: String,
   },
   computed: {
     profileImage() {
@@ -38,7 +39,9 @@ export default defineComponent({
       }
     },
     identiconSrc() {
-      return this.profile?.address ? makeBlockie(this.profile?.address) : "";
+      return this.address && this.profile?.name
+        ? makeBlockie(this.address)
+        : "";
     },
   },
 });

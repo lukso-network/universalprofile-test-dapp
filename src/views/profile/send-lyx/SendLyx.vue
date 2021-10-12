@@ -24,7 +24,11 @@
             :style="{ backgroundImage: `url(${backgroundImageSrc})` }"
             v-if="hasExtension"
           >
-            <UiProfile :profile="sender" class="sender"></UiProfile>
+            <UiProfile
+              :profile="sender.LSP3Profile"
+              :address="address"
+              class="sender"
+            ></UiProfile>
           </div>
           <div class="card-content pt-1" v-if="hasExtension">
             <hr />
@@ -35,7 +39,7 @@
                   <input
                     class="input is-large"
                     :class="{ 'is-danger': errors.amount }"
-                    type="number"
+                    type="text"
                     placeholder="0"
                     v-model="amount"
                     @keyup="delete errors.amount"
@@ -80,17 +84,24 @@
                   placeholder="Search: Universal Profile Address..."
                   v-model="search"
                   @change="searchReceiver"
-                  @keyup="searchReceiver && delete errors.search"
+                  @keyup="searchReceiver"
                 />
                 <span class="has-text-danger" v-if="errors.search">{{
                   errors.search
                 }}</span>
               </div>
             </div>
-            <UiProfile :profile="receiver"></UiProfile>
+            <UiProfile
+              :profile="receiver.LSP3Profile"
+              :address="search"
+            ></UiProfile>
             <div class="field is-grouped is-grouped-centered pt-4">
               <p class="control">
-                <button class="button is-primary is-rounded" @click="sendLyx">
+                <button
+                  class="button is-primary is-rounded"
+                  :class="{ 'is-loading': pendingTransaction }"
+                  @click="sendLyx"
+                >
                   Send LYX
                 </button>
               </p>
@@ -120,53 +131,17 @@
   </section>
 </template>
 
-<script lang="ts">
+<script lang="js">
 import { defineComponent } from "vue";
 import UiNotification from "@/components/ui/Notification.vue";
 import UiProfile from "@/components/ui/Profile.vue";
-import { request } from "graphql-request";
-import { LSP3Profile } from "@lukso/lsp-factory.js";
-import { gql } from "graphql-request";
-import { DEFAULT_IPFS_URL, ERC725_CACHE_URL } from "@/helpers/config";
+import { DEFAULT_IPFS_URL } from "@/helpers/config";
 import {
-  // getAccounts,
   getBalance,
+  getAccount,
   sendTransaction,
-} from "@/services/browser-extension.service";
-import { formatEther } from "ethers/lib/utils";
-
-interface Notification {
-  message?: string;
-  type?: string;
-}
-
-interface LSP3ProfileExtended extends LSP3Profile {
-  address: string;
-}
-
-interface FormError {
-  amount?: string;
-  search?: string;
-}
-
-const profileQuery = function (address: string): string {
-  return gql`
-    {
-      LSP3UniversalProfiles(
-        where: {
-          address: { equals: "${address}" }
-        }
-      ) {
-        LSP3Profile {
-          name
-          profileImage
-          backgroundImage
-          address
-        }
-      }
-    }
-  `;
-};
+} from "@/services/ethereum.service";
+import { fetchProfile } from "@/services/erc725.service";
 
 export default defineComponent({
   name: "ProfileSendLyx",
@@ -177,37 +152,42 @@ export default defineComponent({
   props: {},
   data() {
     return {
-      notification: {} as Notification,
-      sender: {} as LSP3ProfileExtended,
-      receiver: {} as LSP3ProfileExtended,
-      balance: "" as string,
-      amount: "" as string,
-      hasExtension: false as boolean,
-      search: "" as string,
-      queryPending: false as boolean,
-      errors: {} as FormError,
+      notification: {},
+      sender: {},
+      receiver: {},
+      balance: "",
+      amount: "",
+      hasExtension: false,
+      search: "",
+      queryPending: false,
+      errors: {},
+      erc725: {},
+      address: "",
+      pendingTransaction: false,
     };
   },
-  async created(): Promise<void> {
+  async created() {
     const { ethereum } = window;
 
     if (ethereum) {
       this.hasExtension = true;
+    } else {
+      return;
     }
 
-    //! uncomment once browser extension support this
-    // const accounts = await getAccounts();
-    // console.log(accounts);
-    // const [address] = accounts;
-    const address = "0x97bEE0617167DFcA08B02C2966cad2b7429c6BAd";
-    this.sender = await this.queryProfile(address as string);
 
-    const balance = await getBalance(address);
-    this.balance = formatEther(balance);
+    const accountsRequest = await ethereum.request({method: 'eth_requestAccounts', params: []});
+    console.log(accountsRequest.accounts)
+    this.address = await getAccount();
+
+    const sender = await fetchProfile(this.address);
+    this.sender = sender;
+
+    this.balance = await getBalance(this.address);
   },
 
   methods: {
-    async sendLyx(): Promise<void> {
+    async sendLyx() {
       this.notification = {};
 
       if (!this.validate()) {
@@ -217,21 +197,18 @@ export default defineComponent({
         };
         return;
       }
-      // ! TODO provide send LYX logic
-      // ! update balance
-      // ! add validation
       try {
-        await sendTransaction(
-          this.sender.address,
-          this.receiver.address,
-          this.amount
-        );
+        this.pendingTransaction = true;
+        await sendTransaction(this.address, this.search, this.amount);
+        this.balance = await getBalance(this.address);
       } catch (error) {
         this.notification = {
           message: `Error: ${error.message}`,
           type: "danger",
         };
         throw Error(error);
+      } finally {
+        this.pendingTransaction = false;
       }
 
       this.notification = {
@@ -241,25 +218,24 @@ export default defineComponent({
       this.amount = "";
     },
 
-    clearNotification(): void {
+    clearNotification() {
       this.notification = {};
     },
 
-    async queryProfile(address: string): Promise<LSP3ProfileExtended> {
+    async searchReceiver() {
       this.queryPending = true;
-      const queryProfile = await request(
-        ERC725_CACHE_URL,
-        profileQuery(address)
-      );
+      delete this.errors.search;
+      this.receiver = {};
+
+      try {
+        this.receiver = await fetchProfile(this.search);
+      } catch (error) {
+        this.errors.search = error.message
+      }
       this.queryPending = false;
-      return queryProfile.LSP3UniversalProfiles[0]?.LSP3Profile;
     },
 
-    async searchReceiver(): Promise<void> {
-      this.receiver = await this.queryProfile(this.search);
-    },
-
-    installExtension(): boolean {
+    installExtension() {
       // ! TODO link to extension install
       const w = window.open(
         "https://chrome.google.com/webstore/category/extensions?hl=en",
@@ -274,7 +250,7 @@ export default defineComponent({
     },
 
     validate() {
-      if (this.search && this.sender?.address && this.amount) {
+      if (this.search && this.address && this.amount) {
         return true;
       }
 
@@ -293,8 +269,10 @@ export default defineComponent({
   },
   computed: {
     backgroundImageSrc() {
-      if (this.sender?.backgroundImage) {
-        const backgroundUrl = this.sender?.backgroundImage[2]?.url as string;
+      const backgroundImage = this.sender?.LSP3Profile?.backgroundImage;
+
+      if (backgroundImage) {
+        const backgroundUrl = backgroundImage[2]?.url;
         return backgroundUrl.replace("ipfs://", DEFAULT_IPFS_URL);
       } else {
         return "";
