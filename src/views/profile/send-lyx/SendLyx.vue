@@ -175,14 +175,8 @@ export default defineComponent({
       return;
     }
 
-
-    const accountsRequest = await ethereum.request({method: 'eth_requestAccounts', params: []});
-    console.log(accountsRequest.accounts)
     this.address = await getAccount();
-
-    const sender = await fetchProfile(this.address);
-    this.sender = sender;
-
+    this.sender = await fetchProfile(this.address);
     this.balance = await getBalance(this.address);
   },
 
@@ -200,7 +194,6 @@ export default defineComponent({
       try {
         this.pendingTransaction = true;
         await sendTransaction(this.address, this.search, this.amount);
-        this.balance = await getBalance(this.address);
       } catch (error) {
         this.notification = {
           message: `Error: ${error.message}`,
@@ -209,6 +202,7 @@ export default defineComponent({
         throw Error(error);
       } finally {
         this.pendingTransaction = false;
+        this.balance = await getBalance(this.address);
       }
 
       this.notification = {
