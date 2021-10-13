@@ -39,7 +39,7 @@
                   <input
                     class="input is-large"
                     :class="{ 'is-danger': errors.amount }"
-                    type="text"
+                    type="number"
                     placeholder="0"
                     v-model="amount"
                     @keyup="delete errors.amount"
@@ -193,7 +193,7 @@ export default defineComponent({
       }
       try {
         this.pendingTransaction = true;
-        await sendTransaction(this.address, this.search, this.amount);
+        await sendTransaction(this.address, this.search, this.amount.toString());
       } catch (error) {
         this.notification = {
           message: `Error: ${error.message}`,
