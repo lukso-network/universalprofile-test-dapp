@@ -26,21 +26,3 @@ export async function sendTransaction(from: string, to: string, value: string) {
     value: weiValue,
   });
 }
-
-// export async function sendTransaction(
-//   from: string,
-//   to: string,
-//   value: string
-// ): Promise<void> {
-//   const weiValue = web3.utils.toWei(value, WEI_UNIT);
-//   return await ethereum.request({
-//     method: "eth_sendTransaction",
-//     params: [
-//       {
-//         to,
-//         from,
-//         value: weiValue,
-//       },
-//     ],
-//   });
-// }
