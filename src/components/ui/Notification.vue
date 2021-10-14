@@ -1,5 +1,5 @@
 <template>
-  <div class="notification" :class="'is-' + notification.type">
+  <div class="notification card" :class="'is-' + notification.type">
     <button class="delete" @click="hide"></button>
     {{ notification.message }}
   </div>

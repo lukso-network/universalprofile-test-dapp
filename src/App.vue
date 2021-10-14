@@ -71,12 +71,7 @@
 
 <style lang="scss">
 html {
-  height: 100%;
-}
-
-body {
-  height: 100%;
-  background-color: #f2f2f2;
+  background-color: #f2f2f2 !important;
 }
 
 #app {
