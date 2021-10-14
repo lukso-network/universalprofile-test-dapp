@@ -83,7 +83,6 @@
                   type="text"
                   placeholder="Search: Universal Profile Address..."
                   v-model="search"
-                  @change="searchReceiver"
                   @keyup="searchReceiver"
                 />
                 <span class="has-text-danger" v-if="errors.search">{{
@@ -131,7 +130,7 @@
   </section>
 </template>
 
-<script lang="js">
+<script lang="ts">
 import { defineComponent } from "vue";
 import UiNotification from "@/components/ui/Notification.vue";
 import UiProfile from "@/components/ui/Profile.vue";
@@ -142,6 +141,21 @@ import {
   sendTransaction,
 } from "@/services/ethereum.service";
 import { fetchProfile } from "@/services/erc725.service";
+import { LSP3Profile } from "@lukso/lsp-factory.js";
+
+interface Errors {
+  search?: string;
+  amount?: string;
+}
+
+interface Notification {
+  message?: string;
+  type?: string;
+}
+
+interface LSP3ProfileNested extends LSP3Profile {
+  LSP3Profile?: LSP3Profile;
+}
 
 export default defineComponent({
   name: "ProfileSendLyx",
@@ -152,16 +166,15 @@ export default defineComponent({
   props: {},
   data() {
     return {
-      notification: {},
-      sender: {},
-      receiver: {},
+      notification: {} as Notification,
+      sender: {} as LSP3ProfileNested,
+      receiver: {} as LSP3ProfileNested,
       balance: "",
       amount: "",
       hasExtension: false,
       search: "",
       queryPending: false,
-      errors: {},
-      erc725: {},
+      errors: {} as Errors,
       address: "",
       pendingTransaction: false,
     };
@@ -193,7 +206,11 @@ export default defineComponent({
       }
       try {
         this.pendingTransaction = true;
-        await sendTransaction(this.address, this.search, this.amount.toString());
+        await sendTransaction(
+          this.address,
+          this.search,
+          this.amount.toString()
+        );
       } catch (error) {
         this.notification = {
           message: `Error: ${error.message}`,
@@ -219,12 +236,15 @@ export default defineComponent({
     async searchReceiver() {
       this.queryPending = true;
       delete this.errors.search;
-      this.receiver = {};
+      this.receiver.LSP3Profile = {
+        name: "",
+        description: "",
+      };
 
       try {
         this.receiver = await fetchProfile(this.search);
       } catch (error) {
-        this.errors.search = error.message
+        this.errors.search = error.message;
       }
       this.queryPending = false;
     },
@@ -266,7 +286,7 @@ export default defineComponent({
       const backgroundImage = this.sender?.LSP3Profile?.backgroundImage;
 
       if (backgroundImage) {
-        const backgroundUrl = backgroundImage[2]?.url;
+        const backgroundUrl = backgroundImage[2]?.url as string;
         return backgroundUrl.replace("ipfs://", DEFAULT_IPFS_URL);
       } else {
         return "";

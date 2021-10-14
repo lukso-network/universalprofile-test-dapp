@@ -23,7 +23,7 @@ export function getInstance(address: string) {
   return erc725;
 }
 
-export async function fetchProfile(address: string) {
+export async function fetchProfile(address: string): Promise<any> {
   const erc725 = getInstance(address);
   const profile = await erc725.fetchData("LSP3Profile");
 
