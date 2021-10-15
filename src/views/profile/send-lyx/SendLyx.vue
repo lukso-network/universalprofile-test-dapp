@@ -313,8 +313,9 @@ export default defineComponent({
       width: 75px;
       height: 75px;
 
-      img {
+      div {
         height: 75px;
+        width: 75px;
       }
     }
   }

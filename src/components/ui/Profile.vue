@@ -5,7 +5,7 @@
       :style="{ backgroundImage: `url(${identiconSrc})` }"
     >
       <figure class="image is-48x48">
-        <img :src="profileImage" :alt="profile?.name" />
+        <div :style="{ backgroundImage: `url(${profileImage})` }"></div>
       </figure>
     </div>
     <div class="media-content pt-2">
@@ -53,8 +53,12 @@ export default defineComponent({
   border-radius: 50%;
 }
 
-.profile-image .image img {
-  border-radius: 50%;
+.profile-image .image div {
+  width: 48px;
   height: 48px;
+  border-radius: 50%;
+  background-color: #f2f2f2;
+  background-position: 50%;
+  background-size: cover;
 }
 </style>
