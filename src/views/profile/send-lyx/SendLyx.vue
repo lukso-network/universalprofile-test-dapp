@@ -330,5 +330,6 @@ export default defineComponent({
   border-top-right-radius: 4px;
   height: 90px;
   background-size: cover;
+  background-position: 50%;
 }
 </style>
