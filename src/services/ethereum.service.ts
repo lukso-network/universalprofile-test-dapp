@@ -5,7 +5,15 @@ const { ethereum } = window;
 const web3 = new Web3(ethereum);
 const WEI_UNIT = "ether";
 
-export async function getAccount(): Promise<string> {
+export async function accounts(): Promise<string> {
+  const accountsRequest = await ethereum.request({
+    method: "eth_accounts",
+    params: [],
+  });
+  return accountsRequest[0];
+}
+
+export async function requestAccounts(): Promise<string> {
   const accountsRequest = await ethereum.request({
     method: "eth_requestAccounts",
     params: [],

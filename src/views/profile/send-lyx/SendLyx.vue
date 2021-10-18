@@ -137,8 +137,9 @@ import UiProfile from "@/components/ui/Profile.vue";
 import { DEFAULT_IPFS_URL } from "@/helpers/config";
 import {
   getBalance,
-  getAccount,
+  requestAccounts,
   sendTransaction,
+  accounts,
 } from "@/services/ethereum.service";
 import { fetchProfile } from "@/services/erc725.service";
 import { LSP3Profile } from "@lukso/lsp-factory.js";
@@ -188,9 +189,18 @@ export default defineComponent({
       return;
     }
 
-    this.address = await getAccount();
-    this.sender = await fetchProfile(this.address);
-    this.balance = await getBalance(this.address);
+    const address = await accounts();
+
+    if (address) {
+      this.address = address;
+    } else {
+      this.address = await requestAccounts();
+    }
+
+    if (this.address) {
+      this.sender = await fetchProfile(this.address);
+      this.balance = await getBalance(this.address);
+    }
   },
 
   methods: {
