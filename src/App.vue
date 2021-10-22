@@ -1,9 +1,5 @@
 <template>
-  <nav
-    class="navbar is-white is-fixed-top"
-    role="navigation"
-    aria-label="main navigation"
-  >
+  <nav class="navbar is-light" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
       <a class="navbar-item" href="https://lukso.network">
         <img src="./assets/lukso.png" height="28" />
@@ -41,9 +37,6 @@
             <router-link class="navbar-item" to="/profiles/deploy"
               >Deploy</router-link
             >
-            <router-link class="navbar-item" to="/profiles/send-lyx"
-              >Send LYX</router-link
-            >
           </div>
         </div>
 
@@ -70,10 +63,6 @@
 </template>
 
 <style lang="scss">
-html {
-  background-color: #f2f2f2 !important;
-}
-
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -81,12 +70,12 @@ html {
   color: #2c3e50;
 }
 
-nav {
-  box-shadow: 0 0.5em 1em -0.125em rgb(10 10 10 / 10%),
-    0 0px 0 1px rgb(10 10 10 / 2%);
+#nav {
+  padding: 30px;
 
   a {
     font-weight: bold;
+    color: #2c3e50;
 
     &.router-link-exact-active {
       color: #42b983;
