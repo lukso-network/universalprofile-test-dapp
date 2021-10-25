@@ -143,6 +143,7 @@ import {
 } from "@/services/ethereum.service";
 import { fetchProfile } from "@/services/erc725.service";
 import { LSP3Profile } from "@lukso/lsp-factory.js";
+import Web3 from "web3";
 
 interface Errors {
   search?: string;
@@ -222,11 +223,14 @@ export default defineComponent({
           this.amount.toString()
         );
       } catch (error) {
-        this.notification = {
-          message: `Error: ${error.message}`,
-          type: "danger",
-        };
-        throw Error(error);
+        if (error instanceof Error) {
+          this.notification = {
+            message: `Error: ${error.message}`,
+            type: "danger",
+          };
+        } else {
+          throw error;
+        }
       } finally {
         this.pendingTransaction = false;
         this.balance = await getBalance(this.address);
@@ -246,15 +250,23 @@ export default defineComponent({
     async searchReceiver() {
       this.queryPending = true;
       delete this.errors.search;
-      this.receiver.LSP3Profile = {
-        name: "",
-        description: "",
-      };
+
+      if (!Web3.utils.isAddress(this.search)) {
+        this.receiver.LSP3Profile = {
+          name: "",
+          description: "",
+        };
+        this.queryPending = false;
+        this.errors.search = "Address not valid";
+        return;
+      }
 
       try {
         this.receiver = await fetchProfile(this.search);
       } catch (error) {
-        this.errors.search = error.message;
+        if (error instanceof Error) {
+          this.errors.search = error.message;
+        }
       }
       this.queryPending = false;
     },
