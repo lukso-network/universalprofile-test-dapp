@@ -16,7 +16,7 @@
     "bulma": "^0.9.3",
     "core-js": "^3.16.1",
     "ethereum-blockies-base64": "^1.0.2",
-    "ethers": "^5.4.5",
+    "ethers": "5.4.6",
     "filesize": "^8.0.0",
     "graphql": "^15.5.1",
     "graphql-request": "^3.5.0",
