@@ -936,6 +936,14 @@
     debug "^3.1.0"
     lodash.once "^4.1.1"
 
+"@erc725/erc725.js@0.7.0":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@erc725/erc725.js/-/erc725.js-0.7.0.tgz#a21f251d402f055e2c70812b0281346fd15890cc"
+  integrity sha512-wFEejDkrVsb6WXxY2qr6SwLGWAmdjZCjkNQVtdEJWHy7aB1mQllRTFjmjI+Q+VgpxyAVsEu6GrJcL8KZJNh72A==
+  dependencies:
+    web3-eth-abi "^1.5.2"
+    web3-utils "^1.5.2"
+
 "@erc725/erc725.js@^0.6.2-beta.4":
   version "0.6.2-beta.4"
   resolved "https://registry.yarnpkg.com/@erc725/erc725.js/-/erc725.js-0.6.2-beta.4.tgz#c378c66066a2f2f39dd2af6e09a136bc7cd18877"
