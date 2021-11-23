@@ -936,10 +936,10 @@
     debug "^3.1.0"
     lodash.once "^4.1.1"
 
-"@erc725/erc725.js@0.7.0":
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/@erc725/erc725.js/-/erc725.js-0.7.0.tgz#a21f251d402f055e2c70812b0281346fd15890cc"
-  integrity sha512-wFEejDkrVsb6WXxY2qr6SwLGWAmdjZCjkNQVtdEJWHy7aB1mQllRTFjmjI+Q+VgpxyAVsEu6GrJcL8KZJNh72A==
+"@erc725/erc725.js@0.8.0":
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/@erc725/erc725.js/-/erc725.js-0.8.0.tgz#db41e11f6c684c8f242865917e9ca99d0ec84d50"
+  integrity sha512-acHGXvSEnGPQPsmkisQe4fHlD4TaFFQN//pcaFBzEP5kPg6o+JdfGzUFlAKvs9JTHTZNVkk5OV74HEfm9H7Tzw==
   dependencies:
     web3-eth-abi "^1.5.2"
     web3-utils "^1.5.2"
