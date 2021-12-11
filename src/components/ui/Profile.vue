@@ -3,14 +3,20 @@
     <div
       class="media-left profile-image"
       :style="{ backgroundImage: `url(${identiconSrc})` }"
+      data-testid="identicon"
     >
       <figure class="image is-48x48">
-        <div :style="{ backgroundImage: `url(${profileImage})` }"></div>
+        <div
+          :style="{ backgroundImage: `url(${profileImage})` }"
+          data-testid="profile-image"
+        ></div>
       </figure>
     </div>
     <div class="media-content pt-2">
-      <p class="title is-5" v-if="profile?.name">@{{ profile?.name }}</p>
-      <p class="subtitle is-7 has-text-grey-light">
+      <p class="title is-5" v-if="profile?.name" data-testid="name">
+        @{{ profile?.name }}
+      </p>
+      <p class="subtitle is-7 has-text-grey-light" data-testid="address">
         {{ address }}
       </p>
     </div>
