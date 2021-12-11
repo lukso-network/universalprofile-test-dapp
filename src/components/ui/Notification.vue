@@ -1,30 +1,21 @@
 <template>
-  <div class="notification card" :class="'is-' + notification.type">
+  <div
+    v-if="notification"
+    class="notification card"
+    :class="'is-' + notification.type"
+  >
     <button class="delete" @click="hide"></button>
     {{ notification.message }}
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
+import { Notification } from "@/types";
 
-export default defineComponent({
-  name: "UiNotification",
-  props: {
-    notification: {
-      type: Object,
-    },
-  },
-  data() {
-    return {
-      isVisible: true,
-    };
-  },
+defineProps<{ notification: Notification }>();
+const emits = defineEmits(["hide"]);
 
-  methods: {
-    hide() {
-      this.$emit("hide");
-    },
-  },
-});
+const hide = () => {
+  emits("hide");
+};
 </script>

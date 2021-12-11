@@ -1,4 +1,4 @@
-<template>
+<template name="Profile">
   <div class="media">
     <div
       class="media-left profile-image"
@@ -10,55 +10,50 @@
     </div>
     <div class="media-content pt-2">
       <p class="title is-5" v-if="profile?.name">@{{ profile?.name }}</p>
-      <p class="has-text-grey-light is-5 mt-2" v-else>No profile found</p>
-      <p class="subtitle is-7 has-text-grey-light" v-if="profile?.name">
+      <p class="subtitle is-7 has-text-grey-light">
         {{ address }}
       </p>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
+import { computed } from "vue";
 import { DEFAULT_IPFS_URL } from "@/helpers/config";
 import makeBlockie from "ethereum-blockies-base64";
+import { LSP3Profile } from "@lukso/lsp-factory.js";
 
-export default defineComponent({
-  name: "UiProfile",
-  props: {
-    profile: Object,
-    address: String,
-  },
-  computed: {
-    profileImage() {
-      if (this.profile?.profileImage) {
-        const profileUrl = this.profile?.profileImage[4]?.url as string;
-        return profileUrl.replace("ipfs://", DEFAULT_IPFS_URL);
-      } else {
-        return "https://bulma.io/images/placeholders/96x96.png";
-      }
-    },
-    identiconSrc() {
-      return this.address && this.profile?.name
-        ? makeBlockie(this.address)
-        : "";
-    },
-  },
+const props = defineProps<{
+  profile?: LSP3Profile;
+  address: string;
+}>();
+
+const profileImage = computed(() => {
+  if (props.profile?.profileImage) {
+    const profileUrl = props.profile?.profileImage[4]?.url as string;
+    return profileUrl.replace("ipfs://", DEFAULT_IPFS_URL);
+  } else {
+    return "https://bulma.io/images/placeholders/96x96.png";
+  }
 });
+
+const identiconSrc = computed(() =>
+  props.address ? makeBlockie(props.address) : ""
+);
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
 .profile-image {
   padding: 3px;
   border-radius: 50%;
-}
 
-.profile-image .image div {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background-color: #f2f2f2;
-  background-position: 50%;
-  background-size: cover;
+  & .image div {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: #f2f2f2;
+    background-position: 50%;
+    background-size: cover;
+  }
 }
 </style>

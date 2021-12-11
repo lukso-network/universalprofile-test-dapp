@@ -4,11 +4,11 @@
 
     <div class="columns">
       <div class="column is-three-fifths is-offset-one-fifth">
-        <UiNotification
+        <Notifications
           v-if="notification.message"
           :notification="notification"
           @hide="clearNotification"
-        ></UiNotification>
+        ></Notifications>
       </div>
     </div>
     <div class="columns">
@@ -24,11 +24,11 @@
             :style="{ backgroundImage: `url(${backgroundImageSrc})` }"
             v-if="hasExtension"
           >
-            <UiProfile
+            <Profile
               :profile="sender.LSP3Profile"
               :address="address"
               class="sender"
-            ></UiProfile>
+            ></Profile>
           </div>
           <div class="card-content pt-1" v-if="hasExtension">
             <hr />
@@ -90,10 +90,10 @@
                 }}</span>
               </div>
             </div>
-            <UiProfile
+            <Profile
               :profile="receiver.LSP3Profile"
               :address="search"
-            ></UiProfile>
+            ></Profile>
             <div class="field is-grouped is-grouped-centered pt-4">
               <p class="control">
                 <button
@@ -130,10 +130,10 @@
   </section>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
-import UiNotification from "@/components/ui/Notification.vue";
-import UiProfile from "@/components/ui/Profile.vue";
+<script setup lang="ts">
+import { ref, computed } from "vue";
+import Notifications from "@/components/ui/Notification.vue";
+import Profile from "@/components/ui/Profile.vue";
 import { DEFAULT_IPFS_URL } from "@/helpers/config";
 import {
   getBalance,
@@ -142,188 +142,161 @@ import {
   accounts,
 } from "@/services/ethereum.service";
 import { fetchProfile } from "@/services/erc725.service";
-import { LSP3Profile } from "@lukso/lsp-factory.js";
 import Web3 from "web3";
+import { Errors, Notification, LSP3ProfileNested } from "@/types";
 
-interface Errors {
-  search?: string;
-  amount?: string;
+const notification = ref({} as Notification);
+const sender = ref({} as LSP3ProfileNested);
+const receiver = ref({} as LSP3ProfileNested);
+const balance = ref("");
+const amount = ref("");
+const hasExtension = ref(false);
+const search = ref("");
+const queryPending = ref(false);
+const errors = ref({} as Errors);
+const address = ref("");
+const pendingTransaction = ref(false);
+
+const { ethereum } = window;
+
+if (ethereum) {
+  hasExtension.value = true;
+} else {
+  throw new Error("No ethereum object");
 }
 
-interface Notification {
-  message?: string;
-  type?: string;
+try {
+  const account = await accounts();
+
+  if (account) {
+    address.value = account;
+  } else {
+    address.value = await requestAccounts();
+  }
+} catch (error: any) {
+  notification.value = {
+    message: error?.message,
+    type: "danger",
+  };
 }
 
-interface LSP3ProfileNested extends LSP3Profile {
-  LSP3Profile?: LSP3Profile;
+if (address.value) {
+  sender.value = await fetchProfile(address.value);
+  balance.value = await getBalance(address.value);
 }
 
-export default defineComponent({
-  name: "ProfileSendLyx",
-  components: {
-    UiNotification,
-    UiProfile,
-  },
-  props: {},
-  data() {
-    return {
-      notification: {} as Notification,
-      sender: {} as LSP3ProfileNested,
-      receiver: {} as LSP3ProfileNested,
-      balance: "",
-      amount: "",
-      hasExtension: false,
-      search: "",
-      queryPending: false,
-      errors: {} as Errors,
-      address: "",
-      pendingTransaction: false,
+const sendLyx = async () => {
+  notification.value = {};
+
+  if (!validate()) {
+    notification.value = {
+      message: "There was some issue in your form",
+      type: "danger",
     };
-  },
-  async created() {
-    const { ethereum } = window;
-
-    if (ethereum) {
-      this.hasExtension = true;
-    } else {
-      return;
-    }
-
-    const address = await accounts();
-
-    if (address) {
-      this.address = address;
-    } else {
-      this.address = await requestAccounts();
-    }
-
-    if (this.address) {
-      this.sender = await fetchProfile(this.address);
-      this.balance = await getBalance(this.address);
-    }
-  },
-
-  methods: {
-    async sendLyx() {
-      this.notification = {};
-
-      if (!this.validate()) {
-        this.notification = {
-          message: "There was some issue in your form",
-          type: "danger",
-        };
-        return;
-      }
-      try {
-        this.pendingTransaction = true;
-        await sendTransaction(
-          this.address,
-          this.search,
-          this.amount.toString()
-        );
-      } catch (error) {
-        if (error instanceof Error) {
-          this.notification = {
-            message: `Error: ${error.message}`,
-            type: "danger",
-          };
-        } else {
-          throw error;
-        }
-      } finally {
-        this.pendingTransaction = false;
-        this.balance = await getBalance(this.address);
-      }
-
-      this.notification = {
-        message: `You successfully send ${this.amount} LYX`,
-        type: "primary",
+    return;
+  }
+  try {
+    pendingTransaction.value = true;
+    await sendTransaction(address.value, search.value, amount.value.toString());
+  } catch (error) {
+    if (error instanceof Error) {
+      notification.value = {
+        message: `Error: ${error.message}`,
+        type: "danger",
       };
-      this.amount = "";
-    },
+    } else {
+      throw error;
+    }
+  } finally {
+    pendingTransaction.value = false;
+    balance.value = await getBalance(address.value);
+  }
 
-    clearNotification() {
-      this.notification = {};
-    },
+  notification.value = {
+    message: `You successfully send ${amount.value} LYX`,
+    type: "primary",
+  };
+  amount.value = "";
+};
 
-    async searchReceiver() {
-      this.queryPending = true;
-      delete this.errors.search;
+const clearNotification = () => {
+  notification.value = {};
+};
 
-      if (!Web3.utils.isAddress(this.search)) {
-        this.receiver.LSP3Profile = {
-          name: "",
-          description: "",
-        };
-        this.queryPending = false;
-        this.errors.search = "Address not valid";
-        return;
-      }
+const searchReceiver = async () => {
+  queryPending.value = true;
+  delete errors.value.search;
 
-      try {
-        this.receiver = await fetchProfile(this.search);
-      } catch (error) {
-        if (error instanceof Error) {
-          this.errors.search = error.message;
-        }
-      }
-      this.queryPending = false;
-    },
+  if (!Web3.utils.isAddress(search.value)) {
+    receiver.value.LSP3Profile = {
+      name: "",
+      description: "",
+    };
+    queryPending.value = false;
+    errors.value.search = "Address not valid";
+    return;
+  }
 
-    installExtension() {
-      // ! TODO link to extension install
-      const w = window.open(
-        "https://chrome.google.com/webstore/category/extensions?hl=en",
-        "_blank"
-      );
+  try {
+    receiver.value = await fetchProfile(search.value);
+  } catch (error) {
+    if (error instanceof Error) {
+      errors.value.search = error.message;
+    }
+  }
+  queryPending.value = false;
+};
 
-      if (w) {
-        w.focus();
-      }
+const installExtension = () => {
+  // ! TODO link to extension install
+  const w = window.open(
+    "https://chrome.google.com/webstore/category/extensions?hl=en",
+    "_blank"
+  );
 
-      return false;
-    },
+  if (w) {
+    w.focus();
+  }
 
-    validate() {
-      if (this.search && this.address && this.amount) {
-        return true;
-      }
+  return false;
+};
 
-      this.errors = {};
+const validate = () => {
+  if (search.value && address.value && amount.value) {
+    return true;
+  }
 
-      if (!this.amount) {
-        this.errors.amount = "Amount is missing";
-      }
+  errors.value = {};
 
-      if (!this.search) {
-        this.errors.search = "Receiver is missing";
-      }
+  if (!amount.value) {
+    errors.value.amount = "Amount is missing";
+  }
 
-      return false;
-    },
-  },
-  computed: {
-    backgroundImageSrc() {
-      const backgroundImage = this.sender?.LSP3Profile?.backgroundImage;
+  if (!search.value) {
+    errors.value.search = "Receiver is missing";
+  }
 
-      if (backgroundImage) {
-        const backgroundUrl = backgroundImage[2]?.url as string;
-        return backgroundUrl.replace("ipfs://", DEFAULT_IPFS_URL);
-      } else {
-        return "";
-      }
-    },
-  },
+  return false;
+};
+
+const backgroundImageSrc = computed(() => {
+  const backgroundImage = sender.value?.LSP3Profile?.backgroundImage;
+
+  if (backgroundImage) {
+    const backgroundUrl = backgroundImage[2]?.url as string;
+    return backgroundUrl.replace("ipfs://", DEFAULT_IPFS_URL);
+  } else {
+    return "";
+  }
 });
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
 .nowrap {
   white-space: nowrap;
 }
 
-.sender {
+:deep(.sender) {
   position: relative;
   top: 55px;
   margin-bottom: 0;
