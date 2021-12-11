@@ -72,28 +72,11 @@
             </div>
             <hr />
             <p class="mb-4">To profile</p>
-            <div class="field">
-              <div
-                class="control is-small"
-                :class="{ 'is-loading': queryPending }"
-              >
-                <input
-                  class="input is-small"
-                  :class="{ 'is-danger': errors.search }"
-                  type="text"
-                  placeholder="Search: Universal Profile Address..."
-                  v-model="search"
-                  @keyup="searchReceiver"
-                />
-                <span class="has-text-danger" v-if="errors.search">{{
-                  errors.search
-                }}</span>
-              </div>
-            </div>
-            <Profile
-              :profile="receiver.LSP3Profile"
-              :address="search"
-            ></Profile>
+            <Search
+              :errors="errors"
+              @error="setSearchError"
+              @update="setSearchValue"
+            />
             <div class="field is-grouped is-grouped-centered pt-4">
               <p class="control">
                 <button
@@ -134,6 +117,7 @@
 import { ref, computed } from "vue";
 import Notifications from "@/components/ui/Notification.vue";
 import Profile from "@/components/ui/Profile.vue";
+import Search from "@/views/profile/send-lyx/Search.vue";
 import { DEFAULT_IPFS_URL } from "@/helpers/config";
 import {
   getBalance,
@@ -142,17 +126,16 @@ import {
   accounts,
 } from "@/services/ethereum.service";
 import { fetchProfile } from "@/services/erc725.service";
-import Web3 from "web3";
 import { Errors, Notification, LSP3ProfileNested } from "@/types";
 
 const notification = ref({} as Notification);
 const sender = ref({} as LSP3ProfileNested);
-const receiver = ref({} as LSP3ProfileNested);
+
 const balance = ref("");
 const amount = ref("");
 const hasExtension = ref(false);
 const search = ref("");
-const queryPending = ref(false);
+
 const errors = ref({} as Errors);
 const address = ref("");
 const pendingTransaction = ref(false);
@@ -161,40 +144,35 @@ const { ethereum } = window;
 
 if (ethereum) {
   hasExtension.value = true;
-} else {
-  throw new Error("No ethereum object");
-}
 
-try {
-  const account = await accounts();
+  try {
+    const account = await accounts();
 
-  if (account) {
-    address.value = account;
-  } else {
-    address.value = await requestAccounts();
+    if (account) {
+      address.value = account;
+    } else {
+      address.value = await requestAccounts();
+    }
+  } catch (error) {
+    notification.value = {
+      message: "Couldn't load sender data",
+      type: "danger",
+    };
   }
-} catch (error: any) {
-  notification.value = {
-    message: error?.message,
-    type: "danger",
-  };
-}
 
-if (address.value) {
-  sender.value = await fetchProfile(address.value);
-  balance.value = await getBalance(address.value);
+  if (address.value) {
+    sender.value = await fetchProfile(address.value);
+    balance.value = await getBalance(address.value);
+  }
 }
 
 const sendLyx = async () => {
   notification.value = {};
 
   if (!validate()) {
-    notification.value = {
-      message: "There was some issue in your form",
-      type: "danger",
-    };
     return;
   }
+
   try {
     pendingTransaction.value = true;
     await sendTransaction(address.value, search.value, amount.value.toString());
@@ -223,28 +201,12 @@ const clearNotification = () => {
   notification.value = {};
 };
 
-const searchReceiver = async () => {
-  queryPending.value = true;
-  delete errors.value.search;
+const setSearchError = (error: string) => {
+  errors.value.search = error;
+};
 
-  if (!Web3.utils.isAddress(search.value)) {
-    receiver.value.LSP3Profile = {
-      name: "",
-      description: "",
-    };
-    queryPending.value = false;
-    errors.value.search = "Address not valid";
-    return;
-  }
-
-  try {
-    receiver.value = await fetchProfile(search.value);
-  } catch (error) {
-    if (error instanceof Error) {
-      errors.value.search = error.message;
-    }
-  }
-  queryPending.value = false;
+const setSearchValue = (value: string) => {
+  search.value = value;
 };
 
 const installExtension = () => {
@@ -268,12 +230,27 @@ const validate = () => {
 
   errors.value = {};
 
+  if (!address.value) {
+    notification.value = {
+      message: "Please select proper sender",
+      type: "danger",
+    };
+  }
+
   if (!amount.value) {
     errors.value.amount = "Amount is missing";
+    notification.value = {
+      message: "There was some issue in your form",
+      type: "danger",
+    };
   }
 
   if (!search.value) {
     errors.value.search = "Receiver is missing";
+    notification.value = {
+      message: "There was some issue in your form",
+      type: "danger",
+    };
   }
 
   return false;

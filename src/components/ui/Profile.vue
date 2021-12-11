@@ -31,7 +31,7 @@ import { LSP3Profile } from "@lukso/lsp-factory.js";
 
 const props = defineProps<{
   profile?: LSP3Profile;
-  address: string;
+  address?: string;
 }>();
 
 const profileImage = computed(() => {
