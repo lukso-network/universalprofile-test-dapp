@@ -29,7 +29,7 @@ import Web3 from "web3";
 import { ref } from "vue";
 import { LSP3ProfileNested, Errors } from "@/types";
 import { fetchProfile } from "@/services/erc725.service";
-import Profile from "@/components/ui/Profile.vue";
+import Profile from "@/components/shared/Profile.vue";
 
 const receiver = ref({} as LSP3ProfileNested);
 const queryPending = ref(false);

@@ -115,8 +115,8 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import Notifications from "@/components/ui/Notification.vue";
-import Profile from "@/components/ui/Profile.vue";
+import Notifications from "@/components/shared/Notification.vue";
+import Profile from "@/components/shared/Profile.vue";
 import Search from "@/views/profile/send-lyx/Search.vue";
 import { DEFAULT_IPFS_URL } from "@/helpers/config";
 import {
