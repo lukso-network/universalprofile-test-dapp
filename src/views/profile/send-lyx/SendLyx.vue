@@ -89,24 +89,7 @@
               </p>
             </div>
           </div>
-          <div class="card-content" v-else>
-            <div
-              class="
-                notification
-                is-info is-light is-flex is-flex-direction-column
-                pr-5
-                has-text-centered
-              "
-            >
-              You need Browser Extension for sending LYX.
-              <button
-                class="button is-info is-rounded mt-4"
-                @click="installExtension"
-              >
-                Install Browser Extension
-              </button>
-            </div>
-          </div>
+          <EmptyState v-else />
         </div>
       </div>
     </div>
@@ -117,6 +100,7 @@
 import { ref, computed } from "vue";
 import Notifications from "@/components/shared/Notification.vue";
 import Profile from "@/components/shared/Profile.vue";
+import EmptyState from "@/views/profile/send-lyx/EmptyState.vue";
 import Search from "@/views/profile/send-lyx/Search.vue";
 import { DEFAULT_IPFS_URL } from "@/helpers/config";
 import {
@@ -130,12 +114,10 @@ import { Errors, Notification, LSP3ProfileNested } from "@/types";
 
 const notification = ref({} as Notification);
 const sender = ref({} as LSP3ProfileNested);
-
 const balance = ref("");
 const amount = ref("");
 const hasExtension = ref(false);
 const search = ref("");
-
 const errors = ref({} as Errors);
 const address = ref("");
 const pendingTransaction = ref(false);
@@ -207,20 +189,6 @@ const setSearchError = (error: string) => {
 
 const setSearchValue = (value: string) => {
   search.value = value;
-};
-
-const installExtension = () => {
-  // ! TODO link to extension install
-  const w = window.open(
-    "https://chrome.google.com/webstore/category/extensions?hl=en",
-    "_blank"
-  );
-
-  if (w) {
-    w.focus();
-  }
-
-  return false;
 };
 
 const validate = () => {
