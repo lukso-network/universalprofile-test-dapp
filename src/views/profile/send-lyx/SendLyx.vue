@@ -135,16 +135,13 @@ if (ethereum) {
     } else {
       address.value = await requestAccounts();
     }
-  } catch (error) {
-    notification.value = {
-      message: "Couldn't load sender data",
-      type: "danger",
-    };
-  }
 
-  if (address.value) {
-    sender.value = await fetchProfile(address.value);
-    balance.value = await getBalance(address.value);
+    if (address.value) {
+      sender.value = await fetchProfile(address.value);
+      balance.value = await getBalance(address.value);
+    }
+  } catch (error) {
+    console.error(error);
   }
 }
 
