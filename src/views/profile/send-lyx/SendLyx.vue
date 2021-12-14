@@ -111,6 +111,7 @@ import {
 } from "@/services/ethereum.service";
 import { fetchProfile } from "@/services/erc725.service";
 import { Errors, Notification, LSP3ProfileNested } from "@/types";
+import { EthereumProviderError } from "eth-rpc-errors";
 
 const notification = ref({} as Notification);
 const sender = ref({} as LSP3ProfileNested);
@@ -135,13 +136,22 @@ if (ethereum) {
     } else {
       address.value = await requestAccounts();
     }
-
-    if (address.value) {
-      sender.value = await fetchProfile(address.value);
-      balance.value = await getBalance(address.value);
-    }
   } catch (error) {
-    console.error(error);
+    const epError = error as EthereumProviderError<Error>;
+
+    if (epError.code === 4100) {
+      address.value = await requestAccounts();
+    } else {
+      notification.value = {
+        message: "Please authenticate your account",
+        type: "danger",
+      };
+    }
+  }
+
+  if (address.value) {
+    sender.value = await fetchProfile(address.value);
+    balance.value = await getBalance(address.value);
   }
 }
 

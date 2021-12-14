@@ -15,6 +15,7 @@
     "@types/node": "^16.7.2",
     "bulma": "^0.9.3",
     "core-js": "^3.16.1",
+    "eth-rpc-errors": "4.0.3",
     "ethereum-blockies-base64": "^1.0.2",
     "ethers": "5.4.6",
     "filesize": "^8.0.0",
