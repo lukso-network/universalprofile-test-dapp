@@ -1,4 +1,4 @@
-<template>
+<template name="SendLyx">
   <section class="section">
     <h1 class="title">Send LYX</h1>
 
