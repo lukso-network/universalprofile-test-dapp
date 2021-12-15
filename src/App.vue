@@ -55,9 +55,10 @@
       <div class="navbar-end">
         <div class="navbar-item">
           <div class="buttons">
-            <Suspense>
+            <!-- <Suspense>
               <WalletBalance :msg="'sadf'"></WalletBalance>
-            </Suspense>
+            </Suspense> -->
+            <Connect />
           </div>
         </div>
       </div>
@@ -97,11 +98,12 @@ nav {
 
 <script lang="ts">
 import WalletBalance from "@/components/wallet/WalletBalance.vue";
+import Connect from "@/components/wallet/Connect.vue";
 
 export default {
   name: "MainFile",
   components: {
-    WalletBalance,
+    Connect,
   },
 };
 </script>

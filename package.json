@@ -13,6 +13,8 @@
     "@erc725/erc725.js": "0.8.0",
     "@lukso/lsp-factory.js": "1.0.2-alpha.6",
     "@types/node": "^16.7.2",
+    "@walletconnect/client": "2.0.0-beta.20",
+    "@walletconnect/web3-provider": "1.7.0",
     "bulma": "^0.9.3",
     "core-js": "^3.16.1",
     "eth-rpc-errors": "4.0.3",
@@ -24,7 +26,8 @@
     "sass": "^1.37.5",
     "vue": "3.2.23",
     "vue-router": "4.0.8",
-    "web3": "^1.6.0"
+    "web3": "^1.6.0",
+    "web3modal": "1.9.4"
   },
   "devDependencies": {
     "@testing-library/dom": "8.11.1",
