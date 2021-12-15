@@ -1,5 +1,5 @@
 <template name="EmptyState">
-  <div class="card-content">
+  <div class="card-content" data-testid="empty-state">
     <div
       class="
         notification
@@ -9,7 +9,11 @@
       "
     >
       You need Browser Extension for sending LYX.
-      <button class="button is-info is-rounded mt-4" @click="installExtension">
+      <button
+        class="button is-info is-rounded mt-4"
+        @click="installExtension"
+        data-testid="button"
+      >
         Install Browser Extension
       </button>
     </div>
