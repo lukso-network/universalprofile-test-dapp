@@ -1,14 +1,14 @@
-<template>
+<template name="SendLyx">
   <section class="section">
     <h1 class="title">Send LYX</h1>
 
     <div class="columns">
       <div class="column is-three-fifths is-offset-one-fifth">
-        <UiNotification
+        <Notifications
           v-if="notification.message"
           :notification="notification"
           @hide="clearNotification"
-        ></UiNotification>
+        ></Notifications>
       </div>
     </div>
     <div class="columns">
@@ -24,11 +24,11 @@
             :style="{ backgroundImage: `url(${backgroundImageSrc})` }"
             v-if="hasExtension"
           >
-            <UiProfile
+            <Profile
               :profile="sender.LSP3Profile"
               :address="address"
               class="sender"
-            ></UiProfile>
+            ></Profile>
           </div>
           <div class="card-content pt-1" v-if="hasExtension">
             <hr />
@@ -72,28 +72,11 @@
             </div>
             <hr />
             <p class="mb-4">To profile</p>
-            <div class="field">
-              <div
-                class="control is-small"
-                :class="{ 'is-loading': queryPending }"
-              >
-                <input
-                  class="input is-small"
-                  :class="{ 'is-danger': errors.search }"
-                  type="text"
-                  placeholder="Search: Universal Profile Address..."
-                  v-model="search"
-                  @keyup="searchReceiver"
-                />
-                <span class="has-text-danger" v-if="errors.search">{{
-                  errors.search
-                }}</span>
-              </div>
-            </div>
-            <UiProfile
-              :profile="receiver.LSP3Profile"
-              :address="search"
-            ></UiProfile>
+            <Search
+              :errors="errors"
+              @error="setSearchError"
+              @update="setSearchValue"
+            />
             <div class="field is-grouped is-grouped-centered pt-4">
               <p class="control">
                 <button
@@ -106,34 +89,19 @@
               </p>
             </div>
           </div>
-          <div class="card-content" v-else>
-            <div
-              class="
-                notification
-                is-info is-light is-flex is-flex-direction-column
-                pr-5
-                has-text-centered
-              "
-            >
-              You need Browser Extension for sending LYX.
-              <button
-                class="button is-info is-rounded mt-4"
-                @click="installExtension"
-              >
-                Install Browser Extension
-              </button>
-            </div>
-          </div>
+          <EmptyState v-else />
         </div>
       </div>
     </div>
   </section>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
-import UiNotification from "@/components/ui/Notification.vue";
-import UiProfile from "@/components/ui/Profile.vue";
+<script setup lang="ts">
+import { ref, computed } from "vue";
+import Notifications from "@/components/shared/Notification.vue";
+import Profile from "@/components/shared/Profile.vue";
+import EmptyState from "@/views/profile/send-lyx/EmptyState.vue";
+import Search from "@/views/profile/send-lyx/Search.vue";
 import { DEFAULT_IPFS_URL } from "@/helpers/config";
 import {
   getBalance,
@@ -142,188 +110,145 @@ import {
   accounts,
 } from "@/services/ethereum.service";
 import { fetchProfile } from "@/services/erc725.service";
-import { LSP3Profile } from "@lukso/lsp-factory.js";
-import Web3 from "web3";
+import { Errors, Notification, LSP3ProfileNested } from "@/types";
+import { EthereumProviderError } from "eth-rpc-errors";
 
-interface Errors {
-  search?: string;
-  amount?: string;
-}
+const notification = ref({} as Notification);
+const sender = ref({} as LSP3ProfileNested);
+const balance = ref("");
+const amount = ref("");
+const hasExtension = ref(false);
+const search = ref("");
+const errors = ref({} as Errors);
+const address = ref("");
+const pendingTransaction = ref(false);
 
-interface Notification {
-  message?: string;
-  type?: string;
-}
+const { ethereum } = window;
 
-interface LSP3ProfileNested extends LSP3Profile {
-  LSP3Profile?: LSP3Profile;
-}
+if (ethereum) {
+  hasExtension.value = true;
 
-export default defineComponent({
-  name: "ProfileSendLyx",
-  components: {
-    UiNotification,
-    UiProfile,
-  },
-  props: {},
-  data() {
-    return {
-      notification: {} as Notification,
-      sender: {} as LSP3ProfileNested,
-      receiver: {} as LSP3ProfileNested,
-      balance: "",
-      amount: "",
-      hasExtension: false,
-      search: "",
-      queryPending: false,
-      errors: {} as Errors,
-      address: "",
-      pendingTransaction: false,
-    };
-  },
-  async created() {
-    const { ethereum } = window;
+  try {
+    const account = await accounts();
 
-    if (ethereum) {
-      this.hasExtension = true;
+    if (account) {
+      address.value = account;
     } else {
-      return;
+      address.value = await requestAccounts();
     }
+  } catch (error) {
+    const epError = error as EthereumProviderError<Error>;
 
-    const address = await accounts();
-
-    if (address) {
-      this.address = address;
+    if (epError.code === 4100) {
+      address.value = await requestAccounts();
     } else {
-      this.address = await requestAccounts();
-    }
-
-    if (this.address) {
-      this.sender = await fetchProfile(this.address);
-      this.balance = await getBalance(this.address);
-    }
-  },
-
-  methods: {
-    async sendLyx() {
-      this.notification = {};
-
-      if (!this.validate()) {
-        this.notification = {
-          message: "There was some issue in your form",
-          type: "danger",
-        };
-        return;
-      }
-      try {
-        this.pendingTransaction = true;
-        await sendTransaction(
-          this.address,
-          this.search,
-          this.amount.toString()
-        );
-      } catch (error) {
-        if (error instanceof Error) {
-          this.notification = {
-            message: `Error: ${error.message}`,
-            type: "danger",
-          };
-        } else {
-          throw error;
-        }
-      } finally {
-        this.pendingTransaction = false;
-        this.balance = await getBalance(this.address);
-      }
-
-      this.notification = {
-        message: `You successfully send ${this.amount} LYX`,
-        type: "primary",
+      notification.value = {
+        message: "Please authenticate your account",
+        type: "danger",
       };
-      this.amount = "";
-    },
+    }
+  }
 
-    clearNotification() {
-      this.notification = {};
-    },
+  if (address.value) {
+    sender.value = await fetchProfile(address.value);
+    balance.value = await getBalance(address.value);
+  }
+}
 
-    async searchReceiver() {
-      this.queryPending = true;
-      delete this.errors.search;
+const sendLyx = async () => {
+  notification.value = {};
 
-      if (!Web3.utils.isAddress(this.search)) {
-        this.receiver.LSP3Profile = {
-          name: "",
-          description: "",
-        };
-        this.queryPending = false;
-        this.errors.search = "Address not valid";
-        return;
-      }
+  if (!validate()) {
+    return;
+  }
 
-      try {
-        this.receiver = await fetchProfile(this.search);
-      } catch (error) {
-        if (error instanceof Error) {
-          this.errors.search = error.message;
-        }
-      }
-      this.queryPending = false;
-    },
+  try {
+    pendingTransaction.value = true;
+    await sendTransaction(address.value, search.value, amount.value.toString());
+  } catch (error) {
+    if (error instanceof Error) {
+      notification.value = {
+        message: `Error: ${error.message}`,
+        type: "danger",
+      };
+    } else {
+      throw error;
+    }
+  } finally {
+    pendingTransaction.value = false;
+    balance.value = await getBalance(address.value);
+  }
 
-    installExtension() {
-      // ! TODO link to extension install
-      const w = window.open(
-        "https://chrome.google.com/webstore/category/extensions?hl=en",
-        "_blank"
-      );
+  notification.value = {
+    message: `You successfully send ${amount.value} LYX`,
+    type: "primary",
+  };
+  amount.value = "";
+};
 
-      if (w) {
-        w.focus();
-      }
+const clearNotification = () => {
+  notification.value = {};
+};
 
-      return false;
-    },
+const setSearchError = (error: string) => {
+  errors.value.search = error;
+};
 
-    validate() {
-      if (this.search && this.address && this.amount) {
-        return true;
-      }
+const setSearchValue = (value: string) => {
+  search.value = value;
+};
 
-      this.errors = {};
+const validate = () => {
+  if (search.value && address.value && amount.value) {
+    return true;
+  }
 
-      if (!this.amount) {
-        this.errors.amount = "Amount is missing";
-      }
+  errors.value = {};
 
-      if (!this.search) {
-        this.errors.search = "Receiver is missing";
-      }
+  if (!address.value) {
+    notification.value = {
+      message: "Please select proper sender",
+      type: "danger",
+    };
+  }
 
-      return false;
-    },
-  },
-  computed: {
-    backgroundImageSrc() {
-      const backgroundImage = this.sender?.LSP3Profile?.backgroundImage;
+  if (!amount.value) {
+    errors.value.amount = "Amount is missing";
+    notification.value = {
+      message: "There was some issue in your form",
+      type: "danger",
+    };
+  }
 
-      if (backgroundImage) {
-        const backgroundUrl = backgroundImage[2]?.url as string;
-        return backgroundUrl.replace("ipfs://", DEFAULT_IPFS_URL);
-      } else {
-        return "";
-      }
-    },
-  },
+  if (!search.value) {
+    errors.value.search = "Receiver is missing";
+    notification.value = {
+      message: "There was some issue in your form",
+      type: "danger",
+    };
+  }
+
+  return false;
+};
+
+const backgroundImageSrc = computed(() => {
+  const backgroundImage = sender.value?.LSP3Profile?.backgroundImage;
+
+  if (backgroundImage) {
+    const backgroundUrl = backgroundImage[2]?.url as string;
+    return backgroundUrl.replace("ipfs://", DEFAULT_IPFS_URL);
+  } else {
+    return "";
+  }
 });
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
 .nowrap {
   white-space: nowrap;
 }
 
-.sender {
+:deep(.sender) {
   position: relative;
   top: 55px;
   margin-bottom: 0;
