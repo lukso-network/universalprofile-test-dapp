@@ -1,5 +1,3 @@
-import { Ref } from "vue";
-
 export default function useDropdown(): {
   close: (dropdown: HTMLElement) => void;
   open: (dropdown: HTMLElement) => void;
