@@ -11,11 +11,15 @@
 
       <a
         role="button"
-        :class="`navbar-burger ${isActive ? 'is-active' : ''}`"
+        class="navbar-burger"
         aria-label="menu"
         aria-expanded="false"
         data-target="navbar"
-        @click="menuToggle"
+        @click="
+          toggle(burger);
+          toggle(menu);
+        "
+        ref="burger"
       >
         <span aria-hidden="true"></span>
         <span aria-hidden="true"></span>
@@ -23,7 +27,7 @@
       </a>
     </div>
 
-    <div id="navbar" :class="`navbar-menu ${isActive ? 'is-active' : ''}`">
+    <div id="navbar" class="navbar-menu" ref="menu">
       <div class="navbar-start">
         <router-link class="navbar-item" to="/">Home</router-link>
 
@@ -69,12 +73,11 @@
 <script setup lang="ts">
 import Connect from "@/components/Connect.vue";
 import { ref } from "vue";
+import useDropdown from "@/compositions/useDropdown";
 
-const isActive = ref(false);
-
-const menuToggle = () => {
-  isActive.value = !isActive.value;
-};
+const burger = ref();
+const menu = ref();
+const { toggle } = useDropdown();
 </script>
 
 <style scoped lang="scss">
