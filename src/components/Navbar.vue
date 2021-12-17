@@ -57,7 +57,6 @@
         <div class="navbar-item">
           <div class="buttons">
             <Suspense>
-              <!-- <WalletBalance :msg="'sadf'"></WalletBalance> -->
               <Connect />
             </Suspense>
           </div>
@@ -68,8 +67,7 @@
 </template>
 
 <script setup lang="ts">
-import WalletBalance from "@/components/wallet/WalletBalance.vue";
-import Connect from "@/components/wallet/Connect.vue";
+import Connect from "@/components/Connect.vue";
 import { ref } from "vue";
 
 const isActive = ref(false);
