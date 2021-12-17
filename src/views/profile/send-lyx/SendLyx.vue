@@ -5,7 +5,7 @@
     <div class="columns">
       <div class="column is-three-fifths is-offset-one-fifth">
         <Notifications
-          v-if="notification.message"
+          v-if="hasNotification"
           :notification="notification"
           @hide="clearNotification"
         ></Notifications>
@@ -110,10 +110,13 @@ import {
   accounts,
 } from "@/services/ethereum.service";
 import { fetchProfile } from "@/services/erc725.service";
-import { Errors, Notification, LSP3ProfileNested } from "@/types";
+import { Errors, LSP3ProfileNested } from "@/types";
 import { EthereumProviderError } from "eth-rpc-errors";
+import useNotifications from "@/compositions/useNotifications";
 
-const notification = ref({} as Notification);
+const { notification, clearNotification, hasNotification, setNotification } =
+  useNotifications();
+
 const sender = ref({} as LSP3ProfileNested);
 const balance = ref("");
 const amount = ref("");
@@ -142,10 +145,7 @@ if (ethereum) {
     if (epError.code === 4100) {
       address.value = await requestAccounts();
     } else {
-      notification.value = {
-        message: "Please authenticate your account",
-        type: "danger",
-      };
+      setNotification("Please authenticate your account", "danger");
     }
   }
 
@@ -156,7 +156,7 @@ if (ethereum) {
 }
 
 const sendLyx = async () => {
-  notification.value = {};
+  clearNotification();
 
   if (!validate()) {
     return;
@@ -167,10 +167,7 @@ const sendLyx = async () => {
     await sendTransaction(address.value, search.value, amount.value.toString());
   } catch (error) {
     if (error instanceof Error) {
-      notification.value = {
-        message: `Error: ${error.message}`,
-        type: "danger",
-      };
+      setNotification(`Error: ${error.message}`, "danger");
     } else {
       throw error;
     }
@@ -179,15 +176,8 @@ const sendLyx = async () => {
     balance.value = await getBalance(address.value);
   }
 
-  notification.value = {
-    message: `You successfully send ${amount.value} LYX`,
-    type: "primary",
-  };
+  setNotification(`You successfully send ${amount.value} LYX`);
   amount.value = "";
-};
-
-const clearNotification = () => {
-  notification.value = {};
 };
 
 const setSearchError = (error: string) => {
@@ -206,26 +196,17 @@ const validate = () => {
   errors.value = {};
 
   if (!address.value) {
-    notification.value = {
-      message: "Please select proper sender",
-      type: "danger",
-    };
+    setNotification("Please select proper sender", "danger");
   }
 
   if (!amount.value) {
     errors.value.amount = "Amount is missing";
-    notification.value = {
-      message: "There was some issue in your form",
-      type: "danger",
-    };
+    setNotification("There was some issue in your form", "danger");
   }
 
   if (!search.value) {
     errors.value.search = "Receiver is missing";
-    notification.value = {
-      message: "There was some issue in your form",
-      type: "danger",
-    };
+    setNotification("There was some issue in your form", "danger");
   }
 
   return false;

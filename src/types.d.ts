@@ -10,6 +10,8 @@ export interface Notification {
   type?: string;
 }
 
+export type NotificationType = "primary" | "danger";
+
 export interface LSP3ProfileNested extends LSP3Profile {
   LSP3Profile?: LSP3Profile;
 }
