@@ -1,16 +1,14 @@
 import Web3 from "web3";
 import { TransactionReceipt } from "web3-core";
+import Web3Utils from "web3-utils";
 
 const { ethereum } = window;
 const web3 = new Web3(ethereum);
 const WEI_UNIT = "ether";
 
 export async function accounts(): Promise<string> {
-  const accountsRequest = await ethereum.request({
-    method: "eth_accounts",
-    params: [],
-  });
-  return accountsRequest[0];
+  const [account] = await web3.eth.getAccounts();
+  return account;
 }
 
 export async function requestAccounts(): Promise<string> {
@@ -23,7 +21,7 @@ export async function requestAccounts(): Promise<string> {
 
 export async function getBalance(address: string): Promise<string> {
   const wei = await web3.eth.getBalance(address);
-  return web3.utils.fromWei(wei, WEI_UNIT);
+  return Web3Utils.fromWei(wei, WEI_UNIT);
 }
 
 export async function sendTransaction(
