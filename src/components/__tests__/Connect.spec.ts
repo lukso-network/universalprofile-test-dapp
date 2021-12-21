@@ -69,12 +69,12 @@ test("can disconnect from wallet connect", async () => {
   });
   mockGetBalance = jest.fn().mockReturnValue("2");
   const { setConnected } = useState();
-  setConnected("0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298", "walletConnect");
+  setConnected("0x8e54b33F8d42E59c0B4Cf02e6457CF8bb6a71094", "walletConnect");
 
   const utils = render(Connect);
 
   expect(mockSetupProvider).toBeCalledTimes(1);
-  expect(utils.getByTestId("address").innerHTML).toContain("0x7367C9...");
+  expect(utils.getByTestId("address").innerHTML).toContain("0x8e54b3...");
 
   await fireEvent.click(utils.getByTestId("disconnect"));
 
@@ -85,7 +85,7 @@ test("can disconnect from wallet connect", async () => {
 test("can connect to browser extension when authorized", async () => {
   mockAccounts = jest
     .fn()
-    .mockResolvedValue("0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298");
+    .mockResolvedValue("0xD8B0b80Fa7938f2F841b314d8b6052EAe97db826");
   mockGetProvider = jest.fn().mockReturnValue({
     wc: {
       connected: false,
@@ -101,7 +101,7 @@ test("can connect to browser extension when authorized", async () => {
     expect(mockSetupWeb3).toBeCalledTimes(1);
     expect(mockAccounts).toBeCalledTimes(1);
     expect(utils.getByTestId("balance").innerHTML).toContain("2 LYX");
-    expect(utils.getByTestId("address").innerHTML).toContain("0x7367C9...");
+    expect(utils.getByTestId("address").innerHTML).toContain("0xD8B0b8...");
   });
 });
 

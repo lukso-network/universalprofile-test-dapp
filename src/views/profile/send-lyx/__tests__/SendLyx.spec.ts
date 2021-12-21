@@ -26,7 +26,7 @@ test("can see provider connect message", async () => {
 
 test("can send lyx", async () => {
   window.ethereum = {};
-  setState("address", "0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298");
+  setState("address", "0xcde9e8d6EE1d8D50392B81F254bC6AB385ADA436");
   setState("isConnected", true);
   const utils = render(SendLyx);
 

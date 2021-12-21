@@ -52,7 +52,7 @@ test("can connect to wallet connect", async () => {
 test("can connect to browser extension when authorized", async () => {
   mockRequestAccounts = jest
     .fn()
-    .mockReturnValue(["0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298"]);
+    .mockReturnValue(["0x83b21Ba5Cb73f4C17E82f2f7E37787b13d924306"]);
   mockGetProvider = jest.fn().mockReturnValue({
     wc: {
       connected: false,
@@ -75,7 +75,7 @@ test("can disconnect from browser extension", async () => {
   window.ethereum = {};
   const { setConnected } = useState();
   setConnected(
-    "0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298",
+    "0x517216362D594516c6f96Ee34b2c502d65B847E4",
     "browserExtension"
   );
 
