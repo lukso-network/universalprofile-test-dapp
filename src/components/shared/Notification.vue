@@ -20,3 +20,9 @@ const hide = () => {
   emits("hide");
 };
 </script>
+
+<style scoped lang="scss">
+.notification {
+  word-break: break-all;
+}
+</style>

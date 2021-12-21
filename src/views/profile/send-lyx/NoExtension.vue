@@ -1,4 +1,4 @@
-<template name="EmptyState">
+<template name="NoExtension">
   <div class="card-content" data-testid="empty-state">
     <div
       class="

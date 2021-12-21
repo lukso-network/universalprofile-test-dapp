@@ -19,7 +19,7 @@
     </div>
   </div>
   <Profile
-    :profile="receiver.LSP3Profile"
+    :profile="receiver"
     :address="errors?.search ? undefined : search"
   ></Profile>
 </template>
@@ -27,11 +27,13 @@
 <script setup lang="ts">
 import Web3 from "web3";
 import { ref } from "vue";
-import { LSP3ProfileNested, Errors } from "@/types";
-import { fetchProfile } from "@/services/erc725.service";
+import { Errors } from "@/types";
+import useErc725 from "@/compositions/useErc725";
 import Profile from "@/components/shared/Profile.vue";
+import { LSP3Profile } from "@lukso/lsp-factory.js";
 
-const receiver = ref({} as LSP3ProfileNested);
+const { fetchProfile } = useErc725();
+const receiver = ref({} as LSP3Profile);
 const queryPending = ref(false);
 const search = ref("");
 
@@ -41,12 +43,11 @@ const emits = defineEmits(["error", "update"]);
 
 const searchReceiver = async () => {
   queryPending.value = true;
-  // delete props.errors.search;
   emits("error", null);
   emits("update", search.value);
 
   if (!Web3.utils.isAddress(search.value)) {
-    receiver.value.LSP3Profile = {
+    receiver.value = {
       name: "",
       description: "",
     };
