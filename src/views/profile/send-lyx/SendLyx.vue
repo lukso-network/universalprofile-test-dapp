@@ -169,7 +169,6 @@ const sendLyx = async () => {
       to: search.value,
       value: amount.value.toString(),
     };
-    console.log(transaction);
     await sendTransaction(transaction);
   } catch (error) {
     if (error instanceof Error) {
