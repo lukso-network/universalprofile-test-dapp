@@ -10,9 +10,16 @@
     </p>
     <p class="control">
       <button
-        class="button is-static is-small is-rounded"
+        class="button is-static is-small is-rounded address"
         data-testid="address"
       >
+        <div
+          :class="`logo ${
+            getState('channel') === 'browserExtension'
+              ? 'browser-extension'
+              : 'wallet-connect'
+          }`"
+        />
         <span>{{ sliceAddress(getState("address")) }}</span>
       </button>
     </p>
@@ -151,28 +158,35 @@ onMounted(async () => {
 </script>
 
 <style scoped lang="scss">
-.dropdown-item {
-  .logo {
-    height: 16px;
-    width: 30px;
-    background-repeat: no-repeat;
-    display: inline-flex;
-    background-position: center;
-    background-size: contain;
-    position: relative;
-    top: 3px;
+.logo {
+  height: 16px;
+  width: 30px;
+  background-repeat: no-repeat;
+  display: inline-flex;
+  background-position: center;
+  background-size: contain;
+  position: relative;
+  top: 3px;
 
-    &.wallet-connect {
-      background-image: url("~@/assets/walletconnect-logo.svg");
-    }
-
-    &.browser-extension {
-      background-image: url("~@/assets/lukso.png");
-    }
+  &.wallet-connect {
+    background-image: url("~@/assets/walletconnect-logo.svg");
   }
 
+  &.browser-extension {
+    background-image: url("~@/assets/lukso.png");
+  }
+}
+.dropdown-item {
   &.is-text {
     text-decoration: none;
+  }
+}
+
+.address {
+  .logo {
+    top: 0px;
+    left: -7px;
+    width: 20px;
   }
 }
 </style>

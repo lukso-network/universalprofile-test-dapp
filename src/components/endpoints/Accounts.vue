@@ -10,6 +10,14 @@
       >
         Connect with Browser Extension
       </button>
+      <span
+        class="icon ml-3 mt-1 has-text-primary"
+        v-if="
+          getState('channel') === 'browserExtension' && getState('isConnected')
+        "
+      >
+        <i class="fas fa-check"></i>
+      </span>
       <br />
       <button
         class="mt-3 button is-primary is-rounded"
@@ -19,6 +27,14 @@
       >
         Connect with Wallet Connect
       </button>
+      <span
+        class="icon ml-3 mt-4 has-text-primary"
+        v-if="
+          getState('channel') === 'walletConnect' && getState('isConnected')
+        "
+      >
+        <i class="fas fa-check"></i>
+      </span>
       <br />
       <button
         class="mt-3 button is-primary is-rounded"
