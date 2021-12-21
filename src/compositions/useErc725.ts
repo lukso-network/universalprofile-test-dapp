@@ -17,15 +17,25 @@ const schema = [
   },
 ] as Array<ERC725JSONSchema>;
 
-export function getInstance(address: string) {
+const getInstance = (address: string) => {
   const erc725 = new ERC725(schema, address, provider, config);
 
   return erc725;
-}
+};
 
-export async function fetchProfile(address: string): Promise<any> {
+const fetchProfile = async (address: string): Promise<any> => {
   const erc725 = getInstance(address);
   const profile = await erc725.fetchData("LSP3Profile");
 
   return profile.LSP3Profile;
+};
+
+export default function useErc725(): {
+  fetchProfile: (address: string) => Promise<any>;
+  getInstance: (address: string) => ERC725<any>;
+} {
+  return {
+    fetchProfile,
+    getInstance,
+  };
 }

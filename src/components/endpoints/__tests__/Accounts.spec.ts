@@ -7,31 +7,27 @@ const mockEnableProvider = jest.fn();
 const mockResetProvider = jest.fn();
 let mockGetProvider = jest.fn();
 
-jest.mock("@/compositions/useWalletConnect", () => {
-  return {
-    __esModule: true,
-    default: () => ({
-      resetProvider: () => mockResetProvider(),
-      setupProvider: () => mockSetupProvider(),
-      enableProvider: () => mockEnableProvider(),
-      getProvider: () => mockGetProvider(),
-    }),
-  };
-});
+jest.mock("@/compositions/useWalletConnect", () => ({
+  __esModule: true,
+  default: () => ({
+    resetProvider: () => mockResetProvider(),
+    setupProvider: () => mockSetupProvider(),
+    enableProvider: () => mockEnableProvider(),
+    getProvider: () => mockGetProvider(),
+  }),
+}));
 
 const mockAccounts = jest.fn();
 const mockGetBalance = jest.fn();
 let mockRequestAccounts = jest.fn();
-jest.mock("@/compositions/useEthereumRpc", () => {
-  return {
-    __esModule: true,
-    default: () => ({
-      accounts: () => mockAccounts(),
-      getBalance: () => mockGetBalance(),
-      requestAccounts: () => mockRequestAccounts(),
-    }),
-  };
-});
+jest.mock("@/compositions/useEthereumRpc", () => ({
+  __esModule: true,
+  default: () => ({
+    accounts: () => mockAccounts(),
+    getBalance: () => mockGetBalance(),
+    requestAccounts: () => mockRequestAccounts(),
+  }),
+}));
 
 test("can connect to wallet connect", async () => {
   mockGetProvider = jest.fn().mockReturnValue({

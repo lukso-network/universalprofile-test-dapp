@@ -1,52 +1,55 @@
 import Search from "../Search.vue";
 import { render, fireEvent } from "@testing-library/vue";
 
-jest.mock("@/services/erc725.service", () => ({
-  fetchProfile() {
-    return {
-      LSP3Profile: {
-        name: "test",
-        description: "Lorem ipsum",
-        profileImage: [
-          {
-            width: 600,
-            height: 350,
-            hashFunction: "keccak256(bytes)",
-            hash: "0x123..",
-            url: "ipfs://QmPLq_variant_1",
-          },
-          {
-            width: 600,
-            height: 350,
-            hashFunction: "keccak256(bytes)",
-            hash: "0x123..",
-            url: "ipfs://QmPLq_variant_2",
-          },
-          {
-            width: 600,
-            height: 350,
-            hashFunction: "keccak256(bytes)",
-            hash: "0x123..",
-            url: "ipfs://QmPLq_variant_3",
-          },
-          {
-            width: 320,
-            height: 186,
-            hashFunction: "keccak256(bytes)",
-            hash: "0x123..",
-            url: "ipfs://QmPLq_variant_4",
-          },
-          {
-            width: 180,
-            height: 105,
-            hashFunction: "keccak256(bytes)",
-            hash: "0x123..",
-            url: "ipfs://QmPLq_variant_5",
-          },
-        ],
-      },
-    };
-  },
+jest.mock("@/compositions/useErc725", () => ({
+  __esModule: true,
+  default: () => ({
+    fetchProfile() {
+      return {
+        LSP3Profile: {
+          name: "test",
+          description: "Lorem ipsum",
+          profileImage: [
+            {
+              width: 600,
+              height: 350,
+              hashFunction: "keccak256(bytes)",
+              hash: "0x123..",
+              url: "ipfs://QmPLq_variant_1",
+            },
+            {
+              width: 600,
+              height: 350,
+              hashFunction: "keccak256(bytes)",
+              hash: "0x123..",
+              url: "ipfs://QmPLq_variant_2",
+            },
+            {
+              width: 600,
+              height: 350,
+              hashFunction: "keccak256(bytes)",
+              hash: "0x123..",
+              url: "ipfs://QmPLq_variant_3",
+            },
+            {
+              width: 320,
+              height: 186,
+              hashFunction: "keccak256(bytes)",
+              hash: "0x123..",
+              url: "ipfs://QmPLq_variant_4",
+            },
+            {
+              width: 180,
+              height: 105,
+              hashFunction: "keccak256(bytes)",
+              hash: "0x123..",
+              url: "ipfs://QmPLq_variant_5",
+            },
+          ],
+        },
+      };
+    },
+  }),
 }));
 
 test("can search profile", async () => {

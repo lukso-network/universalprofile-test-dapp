@@ -23,7 +23,7 @@
         data-testid="disconnect"
       >
         <span class="icon is-small">
-          <i class="fas fa-unlink"></i>
+          <i class="fas fa-sign-out-alt"></i>
         </span>
       </button>
     </p>
@@ -44,23 +44,23 @@
     </div>
     <div class="dropdown-menu" id="dropdown-menu" role="menu">
       <div class="dropdown-content">
-        <a
-          href="#"
-          class="dropdown-item has-text-weight-bold"
+        <button
+          class="dropdown-item has-text-weight-bold button is-text"
           @click="connectExtension"
           data-testid="connect-extension"
+          :disabled="hasExtension ? undefined : true"
         >
           <div class="logo browser-extension" />
           Browser Extension
-        </a>
-        <a
-          class="dropdown-item has-text-weight-bold"
+        </button>
+        <button
+          class="dropdown-item has-text-weight-bold button is-text"
           @click="connectWalletConnect"
           data-testid="connect-wc"
         >
           <div class="logo wallet-connect" />
           Wallet Connect
-        </a>
+        </button>
       </div>
     </div>
   </div>
@@ -84,6 +84,7 @@ const { close, toggle } = useDropdown();
 const { accounts, requestAccounts } = useEthereumRpc();
 const dropdown = ref();
 const browserExtensionConnected = localStorage.getItem(UP_CONNECTED_ADDRESS);
+const hasExtension = !!window.ethereum;
 
 const connectWalletConnect = async () => {
   close(dropdown.value);
@@ -110,6 +111,7 @@ const connectExtension = async () => {
     if (epError.code === 4100) {
       const address = (await requestAccounts())[0];
       setConnected(address, "browserExtension");
+      localStorage.setItem(UP_CONNECTED_ADDRESS, address);
     }
   }
 };
@@ -167,6 +169,10 @@ onMounted(async () => {
     &.browser-extension {
       background-image: url("~@/assets/lukso.png");
     }
+  }
+
+  &.is-text {
+    text-decoration: none;
   }
 }
 </style>
