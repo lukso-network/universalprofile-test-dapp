@@ -5,7 +5,7 @@
       <button
         class="button is-primary is-rounded"
         @click="connectExtension"
-        :disabled="getState('address') ? true : undefined"
+        :disabled="getState('address') || !hasExtension ? true : undefined"
         data-testid="connect-extension"
       >
         Connect with Browser Extension
@@ -69,6 +69,7 @@ const { setDisconnected, setConnected } = useState();
 const { setupWeb3 } = useWeb3();
 const { resetProvider, enableProvider, setupProvider } = useWalletConnect();
 const { requestAccounts } = useEthereumRpc();
+const hasExtension = !!window.ethereum;
 
 const connectExtension = async () => {
   clearNotification();

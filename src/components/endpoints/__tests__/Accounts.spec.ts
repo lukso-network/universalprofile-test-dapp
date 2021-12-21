@@ -72,6 +72,7 @@ test("can connect to browser extension when authorized", async () => {
 });
 
 test("can disconnect from browser extension", async () => {
+  window.ethereum = {};
   const { setConnected } = useState();
   setConnected(
     "0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298",

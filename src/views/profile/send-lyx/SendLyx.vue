@@ -36,7 +36,7 @@
               :style="{ backgroundImage: `url(${backgroundImageSrc})` }"
             >
               <Profile
-                :profile="sender.LSP3Profile"
+                :profile="sender"
                 :address="getState('address')"
                 class="sender"
               ></Profile>
@@ -120,10 +120,11 @@ import NoExtension from "@/views/profile/send-lyx/NoExtension.vue";
 import Search from "@/views/profile/send-lyx/Search.vue";
 import { DEFAULT_IPFS_URL } from "@/helpers/config";
 import useErc725 from "@/compositions/useErc725";
-import { Errors, LSP3ProfileNested } from "@/types";
+import { Errors } from "@/types";
 import useNotifications from "@/compositions/useNotifications";
 import useEthereumRpc from "@/compositions/useEthereumRpc";
 import { getState } from "@/stores";
+import { LSP3Profile } from "@lukso/lsp-factory.js";
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications();
@@ -131,7 +132,7 @@ const { getBalance, sendTransaction } = useEthereumRpc();
 const { fetchProfile } = useErc725();
 
 const hasExtension = !!window.ethereum;
-const sender = ref({} as LSP3ProfileNested);
+const sender = ref({} as LSP3Profile);
 const balance = ref("");
 const amount = ref("");
 const search = ref("");
@@ -218,7 +219,7 @@ const validate = () => {
 };
 
 const backgroundImageSrc = computed(() => {
-  const backgroundImage = sender.value?.LSP3Profile?.backgroundImage;
+  const backgroundImage = sender.value?.backgroundImage;
 
   if (backgroundImage) {
     const backgroundUrl = backgroundImage[2]?.url as string;

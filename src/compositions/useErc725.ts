@@ -27,7 +27,7 @@ const fetchProfile = async (address: string): Promise<any> => {
   const erc725 = getInstance(address);
   const profile = await erc725.fetchData("LSP3Profile");
 
-  return profile.LSP3Profile;
+  return profile.LSP3Profile.LSP3Profile;
 };
 
 export default function useErc725(): {
