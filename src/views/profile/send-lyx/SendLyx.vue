@@ -137,13 +137,13 @@ if (ethereum) {
     if (account) {
       address.value = account;
     } else {
-      address.value = await requestAccounts();
+      address.value = (await requestAccounts())[0];
     }
   } catch (error) {
     const epError = error as EthereumProviderError<Error>;
 
     if (epError.code === 4100) {
-      address.value = await requestAccounts();
+      address.value = (await requestAccounts())[0];
     } else {
       setNotification("Please authenticate your account", "danger");
     }
