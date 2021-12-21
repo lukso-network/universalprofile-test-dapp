@@ -3,6 +3,7 @@ FROM node:16.13.0-alpine as build-stage
 
 WORKDIR /app
 COPY package*.json ./
+RUN apk add --no-cache git
 RUN yarn
 COPY . .
 RUN yarn build
