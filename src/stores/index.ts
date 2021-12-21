@@ -34,7 +34,7 @@ export function useState(): {
     setDisconnected: () => {
       setState("address", "");
       setState("isConnected", false);
-      setState("channel", "");
+      setState("channel", undefined);
       setState("balance", 0);
     },
   };

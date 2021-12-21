@@ -91,7 +91,7 @@ const connectWalletconnect = async () => {
   try {
     await setupProvider();
     await enableProvider();
-    setConnected(getState("address"), "browserExtension");
+    setConnected(getState("address"), "walletConnect");
     setNotification(`Connected to address: ${getState("address")}`, "info");
   } catch (error) {
     setNotification((error as unknown as Error).message, "danger");
