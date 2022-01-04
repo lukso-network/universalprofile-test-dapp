@@ -5,6 +5,7 @@ let web3: Web3;
 
 const setupWeb3 = (provider: Provider): void => {
   web3 = new Web3(provider);
+  window.web3 = web3;
 };
 
 const getWeb3 = (): Web3 => {
