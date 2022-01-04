@@ -1,3 +1,5 @@
+import Web3 from "web3";
+
 export interface Errors {
   search?: string;
   amount?: string;
@@ -18,4 +20,11 @@ export interface Store {
   chainId: number;
   balance: number;
   channel?: Channel;
+}
+
+declare global {
+  interface Window {
+    web3: Web3;
+    store: Store;
+  }
 }

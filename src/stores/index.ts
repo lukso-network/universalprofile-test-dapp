@@ -10,6 +10,8 @@ export const store = reactive<Store>({
   channel: undefined,
 });
 
+window.store = store;
+
 export const getState: (key: keyof Store) => any = (key) => {
   return store[key];
 };
