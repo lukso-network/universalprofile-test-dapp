@@ -1,3 +1,56 @@
+<script lang="ts">
+import { getDeployedBaseContracts } from "@/helpers/deployment.helper";
+import { getLspFactory } from "@/services/lsp-factory.service";
+import { getSigner } from "@/services/provider.service";
+import { defineComponent } from "vue";
+
+export default defineComponent({
+  name: "Deployment",
+  props: {
+    msg: { type: String, default: "" },
+  },
+  setup: async function () {
+    const { provider } = await getSigner();
+    const { chainId } = await provider.getNetwork();
+    const lspFactory = await getLspFactory();
+
+    const networkDetails = await getDeployedBaseContracts(chainId);
+    const selectOptions = networkDetails
+      ? Object.keys(networkDetails.baseContracts).sort().reverse()
+      : [];
+    return {
+      chainId,
+      networkDetails,
+      selectOptions,
+      lspFactory,
+    };
+  },
+  data: () => {
+    return {
+      isLoading: false,
+      deployedBaseContracts: {} as any,
+    };
+  },
+  methods: {
+    async deployLatestVersion() {
+      this.isLoading = true;
+      this.deployedBaseContracts =
+        await this.lspFactory.ProxyDeployer.deployBaseContracts();
+      this.isLoading = false;
+      localStorage.setItem(
+        "latestContracts",
+        JSON.stringify({
+          lsp3Account: this.deployedBaseContracts.lsp3Account.address,
+          universalReceiverAddressStore:
+            this.deployedBaseContracts.universalReceiverAddressStore.address,
+        })
+      );
+      return false;
+    },
+  },
+});
+</script>
+
 <template>
   <section class="section">
     <h1 class="title">Base Contracts</h1>
@@ -47,56 +100,3 @@
     </div>
   </section>
 </template>
-
-<script lang="ts">
-import { getDeployedBaseContracts } from "@/helpers/deployment.helper";
-import { getLspFactory } from "@/services/lsp-factory.service";
-import { getSigner } from "@/services/provider.service";
-import { defineComponent } from "vue";
-
-export default defineComponent({
-  name: "Deployment",
-  props: {
-    msg: String,
-  },
-  data: () => {
-    return {
-      isLoading: false,
-      deployedBaseContracts: {} as any,
-    };
-  },
-  setup: async function () {
-    const { provider } = await getSigner();
-    const { chainId } = await provider.getNetwork();
-    const lspFactory = await getLspFactory();
-
-    const networkDetails = await getDeployedBaseContracts(chainId);
-    const selectOptions = networkDetails
-      ? Object.keys(networkDetails.baseContracts).sort().reverse()
-      : [];
-    return {
-      chainId,
-      networkDetails,
-      selectOptions,
-      lspFactory,
-    };
-  },
-  methods: {
-    async deployLatestVersion() {
-      this.isLoading = true;
-      this.deployedBaseContracts =
-        await this.lspFactory.ProxyDeployer.deployBaseContracts();
-      this.isLoading = false;
-      localStorage.setItem(
-        "latestContracts",
-        JSON.stringify({
-          lsp3Account: this.deployedBaseContracts.lsp3Account.address,
-          universalReceiverAddressStore:
-            this.deployedBaseContracts.universalReceiverAddressStore.address,
-        })
-      );
-      return false;
-    },
-  },
-});
-</script>

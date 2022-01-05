@@ -1,17 +1,10 @@
-<template>
-  <div class="user">
-    <h2>Profile Component {{ $route.params.address }}</h2>
-    <router-view></router-view>
-  </div>
-</template>
-
 <script lang="ts">
 import { defineComponent } from "vue";
 
 export default defineComponent({
   name: "Profile",
   props: {
-    msg: String,
+    msg: { type: String, default: "" },
   },
   setup: async function () {
     return {
@@ -21,4 +14,9 @@ export default defineComponent({
 });
 </script>
 
-<style></style>
+<template>
+  <div class="user">
+    <h2>Profile Component {{ $route.params.address }}</h2>
+    <router-view></router-view>
+  </div>
+</template>

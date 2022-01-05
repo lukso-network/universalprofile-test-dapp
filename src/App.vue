@@ -1,3 +1,7 @@
+<script setup lang="ts">
+import Navbar from "@/components/Navbar.vue";
+</script>
+
 <template>
   <Navbar />
 
@@ -18,7 +22,3 @@ html {
   color: #2c3e50;
 }
 </style>
-
-<script setup lang="ts">
-import Navbar from "@/components/Navbar.vue";
-</script>

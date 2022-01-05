@@ -1,72 +1,3 @@
-<template name="EndpointsAccounts">
-  <div class="tile is-4 is-parent">
-    <div class="tile is-child box">
-      <p class="is-size-5 has-text-weight-bold mb-4">Connect</p>
-      <button
-        class="button is-primary is-rounded"
-        @click="connectExtension"
-        :disabled="getState('address') || !hasExtension ? true : undefined"
-        data-testid="connect-extension"
-      >
-        Connect with Browser Extension
-      </button>
-      <span
-        class="icon ml-3 mt-1 has-text-primary"
-        v-if="
-          getState('channel') === 'browserExtension' && getState('isConnected')
-        "
-      >
-        <i class="fas fa-check"></i>
-      </span>
-      <br />
-      <button
-        class="mt-3 button is-primary is-rounded"
-        @click="connectWalletconnect"
-        :disabled="getState('address') ? true : undefined"
-        data-testid="connect-wc"
-      >
-        Connect with Wallet Connect {{ walletConnectVersion }}
-      </button>
-      <span
-        class="icon ml-3 mt-4 has-text-primary"
-        v-if="
-          getState('channel') === 'walletConnect' && getState('isConnected')
-        "
-      >
-        <i class="fas fa-check"></i>
-      </span>
-      <br />
-      <button
-        class="mt-3 button is-primary is-rounded"
-        @click="disconnect"
-        :disabled="getState('isConnected') ? undefined : true"
-        data-testid="disconnect"
-      >
-        Disconnect
-      </button>
-      <Notifications
-        v-if="hasNotification"
-        :notification="notification"
-        @hide="clearNotification"
-        class="mt-4"
-      ></Notifications>
-
-      <div
-        v-if="getState('isConnected')"
-        class="notification is-info is-light mt-5"
-        data-testid="info"
-      >
-        <p class="mb-3">
-          Connected to address: <b>{{ getState("address") }}</b>
-        </p>
-        <p data-testid="chain">
-          Chain ID: <b>{{ getState("chainId") }} ({{ hexChainId }})</b>
-        </p>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import Notifications from "@/components/shared/Notification.vue";
 import useNotifications from "@/compositions/useNotifications";
@@ -133,6 +64,75 @@ const disconnect = async () => {
   setupWeb3(null);
 };
 </script>
+
+<template>
+  <div class="tile is-4 is-parent">
+    <div class="tile is-child box">
+      <p class="is-size-5 has-text-weight-bold mb-4">Connect</p>
+      <button
+        class="button is-primary is-rounded"
+        :disabled="getState('address') || !hasExtension ? true : undefined"
+        data-testid="connect-extension"
+        @click="connectExtension"
+      >
+        Connect with Browser Extension
+      </button>
+      <span
+        v-if="
+          getState('channel') === 'browserExtension' && getState('isConnected')
+        "
+        class="icon ml-3 mt-1 has-text-primary"
+      >
+        <i class="fas fa-check"></i>
+      </span>
+      <br />
+      <button
+        class="mt-3 button is-primary is-rounded"
+        :disabled="getState('address') ? true : undefined"
+        data-testid="connect-wc"
+        @click="connectWalletconnect"
+      >
+        Connect with Wallet Connect {{ walletConnectVersion }}
+      </button>
+      <span
+        v-if="
+          getState('channel') === 'walletConnect' && getState('isConnected')
+        "
+        class="icon ml-3 mt-4 has-text-primary"
+      >
+        <i class="fas fa-check"></i>
+      </span>
+      <br />
+      <button
+        class="mt-3 button is-primary is-rounded"
+        :disabled="getState('isConnected') ? undefined : true"
+        data-testid="disconnect"
+        @click="disconnect"
+      >
+        Disconnect
+      </button>
+      <Notifications
+        v-if="hasNotification"
+        :notification="notification"
+        class="mt-4"
+        @hide="clearNotification"
+      ></Notifications>
+
+      <div
+        v-if="getState('isConnected')"
+        class="notification is-info is-light mt-5"
+        data-testid="info"
+      >
+        <p class="mb-3">
+          Connected to address: <b>{{ getState("address") }}</b>
+        </p>
+        <p data-testid="chain">
+          Chain ID: <b>{{ getState("chainId") }} ({{ hexChainId }})</b>
+        </p>
+      </div>
+    </div>
+  </div>
+</template>
 
 <style scoped lang="scss">
 .notification {

@@ -8,20 +8,20 @@ export default defineComponent({
   components: {
     ProfileListIpfs,
   },
+  data() {
+    return {
+      account: {},
+      profile: {},
+    };
+  },
   async created() {
-    const { provider, signer } = await getSigner();
+    const { signer } = await getSigner();
     if (this.$route.params.address) {
       this.account = new LSP3Account__factory(signer).attach(
         this.$route.params.address as string
       );
     }
     this.fetchData();
-  },
-  data() {
-    return {
-      account: {},
-      profile: {},
-    };
   },
   methods: {
     formatNumber,

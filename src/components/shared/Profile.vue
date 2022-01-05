@@ -1,28 +1,3 @@
-<template name="Profile">
-  <div class="media">
-    <div
-      class="media-left profile-image"
-      :style="{ backgroundImage: `url(${identiconSrc})` }"
-      data-testid="identicon"
-    >
-      <figure class="image is-48x48">
-        <div
-          :style="{ backgroundImage: `url(${profileImage})` }"
-          data-testid="profile-image"
-        ></div>
-      </figure>
-    </div>
-    <div class="media-content pt-2">
-      <p class="title is-5" v-if="profile?.name" data-testid="name">
-        @{{ profile?.name }}
-      </p>
-      <p class="subtitle is-7 has-text-grey-light" data-testid="address">
-        {{ address }}
-      </p>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { computed } from "vue";
 import { DEFAULT_IPFS_URL } from "@/helpers/config";
@@ -47,6 +22,31 @@ const identiconSrc = computed(() =>
   props.address ? makeBlockie(props.address) : ""
 );
 </script>
+
+<template name="Profile">
+  <div class="media">
+    <div
+      class="media-left profile-image"
+      :style="{ backgroundImage: `url(${identiconSrc})` }"
+      data-testid="identicon"
+    >
+      <figure class="image is-48x48">
+        <div
+          :style="{ backgroundImage: `url(${profileImage})` }"
+          data-testid="profile-image"
+        ></div>
+      </figure>
+    </div>
+    <div class="media-content pt-2">
+      <p v-if="profile?.name" class="title is-5" data-testid="name">
+        @{{ profile?.name }}
+      </p>
+      <p class="subtitle is-7 has-text-grey-light" data-testid="address">
+        {{ address }}
+      </p>
+    </div>
+  </div>
+</template>
 
 <style scoped lang="scss">
 .profile-image {

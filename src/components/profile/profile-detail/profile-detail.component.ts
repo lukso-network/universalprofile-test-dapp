@@ -9,7 +9,7 @@ import { getSigner } from "@/services/provider.service";
 export default defineComponent({
   name: "ProfileDetail",
   props: {
-    address: String,
+    address: { type: String, default: "" },
   },
   data() {
     return {
@@ -21,6 +21,10 @@ export default defineComponent({
       uploadTarget: DEFAULT_IPFS_URL,
     };
   },
+  watch: {
+    // call again the method if the route changes
+    $route: "fetchData",
+  },
   async created() {
     // fetch the data when the view is created and the data is
     // already being observed
@@ -31,10 +35,6 @@ export default defineComponent({
       );
     }
     this.fetchData();
-  },
-  watch: {
-    // call again the method if the route changes
-    $route: "fetchData",
   },
   methods: {
     fetchData() {

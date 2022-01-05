@@ -1,4 +1,14 @@
-<template name="Navbar">
+<script setup lang="ts">
+import Connect from "@/components/Connect.vue";
+import { ref } from "vue";
+import useDropdown from "@/compositions/useDropdown";
+
+const burger = ref();
+const menu = ref();
+const { toggle } = useDropdown();
+</script>
+
+<template>
   <nav
     class="navbar is-white is-fixed-top"
     role="navigation"
@@ -10,6 +20,7 @@
       </a>
 
       <a
+        ref="burger"
         role="button"
         class="navbar-burger"
         aria-label="menu"
@@ -19,7 +30,6 @@
           toggle(burger);
           toggle(menu);
         "
-        ref="burger"
       >
         <span aria-hidden="true"></span>
         <span aria-hidden="true"></span>
@@ -27,7 +37,7 @@
       </a>
     </div>
 
-    <div id="navbar" class="navbar-menu" ref="menu">
+    <div id="navbar" ref="menu" class="navbar-menu">
       <div class="navbar-start">
         <router-link class="navbar-item" to="/">Home</router-link>
 
@@ -69,16 +79,6 @@
     </div>
   </nav>
 </template>
-
-<script setup lang="ts">
-import Connect from "@/components/Connect.vue";
-import { ref } from "vue";
-import useDropdown from "@/compositions/useDropdown";
-
-const burger = ref();
-const menu = ref();
-const { toggle } = useDropdown();
-</script>
 
 <style scoped lang="scss">
 nav {

@@ -17,7 +17,10 @@ export const getState: (key: keyof Store) => any = (key) => {
   return store[key];
 };
 
-export async function setState(key: keyof Store, newState: any): Promise<void> {
+export async function setState(
+  key: keyof Store,
+  newState: unknown
+): Promise<void> {
   (store[key] as any) = newState;
 }
 
