@@ -12,7 +12,7 @@ import { DEFAULT_IPFS_URL } from "@/helpers/config";
 export default defineComponent({
   name: "Upload",
   props: {
-    msg: String,
+    msg: { type: String, default: "" },
   },
   data: function () {
     return {

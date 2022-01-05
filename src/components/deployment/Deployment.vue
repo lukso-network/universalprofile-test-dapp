@@ -7,7 +7,7 @@ import { defineComponent } from "vue";
 export default defineComponent({
   name: "Deployment",
   props: {
-    msg: String,
+    msg: { type: String, default: "" },
   },
   setup: async function () {
     const { provider } = await getSigner();

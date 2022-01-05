@@ -4,7 +4,7 @@ import { defineComponent } from "vue";
 export default defineComponent({
   name: "Profile",
   props: {
-    msg: String,
+    msg: { type: String, default: "" },
   },
   setup: async function () {
     return {

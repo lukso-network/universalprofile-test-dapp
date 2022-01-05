@@ -9,7 +9,7 @@ import { getSigner } from "@/services/provider.service";
 export default defineComponent({
   name: "ProfileDetail",
   props: {
-    address: String,
+    address: { type: String, default: "" },
   },
   data() {
     return {

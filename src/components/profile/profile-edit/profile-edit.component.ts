@@ -15,7 +15,7 @@ export default defineComponent({
     };
   },
   async created() {
-    const { provider, signer } = await getSigner();
+    const { signer } = await getSigner();
     if (this.$route.params.address) {
       this.account = new LSP3Account__factory(signer).attach(
         this.$route.params.address as string
