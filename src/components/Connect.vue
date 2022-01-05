@@ -66,7 +66,7 @@
           data-testid="connect-wc"
         >
           <div class="logo wallet-connect" />
-          Wallet Connect
+          Wallet Connect {{ walletConnectVersion }}
         </button>
       </div>
     </div>
@@ -79,7 +79,9 @@ import { ref, onMounted } from "vue";
 import { EthereumProviderError } from "eth-rpc-errors";
 import useDropdown from "@/compositions/useDropdown";
 import useWeb3 from "@/compositions/useWeb3";
-import useWalletConnect from "@/compositions/useWalletConnect";
+import useWalletConnect, {
+  WALLET_CONNECT_VERSION as walletConnectVersion,
+} from "@/compositions/useWalletConnect";
 import useEthereumRpc from "@/compositions/useEthereumRpc";
 import { UP_CONNECTED_ADDRESS } from "@/helpers/config";
 

@@ -1,5 +1,5 @@
 import SendLyx from "../SendLyx.vue";
-import { render, fireEvent, waitFor } from "@testing-library/vue";
+import { render, fireEvent } from "@testing-library/vue";
 import { setState } from "@/stores";
 
 const mockGetBalance = jest.fn().mockReturnValue(10);
