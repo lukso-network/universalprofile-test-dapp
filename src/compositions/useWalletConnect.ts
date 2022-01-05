@@ -18,7 +18,7 @@ const setupProvider = async (): Promise<void> => {
     chainId: 22,
   });
 
-  provider.on("connect", (error: any, payload: any) => {
+  provider.on("connect", (error: any) => {
     if (error) {
       throw error;
     }
