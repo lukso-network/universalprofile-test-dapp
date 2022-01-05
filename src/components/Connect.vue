@@ -1,78 +1,3 @@
-<template name="Connect">
-  <div class="field has-addons" v-if="getState('isConnected')">
-    <p class="control">
-      <button
-        class="button is-static is-small is-rounded"
-        data-testid="balance"
-      >
-        <span>{{ getState("balance") }} LYX</span>
-      </button>
-    </p>
-    <p class="control">
-      <button
-        class="button is-static is-small is-rounded address"
-        data-testid="address"
-      >
-        <div
-          :class="`logo ${
-            getState('channel') === 'browserExtension'
-              ? 'browser-extension'
-              : 'wallet-connect'
-          }`"
-        />
-        <span>{{ sliceAddress(getState("address")) }}</span>
-      </button>
-    </p>
-    <p class="control">
-      <button
-        class="button is-small is-rounded"
-        @click="disconnect"
-        data-testid="disconnect"
-      >
-        <span class="icon is-small">
-          <i class="fas fa-sign-out-alt"></i>
-        </span>
-      </button>
-    </p>
-  </div>
-
-  <div ref="dropdown" class="dropdown is-right" v-else>
-    <div class="dropdown-trigger">
-      <button
-        class="button is-primary is-small is-rounded has-text-weight-bold"
-        aria-haspopup="true"
-        aria-controls="dropdown-menu"
-        @click="toggle(dropdown)"
-        ref="dropdown"
-        data-testid="connect"
-      >
-        <span>Connect</span>
-      </button>
-    </div>
-    <div class="dropdown-menu" id="dropdown-menu" role="menu">
-      <div class="dropdown-content">
-        <button
-          class="dropdown-item has-text-weight-bold button is-text"
-          @click="connectExtension"
-          data-testid="connect-extension"
-          :disabled="hasExtension ? undefined : true"
-        >
-          <div class="logo browser-extension" />
-          Browser Extension
-        </button>
-        <button
-          class="dropdown-item has-text-weight-bold button is-text"
-          @click="connectWalletConnect"
-          data-testid="connect-wc"
-        >
-          <div class="logo wallet-connect" />
-          Wallet Connect
-        </button>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { getState, useState } from "@/stores";
 import { ref, onMounted } from "vue";
@@ -156,6 +81,81 @@ onMounted(async () => {
   }
 });
 </script>
+
+<template>
+  <div v-if="getState('isConnected')" class="field has-addons">
+    <p class="control">
+      <button
+        class="button is-static is-small is-rounded"
+        data-testid="balance"
+      >
+        <span>{{ getState("balance") }} LYX</span>
+      </button>
+    </p>
+    <p class="control">
+      <button
+        class="button is-static is-small is-rounded address"
+        data-testid="address"
+      >
+        <div
+          :class="`logo ${
+            getState('channel') === 'browserExtension'
+              ? 'browser-extension'
+              : 'wallet-connect'
+          }`"
+        />
+        <span>{{ sliceAddress(getState("address")) }}</span>
+      </button>
+    </p>
+    <p class="control">
+      <button
+        class="button is-small is-rounded"
+        data-testid="disconnect"
+        @click="disconnect"
+      >
+        <span class="icon is-small">
+          <i class="fas fa-sign-out-alt"></i>
+        </span>
+      </button>
+    </p>
+  </div>
+
+  <div v-else ref="dropdown" class="dropdown is-right">
+    <div class="dropdown-trigger">
+      <button
+        ref="dropdown"
+        class="button is-primary is-small is-rounded has-text-weight-bold"
+        aria-haspopup="true"
+        aria-controls="dropdown-menu"
+        data-testid="connect"
+        @click="toggle(dropdown)"
+      >
+        <span>Connect</span>
+      </button>
+    </div>
+    <div id="dropdown-menu" class="dropdown-menu" role="menu">
+      <div class="dropdown-content">
+        <button
+          class="dropdown-item has-text-weight-bold button is-text"
+          data-testid="connect-extension"
+          :disabled="hasExtension ? undefined : true"
+          @click="connectExtension"
+        >
+          <div class="logo browser-extension" />
+          Browser Extension
+        </button>
+        <button
+          class="dropdown-item has-text-weight-bold button is-text"
+          data-testid="connect-wc"
+          @click="connectWalletConnect"
+        >
+          <div class="logo wallet-connect" />
+          Wallet Connect
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
 
 <style scoped lang="scss">
 .logo {

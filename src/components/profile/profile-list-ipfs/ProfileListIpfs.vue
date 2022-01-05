@@ -1,7 +1,9 @@
+<script src="./profile-list-ipfs.component.ts" lang="ts"></script>
+
 <template>
   <section
-    class="has-background-success-light p-5"
     v-if="uploadedProfiles.length > 0"
+    class="has-background-success-light p-5"
   >
     <h2 class="title is-size-4">Previously Uploaded Profiles</h2>
     <table
@@ -12,10 +14,7 @@
         <th>Identifier</th>
         <th>Deploy</th>
       </tr>
-      <tr
-        v-for="uploadedProfile in uploadedProfiles"
-        v-bind:key="uploadedProfile"
-      >
+      <tr v-for="uploadedProfile in uploadedProfiles" :key="uploadedProfile">
         <td>
           {{ uploadedProfile.profile.LSP3Profile.name }}
         </td>
@@ -31,9 +30,9 @@
         <td>
           <button
             class="button is-success"
-            @click="createProfileOnChain(uploadedProfile)"
             :class="loading ? 'is-loading' : ''"
             :disabled="loading"
+            @click="createProfileOnChain(uploadedProfile)"
           >
             Deploy
           </button>
@@ -42,5 +41,3 @@
     </table>
   </section>
 </template>
-
-<script src="./profile-list-ipfs.component.ts" lang="ts"></script>

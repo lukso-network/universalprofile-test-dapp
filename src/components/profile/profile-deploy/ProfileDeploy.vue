@@ -1,9 +1,11 @@
+<script src="./profile-deploy.component.ts" lang="ts"></script>
+
 <template>
   <section class="section">
     <h1 class="title">Deploy Profile</h1>
     <ProfileListIpfs
-      @createProfileOnChain="openModal"
       :loading="status.isLoading"
+      @createProfileOnChain="openModal"
     ></ProfileListIpfs>
     <br />
     <h2 class="title">Deployment Events</h2>
@@ -21,7 +23,7 @@
       </tr>
       <tr
         v-for="deploymentEvent in profileDeploymentEvents"
-        v-bind:key="deploymentEvent"
+        :key="deploymentEvent"
         :class="deploymentEvent.status"
       >
         <td>
@@ -107,7 +109,6 @@
   </div>
 </template>
 
-<script src="./profile-deploy.component.ts" lang="ts"></script>
 <style lang="scss">
 .placeholder {
   opacity: 0.1;

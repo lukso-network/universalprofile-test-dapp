@@ -29,6 +29,7 @@ export default defineComponent({
       },
     };
   },
+  computed: {},
   methods: {
     formatNumber,
     async deploy(controllerKey: string) {
@@ -100,5 +101,4 @@ export default defineComponent({
       return `https://blockscout.com/lukso/l14/tx/${hash}/internal-transactions`;
     },
   },
-  computed: {},
 });

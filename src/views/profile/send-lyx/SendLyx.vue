@@ -1,117 +1,3 @@
-<template name="SendLyx">
-  <section class="section">
-    <h1 class="title">Send LYX</h1>
-
-    <div class="columns">
-      <div class="column is-three-fifths is-offset-one-fifth">
-        <Notifications
-          v-if="hasNotification"
-          :notification="notification"
-          @hide="clearNotification"
-        ></Notifications>
-      </div>
-    </div>
-    <div class="columns">
-      <div
-        class="
-          column
-          is-6-tablet is-offset-3-tablet is-4-fullhd is-offset-4-fullhd
-        "
-      >
-        <div class="card">
-          <NoExtension v-if="!hasExtension" />
-          <div
-            class="card-content is-flex is-align-items-center"
-            data-testid="provider-message"
-            v-else-if="!getState('isConnected')"
-          >
-            <span class="icon mr-5">
-              <i class="fas fa-plug fa-lg has-text-grey-light"></i>
-            </span>
-            Please use button in top right corner to connect with web3 provider.
-          </div>
-          <div v-else>
-            <div
-              class="has-background-primary profile-background pl-5 mb-6"
-              :style="{ backgroundImage: `url(${backgroundImageSrc})` }"
-            >
-              <Profile
-                :profile="sender"
-                :address="getState('address')"
-                class="sender"
-              ></Profile>
-            </div>
-            <div class="card-content pt-1">
-              <hr />
-              <p class="mb-4">You are about to send</p>
-              <div class="field-body">
-                <div class="field has-addons">
-                  <p class="control">
-                    <input
-                      class="input is-large"
-                      :class="{ 'is-danger': errors.amount }"
-                      type="number"
-                      placeholder="0"
-                      v-model="amount"
-                      @keyup="delete errors.amount"
-                      data-testid="amount"
-                    />
-                    <span
-                      class="has-text-danger"
-                      v-if="errors.amount"
-                      data-testid="amount-error"
-                      >{{ errors.amount }}</span
-                    >
-                  </p>
-                  <p class="control">
-                    <a
-                      class="button is-static is-large"
-                      :class="{ 'is-danger is-outlined': errors.amount }"
-                      >LYX</a
-                    >
-                  </p>
-                </div>
-                <div
-                  class="
-                    field
-                    nowrap
-                    is-flex is-flex-direction-column is-justify-content-top
-                    subtitle
-                    is-6
-                    mt-3
-                  "
-                >
-                  <div>Your balance:</div>
-                  <div>{{ balance }} LYX</div>
-                </div>
-              </div>
-              <hr />
-              <p class="mb-4">To profile</p>
-              <Search
-                :errors="errors"
-                @error="setSearchError"
-                @update="setSearchValue"
-              />
-              <div class="field is-grouped is-grouped-centered pt-4">
-                <p class="control">
-                  <button
-                    class="button is-primary is-rounded"
-                    :class="{ 'is-loading': pendingTransaction }"
-                    @click="sendLyx"
-                    data-testid="send"
-                  >
-                    Send LYX
-                  </button>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-</template>
-
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from "vue";
 import Notifications from "@/components/shared/Notification.vue";
@@ -229,6 +115,120 @@ const backgroundImageSrc = computed(() => {
   }
 });
 </script>
+
+<template name="SendLyx">
+  <section class="section">
+    <h1 class="title">Send LYX</h1>
+
+    <div class="columns">
+      <div class="column is-three-fifths is-offset-one-fifth">
+        <Notifications
+          v-if="hasNotification"
+          :notification="notification"
+          @hide="clearNotification"
+        ></Notifications>
+      </div>
+    </div>
+    <div class="columns">
+      <div
+        class="
+          column
+          is-6-tablet is-offset-3-tablet is-4-fullhd is-offset-4-fullhd
+        "
+      >
+        <div class="card">
+          <NoExtension v-if="!hasExtension" />
+          <div
+            v-else-if="!getState('isConnected')"
+            class="card-content is-flex is-align-items-center"
+            data-testid="provider-message"
+          >
+            <span class="icon mr-5">
+              <i class="fas fa-plug fa-lg has-text-grey-light"></i>
+            </span>
+            Please use button in top right corner to connect with web3 provider.
+          </div>
+          <div v-else>
+            <div
+              class="has-background-primary profile-background pl-5 mb-6"
+              :style="{ backgroundImage: `url(${backgroundImageSrc})` }"
+            >
+              <Profile
+                :profile="sender"
+                :address="getState('address')"
+                class="sender"
+              ></Profile>
+            </div>
+            <div class="card-content pt-1">
+              <hr />
+              <p class="mb-4">You are about to send</p>
+              <div class="field-body">
+                <div class="field has-addons">
+                  <p class="control">
+                    <input
+                      v-model="amount"
+                      class="input is-large"
+                      :class="{ 'is-danger': errors.amount }"
+                      type="number"
+                      placeholder="0"
+                      data-testid="amount"
+                      @keyup="delete errors.amount"
+                    />
+                    <span
+                      v-if="errors.amount"
+                      class="has-text-danger"
+                      data-testid="amount-error"
+                      >{{ errors.amount }}</span
+                    >
+                  </p>
+                  <p class="control">
+                    <a
+                      class="button is-static is-large"
+                      :class="{ 'is-danger is-outlined': errors.amount }"
+                      >LYX</a
+                    >
+                  </p>
+                </div>
+                <div
+                  class="
+                    field
+                    nowrap
+                    is-flex is-flex-direction-column is-justify-content-top
+                    subtitle
+                    is-6
+                    mt-3
+                  "
+                >
+                  <div>Your balance:</div>
+                  <div>{{ balance }} LYX</div>
+                </div>
+              </div>
+              <hr />
+              <p class="mb-4">To profile</p>
+              <Search
+                :errors="errors"
+                @error="setSearchError"
+                @update="setSearchValue"
+              />
+              <div class="field is-grouped is-grouped-centered pt-4">
+                <p class="control">
+                  <button
+                    class="button is-primary is-rounded"
+                    :class="{ 'is-loading': pendingTransaction }"
+                    data-testid="send"
+                    @click="sendLyx"
+                  >
+                    Send LYX
+                  </button>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
 
 <style scoped lang="scss">
 .nowrap {

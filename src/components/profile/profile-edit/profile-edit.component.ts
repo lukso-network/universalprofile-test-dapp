@@ -8,6 +8,12 @@ export default defineComponent({
   components: {
     ProfileListIpfs,
   },
+  data() {
+    return {
+      account: {},
+      profile: {},
+    };
+  },
   async created() {
     const { provider, signer } = await getSigner();
     if (this.$route.params.address) {
@@ -16,12 +22,6 @@ export default defineComponent({
       );
     }
     this.fetchData();
-  },
-  data() {
-    return {
-      account: {},
-      profile: {},
-    };
   },
   methods: {
     formatNumber,

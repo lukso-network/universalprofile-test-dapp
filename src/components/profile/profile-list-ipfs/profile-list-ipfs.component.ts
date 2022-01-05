@@ -4,11 +4,11 @@ import { DEFAULT_IPFS_URL } from "@/helpers/config";
 
 export default defineComponent({
   name: "ProfileListIpfs",
-  emits: {
-    createProfileOnChain: null,
-  },
   props: {
     loading: Boolean,
+  },
+  emits: {
+    createProfileOnChain: null,
   },
   data: function () {
     return {

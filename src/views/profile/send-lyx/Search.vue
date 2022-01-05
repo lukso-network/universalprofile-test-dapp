@@ -1,29 +1,3 @@
-<template name="Search">
-  <div class="field">
-    <div class="control is-small" :class="{ 'is-loading': queryPending }">
-      <input
-        class="input is-small"
-        :class="{ 'is-danger': errors?.search }"
-        type="text"
-        placeholder="Search: Universal Profile Address..."
-        v-model="search"
-        @keyup="searchReceiver"
-        data-testid="search"
-      />
-      <span
-        class="has-text-danger is-size-7"
-        v-if="errors?.search"
-        data-testid="error"
-        >{{ errors.search }}</span
-      >
-    </div>
-  </div>
-  <Profile
-    :profile="receiver"
-    :address="errors?.search ? undefined : search"
-  ></Profile>
-</template>
-
 <script setup lang="ts">
 import Web3 from "web3";
 import { ref } from "vue";
@@ -66,3 +40,29 @@ const searchReceiver = async () => {
   queryPending.value = false;
 };
 </script>
+
+<template name="Search">
+  <div class="field">
+    <div class="control is-small" :class="{ 'is-loading': queryPending }">
+      <input
+        v-model="search"
+        class="input is-small"
+        :class="{ 'is-danger': errors?.search }"
+        type="text"
+        placeholder="Search: Universal Profile Address..."
+        data-testid="search"
+        @keyup="searchReceiver"
+      />
+      <span
+        v-if="errors?.search"
+        class="has-text-danger is-size-7"
+        data-testid="error"
+        >{{ errors.search }}</span
+      >
+    </div>
+  </div>
+  <Profile
+    :profile="receiver"
+    :address="errors?.search ? undefined : search"
+  ></Profile>
+</template>
