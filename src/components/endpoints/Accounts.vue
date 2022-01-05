@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import Notifications from "@/components/shared/Notification.vue";
 import useNotifications from "@/compositions/useNotifications";
-import useWalletConnect from "@/compositions/useWalletConnect";
+import useWalletConnect, {
+  WALLET_CONNECT_VERSION as walletConnectVersion,
+} from "@/compositions/useWalletConnect";
 import { getState, useState } from "@/stores";
 import useWeb3 from "@/compositions/useWeb3";
 import { UP_CONNECTED_ADDRESS } from "@/helpers/config";
 import useEthereumRpc from "@/compositions/useEthereumRpc";
+import Web3Utils from "web3-utils";
+import { computed } from "vue";
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications();
@@ -15,6 +19,10 @@ const { resetProvider, enableProvider, setupProvider } = useWalletConnect();
 const { requestAccounts } = useEthereumRpc();
 const hasExtension = !!window.ethereum;
 
+const hexChainId = computed(() => {
+  return Web3Utils.numberToHex(getState("chainId"));
+});
+
 const connectExtension = async () => {
   clearNotification();
   setupWeb3(window.ethereum);
@@ -23,7 +31,6 @@ const connectExtension = async () => {
     const [address] = await requestAccounts();
     setConnected(address, "browserExtension");
     localStorage.setItem(UP_CONNECTED_ADDRESS, address);
-    setNotification(`Connected to address: ${address}`, "info");
   } catch (error) {
     setNotification((error as unknown as Error).message, "danger");
   }
@@ -61,7 +68,7 @@ const disconnect = async () => {
 <template>
   <div class="tile is-4 is-parent">
     <div class="tile is-child box">
-      <p class="is-size-5 has-text-weight-bold mb-4">Accounts</p>
+      <p class="is-size-5 has-text-weight-bold mb-4">Connect</p>
       <button
         class="button is-primary is-rounded"
         :disabled="getState('address') || !hasExtension ? true : undefined"
@@ -85,7 +92,7 @@ const disconnect = async () => {
         data-testid="connect-wc"
         @click="connectWalletconnect"
       >
-        Connect with Wallet Connect
+        Connect with Wallet Connect {{ walletConnectVersion }}
       </button>
       <span
         v-if="
@@ -110,6 +117,25 @@ const disconnect = async () => {
         class="mt-4"
         @hide="clearNotification"
       ></Notifications>
+
+      <div
+        v-if="getState('isConnected')"
+        class="notification is-info is-light mt-5"
+        data-testid="info"
+      >
+        <p class="mb-3">
+          Connected to address: <b>{{ getState("address") }}</b>
+        </p>
+        <p data-testid="chain">
+          Chain ID: <b>{{ getState("chainId") }} ({{ hexChainId }})</b>
+        </p>
+      </div>
     </div>
   </div>
 </template>
+
+<style scoped lang="scss">
+.notification {
+  word-break: break-all;
+}
+</style>

@@ -12,12 +12,18 @@ const getWeb3 = (): Web3 => {
   return web3;
 };
 
+const getChainId = async (): Promise<number> => {
+  return await web3.eth.getChainId();
+};
+
 export default function useWeb3(): {
   setupWeb3: (provider: Provider) => void;
   getWeb3: () => Web3;
+  getChainId: () => Promise<number>;
 } {
   return {
     setupWeb3,
     getWeb3,
+    getChainId,
   };
 }

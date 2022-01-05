@@ -4,7 +4,9 @@ import { ref, onMounted } from "vue";
 import { EthereumProviderError } from "eth-rpc-errors";
 import useDropdown from "@/compositions/useDropdown";
 import useWeb3 from "@/compositions/useWeb3";
-import useWalletConnect from "@/compositions/useWalletConnect";
+import useWalletConnect, {
+  WALLET_CONNECT_VERSION as walletConnectVersion,
+} from "@/compositions/useWalletConnect";
 import useEthereumRpc from "@/compositions/useEthereumRpc";
 import { UP_CONNECTED_ADDRESS } from "@/helpers/config";
 
@@ -81,6 +83,81 @@ onMounted(async () => {
   }
 });
 </script>
+
+<template>
+  <div v-if="getState('isConnected')" class="field has-addons">
+    <p class="control">
+      <button
+        class="button is-static is-small is-rounded"
+        data-testid="balance"
+      >
+        <span>{{ getState("balance") }} LYX</span>
+      </button>
+    </p>
+    <p class="control">
+      <button
+        class="button is-static is-small is-rounded address"
+        data-testid="address"
+      >
+        <div
+          :class="`logo ${
+            getState('channel') === 'browserExtension'
+              ? 'browser-extension'
+              : 'wallet-connect'
+          }`"
+        />
+        <span>{{ sliceAddress(getState("address")) }}</span>
+      </button>
+    </p>
+    <p class="control">
+      <button
+        class="button is-small is-rounded"
+        data-testid="disconnect"
+        @click="disconnect"
+      >
+        <span class="icon is-small">
+          <i class="fas fa-sign-out-alt"></i>
+        </span>
+      </button>
+    </p>
+  </div>
+
+  <div v-else ref="dropdown" class="dropdown is-right">
+    <div class="dropdown-trigger">
+      <button
+        ref="dropdown"
+        class="button is-primary is-small is-rounded has-text-weight-bold"
+        aria-haspopup="true"
+        aria-controls="dropdown-menu"
+        data-testid="connect"
+        @click="toggle(dropdown)"
+      >
+        <span>Connect</span>
+      </button>
+    </div>
+    <div id="dropdown-menu" class="dropdown-menu" role="menu">
+      <div class="dropdown-content">
+        <button
+          class="dropdown-item has-text-weight-bold button is-text"
+          data-testid="connect-extension"
+          :disabled="hasExtension ? undefined : true"
+          @click="connectExtension"
+        >
+          <div class="logo browser-extension" />
+          Browser Extension
+        </button>
+        <button
+          class="dropdown-item has-text-weight-bold button is-text"
+          data-testid="connect-wc"
+          @click="connectWalletConnect"
+        >
+          <div class="logo wallet-connect" />
+          Wallet Connect {{ walletConnectVersion }}
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
 
 <template>
   <div v-if="getState('isConnected')" class="field has-addons">

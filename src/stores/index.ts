@@ -1,6 +1,7 @@
 import { reactive } from "vue";
 import { Store, Channel } from "@/types";
 import useEthereumRpc from "@/compositions/useEthereumRpc";
+import useWeb3 from "@/compositions/useWeb3";
 
 export const store = reactive<Store>({
   isConnected: false,
@@ -27,16 +28,19 @@ export function useState(): {
   return {
     setConnected: async (address: string, channel: Channel) => {
       const { getBalance } = useEthereumRpc();
+      const { getChainId } = useWeb3();
 
       setState("address", address);
       setState("isConnected", true);
       setState("channel", channel);
+      setState("chainId", await getChainId());
       setState("balance", await getBalance(address));
     },
     setDisconnected: () => {
       setState("address", "");
       setState("isConnected", false);
       setState("channel", undefined);
+      setState("chainId", 0);
       setState("balance", 0);
     },
   };

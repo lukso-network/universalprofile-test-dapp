@@ -23,6 +23,7 @@ jest.mock("@/compositions/useWeb3", () => ({
   __esModule: true,
   default: () => ({
     setupWeb3: () => mockSetupWeb3(),
+    getChainId: () => 22,
   }),
 }));
 
