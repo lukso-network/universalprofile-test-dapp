@@ -29,6 +29,16 @@ jest.mock("@/compositions/useEthereumRpc", () => ({
   }),
 }));
 
+const mockSetupWeb3 = jest.fn();
+
+jest.mock("@/compositions/useWeb3", () => ({
+  __esModule: true,
+  default: () => ({
+    setupWeb3: () => mockSetupWeb3(),
+    getChainId: () => 22,
+  }),
+}));
+
 test("can connect to wallet connect", async () => {
   mockGetProvider = jest.fn().mockReturnValue({
     wc: {
@@ -65,9 +75,10 @@ test("can connect to browser extension when authorized", async () => {
 
   await waitFor(() => {
     expect(mockRequestAccounts).toBeCalledTimes(1);
-    expect(utils.getByTestId("notification").innerHTML).toContain(
+    expect(utils.getByTestId("info").innerHTML).toContain(
       "Connected to address"
     );
+    expect(utils.getByTestId("chain").innerHTML).toContain("22 (0x16)");
   });
 });
 

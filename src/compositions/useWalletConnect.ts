@@ -5,6 +5,7 @@ import useWeb3 from "@/compositions/useWeb3";
 import { provider as Provider } from "web3-core";
 
 let provider: WalletConnectProvider;
+export const WALLET_CONNECT_VERSION = "1.0";
 
 const setupProvider = async (): Promise<void> => {
   const { setupWeb3 } = useWeb3();
