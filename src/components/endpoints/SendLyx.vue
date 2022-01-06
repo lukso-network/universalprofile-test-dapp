@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import Web3Utils from "web3-utils";
-import { getState } from "@/stores";
+import { getState, setState } from "@/stores";
 import { ref } from "vue";
-import { setState } from "@/stores";
 import Notifications from "@/components/shared/Notification.vue";
 import useNotifications from "@/compositions/useNotifications";
 import useEthereumRpc from "@/compositions/useEthereumRpc";
@@ -15,23 +14,22 @@ const to = ref("");
 const amount = ref(0);
 
 const sendLyx = async () => {
-  if (!getState("address")) {
-    return;
+  const from = getState("address");
+
+  if (!from) {
+    return setNotification("No from address", "danger");
   }
 
   const transaction = {
-    from: getState("address"),
+    from,
     to: to.value,
     value: Web3Utils.toWei(amount.value.toString()),
-    gas: "0x9c40",
-    gasPrice: "0x02540be400",
-    data: "0x",
   };
 
   try {
     await sendTransaction(transaction);
     setNotification(`You successfully send ${amount.value} LYX`);
-    setState("balance", await getBalance(getState("address")));
+    setState("balance", await getBalance(from));
   } catch (error) {
     setNotification((error as unknown as Error).message, "danger");
   }
@@ -81,21 +79,24 @@ const sendLyx = async () => {
           </div>
         </div>
       </div>
-      <button
-        class="button is-primary is-rounded mt-4"
-        :disabled="getState('address') ? undefined : true"
-        data-testid="send"
-        @click="sendLyx"
-      >
-        Send Transaction
-      </button>
-
-      <Notifications
-        v-if="hasNotification"
-        :notification="notification"
-        class="mt-4"
-        @hide="clearNotification"
-      ></Notifications>
+      <div class="field">
+        <button
+          class="button is-primary is-rounded mt-4"
+          :disabled="getState('address') ? undefined : true"
+          data-testid="send"
+          @click="sendLyx"
+        >
+          Send Transaction
+        </button>
+      </div>
+      <div class="field">
+        <Notifications
+          v-if="hasNotification"
+          :notification="notification"
+          class="mt-4"
+          @hide="clearNotification"
+        ></Notifications>
+      </div>
     </div>
   </div>
 </template>
