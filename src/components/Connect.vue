@@ -9,6 +9,7 @@ import useWalletConnect, {
 } from "@/compositions/useWalletConnect";
 import useEthereumRpc from "@/compositions/useEthereumRpc";
 import { UP_CONNECTED_ADDRESS } from "@/helpers/config";
+import { sliceAddress } from "@/utils/sliceAddress";
 
 const { setupWeb3 } = useWeb3();
 const { resetProvider, setupProvider, enableProvider, getProvider } =
@@ -59,18 +60,6 @@ const disconnect = async () => {
 
   setDisconnected();
   setupWeb3(null);
-};
-
-const sliceAddress = (address?: string, sliceBy = 6): string => {
-  let sliceAddress = "";
-
-  if (address) {
-    sliceAddress = `${address.slice(0, sliceBy + 2)}...${address.slice(
-      -sliceBy
-    )}`;
-  }
-
-  return sliceAddress;
 };
 
 onMounted(async () => {
