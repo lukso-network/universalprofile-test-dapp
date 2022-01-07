@@ -41,7 +41,7 @@ test("can see error for set data when no from address", async () => {
 
   await waitFor(() => {
     expect(utils.getByTestId("notification").innerHTML).toContain(
-      "No from address"
+      "No valid address"
     );
   });
 });
@@ -84,7 +84,7 @@ test("can see error for set permissions when no from address", async () => {
 
   await waitFor(() => {
     expect(utils.getByTestId("notification").innerHTML).toContain(
-      "No from address"
+      "No valid address"
     );
   });
 });
