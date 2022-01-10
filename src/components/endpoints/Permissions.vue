@@ -89,6 +89,7 @@ const setPermissions = async () => {
               v-model="selectedPermissions[key]"
               type="checkbox"
               :value="value"
+              :disabled="getState('address') ? undefined : true"
             />
             {{ key }}
           </label>

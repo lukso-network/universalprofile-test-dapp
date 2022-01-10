@@ -108,7 +108,12 @@ const mint = async () => {
       </div>
       <div class="field">
         <label class="checkbox">
-          <input v-model="token.isNFT" type="checkbox" :value="token.isNFT" />
+          <input
+            v-model="token.isNFT"
+            type="checkbox"
+            :disabled="getState('address') ? undefined : true"
+            :value="token.isNFT"
+          />
           is NFT
         </label>
       </div>
