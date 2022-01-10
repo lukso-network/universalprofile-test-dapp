@@ -2,7 +2,7 @@ import Permissions from "../Permissions.vue";
 import { render, fireEvent, waitFor } from "@testing-library/vue";
 import { setState } from "@/stores";
 
-const mockSend = jest.fn();
+let mockSend = jest.fn();
 const mockSetData = jest.fn();
 let mockContract = jest.fn();
 
@@ -42,6 +42,9 @@ test("can selected permissions for given address", async () => {
 test("can update permissions", async () => {
   setState("address", "0x517216362D594516c6f96Ee34b2c502d65B847E4");
 
+  mockSend = jest.fn().mockImplementation(() => ({
+    on: jest.fn(),
+  }));
   mockContract = jest.fn().mockImplementation(() => ({
     methods: {
       setData: () => ({

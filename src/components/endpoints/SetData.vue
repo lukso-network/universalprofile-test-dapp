@@ -28,9 +28,14 @@ const setData = async () => {
     erc725AccountAddress
   );
   try {
-    await erc725yContract.methods.setData([key.value], [value.value]).send({
-      from: erc725AccountAddress,
-    });
+    await erc725yContract.methods
+      .setData([key.value], [value.value])
+      .send({
+        from: erc725AccountAddress,
+      })
+      .on("receipt", function (receipt: any) {
+        console.log(receipt);
+      });
 
     setNotification(`Set data`, "info");
   } catch (error) {

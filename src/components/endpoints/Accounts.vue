@@ -132,7 +132,16 @@ const disconnect = async () => {
           data-testid="info"
         >
           <p class="mb-3">
-            Connected to address: <b>{{ getState("address") }}</b>
+            Connected to address:
+            <b
+              ><a
+                :href="`https://blockscout.com/lukso/l14/address/${getState(
+                  'address'
+                )}/transactions`"
+                target="_blank"
+                >{{ getState("address") }}</a
+              ></b
+            >
           </p>
           <p class="mb-3">
             Balance: <b>{{ getState("balance") }} LYX</b>

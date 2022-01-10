@@ -45,12 +45,16 @@ const setPermissions = async () => {
   );
   const key = PERMISSION_KEY + grantPermissionAddress.value.slice(2); // key hash of AddressPermissions:Permissions:<address>
   const value = encodePermissions(selectedPermissions.value);
-  // const value = Web3Utils.padLeft(Web3Utils.toHex(ALL_PERMISSIONS), 64); // all permissions in 32 bytes
 
   try {
-    await erc725yContract.methods.setData([key], [value]).send({
-      from: erc725AccountAddress,
-    });
+    await erc725yContract.methods
+      .setData([key], [value])
+      .send({
+        from: erc725AccountAddress,
+      })
+      .on("receipt", function (receipt: any) {
+        console.log(receipt);
+      });
 
     setNotification(`Set permissions`, "info");
   } catch (error) {
