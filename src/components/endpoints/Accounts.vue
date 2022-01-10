@@ -69,66 +69,87 @@ const disconnect = async () => {
   <div class="tile is-4 is-parent">
     <div class="tile is-child box">
       <p class="is-size-5 has-text-weight-bold mb-4">Connect</p>
-      <button
-        class="button is-primary is-rounded"
-        :disabled="getState('address') || !hasExtension ? true : undefined"
-        data-testid="connect-extension"
-        @click="connectExtension"
-      >
-        Connect with Browser Extension
-      </button>
-      <span
-        v-if="
-          getState('channel') === 'browserExtension' && getState('isConnected')
-        "
-        class="icon ml-3 mt-1 has-text-primary"
-      >
-        <i class="fas fa-check"></i>
-      </span>
-      <br />
-      <button
-        class="mt-3 button is-primary is-rounded"
-        :disabled="getState('address') ? true : undefined"
-        data-testid="connect-wc"
-        @click="connectWalletconnect"
-      >
-        Connect with Wallet Connect {{ walletConnectVersion }}
-      </button>
-      <span
-        v-if="
-          getState('channel') === 'walletConnect' && getState('isConnected')
-        "
-        class="icon ml-3 mt-4 has-text-primary"
-      >
-        <i class="fas fa-check"></i>
-      </span>
-      <br />
-      <button
-        class="mt-3 button is-primary is-rounded"
-        :disabled="getState('isConnected') ? undefined : true"
-        data-testid="disconnect"
-        @click="disconnect"
-      >
-        Disconnect
-      </button>
-      <Notifications
-        v-if="hasNotification"
-        :notification="notification"
-        class="mt-4"
-        @hide="clearNotification"
-      ></Notifications>
+      <div class="field">
+        <button
+          class="button is-primary is-rounded mb-3"
+          :disabled="getState('address') || !hasExtension ? true : undefined"
+          data-testid="connect-extension"
+          @click="connectExtension"
+        >
+          Connect with Browser Extension
+        </button>
+        <span
+          v-if="
+            getState('channel') === 'browserExtension' &&
+            getState('isConnected')
+          "
+          class="icon ml-3 mt-1 has-text-primary"
+        >
+          <i class="fas fa-check"></i>
+        </span>
+      </div>
+      <div class="field">
+        <button
+          class="button is-primary is-rounded mb-3"
+          :disabled="getState('address') ? true : undefined"
+          data-testid="connect-wc"
+          @click="connectWalletconnect"
+        >
+          Connect with Wallet Connect {{ walletConnectVersion }}
+        </button>
+        <span
+          v-if="
+            getState('channel') === 'walletConnect' && getState('isConnected')
+          "
+          class="icon ml-3 mt-4 has-text-primary"
+        >
+          <i class="fas fa-check"></i>
+        </span>
+      </div>
+      <div class="field">
+        <button
+          class="button is-primary is-rounded"
+          :disabled="getState('isConnected') ? undefined : true"
+          data-testid="disconnect"
+          @click="disconnect"
+        >
+          Disconnect
+        </button>
+      </div>
+      <div class="field">
+        <Notifications
+          v-if="hasNotification"
+          :notification="notification"
+          class="mt-4"
+          @hide="clearNotification"
+        ></Notifications>
+      </div>
 
-      <div
-        v-if="getState('isConnected')"
-        class="notification is-info is-light mt-5"
-        data-testid="info"
-      >
-        <p class="mb-3">
-          Connected to address: <b>{{ getState("address") }}</b>
-        </p>
-        <p data-testid="chain">
-          Chain ID: <b>{{ getState("chainId") }} ({{ hexChainId }})</b>
-        </p>
+      <div class="field">
+        <div
+          v-if="getState('isConnected')"
+          class="notification is-info is-light mt-5"
+          data-testid="info"
+        >
+          <p class="mb-3">
+            Connected to address:
+            <b
+              ><a
+                :href="`https://blockscout.com/lukso/l14/address/${getState(
+                  'address'
+                )}/transactions`"
+                target="_blank"
+                >{{ getState("address") }}</a
+              ></b
+            >
+          </p>
+          <p class="mb-3">
+            Balance: <b>{{ getState("balance") }} LYX</b>
+          </p>
+          <p data-testid="chain">
+            Chain ID: <b>{{ getState("chainId") }} ({{ hexChainId }})</b>
+          </p>
+        </div>
       </div>
     </div>
   </div>
