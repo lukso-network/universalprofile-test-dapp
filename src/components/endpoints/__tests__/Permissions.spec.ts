@@ -3,7 +3,6 @@ import { render, fireEvent, waitFor } from "@testing-library/vue";
 import { setState } from "@/stores";
 
 let mockSend = jest.fn();
-const mockSetData = jest.fn();
 let mockContract = jest.fn();
 
 jest.mock("@/compositions/useWeb3", () => ({
@@ -17,29 +16,7 @@ beforeEach(() => {
   jest.resetAllMocks();
 });
 
-test("can selected permissions for given address", async () => {
-  setState("address", "0x517216362D594516c6f96Ee34b2c502d65B847E4");
-
-  mockContract = jest.fn().mockImplementation(() => ({
-    methods: {
-      setData: (key: any[], value: any[]) => mockSetData(key, value),
-    },
-  }));
-
-  const utils = render(Permissions);
-
-  await fireEvent.click(utils.getByTestId("CHANGEOWNER"));
-  await fireEvent.click(utils.getByTestId("setPermissions"));
-
-  await waitFor(() => {
-    expect(mockSetData).toBeCalledWith(
-      ["0x4b80742d0000000082ac0000af3bf2ffb025098b79caddfbdd113b3681817744"],
-      ["0x0000000000000000000000000000000000000000000000000000000000000001"]
-    );
-  });
-});
-
-test("can update permissions", async () => {
+test("can update permissions for given address", async () => {
   setState("address", "0x517216362D594516c6f96Ee34b2c502d65B847E4");
 
   mockSend = jest.fn().mockImplementation(() => ({
@@ -49,8 +26,8 @@ test("can update permissions", async () => {
   }));
   mockContract = jest.fn().mockImplementation(() => ({
     methods: {
-      setData: () => ({
-        send: () => mockSend(),
+      setData: (key: any[], value: any[]) => ({
+        send: () => mockSend(key, value),
       }),
     },
   }));
@@ -63,6 +40,10 @@ test("can update permissions", async () => {
   await waitFor(() => {
     expect(utils.getByTestId("notification").innerHTML).toContain(
       "Set permissions"
+    );
+    expect(mockSend).toBeCalledWith(
+      ["0x4b80742d0000000082ac0000af3bf2ffb025098b79caddfbdd113b3681817744"],
+      ["0x0000000000000000000000000000000000000000000000000000000000000001"]
     );
   });
 });

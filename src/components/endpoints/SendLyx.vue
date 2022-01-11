@@ -5,6 +5,7 @@ import { ref } from "vue";
 import Notifications from "@/components/shared/Notification.vue";
 import useNotifications from "@/compositions/useNotifications";
 import useEthereumRpc from "@/compositions/useEthereumRpc";
+import { TransactionConfig } from "web3-core";
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications();
@@ -12,6 +13,10 @@ const { getBalance, sendTransaction } = useEthereumRpc();
 
 const to = ref("");
 const amount = ref(0);
+const data = ref(
+  "0xa9059cbb000000000000000000000000def3325cce6f7289a583ff735eaee52611333fad0000000000000000000000000000000000000000000015d5cb65e4b714308000"
+);
+const hasData = ref(false);
 
 const sendLyx = async () => {
   const from = getState("address");
@@ -20,11 +25,15 @@ const sendLyx = async () => {
     return setNotification("No from address", "danger");
   }
 
-  const transaction = {
+  let transaction = {
     from,
     to: to.value,
     value: Web3Utils.toWei(amount.value.toString()),
-  };
+  } as TransactionConfig;
+
+  if (hasData.value) {
+    transaction = { ...transaction, data: data.value };
+  }
 
   try {
     await sendTransaction(transaction);
@@ -78,6 +87,28 @@ const sendLyx = async () => {
             />
           </div>
         </div>
+      </div>
+      <div class="field">
+        <label class="checkbox">
+          <input
+            v-model="hasData"
+            type="checkbox"
+            :disabled="getState('address') ? undefined : true"
+            :value="hasData"
+            data-testid="hasData"
+          />
+          with data
+        </label>
+      </div>
+      <div v-if="hasData" class="field">
+        <label class="label">Data (optional)</label>
+        <textarea
+          v-model="data"
+          class="textarea"
+          placeholder="0x..."
+          :disabled="getState('address') ? undefined : true"
+          data-testid="data"
+        ></textarea>
       </div>
       <div class="field">
         <button
