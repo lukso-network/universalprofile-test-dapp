@@ -47,6 +47,9 @@ const create = async () => {
       .send({ from: erc725AccountAddress })
       .on("receipt", function (receipt: any) {
         console.log(receipt);
+      })
+      .once("sending", (payload: any) => {
+        console.log(JSON.stringify(payload, null, 2));
       });
     isTokenCreated.value = true;
     setNotification("Token created", "info");
@@ -68,6 +71,9 @@ const mint = async () => {
         .send({ from: erc725AccountAddress })
         .on("receipt", function (receipt: any) {
           console.log(receipt);
+        })
+        .once("sending", (payload: any) => {
+          console.log(JSON.stringify(payload, null, 2));
         });
 
       setNotification("Token minted", "info");

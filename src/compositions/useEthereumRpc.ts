@@ -23,7 +23,14 @@ const requestAccounts = async (): Promise<string[]> => {
 };
 
 const sendTransaction = async (transaction: TransactionConfig) => {
-  return await getWeb3().eth.sendTransaction(transaction);
+  return await getWeb3()
+    .eth.sendTransaction(transaction)
+    .on("receipt", function (receipt: any) {
+      console.log(receipt);
+    })
+    .once("sending", (payload) => {
+      console.log(JSON.stringify(payload, null, 2));
+    });
 };
 
 export default function useEthereumRpc(): {

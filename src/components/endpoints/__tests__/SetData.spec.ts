@@ -24,7 +24,9 @@ test("can set data", async () => {
   setState("address", "0x517216362D594516c6f96Ee34b2c502d65B847E4");
 
   mockSend = jest.fn().mockImplementation(() => ({
-    on: jest.fn(),
+    on: () => ({
+      once: () => jest.fn(),
+    }),
   }));
 
   const utils = render(SetData);

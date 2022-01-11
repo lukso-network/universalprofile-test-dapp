@@ -11,16 +11,20 @@ jest.mock("@/compositions/useWeb3", () => ({
       deploy: () => ({
         send: () => ({
           on: () => ({
-            options: {
-              address: "0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298",
-            },
-            methods: {
-              mint: () => ({
-                send: () => ({
-                  on: () => jest.fn(),
+            once: () => ({
+              options: {
+                address: "0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298",
+              },
+              methods: {
+                mint: () => ({
+                  send: () => ({
+                    on: () => ({
+                      once: () => jest.fn(),
+                    }),
+                  }),
                 }),
-              }),
-            },
+              },
+            }),
           }),
         }),
       }),

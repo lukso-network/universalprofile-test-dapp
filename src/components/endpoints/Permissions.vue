@@ -54,6 +54,9 @@ const setPermissions = async () => {
       })
       .on("receipt", function (receipt: any) {
         console.log(receipt);
+      })
+      .once("sending", (payload: any) => {
+        console.log(JSON.stringify(payload, null, 2));
       });
 
     setNotification(`Set permissions`, "info");
