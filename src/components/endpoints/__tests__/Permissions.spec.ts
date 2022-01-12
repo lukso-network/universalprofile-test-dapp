@@ -39,7 +39,7 @@ test("can update permissions for given address", async () => {
 
   await waitFor(() => {
     expect(utils.getByTestId("notification").innerHTML).toContain(
-      "Set permissions"
+      "Permissions set"
     );
     expect(mockSend).toBeCalledWith(
       ["0x4b80742d0000000082ac0000af3bf2ffb025098b79caddfbdd113b3681817744"],
