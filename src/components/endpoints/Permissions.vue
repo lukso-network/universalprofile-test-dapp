@@ -61,7 +61,7 @@ const setPermissions = async () => {
         console.log(JSON.stringify(payload, null, 2));
       });
 
-    setNotification(`Set permissions`, "info");
+    setNotification("Permissions set", "info");
   } catch (error) {
     setNotification((error as unknown as Error).message, "danger");
   } finally {
