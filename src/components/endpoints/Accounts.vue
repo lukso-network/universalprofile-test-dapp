@@ -76,7 +76,7 @@ const disconnect = async () => {
           data-testid="connect-extension"
           @click="connectExtension"
         >
-          Connect with Browser Extension
+          Browser Extension
         </button>
         <span
           v-if="
@@ -95,7 +95,7 @@ const disconnect = async () => {
           data-testid="connect-wc"
           @click="connectWalletconnect"
         >
-          Connect with Wallet Connect {{ walletConnectVersion }}
+          Wallet Connect {{ walletConnectVersion }}
         </button>
         <span
           v-if="

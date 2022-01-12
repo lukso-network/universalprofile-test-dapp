@@ -15,6 +15,7 @@ const key = ref(
 const value = ref(
   "0x6f357c6a70546a2accab18748420b63c63b5af4cf710848ae83afc0c51dd8ad17fb5e8b3697066733a2f2f516d65637247656a555156587057347a53393438704e76636e51724a314b69416f4d36626466725663575a736e35"
 ); // encoded profile ipfs url
+const isPending = ref(false);
 
 const setData = async () => {
   const erc725AccountAddress = getState("address");
@@ -28,6 +29,7 @@ const setData = async () => {
     erc725AccountAddress
   );
   try {
+    isPending.value = true;
     await erc725yContract.methods
       .setData([key.value], [value.value])
       .send({
@@ -43,6 +45,8 @@ const setData = async () => {
     setNotification(`Set data`, "info");
   } catch (error) {
     setNotification((error as unknown as Error).message, "danger");
+  } finally {
+    isPending.value = false;
   }
 };
 </script>
@@ -75,7 +79,9 @@ const setData = async () => {
       </div>
       <div class="field">
         <button
-          class="button is-primary is-rounded mb-3"
+          :class="`button is-primary is-rounded mb-3 ${
+            isPending ? 'is-loading' : ''
+          }`"
           :disabled="getState('address') ? undefined : true"
           data-testid="setData"
           @click="setData"

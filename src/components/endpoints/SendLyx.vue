@@ -14,9 +14,10 @@ const { getBalance, sendTransaction } = useEthereumRpc();
 const to = ref("");
 const amount = ref(0);
 const data = ref(
-  "0xa9059cbb000000000000000000000000def3325cce6f7289a583ff735eaee52611333fad0000000000000000000000000000000000000000000015d5cb65e4b714308000"
+  "0x44c028fe000000000000000000000000000000000000000000000000000000000000000000000000000000000000000052581Cfc2586cA3a5d3C9eA2235738FE375f918e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000644e3e6e9c0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000140b8bec57d7b5ff0dbd9e9acd0a47dfeb0101e1a203766f5ccab00445fbf39e900000000000000000000000000000000000000000000000000000000"
 );
 const hasData = ref(false);
+const isPending = ref(false);
 
 const sendLyx = async () => {
   const from = getState("address");
@@ -36,11 +37,14 @@ const sendLyx = async () => {
   }
 
   try {
+    isPending.value = true;
     await sendTransaction(transaction);
-    setNotification(`You successfully send ${amount.value} LYX`);
+    setNotification("The transaction was successful");
     setState("balance", await getBalance(from));
   } catch (error) {
     setNotification((error as unknown as Error).message, "danger");
+  } finally {
+    isPending.value = false;
   }
 };
 </script>
@@ -112,7 +116,9 @@ const sendLyx = async () => {
       </div>
       <div class="field">
         <button
-          class="button is-primary is-rounded mt-4"
+          :class="`button is-primary is-rounded mt-4 ${
+            isPending ? 'is-loading' : ''
+          }`"
           :disabled="getState('address') ? undefined : true"
           data-testid="send"
           @click="sendLyx"

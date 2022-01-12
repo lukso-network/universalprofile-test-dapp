@@ -31,6 +31,7 @@ const permissions: Permissions = {
   SIGN: false,
 };
 const selectedPermissions = ref(permissions);
+const isPending = ref(false);
 
 const setPermissions = async () => {
   const erc725AccountAddress = getState("address");
@@ -47,6 +48,7 @@ const setPermissions = async () => {
   const value = encodePermissions(selectedPermissions.value);
 
   try {
+    isPending.value = true;
     await erc725yContract.methods
       .setData([key], [value])
       .send({
@@ -62,6 +64,8 @@ const setPermissions = async () => {
     setNotification(`Set permissions`, "info");
   } catch (error) {
     setNotification((error as unknown as Error).message, "danger");
+  } finally {
+    isPending.value = false;
   }
 };
 </script>
@@ -74,9 +78,9 @@ const setPermissions = async () => {
         <label class="label">Address</label>
         <div class="control">
           <input
+            v-model="grantPermissionAddress"
             class="input"
             type="text"
-            :value="grantPermissionAddress"
             :disabled="getState('address') ? undefined : true"
           />
         </div>
@@ -106,9 +110,7 @@ const setPermissions = async () => {
         >
           <p class="">
             Hex:
-            <b>{{
-              sliceAddress(encodePermissions(selectedPermissions), 10)
-            }}</b>
+            <b>{{ sliceAddress(encodePermissions(selectedPermissions), 8) }}</b>
           </p>
           <p class="">
             Decimal:
@@ -124,7 +126,9 @@ const setPermissions = async () => {
       </div>
       <div class="field">
         <button
-          class="button is-primary is-rounded mb-3"
+          :class="`button is-primary is-rounded mb-3 ${
+            isPending ? 'is-loading' : ''
+          }`"
           :disabled="getState('address') ? undefined : true"
           data-testid="setPermissions"
           @click="setPermissions"
