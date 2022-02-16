@@ -4,7 +4,7 @@ import Accounts from "@/components/endpoints/Accounts.vue";
 import SetData from "@/components/endpoints/SetData.vue";
 import Permissions from "@/components/endpoints/Permissions.vue";
 import Assets from "@/components/endpoints/Assets.vue";
-// import Execute from "@/components/endpoints/Execute.vue";
+import Sign from "@/components/endpoints/Sign.vue";
 </script>
 
 <template>
@@ -17,7 +17,7 @@ import Assets from "@/components/endpoints/Assets.vue";
     <div class="tile is-ancestor">
       <Permissions />
       <Assets />
-      <!-- <Execute /> -->
+      <Sign />
     </div>
   </section>
 </template>
