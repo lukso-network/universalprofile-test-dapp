@@ -8,13 +8,13 @@ import { DEFAULT_IPFS_URL } from "@/helpers/config";
 import useErc725 from "@/compositions/useErc725";
 import { Errors } from "@/types";
 import useNotifications from "@/compositions/useNotifications";
-import useEthereumRpc from "@/compositions/useEthereumRpc";
+import useWeb3 from "@/compositions/useWeb3";
 import { getState } from "@/stores";
 import { LSP3Profile } from "@lukso/lsp-factory.js";
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications();
-const { getBalance, sendTransaction } = useEthereumRpc();
+const { sendTransaction, getBalance } = useWeb3();
 const { fetchProfile } = useErc725();
 
 const hasExtension = !!window.ethereum;

@@ -4,12 +4,12 @@ import { getState, setState } from "@/stores";
 import { ref } from "vue";
 import Notifications from "@/components/shared/Notification.vue";
 import useNotifications from "@/compositions/useNotifications";
-import useEthereumRpc from "@/compositions/useEthereumRpc";
 import { TransactionConfig } from "web3-core";
+import useWeb3 from "@/compositions/useWeb3";
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications();
-const { getBalance, sendTransaction } = useEthereumRpc();
+const { sendTransaction, getBalance } = useWeb3();
 
 const to = ref("");
 const amount = ref(0);

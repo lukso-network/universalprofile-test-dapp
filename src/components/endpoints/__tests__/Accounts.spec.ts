@@ -20,22 +20,15 @@ jest.mock("@/compositions/useWalletConnect", () => ({
 const mockAccounts = jest.fn();
 const mockGetBalance = jest.fn();
 let mockRequestAccounts = jest.fn();
-jest.mock("@/compositions/useEthereumRpc", () => ({
-  __esModule: true,
-  default: () => ({
-    accounts: () => mockAccounts(),
-    getBalance: () => mockGetBalance(),
-    requestAccounts: () => mockRequestAccounts(),
-  }),
-}));
-
 const mockSetupWeb3 = jest.fn();
-
 jest.mock("@/compositions/useWeb3", () => ({
   __esModule: true,
   default: () => ({
     setupWeb3: () => mockSetupWeb3(),
     getChainId: () => 22,
+    accounts: () => mockAccounts(),
+    getBalance: () => mockGetBalance(),
+    requestAccounts: () => mockRequestAccounts(),
   }),
 }));
 

@@ -7,16 +7,14 @@ import useWalletConnect, {
 import { getState, useState } from "@/stores";
 import useWeb3 from "@/compositions/useWeb3";
 import { UP_CONNECTED_ADDRESS } from "@/helpers/config";
-import useEthereumRpc from "@/compositions/useEthereumRpc";
 import Web3Utils from "web3-utils";
 import { computed } from "vue";
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications();
 const { setDisconnected, setConnected } = useState();
-const { setupWeb3 } = useWeb3();
+const { setupWeb3, requestAccounts } = useWeb3();
 const { resetProvider, enableProvider, setupProvider } = useWalletConnect();
-const { requestAccounts } = useEthereumRpc();
 const hasExtension = !!window.ethereum;
 
 const hexChainId = computed(() => {
@@ -124,7 +122,6 @@ const disconnect = async () => {
           @hide="clearNotification"
         ></Notifications>
       </div>
-
       <div class="field">
         <div
           v-if="getState('isConnected')"
