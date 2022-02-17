@@ -6,6 +6,7 @@ import LSP7Mintable from "@lukso/universalprofile-smart-contracts/artifacts/LSP7
 import useWeb3 from "@/compositions/useWeb3";
 import { ref } from "vue";
 import { Contract } from "web3-eth-contract";
+import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from "@/helpers/config";
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications();
@@ -37,8 +38,8 @@ const create = async () => {
   try {
     // create an instance
     myToken.value = contract(LSP7Mintable.abi as any, "", {
-      gas: 5_000_000,
-      gasPrice: "1000000000",
+      gas: DEFAULT_GAS,
+      gasPrice: DEFAULT_GAS_PRICE,
     }); // address is empty because we are deploying the contract
 
     // deploy the token contract

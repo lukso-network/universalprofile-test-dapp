@@ -1172,6 +1172,14 @@
     "@openzeppelin/contracts" "^4.3.1"
     solidity-bytes-utils "0.8.0"
 
+"@erc725/smart-contracts@^2.3.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@erc725/smart-contracts/-/smart-contracts-2.3.0.tgz#cfd9a2391393e875e38f60c00825a190f0ca367f"
+  integrity sha512-SPSlf9L4qU4NTKulquLnB7IEzBVpvGnP7Cuy2OntBL08a9ZmzyE9cvBk9Gx+faNFdwS89AxTwcaM/p08UFB6BQ==
+  dependencies:
+    "@openzeppelin/contracts" "^4.3.1"
+    solidity-bytes-utils "0.8.0"
+
 "@eslint/eslintrc@^0.4.3":
   version "0.4.3"
   resolved "https://registry.npmjs.org/@eslint/eslintrc/-/eslintrc-0.4.3.tgz"
@@ -1889,6 +1897,15 @@
     ipfs-http-client "52.0.3"
     ipfs-utils "8.1.6"
     rxjs "^7.3.0"
+
+"@lukso/lsp-smart-contracts@0.4.3":
+  version "0.4.3"
+  resolved "https://registry.yarnpkg.com/@lukso/lsp-smart-contracts/-/lsp-smart-contracts-0.4.3.tgz#229abe1e04cab7410a785572ebc60059f353a7f9"
+  integrity sha512-kjj27I8wnJJzkiO0p4ZBPUpH43OfPGY9ylczYegi+65QhD7SHBahMMhXaQhT9f6gXXL+4YNP2757MLGq2MeLOw==
+  dependencies:
+    "@erc725/smart-contracts" "^2.3.0"
+    "@openzeppelin/contracts" "^4.3.1"
+    solidity-bytes-utils "0.8.0"
 
 "@lukso/universalprofile-smart-contracts@0.4.1":
   version "0.4.1"
