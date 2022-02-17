@@ -11,6 +11,7 @@ import useNotifications from "@/compositions/useNotifications";
 import useEthereumRpc from "@/compositions/useEthereumRpc";
 import { getState } from "@/stores";
 import { LSP3Profile } from "@lukso/lsp-factory.js";
+import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from "@/helpers/config";
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications();
@@ -55,6 +56,8 @@ const sendLyx = async () => {
       from: getState("address"),
       to: search.value,
       value: amount.value.toString(),
+      gas: DEFAULT_GAS,
+      gasPrice: DEFAULT_GAS_PRICE,
     };
     await sendTransaction(transaction);
   } catch (error) {

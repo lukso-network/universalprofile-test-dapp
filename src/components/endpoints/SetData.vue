@@ -5,6 +5,7 @@ import useNotifications from "@/compositions/useNotifications";
 import useWeb3 from "@/compositions/useWeb3";
 import UniversalProfile from "@lukso/universalprofile-smart-contracts/artifacts/UniversalProfile.json";
 import { ref } from "vue";
+import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from "@/helpers/config";
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications();
@@ -26,7 +27,8 @@ const setData = async () => {
 
   const erc725yContract = contract(
     UniversalProfile.abi as any,
-    erc725AccountAddress
+    erc725AccountAddress,
+    { gas: DEFAULT_GAS, gasPrice: DEFAULT_GAS_PRICE }
   );
   try {
     isPending.value = true;

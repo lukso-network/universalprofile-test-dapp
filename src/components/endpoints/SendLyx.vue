@@ -6,6 +6,7 @@ import Notifications from "@/components/shared/Notification.vue";
 import useNotifications from "@/compositions/useNotifications";
 import useEthereumRpc from "@/compositions/useEthereumRpc";
 import { TransactionConfig } from "web3-core";
+import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from "@/helpers/config";
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications();
@@ -30,6 +31,8 @@ const sendLyx = async () => {
     from,
     to: to.value,
     value: Web3Utils.toWei(amount.value.toString()),
+    gas: DEFAULT_GAS,
+    gasPrice: DEFAULT_GAS_PRICE,
   } as TransactionConfig;
 
   if (hasData.value) {

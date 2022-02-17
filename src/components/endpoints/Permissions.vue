@@ -10,6 +10,7 @@ import useErc725, { Permissions } from "@/compositions/useErc725";
 import { sliceAddress } from "@/utils/sliceAddress";
 import { hexToBytes } from "@/utils/hexToBytes";
 import Web3Utils from "web3-utils";
+import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from "@/helpers/config";
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications();
@@ -42,7 +43,8 @@ const setPermissions = async () => {
 
   const erc725yContract = contract(
     UniversalProfile.abi as any,
-    erc725AccountAddress
+    erc725AccountAddress,
+    { gas: DEFAULT_GAS, gasPrice: DEFAULT_GAS_PRICE }
   );
   const key = PERMISSION_KEY + grantPermissionAddress.value.slice(2); // key hash of AddressPermissions:Permissions:<address>
   const value = encodePermissions(selectedPermissions.value);
