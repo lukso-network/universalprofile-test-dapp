@@ -4,7 +4,7 @@ import Notifications from "@/components/shared/Notification.vue";
 import useNotifications from "@/compositions/useNotifications";
 import useWeb3 from "@/compositions/useWeb3";
 import UniversalProfile from "@lukso/universalprofile-smart-contracts/artifacts/UniversalProfile.json";
-import { PERMISSION_KEY } from "@/helpers/config";
+import { ERC725YKeys } from "@lukso/lsp-smart-contracts/constants";
 import { ref } from "vue";
 import useErc725, { Permissions } from "@/compositions/useErc725";
 import { sliceAddress } from "@/utils/sliceAddress";
@@ -46,7 +46,9 @@ const setPermissions = async () => {
     erc725AccountAddress,
     { gas: DEFAULT_GAS, gasPrice: DEFAULT_GAS_PRICE }
   );
-  const key = PERMISSION_KEY + grantPermissionAddress.value.slice(2); // key hash of AddressPermissions:Permissions:<address>
+  const key =
+    ERC725YKeys["LSP6"]["AddressPermissions:Permissions"] +
+    grantPermissionAddress.value.slice(2);
   const value = encodePermissions(selectedPermissions.value);
 
   try {
