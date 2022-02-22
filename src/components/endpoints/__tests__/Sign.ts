@@ -18,7 +18,10 @@ beforeEach(() => {
 });
 
 test("can sign message", async () => {
-  mockSign = jest.fn().mockReturnValue("0x123");
+  mockSign = jest.fn().mockReturnValue({
+    signature: "0x123",
+    address: "0x321",
+  });
   setState("address", "0x517216362D594516c6f96Ee34b2c502d65B847E4");
   const utils = render(Sign);
 
@@ -32,12 +35,20 @@ test("can sign message", async () => {
       "sign message",
       "0x517216362D594516c6f96Ee34b2c502d65B847E4"
     );
-    expect(utils.getByTestId("info").innerHTML).toContain("0x123");
+    expect(mockSign).toReturnWith({
+      signature: "0x123",
+      address: "0x321",
+    });
+    expect(utils.getByTestId("signature").innerHTML).toContain("0x123");
+    expect(utils.getByTestId("sign-eoa").innerHTML).toContain("0x321");
   });
 });
 
 test("can recovery message", async () => {
-  mockSign = jest.fn().mockReturnValue("0x123");
+  mockSign = jest.fn().mockReturnValue({
+    signature: "0x123",
+    address: "0x321",
+  });
   mockRecover = jest.fn().mockReturnValue("0x321");
   setState("address", "0x517216362D594516c6f96Ee34b2c502d65B847E4");
   const utils = render(Sign);
@@ -50,7 +61,7 @@ test("can recovery message", async () => {
       "Recover was successful"
     );
     expect(mockRecover).toBeCalledWith("sign message", "0x123");
-    expect(utils.getByTestId("info").innerHTML).toContain("0x123");
-    expect(utils.getByTestId("info").innerHTML).toContain("0x321");
+    expect(mockRecover).toReturnWith("0x321");
+    expect(utils.getByTestId("recovery-eoa").innerHTML).toContain("0x321");
   });
 });

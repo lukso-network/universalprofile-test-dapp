@@ -11,7 +11,7 @@ const { sign, recover } = useWeb3();
 
 const isPending = ref(false);
 const message = ref("sign message");
-const signature = ref();
+const signResponse = ref();
 const recovery = ref();
 
 const onSign = async () => {
@@ -23,7 +23,7 @@ const onSign = async () => {
 
   try {
     isPending.value = true;
-    signature.value = await sign(message.value, erc725AccountAddress);
+    signResponse.value = await sign(message.value, erc725AccountAddress);
 
     setNotification("Message signed successfully");
   } catch (error) {
@@ -35,7 +35,7 @@ const onSign = async () => {
 
 const onRecover = async () => {
   try {
-    recovery.value = await recover(message.value, signature.value);
+    recovery.value = await recover(message.value, signResponse.value.signature);
 
     setNotification("Recover was successful");
   } catch (error) {
@@ -75,7 +75,7 @@ const onRecover = async () => {
       <div class="field">
         <button
           class="button is-primary is-rounded mb-3"
-          :disabled="getState('address') && signature ? undefined : true"
+          :disabled="getState('address') && signResponse ? undefined : true"
           data-testid="recover"
           @click="onRecover"
         >
@@ -92,16 +92,20 @@ const onRecover = async () => {
       </div>
       <div class="field">
         <div
-          v-if="signature"
+          v-if="signResponse"
           class="notification is-info is-light mt-5"
           data-testid="info"
         >
           <p class="mb-3">
             Signature:
-            <b>{{ signature }}</b>
+            <b data-testid="signature">{{ signResponse.signature }}</b>
+          </p>
+          <p class="mb-3">
+            Sign EoA:
+            <b data-testid="sign-eoa">{{ signResponse.address }}</b>
           </p>
           <p v-if="recovery" class="mb-3">
-            Recover EoA: <b>{{ recovery }}</b>
+            Recover EoA: <b data-testid="recovery-eoa">{{ recovery }}</b>
           </p>
         </div>
       </div>
