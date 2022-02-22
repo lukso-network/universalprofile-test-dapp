@@ -95,9 +95,9 @@ const mint = async () => {
         <label class="label">Token name</label>
         <div class="control">
           <input
+            v-model="token.name"
             class="input"
             type="text"
-            :value="token.name"
             :disabled="getState('address') ? undefined : true"
           />
         </div>
@@ -106,9 +106,9 @@ const mint = async () => {
         <label class="label">Token symbol</label>
         <div class="control">
           <input
+            v-model="token.symbol"
             class="input"
             type="text"
-            :value="token.symbol"
             :disabled="getState('address') ? undefined : true"
           />
         </div>
