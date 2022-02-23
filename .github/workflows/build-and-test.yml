@@ -142,7 +142,12 @@ jobs:
         run: npm run build --if-present
   test_unit:
     name: Unit Tests
-    needs: build
+    needs:
+      - build
+      - lint_scripts
+      - lint_styles
+      - lint_format
+      - lint_types
     runs-on: ubuntu-latest
     continue-on-error: false
     outputs:
