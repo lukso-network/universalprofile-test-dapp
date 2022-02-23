@@ -3,7 +3,7 @@
   overflow: hidden;
   width: 250px;
   height: 300px;
-  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 2px rgba(0 0 0 / 30%);
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -38,6 +38,14 @@
   overflow: hidden;
   padding: 0.625rem 1.25rem;
   width: 250px;
+  margin-bottom: 50px;
+  background: white;
+}
+
+.input-fields {
+  label {
+    display: block;
+  }
 }
 
 .no-js .image-file + label {
@@ -50,29 +58,13 @@
   outline: -webkit-focus-ring-color auto 5px;
 }
 
-// .image-file + label * {
-//   /* pointer-events: none; */
-//   /* in case of FastClick lib use */
-// }
-
 .image-file + label svg {
   width: 1em;
   height: 1em;
   vertical-align: middle;
-  fill: currentColor;
+  fill: currentcolor;
   margin-top: -0.25em;
   margin-right: 0.25em;
-}
-
-.image-file + label {
-  margin-bottom: 50px;
-  background: white;
-}
-
-.input-fields {
-  label {
-    display: block;
-  }
 }
 
 section.images {
@@ -90,9 +82,11 @@ section.images {
 .field-body {
   margin-bottom: 10px;
 }
+
 section {
   overflow: hidden;
 }
+
 .upload-form {
   padding: 20px;
   margin-bottom: 20px;
