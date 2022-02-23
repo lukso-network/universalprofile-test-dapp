@@ -7,16 +7,14 @@ import useWeb3 from "@/compositions/useWeb3";
 import useWalletConnect, {
   WALLET_CONNECT_VERSION as walletConnectVersion,
 } from "@/compositions/useWalletConnect";
-import useEthereumRpc from "@/compositions/useEthereumRpc";
 import { UP_CONNECTED_ADDRESS } from "@/helpers/config";
 import { sliceAddress } from "@/utils/sliceAddress";
 
-const { setupWeb3 } = useWeb3();
+const { setupWeb3, accounts, requestAccounts } = useWeb3();
 const { resetProvider, setupProvider, enableProvider, getProvider } =
   useWalletConnect();
 const { setDisconnected, setConnected } = useState();
 const { close, toggle } = useDropdown();
-const { accounts, requestAccounts } = useEthereumRpc();
 const dropdown = ref();
 const browserExtensionConnected = localStorage.getItem(UP_CONNECTED_ADDRESS);
 const hasExtension = !!window.ethereum;

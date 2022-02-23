@@ -3,7 +3,7 @@ import { render, fireEvent } from "@testing-library/vue";
 import { setState } from "@/stores";
 
 const mockGetBalance = jest.fn().mockReturnValue(10);
-jest.mock("@/compositions/useEthereumRpc", () => ({
+jest.mock("@/compositions/useWeb3", () => ({
   __esModule: true,
   default: () => ({
     getBalance: () => mockGetBalance(),

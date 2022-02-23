@@ -4,7 +4,7 @@ import { setState } from "@/stores";
 
 const mockGetBalance = jest.fn();
 const mockSendTransaction = jest.fn();
-jest.mock("@/compositions/useEthereumRpc", () => ({
+jest.mock("@/compositions/useWeb3", () => ({
   __esModule: true,
   default: () => ({
     getBalance: () => mockGetBalance(),

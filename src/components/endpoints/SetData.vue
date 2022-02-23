@@ -61,9 +61,9 @@ const setData = async () => {
         <label class="label">Key</label>
         <div class="control">
           <input
+            v-model="key"
             class="input"
             type="text"
-            :value="key"
             :disabled="getState('address') ? undefined : true"
           />
         </div>
@@ -72,9 +72,9 @@ const setData = async () => {
         <label class="label">Value</label>
         <div class="control">
           <input
+            v-model="value"
             class="input"
             type="text"
-            :value="value"
             :disabled="getState('address') ? undefined : true"
           />
         </div>
