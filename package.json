@@ -10,7 +10,8 @@
     "lint": "npm-run-all --aggregate-output --continue-on-error --parallel 'lint:!(fix)'",
     "lint:js": "vue-cli-service lint",
     "lint:css": "stylelint \"**/*.{css,scss,vue}\"",
-    "lint:format": "prettier --check --loglevel=warn ."
+    "lint:format": "prettier --check --loglevel=warn .",
+    "lint:types": "tsc --noEmit"
   },
   "dependencies": {
     "@erc725/erc725.js": "0.9.0",
