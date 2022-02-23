@@ -2,8 +2,6 @@ import Assets from "../Assets.vue";
 import { render, fireEvent, waitFor } from "@testing-library/vue";
 import { setState } from "@/stores";
 
-const mockContract = jest.fn();
-
 jest.mock("@/compositions/useWeb3", () => ({
   __esModule: true,
   default: () => ({
