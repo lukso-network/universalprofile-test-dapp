@@ -12,20 +12,157 @@ on:
       - "*"
 
 env:
+  cache_version: v1
   node-version: 16.14.0
 
 jobs:
-  build:
+  dependencies:
+    name: Install dependencies
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2
         with:
           node-version: ${{ env.node-version }}
-          cache: "npm"
-      - run: npm i
-      - run: npm run build --if-present
-      - run: npm run lint
-      - run: npm run test:unit
+      - name: Set lockfile_hash
+        run: echo "lockfile_hash=${{ hashFiles('**/package-lock.json') }}" >> $GITHUB_ENV
+      - name: Restore node_modules cache
+        uses: actions/cache@v2
+        id: node-modules-cache
+        with:
+          path: ./node_modules
+          key: ${{ runner.os }}-node-modules-${{ env.cache_version }}-${{ env.lockfile_hash }}
+      - name: Get npm cache directory path
+        if: steps.node-modules-cache.outputs.cache-hit != 'true'
+        id: npm-cache-dir-path
+        run: echo "::set-output name=dir::~/.npm/_cacache"
+      - name: Restore npm cache
+        if: steps.node-modules-cache.outputs.cache-hit != 'true'
+        uses: actions/cache@v2
+        id: npm-cache
+        with:
+          path: ${{ steps.npm-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-npm-${{ env.cache_version }}-${{ env.lockfile_hash }}
+          restore-keys: ${{ runner.os }}-npm-${{ env.cache_version }}-
+      - name: Install dependencies
+        if: steps.node-modules-cache.outputs.cache-hit != 'true'
+        run: npm i
+  lint_scripts:
+    name: Lint JavaScript
+    needs: dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.node-version }}
+      - name: Restore node_modules cache
+        uses: actions/cache@v2
+        id: node-modules-cache
+        with:
+          path: ./node_modules
+          key: ${{ runner.os }}-node-modules-${{ env.cache_version }}-${{ hashFiles('**/package-lock.json') }}
+      - name: Lint
+        run: npm run lint:js
+  lint_styles:
+    name: Lint Styles
+    needs: dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.node-version }}
+      - name: Restore node_modules cache
+        uses: actions/cache@v2
+        id: node-modules-cache
+        with:
+          path: ./node_modules
+          key: ${{ runner.os }}-node-modules-${{ env.cache_version }}-${{ hashFiles('**/package-lock.json') }}
+      - name: Lint
+        run: npm run lint:css
+  lint_format:
+    name: Lint Formatting
+    needs: dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.node-version }}
+      - name: Restore node_modules cache
+        uses: actions/cache@v2
+        id: node-modules-cache
+        with:
+          path: ./node_modules
+          key: ${{ runner.os }}-node-modules-${{ env.cache_version }}-${{ hashFiles('**/package-lock.json') }}
+      - name: Lint
+        run: npm run lint:format
+  lint_types:
+    name: Lint Typings
+    needs: dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.node-version }}
+      - name: Restore node_modules cache
+        uses: actions/cache@v2
+        id: node-modules-cache
+        with:
+          path: ./node_modules
+          key: ${{ runner.os }}-node-modules-${{ env.cache_version }}-${{ hashFiles('**/package-lock.json') }}
+      - name: Lint
+        run: npm run lint:types
+  build:
+    name: Build application
+    needs:
+      - dependencies
+      - lint_types
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.node-version }}
+      - name: Restore node_modules cache
+        uses: actions/cache@v2
+        id: node-modules-cache
+        with:
+          path: ./node_modules
+          key: ${{ runner.os }}-node-modules-${{ env.cache_version }}-${{ hashFiles('**/package-lock.json') }}
+      - name: Build app
+        run: npm run build --if-present
+  test_unit:
+    name: Unit Tests
+    needs:
+      - build
+      - lint_scripts
+      - lint_styles
+      - lint_format
+      - lint_types
+    runs-on: ubuntu-latest
+    continue-on-error: false
+    outputs:
+      test-results: ${{ steps.status.outputs.test-results }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.node-version }}
+      - name: Restore node_modules cache
+        uses: actions/cache@v2
+        id: node-modules-cache
+        with:
+          path: ./node_modules
+          key: ${{ runner.os }}-node-modules-${{ env.cache_version }}-${{ hashFiles('**/package-lock.json') }}
+      - name: Run tests
+        run: npm run test:unit
