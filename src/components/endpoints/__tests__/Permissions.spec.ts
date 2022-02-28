@@ -1,16 +1,17 @@
 import Permissions from "../Permissions.vue";
 import { render, fireEvent, waitFor } from "@testing-library/vue";
 import { setState } from "@/stores";
+import { Contract } from "web3-eth-contract";
 
 let mockSend = jest.fn();
-let mockContract = jest.fn();
 
-jest.mock("@/compositions/useWeb3", () => ({
-  __esModule: true,
-  default: () => ({
-    contract: () => mockContract(),
-  }),
-}));
+window.erc725Account = {
+  methods: {
+    setData: (key: any[], value: any[]) => ({
+      send: () => mockSend(key, value),
+    }),
+  },
+} as Contract;
 
 beforeEach(() => {
   jest.resetAllMocks();
@@ -23,13 +24,6 @@ test("can update permissions for given address", async () => {
     on: () => ({
       once: () => jest.fn(),
     }),
-  }));
-  mockContract = jest.fn().mockImplementation(() => ({
-    methods: {
-      setData: (key: any[], value: any[]) => ({
-        send: () => mockSend(key, value),
-      }),
-    },
   }));
 
   const utils = render(Permissions);
@@ -65,16 +59,11 @@ test("can see error for set permissions when no given address", async () => {
 test("can see set permission error from send function", async () => {
   setState("address", "0x517216362D594516c6f96Ee34b2c502d65B847E4");
 
-  mockContract = jest.fn().mockImplementation(() => ({
-    methods: {
-      setData: () => ({
-        send: () =>
-          jest.fn().mockImplementation(() => {
-            throw new Error("Send error");
-          })(),
-      }),
-    },
-  }));
+  mockSend = jest.fn().mockImplementation(() =>
+    jest.fn().mockImplementation(() => {
+      throw new Error("Send error");
+    })()
+  );
 
   const utils = render(Permissions);
 

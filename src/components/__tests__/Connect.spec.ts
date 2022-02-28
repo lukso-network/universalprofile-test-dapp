@@ -21,6 +21,7 @@ const mockSetupWeb3 = jest.fn();
 let mockAccounts = jest.fn();
 let mockGetBalance = jest.fn();
 let mockRequestAccounts = jest.fn();
+const mockContract = jest.fn();
 
 jest.mock("@/compositions/useWeb3", () => ({
   __esModule: true,
@@ -30,6 +31,7 @@ jest.mock("@/compositions/useWeb3", () => ({
     accounts: () => mockAccounts(),
     getBalance: () => mockGetBalance(),
     requestAccounts: () => mockRequestAccounts(),
+    contract: () => mockContract(),
   }),
 }));
 

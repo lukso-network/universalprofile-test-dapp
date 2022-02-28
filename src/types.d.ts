@@ -1,4 +1,5 @@
 import Web3 from "web3";
+import { Contract } from "web3-eth-contract";
 
 export interface Errors {
   search?: string;
@@ -25,6 +26,7 @@ export interface Store {
 declare global {
   interface Window {
     web3: Web3;
-    store: Store;
+    store?: Store;
+    erc725Account?: Contract;
   }
 }
