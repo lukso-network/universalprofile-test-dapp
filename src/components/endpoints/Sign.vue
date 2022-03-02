@@ -47,7 +47,6 @@ const onRecover = async () => {
 };
 
 const onSignatureValidation = async () => {
-  debugger;
   const erc725AccountAddress = getState("address");
 
   if (!erc725AccountAddress) {
