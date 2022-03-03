@@ -1,20 +1,16 @@
 import SetData from "../SetData.vue";
 import { render, fireEvent, waitFor } from "@testing-library/vue";
 import { setState } from "@/stores";
+import { Contract } from "web3-eth-contract";
 
 let mockSend = jest.fn();
-jest.mock("@/compositions/useWeb3", () => ({
-  __esModule: true,
-  default: () => ({
-    contract: () => ({
-      methods: {
-        setData: (key: any[], value: any[]) => ({
-          send: () => mockSend(key, value),
-        }),
-      },
+window.erc725Account = {
+  methods: {
+    setData: (key: any[], value: any[]) => ({
+      send: () => mockSend(key, value),
     }),
-  }),
-}));
+  },
+} as Contract;
 
 beforeEach(() => {
   jest.resetAllMocks();

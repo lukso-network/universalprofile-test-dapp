@@ -4,6 +4,8 @@ import Notifications from "@/components/shared/Notification.vue";
 import useNotifications from "@/compositions/useNotifications";
 import { ref } from "vue";
 import useWeb3 from "@/compositions/useWeb3";
+import Web3Utils from "web3-utils";
+import { MAGICVALUE } from "@/helpers/config";
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications();
@@ -12,7 +14,8 @@ const { sign, recover } = useWeb3();
 const isPending = ref(false);
 const message = ref("sign message");
 const signResponse = ref();
-const recovery = ref();
+const recovery = ref<string>();
+const magicValue = ref<string>();
 
 const onSign = async () => {
   if (!message.value) {
@@ -38,6 +41,31 @@ const onRecover = async () => {
     recovery.value = await recover(message.value, signResponse.value.signature);
 
     setNotification("Recover was successful");
+  } catch (error) {
+    setNotification((error as unknown as Error).message, "danger");
+  }
+};
+
+const onSignatureValidation = async () => {
+  const erc725AccountAddress = getState("address");
+
+  if (!erc725AccountAddress) {
+    return setNotification("No valid address", "danger");
+  }
+
+  try {
+    const messageHash = Web3Utils.keccak256(message.value);
+    magicValue.value =
+      window.erc725Account &&
+      ((await window.erc725Account.methods
+        .isValidSignature(messageHash, signResponse.value.signature)
+        .call()) as string);
+
+    if (magicValue.value === MAGICVALUE) {
+      setNotification(`Signature validated successfully`, "info");
+    } else {
+      setNotification("Response doesn't match magic value", "danger");
+    }
   } catch (error) {
     setNotification((error as unknown as Error).message, "danger");
   }
@@ -83,6 +111,16 @@ const onRecover = async () => {
         </button>
       </div>
       <div class="field">
+        <button
+          class="button is-primary is-rounded mb-3"
+          :disabled="getState('address') && signResponse ? undefined : true"
+          data-testid="validate-signature"
+          @click="onSignatureValidation"
+        >
+          Signature validation
+        </button>
+      </div>
+      <div class="field">
         <Notifications
           v-if="hasNotification"
           :notification="notification"
@@ -106,6 +144,9 @@ const onRecover = async () => {
           </p>
           <p v-if="recovery" class="mb-3">
             Recover EoA: <b data-testid="recovery-eoa">{{ recovery }}</b>
+          </p>
+          <p v-if="magicValue" class="mb-3">
+            Magic value: <b data-testid="magic-value">{{ magicValue }}</b>
           </p>
         </div>
       </div>

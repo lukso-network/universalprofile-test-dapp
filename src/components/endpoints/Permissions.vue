@@ -2,19 +2,15 @@
 import { getState } from "@/stores";
 import Notifications from "@/components/shared/Notification.vue";
 import useNotifications from "@/compositions/useNotifications";
-import useWeb3 from "@/compositions/useWeb3";
-import UniversalProfile from "@lukso/universalprofile-smart-contracts/artifacts/UniversalProfile.json";
 import { ERC725YKeys } from "@lukso/lsp-smart-contracts/constants";
 import { ref } from "vue";
 import useErc725, { Permissions } from "@/compositions/useErc725";
 import { sliceAddress } from "@/utils/sliceAddress";
 import { hexToBytes } from "@/utils/hexToBytes";
 import Web3Utils from "web3-utils";
-import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from "@/helpers/config";
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications();
-const { contract } = useWeb3();
 const { encodePermissions } = useErc725();
 const grantPermissionAddress = ref(
   "0xaf3bf2ffb025098b79caddfbdd113b3681817744"
@@ -41,11 +37,6 @@ const setPermissions = async () => {
     return setNotification("No valid address", "danger");
   }
 
-  const erc725yContract = contract(
-    UniversalProfile.abi as any,
-    erc725AccountAddress,
-    { gas: DEFAULT_GAS, gasPrice: DEFAULT_GAS_PRICE }
-  );
   const key =
     ERC725YKeys["LSP6"]["AddressPermissions:Permissions"] +
     grantPermissionAddress.value.slice(2);
@@ -53,17 +44,18 @@ const setPermissions = async () => {
 
   try {
     isPending.value = true;
-    await erc725yContract.methods
-      .setData([key], [value])
-      .send({
-        from: erc725AccountAddress,
-      })
-      .on("receipt", function (receipt: any) {
-        console.log(receipt);
-      })
-      .once("sending", (payload: any) => {
-        console.log(JSON.stringify(payload, null, 2));
-      });
+    window.erc725Account &&
+      (await window.erc725Account.methods
+        .setData([key], [value])
+        .send({
+          from: erc725AccountAddress,
+        })
+        .on("receipt", function (receipt: any) {
+          console.log(receipt);
+        })
+        .once("sending", (payload: any) => {
+          console.log(JSON.stringify(payload, null, 2));
+        }));
 
     setNotification("Permissions set", "info");
   } catch (error) {

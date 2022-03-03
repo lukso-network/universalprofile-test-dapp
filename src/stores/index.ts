@@ -1,6 +1,8 @@
 import { reactive } from "vue";
 import { Store, Channel } from "@/types";
 import useWeb3 from "@/compositions/useWeb3";
+import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from "@/helpers/config";
+import UniversalProfile from "@lukso/universalprofile-smart-contracts/artifacts/UniversalProfile.json";
 
 export const store = reactive<Store>({
   isConnected: false,
@@ -29,13 +31,18 @@ export function useState(): {
 } {
   return {
     setConnected: async (address: string, channel: Channel) => {
-      const { getChainId, getBalance } = useWeb3();
+      const { getChainId, getBalance, contract } = useWeb3();
 
       setState("address", address);
       setState("isConnected", true);
       setState("channel", channel);
       setState("chainId", await getChainId());
       setState("balance", await getBalance(address));
+
+      window.erc725Account = contract(UniversalProfile.abi as any, address, {
+        gas: DEFAULT_GAS,
+        gasPrice: DEFAULT_GAS_PRICE,
+      });
     },
     setDisconnected: () => {
       setState("address", "");
@@ -43,6 +50,8 @@ export function useState(): {
       setState("channel", undefined);
       setState("chainId", 0);
       setState("balance", 0);
+
+      window.erc725Account = undefined;
     },
   };
 }
