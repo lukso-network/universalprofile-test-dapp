@@ -3,7 +3,8 @@ import { render, fireEvent, waitFor } from "@testing-library/vue";
 import { setState } from "@/stores";
 import { Contract } from "web3-eth-contract";
 
-let mockSend = jest.fn();
+const mockSend = jest.fn();
+
 window.erc725Account = {
   methods: {
     setData: (key: any[], value: any[]) => ({
@@ -19,7 +20,7 @@ beforeEach(() => {
 test("can set data", async () => {
   setState("address", "0x517216362D594516c6f96Ee34b2c502d65B847E4");
 
-  mockSend = jest.fn().mockImplementation(() => ({
+  mockSend.mockImplementation(() => ({
     on: () => ({
       once: () => jest.fn(),
     }),
@@ -56,7 +57,7 @@ test("can see error for set data when no from address", async () => {
 
 test("can see set data error from send function", async () => {
   setState("address", "0x517216362D594516c6f96Ee34b2c502d65B847E4");
-  mockSend = jest.fn().mockImplementation(() => {
+  mockSend.mockImplementation(() => {
     throw new Error("Send error");
   });
 
