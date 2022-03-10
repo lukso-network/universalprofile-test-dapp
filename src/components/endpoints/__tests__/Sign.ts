@@ -3,22 +3,31 @@ import { render, fireEvent, waitFor } from "@testing-library/vue";
 import { setState } from "@/stores";
 import { Contract } from "web3-eth-contract";
 
-let mockSign = jest.fn();
-let mockRecover = jest.fn();
-let mockCall = jest.fn();
+const mockSign = jest.fn();
+const mockRecover = jest.fn();
+const mockValidSignatureCall = jest.fn();
+const mockHashMessage = jest.fn();
+
 jest.mock("@/compositions/useWeb3", () => ({
   __esModule: true,
   default: () => ({
     sign: (message: string, address: string) => mockSign(message, address),
     recover: (message: string, signature: string) =>
       mockRecover(message, signature),
+    getWeb3: () => ({
+      eth: {
+        accounts: {
+          hashMessage: () => mockHashMessage(),
+        },
+      },
+    }),
   }),
 }));
 
 window.erc725Account = {
   methods: {
     isValidSignature: () => ({
-      call: () => mockCall(),
+      call: () => mockValidSignatureCall(),
     }),
   },
 } as Contract;
@@ -28,7 +37,7 @@ beforeEach(() => {
 });
 
 test("can sign message", async () => {
-  mockSign = jest.fn().mockReturnValue({
+  mockSign.mockReturnValue({
     signature: "0x123",
     address: "0x321",
   });
@@ -55,11 +64,11 @@ test("can sign message", async () => {
 });
 
 test("can recovery message", async () => {
-  mockSign = jest.fn().mockReturnValue({
+  mockSign.mockReturnValue({
     signature: "0x123",
     address: "0x321",
   });
-  mockRecover = jest.fn().mockReturnValue("0x321");
+  mockRecover.mockReturnValue("0x321");
   setState("address", "0x517216362D594516c6f96Ee34b2c502d65B847E4");
   const utils = render(Sign);
 
@@ -77,11 +86,12 @@ test("can recovery message", async () => {
 });
 
 test("can verify signature", async () => {
-  mockSign = jest.fn().mockReturnValue({
+  mockSign.mockReturnValue({
     signature: "0x123",
     address: "0x321",
   });
-  mockCall = jest.fn().mockReturnValue("0x1626ba7e");
+  mockValidSignatureCall.mockReturnValue("0x1626ba7e");
+  mockHashMessage.mockReturnValue("0x1626ba7e");
   setState("address", "0x517216362D594516c6f96Ee34b2c502d65B847E4");
   const utils = render(Sign);
 
@@ -92,8 +102,8 @@ test("can verify signature", async () => {
     expect(utils.getByTestId("notification").innerHTML).toContain(
       "Signature validated successfully"
     );
-    expect(mockCall).toBeCalledTimes(1);
-    expect(mockCall).toReturnWith("0x1626ba7e");
+    expect(mockValidSignatureCall).toBeCalledTimes(1);
+    expect(mockValidSignatureCall).toReturnWith("0x1626ba7e");
     expect(utils.getByTestId("magic-value").innerHTML).toContain("0x1626ba7e");
   });
 });

@@ -4,12 +4,11 @@ import Notifications from "@/components/shared/Notification.vue";
 import useNotifications from "@/compositions/useNotifications";
 import { ref } from "vue";
 import useWeb3 from "@/compositions/useWeb3";
-import Web3Utils from "web3-utils";
 import { MAGICVALUE } from "@/helpers/config";
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications();
-const { sign, recover } = useWeb3();
+const { sign, recover, getWeb3 } = useWeb3();
 
 const isPending = ref(false);
 const message = ref("sign message");
@@ -54,7 +53,7 @@ const onSignatureValidation = async () => {
   }
 
   try {
-    const messageHash = Web3Utils.keccak256(message.value);
+    const messageHash = getWeb3().eth.accounts.hashMessage(message.value);
     magicValue.value =
       window.erc725Account &&
       ((await window.erc725Account.methods

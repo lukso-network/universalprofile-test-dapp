@@ -2,10 +2,11 @@ import Connect from "../Connect.vue";
 import { render, fireEvent, waitFor } from "@testing-library/vue";
 import { useState } from "@/stores";
 
+const mockCall = jest.fn();
 const mockSetupProvider = jest.fn();
 const mockEnableProvider = jest.fn();
 const mockResetProvider = jest.fn();
-let mockGetProvider = jest.fn();
+const mockGetProvider = jest.fn();
 
 jest.mock("@/compositions/useWalletConnect", () => ({
   __esModule: true,
@@ -18,10 +19,9 @@ jest.mock("@/compositions/useWalletConnect", () => ({
 }));
 
 const mockSetupWeb3 = jest.fn();
-let mockAccounts = jest.fn();
-let mockGetBalance = jest.fn();
-let mockRequestAccounts = jest.fn();
-const mockContract = jest.fn();
+const mockAccounts = jest.fn();
+const mockGetBalance = jest.fn();
+const mockRequestAccounts = jest.fn();
 
 jest.mock("@/compositions/useWeb3", () => ({
   __esModule: true,
@@ -31,7 +31,13 @@ jest.mock("@/compositions/useWeb3", () => ({
     accounts: () => mockAccounts(),
     getBalance: () => mockGetBalance(),
     requestAccounts: () => mockRequestAccounts(),
-    contract: () => mockContract(),
+    contract: () => ({
+      methods: {
+        owner: () => ({
+          call: () => mockCall(),
+        }),
+      },
+    }),
   }),
 }));
 
@@ -42,7 +48,7 @@ beforeEach(() => {
 });
 
 test("can connect to wallet connect", async () => {
-  mockGetProvider = jest.fn().mockReturnValue({
+  mockGetProvider.mockReturnValue({
     wc: {
       connected: false,
     },
@@ -59,12 +65,12 @@ test("can connect to wallet connect", async () => {
 });
 
 test("can disconnect from wallet connect", async () => {
-  mockGetProvider = jest.fn().mockReturnValue({
+  mockGetProvider.mockReturnValue({
     wc: {
       connected: true,
     },
   });
-  mockGetBalance = jest.fn().mockReturnValue("2");
+  mockGetBalance.mockReturnValue("2");
   const { setConnected } = useState();
   setConnected("0x8e54b33F8d42E59c0B4Cf02e6457CF8bb6a71094", "walletConnect");
 
@@ -80,15 +86,13 @@ test("can disconnect from wallet connect", async () => {
 });
 
 test("can connect to browser extension when authorized", async () => {
-  mockAccounts = jest
-    .fn()
-    .mockResolvedValue("0xD8B0b80Fa7938f2F841b314d8b6052EAe97db826");
-  mockGetProvider = jest.fn().mockReturnValue({
+  mockAccounts.mockResolvedValue("0xD8B0b80Fa7938f2F841b314d8b6052EAe97db826");
+  mockGetProvider.mockReturnValue({
     wc: {
       connected: false,
     },
   });
-  mockGetBalance = jest.fn().mockReturnValue("2");
+  mockGetBalance.mockReturnValue("2");
 
   const utils = render(Connect);
 
@@ -103,16 +107,16 @@ test("can connect to browser extension when authorized", async () => {
 });
 
 test("can connect to browser extension when not authorized", async () => {
-  mockAccounts = jest.fn().mockResolvedValue(undefined);
-  mockRequestAccounts = jest
-    .fn()
-    .mockReturnValue(["0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298"]);
-  mockGetProvider = jest.fn().mockReturnValue({
+  mockAccounts.mockResolvedValue(undefined);
+  mockRequestAccounts.mockReturnValue([
+    "0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298",
+  ]);
+  mockGetProvider.mockReturnValue({
     wc: {
       connected: false,
     },
   });
-  mockGetBalance = jest.fn().mockReturnValue("3");
+  mockGetBalance.mockReturnValue("3");
 
   const utils = render(Connect);
 
