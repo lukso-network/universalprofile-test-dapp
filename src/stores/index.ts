@@ -3,6 +3,7 @@ import { Store, Channel } from "@/types";
 import useWeb3 from "@/compositions/useWeb3";
 import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from "@/helpers/config";
 import UniversalProfile from "@lukso/universalprofile-smart-contracts/artifacts/UniversalProfile.json";
+import KeyManager from "@lukso/universalprofile-smart-contracts/artifacts/LSP6KeyManager.json";
 
 export const store = reactive<Store>({
   isConnected: false,
@@ -40,6 +41,12 @@ export function useState(): {
       setState("balance", await getBalance(address));
 
       window.erc725Account = contract(UniversalProfile.abi as any, address, {
+        gas: DEFAULT_GAS,
+        gasPrice: DEFAULT_GAS_PRICE,
+      });
+
+      const upOwner = await window.erc725Account.methods.owner().call();
+      window.keyManager = contract(KeyManager.abi as any, upOwner, {
         gas: DEFAULT_GAS,
         gasPrice: DEFAULT_GAS_PRICE,
       });

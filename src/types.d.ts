@@ -28,5 +28,6 @@ declare global {
     web3: Web3;
     store?: Store;
     erc725Account?: Contract;
+    keyManager?: Contract;
   }
 }
