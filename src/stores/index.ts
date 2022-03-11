@@ -37,6 +37,7 @@ export function useState(): {
       setState("address", address);
       setState("isConnected", true);
       setState("channel", channel);
+      setState("chainId", await getChainId());
 
       window.erc725Account = contract(UniversalProfile.abi as any, address, {
         gas: DEFAULT_GAS,
@@ -49,7 +50,7 @@ export function useState(): {
         gasPrice: DEFAULT_GAS_PRICE,
       });
 
-      setState("chainId", await getChainId());
+      // check for balance needs to be last as Wallet Connect doesn't support `eth_getBalance` method
       setState("balance", await getBalance(address));
     },
     setDisconnected: () => {
