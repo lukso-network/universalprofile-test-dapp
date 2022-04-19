@@ -34,7 +34,7 @@ test("can send lyx transaction", async () => {
       to: "0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298",
       value: "2000000000000000000",
       gas: 5000000,
-      gasPrice: "1000000000",
+      gasPrice: "10000000000",
     });
   });
 });
@@ -62,7 +62,7 @@ test("can send lyx transaction with data", async () => {
       to: "0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298",
       value: "2000000000000000000",
       gas: 5000000,
-      gasPrice: "1000000000",
+      gasPrice: "10000000000",
     });
   });
 });
