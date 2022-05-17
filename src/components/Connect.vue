@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { getState, useState } from "@/stores";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import { EthereumProviderError } from "eth-rpc-errors";
 import useDropdown from "@/compositions/useDropdown";
 import useWeb3 from "@/compositions/useWeb3";
@@ -60,6 +60,42 @@ const disconnect = async () => {
   setupWeb3(null);
 };
 
+const handleAccountsChanged = (accounts: string[]) => {
+  console.log("Account changed", accounts);
+
+  if (accounts.length === 0 && getState("isConnected")) {
+    disconnect();
+  }
+};
+
+const handleChainChanged = (chainId: string) => {
+  console.log("Chain changed", chainId);
+
+  window.location.reload();
+};
+
+const handleConnect = () => {
+  console.log("Connected");
+};
+
+const handleDisconnect = () => {
+  console.log("Disconnected");
+};
+
+const addEventListeners = () => {
+  window.ethereum?.on("accountsChanged", handleAccountsChanged);
+  window.ethereum?.on("chainChanged", handleChainChanged);
+  window.ethereum?.on("connect", handleConnect);
+  window.ethereum?.on("disconnect", handleDisconnect);
+};
+
+const removeEventListeners = () => {
+  window.ethereum?.removeListener("accountsChanged", handleAccountsChanged);
+  window.ethereum?.removeListener("chainChanged", handleChainChanged);
+  window.ethereum?.removeListener("connect", handleConnect);
+  window.ethereum?.removeListener("disconnect", handleDisconnect);
+};
+
 onMounted(async () => {
   await setupProvider();
 
@@ -68,6 +104,12 @@ onMounted(async () => {
   } else if (browserExtensionConnected) {
     await connectExtension();
   }
+
+  addEventListeners();
+});
+
+onUnmounted(() => {
+  removeEventListeners();
 });
 </script>
 
