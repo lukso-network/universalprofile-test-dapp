@@ -37,6 +37,10 @@ const setPermissions = async () => {
     return setNotification("No valid address", "danger");
   }
 
+  if (!grantPermissionAddress.value) {
+    return setNotification("Enter address", "danger");
+  }
+
   const key =
     ERC725YKeys["LSP6"]["AddressPermissions:Permissions"] +
     grantPermissionAddress.value.slice(2);

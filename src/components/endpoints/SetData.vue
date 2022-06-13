@@ -21,6 +21,14 @@ const setData = async () => {
     return setNotification("No valid address", "danger");
   }
 
+  if (!key.value) {
+    return setNotification("Enter key", "danger");
+  }
+
+  if (!value.value) {
+    return setNotification("Enter value", "danger");
+  }
+
   try {
     isPending.value = true;
     window.erc725Account &&

@@ -33,6 +33,14 @@ const create = async () => {
     return;
   }
 
+  if (!token.value.name) {
+    return setNotification("Enter token name", "danger");
+  }
+
+  if (!token.value.symbol) {
+    return setNotification("Enter token symbol", "danger");
+  }
+
   const erc725AccountAddress = getState("address");
   const tokenParams = [
     token.value.name, // token name
@@ -73,6 +81,14 @@ const mint = async () => {
 
   if (!myToken.value) {
     return setNotification("No token specified", "danger");
+  }
+
+  if (!mintReceiver.value) {
+    return setNotification("Enter mint address", "danger");
+  }
+
+  if (!mintAmount.value) {
+    return setNotification("Enter mint amount", "danger");
   }
 
   try {
