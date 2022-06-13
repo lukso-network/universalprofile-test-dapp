@@ -1,5 +1,5 @@
 import WalletConnectProvider from "@walletconnect/web3-provider";
-import { setState, useState } from "@/stores";
+import { setState, useState, getState } from "@/stores";
 import { NETWORK_URL } from "@/helpers/config";
 import useWeb3 from "@/compositions/useWeb3";
 import { provider as Provider } from "web3-core";
@@ -28,6 +28,12 @@ const setupProvider = async (): Promise<void> => {
   });
 
   provider.on("accountsChanged", async (accounts: string[]) => {
+    console.log("Account changed", accounts);
+
+    if (accounts.length === 0 && getState("isConnected")) {
+      await resetProvider();
+    }
+
     const { setConnected } = useState();
     const [address] = accounts;
 
