@@ -4,7 +4,7 @@ import Notifications from "@/components/shared/Notification.vue";
 import useNotifications from "@/compositions/useNotifications";
 import LSP7Mintable from "@lukso/universalprofile-smart-contracts/artifacts/LSP7Mintable.json";
 import useWeb3 from "@/compositions/useWeb3";
-import { ref } from "vue";
+import { ref, watchEffect } from "vue";
 import { Contract } from "web3-eth-contract";
 import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from "@/helpers/config";
 
@@ -14,11 +14,18 @@ const { contract } = useWeb3();
 
 const myToken = ref<Contract>();
 const isTokenCreated = ref(false);
+const isTokenMinted = ref(false);
 const isTokenPending = ref(false);
 const token = ref({
   name: "My LSP7 Token",
   symbol: "LSP7",
   isNFT: false,
+});
+const mintReceiver = ref<string>();
+const mintAmount = ref(100);
+
+watchEffect(() => {
+  mintReceiver.value = getState("address");
 });
 
 const create = async () => {
@@ -63,26 +70,25 @@ const create = async () => {
 
 const mint = async () => {
   const erc725AccountAddress = getState("address");
-  const receiver = "0xb2147068C4628E296c0769CD2DC7fF762880aE8e";
 
-  if (myToken.value) {
-    try {
-      await myToken.value.methods
-        .mint(receiver, 100, false, "0x")
-        .send({ from: erc725AccountAddress })
-        .on("receipt", function (receipt: any) {
-          console.log(receipt);
-        })
-        .once("sending", (payload: any) => {
-          console.log(JSON.stringify(payload, null, 2));
-        });
+  if (!myToken.value) {
+    return setNotification("No token specified", "danger");
+  }
 
-      setNotification("Token minted", "info");
-    } catch (error) {
-      setNotification((error as unknown as Error).message, "danger");
-    }
-  } else {
-    setNotification("No token specified", "danger");
+  try {
+    await myToken.value.methods
+      .mint(mintReceiver.value, mintAmount.value, false, "0x")
+      .send({ from: erc725AccountAddress })
+      .on("receipt", function (receipt: any) {
+        console.log(receipt);
+      })
+      .once("sending", (payload: any) => {
+        console.log(JSON.stringify(payload, null, 2));
+      });
+    isTokenMinted.value = true;
+    setNotification("Token minted", "info");
+  } catch (error) {
+    setNotification((error as unknown as Error).message, "danger");
   }
 };
 </script>
@@ -137,6 +143,33 @@ const mint = async () => {
         </button>
       </div>
       <div class="field">
+        <label class="label">Mint address</label>
+        <div class="control">
+          <input
+            v-model="mintReceiver"
+            class="input"
+            type="text"
+            :disabled="getState('address') && isTokenCreated ? undefined : true"
+          />
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Mint amount</label>
+        <div class="control columns">
+          <div class="column is-one-third">
+            <input
+              v-model="mintAmount"
+              class="input"
+              type="number"
+              placeholder="0"
+              :disabled="
+                getState('address') && isTokenCreated ? undefined : true
+              "
+            />
+          </div>
+        </div>
+      </div>
+      <div class="field">
         <button
           class="button is-primary is-rounded mb-3 mr-3"
           :disabled="getState('address') && isTokenCreated ? undefined : true"
@@ -146,7 +179,6 @@ const mint = async () => {
           Mint
         </button>
       </div>
-
       <div class="field">
         <div
           v-if="getState('isConnected') && isTokenCreated"

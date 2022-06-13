@@ -1,6 +1,7 @@
 import Assets from "../Assets.vue";
 import { render, fireEvent, waitFor } from "@testing-library/vue";
 import { setState } from "@/stores";
+import { Contract } from "web3-eth-contract";
 
 jest.mock("@/compositions/useWeb3", () => ({
   __esModule: true,
@@ -20,6 +21,9 @@ jest.mock("@/compositions/useWeb3", () => ({
                       once: () => jest.fn(),
                     }),
                   }),
+                }),
+                transfer: () => ({
+                  encodeABI: () => jest.fn(),
                 }),
               },
             }),
