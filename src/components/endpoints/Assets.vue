@@ -165,6 +165,7 @@ const mint = async () => {
             v-model="mintReceiver"
             class="input"
             type="text"
+            data-testid="mint-address"
             :disabled="getState('address') && isTokenCreated ? undefined : true"
           />
         </div>
