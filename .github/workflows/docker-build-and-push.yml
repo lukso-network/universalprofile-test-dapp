@@ -17,7 +17,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: google-github-actions/setup-gcloud@main
+      - uses: google-github-actions/setup-gcloud@v0
         with:
           service_account_key: ${{ secrets.BACKEND_SA_GCR_KEY }}
           project_id: lukso-infrastructure-dev
