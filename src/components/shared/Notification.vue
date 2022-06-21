@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { Notification } from "@/types";
 
-defineProps<{ notification: Notification }>();
+type Props = {
+  notification: Notification;
+  hideNotification?: boolean;
+};
+
+defineProps<Props>();
 const emits = defineEmits(["hide"]);
 
 const hide = () => {
@@ -16,7 +21,12 @@ const hide = () => {
     :class="'is-' + notification.type"
     data-testid="notification"
   >
-    <button class="delete" data-testid="hide" @click="hide"></button>
+    <button
+      v-if="!hideNotification"
+      class="delete"
+      data-testid="hide"
+      @click="hide"
+    ></button>
     {{ notification.message }}
   </div>
 </template>

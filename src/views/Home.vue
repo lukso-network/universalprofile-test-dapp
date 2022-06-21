@@ -21,6 +21,7 @@ const hasExtension = computed(() => {
         message: 'Please instal Universal Profile browser extension.',
         type: 'warning',
       }"
+      :hide-notification="true"
       class="mb-4"
     ></Notifications>
     <div class="tile is-ancestor">
