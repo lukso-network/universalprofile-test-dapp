@@ -7,7 +7,7 @@ import Profile from "@/components/shared/Profile.vue";
 import { LSP3Profile } from "@lukso/lsp-factory.js";
 
 const { fetchProfile } = useErc725();
-const receiver = ref({} as LSP3Profile);
+const receiver = ref<LSP3Profile>();
 const queryPending = ref(false);
 const search = ref("");
 
@@ -31,7 +31,7 @@ const searchReceiver = async () => {
   }
 
   try {
-    receiver.value = await fetchProfile(search.value);
+    receiver.value = (await fetchProfile(search.value))?.LSP3Profile;
   } catch (error) {
     if (error instanceof Error) {
       emits("error", error.message);

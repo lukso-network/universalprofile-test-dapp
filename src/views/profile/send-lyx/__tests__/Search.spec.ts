@@ -2,7 +2,7 @@ import Search from "../Search.vue";
 import { render, fireEvent, waitFor } from "@testing-library/vue";
 
 const mockFetchData = jest.fn().mockReturnValue({
-  LSP3Profile: {
+  value: {
     LSP3Profile: {
       name: "test",
       description: "Lorem ipsum",

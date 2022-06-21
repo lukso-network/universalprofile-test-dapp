@@ -7,6 +7,7 @@ jest.mock("@/compositions/useWeb3", () => ({
   __esModule: true,
   default: () => ({
     getBalance: () => mockGetBalance(),
+    sendTransaction: () => jest.fn(),
   }),
 }));
 
