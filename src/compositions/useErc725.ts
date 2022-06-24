@@ -1,20 +1,8 @@
 import { DEFAULT_IPFS_URL } from "@/helpers/config";
 import { ERC725, ERC725JSONSchema } from "@erc725/erc725.js";
+import { Permissions } from "@erc725/erc725.js/build/main/src/types/Method";
 import { DecodeDataOutput } from "@erc725/erc725.js/build/main/src/types/decodeData";
 import Web3 from "web3";
-
-export type Permissions = {
-  CHANGEOWNER?: boolean;
-  CHANGEPERMISSIONS?: boolean;
-  ADDPERMISSIONS?: boolean;
-  SETDATA?: boolean;
-  CALL?: boolean;
-  STATICCALL?: boolean;
-  DELEGATECALL?: boolean;
-  DEPLOY?: boolean;
-  TRANSFERVALUE?: boolean;
-  SIGN?: boolean;
-};
 
 const provider = new Web3.providers.HttpProvider(
   "https://rpc.l14.lukso.network"
@@ -51,14 +39,20 @@ const encodePermissions = (permissions: Permissions) => {
   return ERC725.encodePermissions(permissions);
 };
 
+const decodePermissions = (permissionHex: string) => {
+  return ERC725.decodePermissions(permissionHex);
+};
+
 export default function useErc725(): {
   fetchProfile: (address: string) => Promise<DecodeDataOutput["value"]>;
   getInstance: (address: string) => ERC725;
   encodePermissions: (permissions: Permissions) => string;
+  decodePermissions: (permissionHex: string) => Permissions;
 } {
   return {
     fetchProfile,
     getInstance,
     encodePermissions,
+    decodePermissions,
   };
 }
