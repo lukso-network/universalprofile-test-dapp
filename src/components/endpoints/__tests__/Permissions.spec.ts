@@ -36,7 +36,7 @@ test("can update permissions for given address", async () => {
       "Permissions set"
     );
     expect(mockSend).toBeCalledWith(
-      ["0x4b80742d0000000082ac0000af3bf2ffb025098b79caddfbdd113b3681817744"],
+      ["0x4b80742de2bf82acb3630000af3bf2ffb025098b79caddfbdd113b3681817744"],
       ["0x0000000000000000000000000000000000000000000000000000000000000001"]
     );
   });

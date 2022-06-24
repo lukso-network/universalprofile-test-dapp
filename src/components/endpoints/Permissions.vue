@@ -2,16 +2,21 @@
 import { getState } from "@/stores";
 import Notifications from "@/components/shared/Notification.vue";
 import useNotifications from "@/compositions/useNotifications";
-import { ERC725YKeys } from "@lukso/lsp-smart-contracts/constants";
-import { ref } from "vue";
-import useErc725, { Permissions } from "@/compositions/useErc725";
+import {
+  ERC725YKeys,
+  ALL_PERMISSIONS,
+  PERMISSIONS,
+} from "@lukso/lsp-smart-contracts/constants";
+import { computed, ref } from "vue";
+import useErc725 from "@/compositions/useErc725";
 import { sliceAddress } from "@/utils/sliceAddress";
 import { hexToBytes } from "@/utils/hexToBytes";
-import Web3Utils from "web3-utils";
+import Web3Utils, { hexToNumber, numberToHex, padLeft } from "web3-utils";
+import type { Permissions } from "@erc725/erc725.js/build/main/src/types/Method";
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications();
-const { encodePermissions } = useErc725();
+const { encodePermissions, decodePermissions } = useErc725();
 const grantPermissionAddress = ref(
   "0xaf3bf2ffb025098b79caddfbdd113b3681817744"
 );
@@ -26,9 +31,20 @@ const permissions: Permissions = {
   DEPLOY: false,
   TRANSFERVALUE: false,
   SIGN: false,
+  SUPER_SETDATA: false,
+  SUPER_TRANSFERVALUE: false,
+  SUPER_CALL: false,
+  SUPER_STATICCALL: false,
+  SUPER_DELEGATECALL: false,
 };
 const selectedPermissions = ref(permissions);
 const isPending = ref(false);
+const ALL_PERMISSIONS_WITH_DELEGATECALL = padLeft(
+  numberToHex(
+    hexToNumber(ALL_PERMISSIONS) + hexToNumber(PERMISSIONS.DELEGATECALL)
+  ),
+  64
+);
 
 const setPermissions = async () => {
   const erc725AccountAddress = getState("address");
@@ -68,6 +84,24 @@ const setPermissions = async () => {
     isPending.value = false;
   }
 };
+
+const allPermissionsToggle = () => {
+  if (allPermissionsSelected.value) {
+    selectedPermissions.value = decodePermissions(padLeft(numberToHex(0), 64));
+  } else {
+    selectedPermissions.value = decodePermissions(
+      ALL_PERMISSIONS_WITH_DELEGATECALL
+    );
+  }
+  console.log();
+};
+
+const allPermissionsSelected = computed(() => {
+  return (
+    encodePermissions(selectedPermissions.value) ===
+    ALL_PERMISSIONS_WITH_DELEGATECALL
+  );
+});
 </script>
 
 <template>
@@ -99,6 +133,19 @@ const setPermissions = async () => {
               :disabled="getState('address') ? undefined : true"
             />
             {{ key }}
+          </label>
+        </div>
+      </div>
+      <div class="field">
+        <div class="mb-2">
+          <label class="checkbox">
+            <input
+              :checked="allPermissionsSelected"
+              type="checkbox"
+              :disabled="getState('address') ? undefined : true"
+              @click.stop="allPermissionsToggle"
+            />
+            Select all
           </label>
         </div>
       </div>
