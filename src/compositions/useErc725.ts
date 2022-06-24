@@ -1,4 +1,6 @@
+import { DEFAULT_IPFS_URL } from "@/helpers/config";
 import { ERC725, ERC725JSONSchema } from "@erc725/erc725.js";
+import { DecodeDataOutput } from "@erc725/erc725.js/build/main/src/types/decodeData";
 import Web3 from "web3";
 
 export type Permissions = {
@@ -18,7 +20,7 @@ const provider = new Web3.providers.HttpProvider(
   "https://rpc.l14.lukso.network"
 );
 const config = {
-  ipfsGateway: "https://ipfs.lukso.network/ipfs/",
+  ipfsGateway: DEFAULT_IPFS_URL,
 };
 const schema = [
   {
@@ -36,11 +38,13 @@ const getInstance = (address: string) => {
   return erc725;
 };
 
-const fetchProfile = async (address: string): Promise<any> => {
+const fetchProfile = async (
+  address: string
+): Promise<DecodeDataOutput["value"]> => {
   const erc725 = getInstance(address);
   const profile = await erc725.fetchData("LSP3Profile");
 
-  return profile.LSP3Profile.LSP3Profile;
+  return profile.value;
 };
 
 const encodePermissions = (permissions: Permissions) => {
@@ -48,8 +52,8 @@ const encodePermissions = (permissions: Permissions) => {
 };
 
 export default function useErc725(): {
-  fetchProfile: (address: string) => Promise<any>;
-  getInstance: (address: string) => ERC725<any>;
+  fetchProfile: (address: string) => Promise<DecodeDataOutput["value"]>;
+  getInstance: (address: string) => ERC725;
   encodePermissions: (permissions: Permissions) => string;
 } {
   return {

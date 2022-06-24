@@ -19,7 +19,7 @@ const { sendTransaction, getBalance } = useWeb3();
 const { fetchProfile } = useErc725();
 
 const hasExtension = !!window.ethereum;
-const sender = ref({} as LSP3Profile);
+const sender = ref<LSP3Profile>();
 const balance = ref("");
 const amount = ref("");
 const search = ref("");
@@ -29,14 +29,15 @@ const pendingTransaction = ref(false);
 onMounted(async () => {
   if (hasExtension) {
     if (getState("address")) {
-      sender.value = await fetchProfile(getState("address"));
+      sender.value = (await fetchProfile(getState("address")))?.LSP3Profile;
       balance.value = await getBalance(getState("address"));
+      console.log(sender.value);
     }
 
     watch(
       () => getState("address"),
       async () => {
-        sender.value = await fetchProfile(getState("address"));
+        sender.value = (await fetchProfile(getState("address")))?.LSP3Profile;
         balance.value = await getBalance(getState("address"));
       }
     );
@@ -60,19 +61,18 @@ const sendLyx = async () => {
       gasPrice: DEFAULT_GAS_PRICE,
     };
     await sendTransaction(transaction);
+    setNotification(`You successfully send ${amount.value} LYX`);
+    amount.value = "";
   } catch (error) {
-    if (error instanceof Error) {
-      setNotification(`Error: ${error.message}`, "danger");
+    if ((error as Error)?.message) {
+      setNotification(`Error: ${(error as Error)?.message}`, "danger");
     } else {
-      throw error;
+      console.error(error);
     }
   } finally {
     pendingTransaction.value = false;
     balance.value = await getBalance(getState("address"));
   }
-
-  setNotification(`You successfully send ${amount.value} LYX`);
-  amount.value = "";
 };
 
 const setSearchError = (error: string) => {
@@ -110,7 +110,7 @@ const validate = () => {
 const backgroundImageSrc = computed(() => {
   const backgroundImage = sender.value?.backgroundImage;
 
-  if (backgroundImage) {
+  if (backgroundImage && backgroundImage.length > 1) {
     const backgroundUrl = backgroundImage[2]?.url as string;
     return backgroundUrl.replace("ipfs://", DEFAULT_IPFS_URL);
   } else {

@@ -53,7 +53,7 @@ test("can show full profile", () => {
 
   expect(utils.getByTestId("identicon")).toHaveAttribute("style");
   expect(utils.getByTestId("profile-image")).toHaveStyle({
-    "background-image": "url(https://ipfs.lukso.network/ipfs/QmPLq_variant_5)",
+    "background-image": "url(https://2eff.lukso.dev/ipfs/QmPLq_variant_5)",
   });
   expect(utils.getByTestId("name")).toHaveTextContent("test");
   expect(utils.getByTestId("address")).toHaveTextContent("0x321");
