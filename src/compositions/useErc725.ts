@@ -4,6 +4,8 @@ import { Permissions } from "@erc725/erc725.js/build/main/src/types/Method";
 import { DecodeDataOutput } from "@erc725/erc725.js/build/main/src/types/decodeData";
 import Web3 from "web3";
 
+window.ERC725 = ERC725;
+
 const provider = new Web3.providers.HttpProvider(
   "https://rpc.l14.lukso.network"
 );

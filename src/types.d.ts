@@ -29,5 +29,6 @@ declare global {
     store?: Store;
     erc725Account?: Contract;
     keyManager?: Contract;
+    ERC725?: ERC725;
   }
 }
