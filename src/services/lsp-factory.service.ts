@@ -5,5 +5,6 @@ import { getSigner } from "./provider.service";
 export async function getLspFactory(): Promise<LSPFactory> {
   const { provider, signer } = await getSigner();
   const nonceManager = new NonceManager(signer);
+  //@ts-ignore
   return new LSPFactory(nonceManager, provider);
 }
