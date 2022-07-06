@@ -66,3 +66,23 @@ test("can send lyx transaction with data", async () => {
     });
   });
 });
+
+test("can't send lyx transaction without amount", async () => {
+  setState("address", "0x517216362D594516c6f96Ee34b2c502d65B847E4");
+
+  const utils = render(SendLyx);
+
+  await fireEvent.update(utils.getByTestId("amount"), "");
+  await fireEvent.update(
+    utils.getByTestId("to"),
+    "0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298"
+  );
+  await fireEvent.click(utils.getByTestId("hasData"));
+  await fireEvent.click(utils.getByTestId("send"));
+
+  await waitFor(() => {
+    expect(utils.getByTestId("notification").innerHTML).toContain(
+      "Enter an amount"
+    );
+  });
+});
