@@ -134,10 +134,7 @@ const backgroundImageSrc = computed(() => {
     </div>
     <div class="columns">
       <div
-        class="
-          column
-          is-6-tablet is-offset-3-tablet is-4-fullhd is-offset-4-fullhd
-        "
+        class="column is-6-tablet is-offset-3-tablet is-4-fullhd is-offset-4-fullhd"
       >
         <div class="card">
           <NoExtension v-if="!hasExtension" />
@@ -193,14 +190,7 @@ const backgroundImageSrc = computed(() => {
                   </p>
                 </div>
                 <div
-                  class="
-                    field
-                    nowrap
-                    is-flex is-flex-direction-column is-justify-content-top
-                    subtitle
-                    is-6
-                    mt-3
-                  "
+                  class="field nowrap is-flex is-flex-direction-column is-justify-content-top subtitle is-6 mt-3"
                 >
                   <div>Your balance:</div>
                   <div>{{ balance }} LYX</div>

@@ -17,12 +17,7 @@ const installExtension = () => {
 <template name="NoExtension">
   <div class="card-content" data-testid="empty-state">
     <div
-      class="
-        notification
-        is-info is-light is-flex is-flex-direction-column
-        pr-5
-        has-text-centered
-      "
+      class="notification is-info is-light is-flex is-flex-direction-column pr-5 has-text-centered"
     >
       You need Browser Extension for sending LYX.
       <button
