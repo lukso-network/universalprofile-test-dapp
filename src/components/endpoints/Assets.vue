@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { getState } from "@/stores";
-import Notifications from "@/components/shared/Notification.vue";
+import Notifications from "@/components/Notification.vue";
 import useNotifications from "@/compositions/useNotifications";
 import LSP7Mintable from "@lukso/universalprofile-smart-contracts/artifacts/LSP7Mintable.json";
 import useWeb3 from "@/compositions/useWeb3";
