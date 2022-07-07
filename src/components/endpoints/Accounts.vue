@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Notifications from "@/components/shared/Notification.vue";
+import Notifications from "@/components/Notification.vue";
 import useNotifications from "@/compositions/useNotifications";
 import useWalletConnect, {
   WALLET_CONNECT_VERSION as walletConnectVersion,
