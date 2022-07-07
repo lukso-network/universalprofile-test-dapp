@@ -6,10 +6,10 @@ test("can produce LSP Factory", async () => {
   it("can deploy base contracts", async () => {
     const deployedBaseContract =
       await lspFactory.ProxyDeployer.deployBaseContracts();
-    expect(deployedBaseContract.lsp3Account.address).toBe(
+    expect(deployedBaseContract.universalProfile.address).toBe(
       expect.stringContaining("0x")
     );
-    expect(deployedBaseContract.universalReceiverAddressStore.address).toBe(
+    expect(deployedBaseContract.universalReceiverDelegate.address).toBe(
       expect.stringContaining("0x")
     );
   });

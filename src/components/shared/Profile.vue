@@ -2,7 +2,7 @@
 import { computed } from "vue";
 import { DEFAULT_IPFS_URL } from "@/helpers/config";
 import makeBlockie from "ethereum-blockies-base64";
-import { LSP3Profile } from "@lukso/lsp-factory.js";
+import { LSP3Profile } from "@lukso/lsp-factory.js-alpha";
 
 const props = defineProps<{
   profile?: LSP3Profile;

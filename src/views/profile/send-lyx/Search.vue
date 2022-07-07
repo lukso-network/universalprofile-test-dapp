@@ -4,7 +4,7 @@ import { ref } from "vue";
 import { Errors } from "@/types";
 import useErc725 from "@/compositions/useErc725";
 import Profile from "@/components/shared/Profile.vue";
-import { LSP3Profile } from "@lukso/lsp-factory.js";
+import { LSP3Profile } from "@lukso/lsp-factory.js-alpha";
 
 const { fetchProfile } = useErc725();
 const receiver = ref<LSP3Profile>();

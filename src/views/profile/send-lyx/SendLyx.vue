@@ -10,7 +10,7 @@ import { Errors } from "@/types";
 import useNotifications from "@/compositions/useNotifications";
 import useWeb3 from "@/compositions/useWeb3";
 import { getState } from "@/stores";
-import { LSP3Profile } from "@lukso/lsp-factory.js";
+import { LSP3Profile } from "@lukso/lsp-factory.js-alpha";
 import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from "@/helpers/config";
 
 const { notification, clearNotification, hasNotification, setNotification } =
