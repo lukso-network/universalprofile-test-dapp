@@ -27,7 +27,7 @@ const sendLyx = async () => {
     return setNotification("No from address", "danger");
   }
 
-  if (!amount.value || typeof amount.value !== "number") {
+  if (!amount.value) {
     return setNotification("Enter an amount", "danger");
   }
 
