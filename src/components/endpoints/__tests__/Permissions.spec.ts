@@ -1,5 +1,5 @@
 import Permissions from "../Permissions.vue";
-import { render, fireEvent, waitFor, screen } from "@testing-library/vue";
+import { render, fireEvent, screen } from "@testing-library/vue";
 import { setState } from "@/stores";
 import { Contract } from "web3-eth-contract";
 

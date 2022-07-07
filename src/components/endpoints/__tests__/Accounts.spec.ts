@@ -1,5 +1,5 @@
 import Accounts from "../Accounts.vue";
-import { render, fireEvent, waitFor, screen } from "@testing-library/vue";
+import { render, fireEvent, screen } from "@testing-library/vue";
 import { useState } from "@/stores";
 
 const mockCall = jest.fn();
