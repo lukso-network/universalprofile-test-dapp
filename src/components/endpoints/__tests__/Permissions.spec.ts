@@ -1,5 +1,5 @@
 import Permissions from "../Permissions.vue";
-import { render, fireEvent, waitFor } from "@testing-library/vue";
+import { render, fireEvent, waitFor, screen } from "@testing-library/vue";
 import { setState } from "@/stores";
 import { Contract } from "web3-eth-contract";
 
@@ -26,13 +26,13 @@ test("can update permissions for given address", async () => {
     }),
   }));
 
-  const utils = render(Permissions);
+  render(Permissions);
 
-  await fireEvent.click(utils.getByTestId("CHANGEOWNER"));
-  await fireEvent.click(utils.getByTestId("setPermissions"));
+  await fireEvent.click(screen.getByTestId("CHANGEOWNER"));
+  await fireEvent.click(screen.getByTestId("setPermissions"));
 
   await waitFor(() => {
-    expect(utils.getByTestId("notification").innerHTML).toContain(
+    expect(screen.getByTestId("notification").innerHTML).toContain(
       "Permissions set"
     );
     expect(mockSend).toBeCalledWith(
@@ -45,12 +45,12 @@ test("can update permissions for given address", async () => {
 test("can see error for set permissions when no given address", async () => {
   setState("address", undefined);
 
-  const utils = render(Permissions);
+  render(Permissions);
 
-  await fireEvent.click(utils.getByTestId("setPermissions"));
+  await fireEvent.click(screen.getByTestId("setPermissions"));
 
   await waitFor(() => {
-    expect(utils.getByTestId("notification").innerHTML).toContain(
+    expect(screen.getByTestId("notification").innerHTML).toContain(
       "No valid address"
     );
   });
@@ -65,11 +65,13 @@ test("can see set permission error from send function", async () => {
     })()
   );
 
-  const utils = render(Permissions);
+  render(Permissions);
 
-  await fireEvent.click(utils.getByTestId("setPermissions"));
+  await fireEvent.click(screen.getByTestId("setPermissions"));
 
   await waitFor(() => {
-    expect(utils.getByTestId("notification").innerHTML).toContain("Send error");
+    expect(screen.getByTestId("notification").innerHTML).toContain(
+      "Send error"
+    );
   });
 });

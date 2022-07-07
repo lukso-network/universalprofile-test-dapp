@@ -1,5 +1,5 @@
 import SetData from "../SetData.vue";
-import { render, fireEvent, waitFor } from "@testing-library/vue";
+import { render, fireEvent, waitFor, screen } from "@testing-library/vue";
 import { setState } from "@/stores";
 import { Contract } from "web3-eth-contract";
 
@@ -26,12 +26,12 @@ test("can set data", async () => {
     }),
   }));
 
-  const utils = render(SetData);
+  render(SetData);
 
-  await fireEvent.click(utils.getByTestId("setData"));
+  await fireEvent.click(screen.getByTestId("setData"));
 
   await waitFor(() => {
-    expect(utils.getByTestId("notification").innerHTML).toContain("Set data");
+    expect(screen.getByTestId("notification").innerHTML).toContain("Set data");
     expect(mockSend).toBeCalledWith(
       ["0x5ef83ad9559033e6e941db7d7c495acdce616347d28e90c7ce47cbfcfcad3bc5"],
       [
@@ -44,12 +44,12 @@ test("can set data", async () => {
 test("can see error for set data when no from address", async () => {
   setState("address", undefined);
 
-  const utils = render(SetData);
+  render(SetData);
 
-  await fireEvent.click(utils.getByTestId("setData"));
+  await fireEvent.click(screen.getByTestId("setData"));
 
   await waitFor(() => {
-    expect(utils.getByTestId("notification").innerHTML).toContain(
+    expect(screen.getByTestId("notification").innerHTML).toContain(
       "No valid address"
     );
   });
@@ -61,11 +61,13 @@ test("can see set data error from send function", async () => {
     throw new Error("Send error");
   });
 
-  const utils = render(SetData);
+  render(SetData);
 
-  await fireEvent.click(utils.getByTestId("setData"));
+  await fireEvent.click(screen.getByTestId("setData"));
 
   await waitFor(() => {
-    expect(utils.getByTestId("notification").innerHTML).toContain("Send error");
+    expect(screen.getByTestId("notification").innerHTML).toContain(
+      "Send error"
+    );
   });
 });
