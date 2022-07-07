@@ -58,10 +58,6 @@ const { toggle } = useDropdown();
             >
           </div>
         </div>
-
-        <!-- <router-link class="navbar-item" to="/deployment"
-          >Deployment</router-link
-        > -->
       </div>
 
       <div class="navbar-end">
