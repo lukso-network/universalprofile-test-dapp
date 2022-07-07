@@ -1,5 +1,5 @@
 import Connect from "../Connect.vue";
-import { render, fireEvent, waitFor } from "@testing-library/vue";
+import { render, fireEvent, waitFor, screen } from "@testing-library/vue";
 import { useState } from "@/stores";
 
 const mockCall = jest.fn();
@@ -54,11 +54,11 @@ test("can connect to wallet connect", async () => {
     },
   });
 
-  const utils = render(Connect);
+  render(Connect);
 
   expect(mockSetupProvider).toBeCalledTimes(1);
 
-  await fireEvent.click(utils.getByTestId("connect-wc"));
+  await fireEvent.click(screen.getByTestId("connect-wc"));
 
   expect(mockSetupProvider).toBeCalledTimes(2);
   expect(mockEnableProvider).toBeCalledTimes(1);
@@ -74,15 +74,15 @@ test("can disconnect from wallet connect", async () => {
   const { setConnected } = useState();
   setConnected("0x8e54b33F8d42E59c0B4Cf02e6457CF8bb6a71094", "walletConnect");
 
-  const utils = render(Connect);
+  render(Connect);
 
   expect(mockSetupProvider).toBeCalledTimes(1);
-  expect(utils.getByTestId("address").innerHTML).toContain("0x8e54b3...");
+  expect(screen.getByTestId("address")).toHaveTextContent("0x8e54b3...");
 
-  await fireEvent.click(utils.getByTestId("disconnect"));
+  await fireEvent.click(screen.getByTestId("disconnect"));
 
   expect(mockEnableProvider).toBeCalledTimes(1);
-  expect(utils.queryByTestId("address")).toBeFalsy();
+  expect(screen.queryByTestId("address")).toBeFalsy();
 });
 
 test("can connect to browser extension when authorized", async () => {
@@ -94,15 +94,15 @@ test("can connect to browser extension when authorized", async () => {
   });
   mockGetBalance.mockReturnValue("2");
 
-  const utils = render(Connect);
+  render(Connect);
 
-  await fireEvent.click(utils.getByTestId("connect-extension"));
+  await fireEvent.click(screen.getByTestId("connect-extension"));
 
+  expect(mockSetupWeb3).toBeCalledTimes(1);
+  expect(mockAccounts).toBeCalledTimes(1);
+  expect(await screen.findByTestId("address")).toHaveTextContent("0xD8B0b8...");
   await waitFor(() => {
-    expect(mockSetupWeb3).toBeCalledTimes(1);
-    expect(mockAccounts).toBeCalledTimes(1);
-    expect(utils.getByTestId("balance").innerHTML).toContain("2 LYX");
-    expect(utils.getByTestId("address").innerHTML).toContain("0xD8B0b8...");
+    expect(screen.getByTestId("balance")).toHaveTextContent("2 LYX");
   });
 });
 
@@ -118,13 +118,13 @@ test("can connect to browser extension when not authorized", async () => {
   });
   mockGetBalance.mockReturnValue("3");
 
-  const utils = render(Connect);
+  render(Connect);
 
-  await fireEvent.click(utils.getByTestId("connect-extension"));
+  await fireEvent.click(screen.getByTestId("connect-extension"));
 
+  expect(await screen.findByTestId("address")).toHaveTextContent("0x7367C9...");
   await waitFor(() => {
     expect(mockRequestAccounts).toBeCalled();
-    expect(utils.getByTestId("balance").innerHTML).toContain("3 LYX");
-    expect(utils.getByTestId("address").innerHTML).toContain("0x7367C9...");
+    expect(screen.getByTestId("balance")).toHaveTextContent("3 LYX");
   });
 });
