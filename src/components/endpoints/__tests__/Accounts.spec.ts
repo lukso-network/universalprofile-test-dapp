@@ -56,13 +56,11 @@ test("can connect to wallet connect", async () => {
 
   await fireEvent.click(screen.getByTestId("connect-wc"));
 
-  await waitFor(() => {
-    expect(mockSetupProvider).toBeCalledTimes(1);
-    expect(mockEnableProvider).toBeCalledTimes(1);
-    expect(screen.getByTestId("notification").innerHTML).toContain(
-      "Connected to address"
-    );
-  });
+  expect(mockSetupProvider).toBeCalledTimes(1);
+  expect(mockEnableProvider).toBeCalledTimes(1);
+  expect(await screen.findByTestId("notification")).toHaveTextContent(
+    "Connected to address"
+  );
 });
 
 test("can connect to browser extension when authorized", async () => {
@@ -79,13 +77,9 @@ test("can connect to browser extension when authorized", async () => {
 
   await fireEvent.click(screen.getByTestId("connect-extension"));
 
-  await waitFor(() => {
-    expect(mockRequestAccounts).toBeCalledTimes(1);
-    expect(screen.getByTestId("info").innerHTML).toContain(
-      "Connected to address"
-    );
-    expect(screen.getByTestId("chain").innerHTML).toContain("22 (0x16)");
-  });
+  expect(mockRequestAccounts).toBeCalledTimes(1);
+  expect(screen.getByTestId("info")).toHaveTextContent("Connected to address");
+  expect(screen.getByTestId("chain")).toHaveTextContent("22 (0x16)");
 });
 
 test("can disconnect from browser extension", async () => {
@@ -105,7 +99,5 @@ test("can disconnect from browser extension", async () => {
 
   expect(screen.getByTestId("connect-extension")).not.toBeDisabled();
   expect(screen.getByTestId("disconnect")).toBeDisabled();
-  expect(screen.getByTestId("notification").innerHTML).toContain(
-    "Disconnected"
-  );
+  expect(screen.getByTestId("notification")).toHaveTextContent("Disconnected");
 });

@@ -77,7 +77,7 @@ test("can disconnect from wallet connect", async () => {
   render(Connect);
 
   expect(mockSetupProvider).toBeCalledTimes(1);
-  expect(screen.getByTestId("address").innerHTML).toContain("0x8e54b3...");
+  expect(screen.getByTestId("address")).toHaveTextContent("0x8e54b3...");
 
   await fireEvent.click(screen.getByTestId("disconnect"));
 
@@ -98,11 +98,11 @@ test("can connect to browser extension when authorized", async () => {
 
   await fireEvent.click(screen.getByTestId("connect-extension"));
 
+  expect(mockSetupWeb3).toBeCalledTimes(1);
+  expect(mockAccounts).toBeCalledTimes(1);
+  expect(await screen.findByTestId("address")).toHaveTextContent("0xD8B0b8...");
   await waitFor(() => {
-    expect(mockSetupWeb3).toBeCalledTimes(1);
-    expect(mockAccounts).toBeCalledTimes(1);
-    expect(screen.getByTestId("balance").innerHTML).toContain("2 LYX");
-    expect(screen.getByTestId("address").innerHTML).toContain("0xD8B0b8...");
+    expect(screen.getByTestId("balance")).toHaveTextContent("2 LYX");
   });
 });
 
@@ -122,9 +122,9 @@ test("can connect to browser extension when not authorized", async () => {
 
   await fireEvent.click(screen.getByTestId("connect-extension"));
 
+  expect(await screen.findByTestId("address")).toHaveTextContent("0x7367C9...");
   await waitFor(() => {
     expect(mockRequestAccounts).toBeCalled();
-    expect(screen.getByTestId("balance").innerHTML).toContain("3 LYX");
-    expect(screen.getByTestId("address").innerHTML).toContain("0x7367C9...");
+    expect(screen.getByTestId("balance")).toHaveTextContent("3 LYX");
   });
 });
