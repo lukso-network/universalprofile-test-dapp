@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { getState } from "@/stores";
-import Notifications from "@/components/shared/Notification.vue";
+import Notifications from "@/components/Notification.vue";
 import useNotifications from "@/compositions/useNotifications";
 import { ref } from "vue";
 import useWeb3 from "@/compositions/useWeb3";
