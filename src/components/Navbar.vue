@@ -56,9 +56,6 @@ const { toggle } = useDropdown();
             <router-link class="navbar-item" to="/profiles/deploy"
               >Deploy</router-link
             >
-            <router-link class="navbar-item" to="/profiles/send-lyx"
-              >Send LYX</router-link
-            >
           </div>
         </div>
 
