@@ -1,5 +1,4 @@
 import { formatNumber } from "@/helpers/ethers";
-import { getLspFactory } from "@/services/lsp-factory.service";
 import {
   LSP3ProfileJSON,
   DeploymentEvent,
@@ -10,6 +9,7 @@ import { defineComponent } from "vue";
 import ProfileListIpfs from "@/components/profile/profile-list-ipfs/ProfileListIpfs.vue";
 import { getDeployedBaseContracts } from "@/helpers/deployment.helper";
 import { getSigner } from "@/services/provider.service";
+import { useLspFactory } from "@/compositions/useLspFactory";
 
 export default defineComponent({
   components: {
@@ -37,7 +37,7 @@ export default defineComponent({
       const signer = await getSigner();
       const network = await signer.provider.getNetwork();
       const networkDetails = await getDeployedBaseContracts(network.chainId);
-      const lspFactory = await getLspFactory();
+      const lspFactory = await useLspFactory();
 
       this.status.isLoading = true;
       lspFactory.LSP3UniversalProfile.deploy(

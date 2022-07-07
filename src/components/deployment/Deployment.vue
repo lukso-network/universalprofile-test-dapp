@@ -1,6 +1,6 @@
 <script lang="ts">
+import { useLspFactory } from "@/compositions/useLspFactory";
 import { getDeployedBaseContracts } from "@/helpers/deployment.helper";
-import { getLspFactory } from "@/services/lsp-factory.service";
 import { getSigner } from "@/services/provider.service";
 import { defineComponent } from "vue";
 
@@ -12,7 +12,7 @@ export default defineComponent({
   setup: async function () {
     const { provider } = await getSigner();
     const { chainId } = await provider.getNetwork();
-    const lspFactory = await getLspFactory();
+    const lspFactory = await useLspFactory();
 
     const networkDetails = await getDeployedBaseContracts(chainId);
     const selectOptions = networkDetails
