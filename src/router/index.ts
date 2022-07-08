@@ -5,8 +5,6 @@ import ProfileUpload from "../components/profile/profile-upload/ProfileUpload.vu
 import ProfileDetail from "../components/profile/profile-detail/ProfileDetail.vue";
 import ProfileDeploy from "../components/profile/profile-deploy/ProfileDeploy.vue";
 import ProfileEdit from "../components/profile/profile-edit/ProfileEdit.vue";
-import ProfileSendLyx from "../views/profile/send-lyx/SendLyx.vue";
-import Deployment from "../components/deployment/Deployment.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -45,15 +43,7 @@ const routes: Array<RouteRecordRaw> = [
         path: "deploy",
         component: ProfileDeploy,
       },
-      {
-        path: "send-lyx",
-        component: ProfileSendLyx,
-      },
     ],
-  },
-  {
-    path: "/deployment",
-    component: Deployment,
   },
 ];
 
