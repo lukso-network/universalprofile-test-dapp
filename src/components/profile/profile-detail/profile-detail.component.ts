@@ -3,7 +3,7 @@ import { request } from "graphql-request";
 import { isAddress } from "ethers/lib/utils";
 import { DEFAULT_IPFS_URL, ERC725_CACHE_URL } from "@/helpers/config";
 import { getLSP3ProfileQuery } from "@/helpers/graphql";
-import { LSP3Account__factory, LSP3Account } from "@lukso/lsp-factory.js";
+import { LSP3Account__factory, LSP3Account } from "@lukso/lsp-factory.js-alpha";
 import { getSigner } from "@/services/provider.service";
 
 export default defineComponent({
