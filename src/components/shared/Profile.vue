@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { DEFAULT_IPFS_URL } from "@/helpers/config";
 import makeBlockie from "ethereum-blockies-base64";
 import { LSP3Profile } from "@lukso/lsp-factory.js";
+import { DEFAULT_NETWORK_CONFIG } from "@/utils/networkConfig";
 
 const props = defineProps<{
   profile?: LSP3Profile;
@@ -12,7 +12,7 @@ const props = defineProps<{
 const profileImage = computed(() => {
   if (props.profile?.profileImage) {
     const profileUrl = props.profile?.profileImage[4]?.url as string;
-    return profileUrl.replace("ipfs://", DEFAULT_IPFS_URL);
+    return profileUrl.replace("ipfs://", DEFAULT_NETWORK_CONFIG.ipfs.url);
   } else {
     return "https://bulma.io/images/placeholders/96x96.png";
   }

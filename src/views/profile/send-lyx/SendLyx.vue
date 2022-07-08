@@ -4,7 +4,6 @@ import Notifications from "@/components/shared/Notification.vue";
 import Profile from "@/components/shared/Profile.vue";
 import NoExtension from "@/views/profile/send-lyx/NoExtension.vue";
 import Search from "@/views/profile/send-lyx/Search.vue";
-import { DEFAULT_IPFS_URL } from "@/helpers/config";
 import useErc725 from "@/compositions/useErc725";
 import { Errors } from "@/types";
 import useNotifications from "@/compositions/useNotifications";
@@ -12,6 +11,7 @@ import useWeb3 from "@/compositions/useWeb3";
 import { getState } from "@/stores";
 import { LSP3Profile } from "@lukso/lsp-factory.js";
 import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from "@/helpers/config";
+import { DEFAULT_NETWORK_CONFIG } from "@/utils/networkConfig";
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications();
@@ -112,7 +112,7 @@ const backgroundImageSrc = computed(() => {
 
   if (backgroundImage && backgroundImage.length > 1) {
     const backgroundUrl = backgroundImage[2]?.url as string;
-    return backgroundUrl.replace("ipfs://", DEFAULT_IPFS_URL);
+    return backgroundUrl.replace("ipfs://", DEFAULT_NETWORK_CONFIG.ipfs.url);
   } else {
     return "";
   }

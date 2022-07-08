@@ -1,6 +1,6 @@
 import { defineComponent } from "vue";
 import { getAndPrepareAllIpfsItems } from "@/helpers/localstorage";
-import { DEFAULT_IPFS_URL } from "@/helpers/config";
+import { DEFAULT_NETWORK_CONFIG } from "@/utils/networkConfig";
 
 export default defineComponent({
   name: "ProfileListIpfs",
@@ -13,7 +13,7 @@ export default defineComponent({
   data: function () {
     return {
       uploadedProfiles: getAndPrepareAllIpfsItems(),
-      uploadTarget: DEFAULT_IPFS_URL,
+      uploadTarget: DEFAULT_NETWORK_CONFIG.ipfs.url,
     };
   },
   methods: {

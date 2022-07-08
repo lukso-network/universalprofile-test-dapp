@@ -1,4 +1,4 @@
-import { DEFAULT_IPFS_URL } from "./config";
+import { DEFAULT_NETWORK_CONFIG } from "./../utils/networkConfig";
 
 const IPFS_PREFIX = "ipfs://";
 
@@ -13,7 +13,7 @@ export function getAndPrepareAllIpfsItems(): {
   while (i--) {
     if (keys[i].startsWith(IPFS_PREFIX)) {
       values.push({
-        url: keys[i].replace(IPFS_PREFIX, DEFAULT_IPFS_URL),
+        url: keys[i].replace(IPFS_PREFIX, DEFAULT_NETWORK_CONFIG.ipfs.url),
         profile: JSON.parse(localStorage.getItem(keys[i]) as string),
       });
     }
