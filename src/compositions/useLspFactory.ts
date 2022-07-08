@@ -82,18 +82,17 @@ export function useLspFactory(): {
     contractDeploymentOptions?: ContractDeploymentOptions | undefined
   ) => Promise<DeployedUniversalProfileContracts>;
   getFactory: () => LSPFactory;
-} | null {
+} {
   const hasExtension = !!window.ethereum;
-  console.log(window.ethereum);
-  if (hasExtension) {
-    lspFactory = new LSPFactory(window.ethereum);
-    return {
-      deployLSP8IdentifiableDigitalAsset,
-      deployLsp7DigitalAsset,
-      uploadUniversalProfileMetaData,
-      deployUniversalProfile,
-      getFactory,
-    };
+  if (!hasExtension) {
+    throw new Error("Extension not installed");
   }
-  return null;
+  lspFactory = new LSPFactory(window.ethereum);
+  return {
+    deployLSP8IdentifiableDigitalAsset,
+    deployLsp7DigitalAsset,
+    uploadUniversalProfileMetaData,
+    deployUniversalProfile,
+    getFactory,
+  };
 }

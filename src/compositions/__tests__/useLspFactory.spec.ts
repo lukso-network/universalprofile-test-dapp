@@ -11,7 +11,7 @@ describe("can produce LSP Factory", () => {
   let lspFactory: any;
   beforeAll(async () => {
     window.ethereum = {};
-    lspFactory = await useLspFactory();
+    useLspFactory();
   });
 
   it("should be called with window.ethereum", async () => {
@@ -20,7 +20,6 @@ describe("can produce LSP Factory", () => {
 
   it("should return null for empty chain id", async () => {
     window.ethereum = undefined;
-    lspFactory = await useLspFactory();
-    expect(lspFactory).toBe(null);
+    expect(useLspFactory).toThrow("Extension not installed");
   });
 });
