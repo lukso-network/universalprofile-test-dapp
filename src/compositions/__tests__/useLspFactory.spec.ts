@@ -1,30 +1,13 @@
 import { useLspFactory } from "@/compositions/useLspFactory";
+import { NETWORK_URL, PRIVATE_KEY } from "@/helpers/config";
+import { getState } from "@/stores";
+import { LSPFactory } from "@lukso/lsp-factory.js";
 
 jest.mock("@lukso/lsp-factory.js", () => ({
-  LSPFactory: jest.fn().mockImplementation(() => ({
-    ProxyDeployer: {
-      deployBaseContracts: () => ({
-        universalProfile: {
-          address: "0x1",
-        },
-        universalReceiverDelegate: {
-          address: "0x1",
-        },
-      }),
-    },
-    LSP3UniversalProfile: {
-      deploy: () => "success",
-    },
-  })),
+  LSPFactory: jest.fn(),
 }));
-jest.mock("@/services/provider.service", () => ({
-  getSigner: async () => ({
-    provider: {
-      getNetwork: jest.fn().mockImplementation(async () => ({
-        chainId: 22,
-      })),
-    },
-  }),
+jest.mock("@/stores", () => ({
+  getState: jest.fn().mockReturnValue(22),
 }));
 
 describe("can produce LSP Factory", () => {
@@ -33,14 +16,16 @@ describe("can produce LSP Factory", () => {
     lspFactory = await useLspFactory();
   });
 
-  it("can deploy base contracts", async () => {
-    const deployedBaseContract =
-      await lspFactory.ProxyDeployer.deployBaseContracts();
-    expect(deployedBaseContract.universalProfile.address).toBe("0x1");
-    expect(deployedBaseContract.universalReceiverDelegate.address).toBe("0x1");
+  it("can call correct parameters", async () => {
+    expect(LSPFactory).toBeCalledWith(NETWORK_URL, {
+      deployKey: PRIVATE_KEY,
+      chainId: 22,
+    });
   });
 
-  it("can deploy universal profile", async () => {
-    expect(lspFactory.LSP3UniversalProfile.deploy()).toBe("success");
+  it("should return null for empty chain id", async () => {
+    (getState as jest.Mock).mockReturnValue(undefined);
+    lspFactory = await useLspFactory();
+    expect(lspFactory).toBe(null);
   });
 });

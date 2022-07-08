@@ -7,3 +7,5 @@ export const DEFAULT_GAS = 5_000_000;
 export const DEFAULT_GAS_PRICE = "10000000000";
 
 export const MAGICVALUE = "0x1626ba7e";
+export const PRIVATE_KEY =
+  "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
