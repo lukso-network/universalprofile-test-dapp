@@ -7,7 +7,7 @@ import {
 import { HTMLInputEvent } from "@/interfaces/html-input-event";
 import { getAndPrepareAllIpfsItems } from "@/helpers/localstorage";
 import fileSize from "filesize";
-import { DEFAULT_NETWORK_CONFIG } from "@/utils/networkConfig";
+import { DEFAULT_NETWORK_CONFIG } from "@/helpers/config";
 
 export default defineComponent({
   name: "Upload",

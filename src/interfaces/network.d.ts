@@ -1,4 +1,4 @@
-export type NetworkType = "l16" | "l14";
+export type NetworkType = "l16";
 
 export type NetworkInfo = {
   name: string;

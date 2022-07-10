@@ -113,6 +113,7 @@
 .placeholder {
   opacity: 0.1;
 }
+
 .table--inline {
   td {
     border: none !important;
@@ -122,6 +123,7 @@
 .PENDING {
   background: hsl(206, 70%, 96%);
 }
+
 .COMPLETE {
   background: hsl(142, 52%, 96%);
 }

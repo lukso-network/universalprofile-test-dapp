@@ -1,4 +1,4 @@
-import { DEFAULT_NETWORK_CONFIG } from "./../utils/networkConfig";
+import { DEFAULT_NETWORK_CONFIG } from "./config";
 
 const IPFS_PREFIX = "ipfs://";
 

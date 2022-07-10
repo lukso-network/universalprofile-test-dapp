@@ -4,7 +4,7 @@ import { isAddress } from "ethers/lib/utils";
 import { getLSP3ProfileQuery } from "@/helpers/graphql";
 import { LSP3Account__factory, LSP3Account } from "@lukso/lsp-factory.js";
 import { getSigner } from "@/services/provider.service";
-import { DEFAULT_NETWORK_CONFIG } from "@/utils/networkConfig";
+import { DEFAULT_NETWORK_CONFIG } from "@/helpers/config";
 
 export default defineComponent({
   name: "ProfileDetail",

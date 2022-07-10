@@ -1,6 +1,6 @@
 import { defineComponent } from "vue";
 import { getAndPrepareAllIpfsItems } from "@/helpers/localstorage";
-import { DEFAULT_NETWORK_CONFIG } from "@/utils/networkConfig";
+import { DEFAULT_NETWORK_CONFIG } from "@/helpers/config";
 
 export default defineComponent({
   name: "ProfileListIpfs",

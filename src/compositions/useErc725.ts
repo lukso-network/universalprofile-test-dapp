@@ -2,7 +2,7 @@ import { ERC725, ERC725JSONSchema } from "@erc725/erc725.js";
 import { Permissions } from "@erc725/erc725.js/build/main/src/types/Method";
 import { DecodeDataOutput } from "@erc725/erc725.js/build/main/src/types/decodeData";
 import Web3 from "web3";
-import { DEFAULT_NETWORK_CONFIG } from "@/utils/networkConfig";
+import { DEFAULT_NETWORK_CONFIG } from "@/helpers/config";
 
 window.ERC725 = ERC725;
 

@@ -6,7 +6,7 @@ import useWalletConnect, {
 } from "@/compositions/useWalletConnect";
 import { getState, useState } from "@/stores";
 import useWeb3 from "@/compositions/useWeb3";
-import { UP_CONNECTED_ADDRESS } from "@/helpers/config";
+import { createBlockScoutLink, UP_CONNECTED_ADDRESS } from "@/helpers/config";
 import Web3Utils from "web3-utils";
 import { computed } from "vue";
 
@@ -120,7 +120,8 @@ const disconnect = async () => {
           :notification="notification"
           class="mt-4"
           @hide="clearNotification"
-        ></Notifications>
+        >
+        </Notifications>
       </div>
       <div class="field">
         <div
@@ -132,9 +133,7 @@ const disconnect = async () => {
             Connected to address:
             <b
               ><a
-                :href="`https://blockscout.com/lukso/l14/address/${getState(
-                  'address'
-                )}/transactions`"
+                :href="createBlockScoutLink(getState('address'))"
                 target="_blank"
                 >{{ getState("address") }}</a
               ></b
