@@ -1,6 +1,4 @@
 import { useLspFactory } from "@/compositions/useLspFactory";
-import { NETWORK_URL, PRIVATE_KEY } from "@/helpers/config";
-import { setState } from "@/stores";
 import { LSPFactory } from "@lukso/lsp-factory.js";
 
 jest.mock("@lukso/lsp-factory.js", () => ({

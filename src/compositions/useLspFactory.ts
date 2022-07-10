@@ -34,49 +34,7 @@ const deployUniversalProfile = async (
   );
 };
 
-const uploadUniversalProfileMetaData = async (
-  profileData: ProfileDataBeforeUpload,
-  uploadOptions?: UploadOptions
-): Promise<ProfileDataForEncoding> => {
-  return await lspFactory.UniversalProfile.uploadProfileData(
-    profileData,
-    uploadOptions
-  );
-};
-
-const deployLsp7DigitalAsset = async (
-  digitalAssetDeploymentOptions: LSP7DigitalAssetDeploymentOptions,
-  contractDeploymentOptions?: LSP7ContractDeploymentOptions
-): Promise<DeployedLSP7DigitalAsset> => {
-  return await lspFactory.LSP7DigitalAsset.deploy(
-    digitalAssetDeploymentOptions,
-    contractDeploymentOptions
-  );
-};
-
-const deployLSP8IdentifiableDigitalAsset = async (
-  digitalAssetDeploymentOptions: DigitalAssetDeploymentOptions,
-  contractDeploymentOptions?: LSP8ContractDeploymentOptions
-): Promise<DeployedLSP8IdentifiableDigitalAsset> => {
-  return await lspFactory.LSP8IdentifiableDigitalAsset.deploy(
-    digitalAssetDeploymentOptions,
-    contractDeploymentOptions
-  );
-};
-
 export function useLspFactory(): {
-  deployLSP8IdentifiableDigitalAsset: (
-    digitalAssetDeploymentOptions: DigitalAssetDeploymentOptions,
-    contractDeploymentOptions?: LSP8ContractDeploymentOptions
-  ) => Promise<DeployedLSP8IdentifiableDigitalAsset>;
-  deployLsp7DigitalAsset: (
-    digitalAssetDeploymentOptions: LSP7DigitalAssetDeploymentOptions,
-    contractDeploymentOptions?: LSP7ContractDeploymentOptions
-  ) => Promise<DeployedLSP7DigitalAsset>;
-  uploadUniversalProfileMetaData: (
-    profileData: ProfileDataBeforeUpload,
-    uploadOptions?: UploadOptions
-  ) => Promise<ProfileDataForEncoding>;
   deployUniversalProfile: (
     profileDeploymentOptions: ProfileDeploymentOptions,
     contractDeploymentOptions?: ContractDeploymentOptions | undefined
@@ -89,9 +47,6 @@ export function useLspFactory(): {
   }
   lspFactory = new LSPFactory(window.ethereum);
   return {
-    deployLSP8IdentifiableDigitalAsset,
-    deployLsp7DigitalAsset,
-    uploadUniversalProfileMetaData,
     deployUniversalProfile,
     getFactory,
   };
