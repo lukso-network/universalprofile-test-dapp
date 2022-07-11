@@ -1,5 +1,5 @@
 import { NonceManager } from "@ethersproject/experimental";
-import { LSPFactory } from "@lukso/lsp-factory.js";
+import { LSPFactory } from "@lukso/lsp-factory.js-alpha";
 import { getSigner } from "./provider.service";
 
 export async function getLspFactory(): Promise<LSPFactory> {
