@@ -1,46 +1,23 @@
 import { useLspFactory } from "@/compositions/useLspFactory";
+import { LSPFactory } from "@lukso/lsp-factory.js";
 
 jest.mock("@lukso/lsp-factory.js", () => ({
-  LSPFactory: jest.fn().mockImplementation(() => ({
-    ProxyDeployer: {
-      deployBaseContracts: () => ({
-        universalProfile: {
-          address: "0x1",
-        },
-        universalReceiverDelegate: {
-          address: "0x1",
-        },
-      }),
-    },
-    LSP3UniversalProfile: {
-      deploy: () => "success",
-    },
-  })),
-}));
-jest.mock("@/services/provider.service", () => ({
-  getSigner: async () => ({
-    provider: {
-      getNetwork: jest.fn().mockImplementation(async () => ({
-        chainId: 22,
-      })),
-    },
-  }),
+  LSPFactory: jest.fn(),
 }));
 
 describe("can produce LSP Factory", () => {
   let lspFactory: any;
   beforeAll(async () => {
-    lspFactory = await useLspFactory();
+    window.ethereum = {};
+    useLspFactory();
   });
 
-  it("can deploy base contracts", async () => {
-    const deployedBaseContract =
-      await lspFactory.ProxyDeployer.deployBaseContracts();
-    expect(deployedBaseContract.universalProfile.address).toBe("0x1");
-    expect(deployedBaseContract.universalReceiverDelegate.address).toBe("0x1");
+  it("should be called with window.ethereum", async () => {
+    expect(LSPFactory).toBeCalledWith({});
   });
 
-  it("can deploy universal profile", async () => {
-    expect(lspFactory.LSP3UniversalProfile.deploy()).toBe("success");
+  it("should return null for empty chain id", async () => {
+    window.ethereum = undefined;
+    expect(useLspFactory).toThrow("Extension not installed");
   });
 });
