@@ -207,6 +207,7 @@ onUnmounted(() => {
     background-image: url("~@/assets/lukso.png");
   }
 }
+
 .dropdown-item {
   &.is-text {
     text-decoration: none;
@@ -215,7 +216,7 @@ onUnmounted(() => {
 
 .address {
   .logo {
-    top: 0px;
+    top: 0;
     left: -7px;
     width: 20px;
   }

@@ -114,17 +114,17 @@
   opacity: 0.1;
 }
 
-.table--inline {
+.table-inline {
   td {
     border: none !important;
   }
 }
 
-.PENDING {
-  background: hsl(206, 70%, 96%);
+.pending {
+  background: hsl(206deg, 70%, 96%);
 }
 
-.COMPLETE {
-  background: hsl(142, 52%, 96%);
+.complete {
+  background: hsl(142deg, 52%, 96%);
 }
 </style>
