@@ -6,11 +6,8 @@ import LSP7Mintable from "@lukso/universalprofile-smart-contracts/artifacts/LSP7
 import useWeb3 from "@/compositions/useWeb3";
 import { ref, watchEffect } from "vue";
 import { Contract } from "web3-eth-contract";
-import {
-  createBlockScoutLink,
-  DEFAULT_GAS,
-  DEFAULT_GAS_PRICE,
-} from "@/helpers/config";
+import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from "@/helpers/config";
+import { createBlockScoutLink } from "@/utils/utils";
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications();

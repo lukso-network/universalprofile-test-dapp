@@ -6,7 +6,8 @@ import useWalletConnect, {
 } from "@/compositions/useWalletConnect";
 import { getState, useState } from "@/stores";
 import useWeb3 from "@/compositions/useWeb3";
-import { createBlockScoutLink, UP_CONNECTED_ADDRESS } from "@/helpers/config";
+import { UP_CONNECTED_ADDRESS } from "@/helpers/config";
+import { createBlockScoutLink } from "@/utils/utils";
 import Web3Utils from "web3-utils";
 import { computed } from "vue";
 
