@@ -2,7 +2,7 @@ import { formatNumber } from "@/helpers/ethers";
 import { defineComponent } from "vue";
 import ProfileListIpfs from "@/components/profile/profile-list-ipfs/ProfileListIpfs.vue";
 import { getSigner } from "@/services/provider.service";
-import { LSP3Account__factory } from "@lukso/lsp-factory.js";
+import { LSP3Account__factory } from "@lukso/lsp-factory.js-alpha";
 
 export default defineComponent({
   components: {

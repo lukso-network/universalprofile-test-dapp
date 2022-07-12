@@ -5,7 +5,7 @@ import {
   DeploymentEvent,
   DeploymentStatus,
   DeploymentType,
-} from "@lukso/lsp-factory.js";
+} from "@lukso/lsp-factory.js-alpha";
 import { defineComponent } from "vue";
 import ProfileListIpfs from "@/components/profile/profile-list-ipfs/ProfileListIpfs.vue";
 import { getDeployedBaseContracts } from "@/helpers/deployment.helper";

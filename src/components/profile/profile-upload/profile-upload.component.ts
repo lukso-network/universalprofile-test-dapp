@@ -3,7 +3,7 @@ import {
   LSP3ProfileJSON,
   LSP3ProfileLink,
   LSP3UniversalProfile,
-} from "@lukso/lsp-factory.js";
+} from "@lukso/lsp-factory.js-alpha";
 import { HTMLInputEvent } from "@/interfaces/html-input-event";
 import { getAndPrepareAllIpfsItems } from "@/helpers/localstorage";
 import fileSize from "filesize";
