@@ -44,6 +44,7 @@ jest.mock("@/compositions/useWeb3", () => ({
 beforeEach(() => {
   const { setDisconnected } = useState();
   setDisconnected();
+  jest.useFakeTimers();
   jest.resetAllMocks();
 });
 

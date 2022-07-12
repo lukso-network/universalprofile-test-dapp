@@ -8,6 +8,7 @@ import {
   ProfileDataBeforeUpload,
   ProfileDeploymentOptions,
 } from "@lukso/lsp-factory.js-alpha";
+
 import { UploadOptions } from "@lukso/lsp-factory.js/build/main/src/lib/interfaces/profile-upload-options";
 
 let lspFactory: LSPFactory;
@@ -36,7 +37,7 @@ const uploadUniversalProfileMetaData = async (
   );
 };
 
-export function useLspFactory(): {
+export default function useLspFactory(): {
   deployUniversalProfile: (
     profileDeploymentOptions: ProfileDeploymentOptions,
     contractDeploymentOptions?: ContractDeploymentOptions | undefined

@@ -1,7 +1,8 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import Home from "../views/Home.vue";
 import Profile from "../views/Profile.vue";
-import ProfileUpload from "../components/profile/profile-upload/ProfileUpload.vue";
+import ProfileUpload from "../views/profile/Upload.vue";
+// import ProfileUpload from "../components/profile/profile-upload/ProfileUpload.vue";
 import ProfileDetail from "../components/profile/profile-detail/ProfileDetail.vue";
 import ProfileDeploy from "../components/profile/profile-deploy/ProfileDeploy.vue";
 import ProfileEdit from "../components/profile/profile-edit/ProfileEdit.vue";
