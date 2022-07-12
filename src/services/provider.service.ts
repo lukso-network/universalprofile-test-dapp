@@ -36,6 +36,6 @@ export async function getSigner(): Promise<{
       address.address = addresses[0];
     });
   }
-
+  //@ts-ignore
   return { address, signer, provider };
 }

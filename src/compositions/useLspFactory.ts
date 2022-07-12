@@ -8,14 +8,6 @@ import {
   ProfileDataBeforeUpload,
   ProfileDeploymentOptions,
 } from "@lukso/lsp-factory.js-alpha";
-import {
-  DeployedLSP7DigitalAsset,
-  DeployedLSP8IdentifiableDigitalAsset,
-  DigitalAssetDeploymentOptions,
-  LSP7ContractDeploymentOptions,
-  LSP7DigitalAssetDeploymentOptions,
-  LSP8ContractDeploymentOptions,
-} from "@lukso/lsp-factory.js/build/main/src/lib/interfaces/digital-asset-deployment";
 import { UploadOptions } from "@lukso/lsp-factory.js/build/main/src/lib/interfaces/profile-upload-options";
 
 let lspFactory: LSPFactory;
@@ -34,11 +26,25 @@ const deployUniversalProfile = async (
   );
 };
 
+const uploadUniversalProfileMetaData = async (
+  profileData: ProfileDataBeforeUpload,
+  uploadOptions?: UploadOptions
+): Promise<ProfileDataForEncoding> => {
+  return await lspFactory.UniversalProfile.uploadProfileData(
+    profileData,
+    uploadOptions
+  );
+};
+
 export function useLspFactory(): {
   deployUniversalProfile: (
     profileDeploymentOptions: ProfileDeploymentOptions,
     contractDeploymentOptions?: ContractDeploymentOptions | undefined
   ) => Promise<DeployedUniversalProfileContracts>;
+  uploadUniversalProfileMetaData: (
+    profileData: ProfileDataBeforeUpload,
+    uploadOptions?: UploadOptions
+  ) => Promise<ProfileDataForEncoding>;
   getFactory: () => LSPFactory;
 } {
   const hasExtension = !!window.ethereum;
@@ -48,6 +54,7 @@ export function useLspFactory(): {
   lspFactory = new LSPFactory(window.ethereum);
   return {
     deployUniversalProfile,
+    uploadUniversalProfileMetaData,
     getFactory,
   };
 }

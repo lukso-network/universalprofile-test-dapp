@@ -62,3 +62,21 @@ test("can send lyx transaction with data", async () => {
     gasPrice: "10000000000",
   });
 });
+
+test("can't send lyx transaction with empty amount", async () => {
+  setState("address", "0x517216362D594516c6f96Ee34b2c502d65B847E4");
+
+  render(SendLyx);
+
+  await fireEvent.update(screen.getByTestId("amount"), "");
+  await fireEvent.update(
+    screen.getByTestId("to"),
+    "0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298"
+  );
+  await fireEvent.click(screen.getByTestId("hasData"));
+  await fireEvent.click(screen.getByTestId("send"));
+
+  expect(screen.getByTestId("notification")).toHaveTextContent(
+    "Enter an amount"
+  );
+});
