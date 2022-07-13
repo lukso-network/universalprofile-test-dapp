@@ -53,11 +53,12 @@ const upload = async () => {
       uploadResult.value?.url,
       JSON.stringify(uploadResult.value)
     );
-    setNotification("Profile uploaded successfully", "primary");
+
+    setNotification(uploadResult.value?.url, "primary");
   } catch (error) {
-    console.error("Upload Error: ", error);
     showError.value = true;
     isUploading.value = false;
+    setNotification("Profile upload failed", "danger");
   }
 };
 
@@ -353,20 +354,6 @@ const removeBackgroundImage = () => {
 
       <div class="column">
         <section
-          v-if="uploadResult?.url"
-          class="has-background-success p-5 mb-5"
-        >
-          <h2 class="title is-size-4">Uploaded Profile:</h2>
-          <a
-            href="{{ uploadResult.url }}"
-            target="_blank"
-            rel="noopener noreferrer"
-            >{{ uploadResult.url }}</a
-          >
-          <pre v-if="uploadResult">{{ uploadResult.url }}</pre>
-        </section>
-
-        <section
           v-if="uploadedProfiles.length > 0"
           class="has-background-success-light p-5"
         >
@@ -378,16 +365,13 @@ const removeBackgroundImage = () => {
             "
           >
             <tr>
-              <th>Name</th>
               <th>Identifier</th>
+              <th>Code</th>
             </tr>
             <tr
               v-for="(uploadedProfile, index) in uploadedProfiles"
               :key="index"
             >
-              <td>
-                {{ uploadedProfile.profile }}
-              </td>
               <td>
                 <a
                   v-if="uploadedProfile.url"
@@ -397,6 +381,9 @@ const removeBackgroundImage = () => {
                 >
                   {{ uploadedProfile.url.replace(uploadTarget, "") }}
                 </a>
+              </td>
+              <td>
+                {{ uploadedProfile.profile }}
               </td>
             </tr>
           </table>
