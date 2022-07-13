@@ -56,7 +56,7 @@ const upload = async (event: Event) => {
     );
     setNotification("Profile uploaded successfully", "primary");
   } catch (error) {
-    console.error("Error: ", error);
+    console.error("Upload Error: ", error);
     showError.value = true;
     isUploading.value = false;
   }
