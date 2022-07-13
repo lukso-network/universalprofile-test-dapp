@@ -1,8 +1,8 @@
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { setState, useState, getState } from "@/stores";
-import { NETWORK_URL } from "@/helpers/config";
 import useWeb3 from "@/compositions/useWeb3";
 import { provider as Provider } from "web3-core";
+import { DEFAULT_NETWORK_CONFIG } from "@/helpers/config";
 
 let provider: WalletConnectProvider;
 export const WALLET_CONNECT_VERSION = "1.0";
@@ -12,7 +12,7 @@ const setupProvider = async (): Promise<void> => {
 
   provider = new WalletConnectProvider({
     rpc: {
-      22: NETWORK_URL,
+      22: DEFAULT_NETWORK_CONFIG.rpc.url,
     },
     bridge: "https://safe-walletconnect.gnosis.io",
     chainId: 22,

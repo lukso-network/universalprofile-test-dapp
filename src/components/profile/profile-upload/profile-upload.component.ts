@@ -7,7 +7,7 @@ import {
 import { HTMLInputEvent } from "@/interfaces/html-input-event";
 import { getAndPrepareAllIpfsItems } from "@/helpers/localstorage";
 import fileSize from "filesize";
-import { DEFAULT_IPFS_URL } from "@/helpers/config";
+import { DEFAULT_NETWORK_CONFIG } from "@/helpers/config";
 
 export default defineComponent({
   name: "Upload",
@@ -26,7 +26,7 @@ export default defineComponent({
       description: "",
       links: [] as LSP3ProfileLink[],
       tags: [] as string[],
-      uploadTarget: DEFAULT_IPFS_URL,
+      uploadTarget: DEFAULT_NETWORK_CONFIG.ipfs.url,
       uploadResult: {} as { profile: LSP3ProfileJSON; url: string },
       uploadedProfiles: getAndPrepareAllIpfsItems(),
     };

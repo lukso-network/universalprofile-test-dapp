@@ -1,16 +1,16 @@
-import { DEFAULT_IPFS_URL } from "@/helpers/config";
 import { ERC725, ERC725JSONSchema } from "@erc725/erc725.js";
 import { Permissions } from "@erc725/erc725.js/build/main/src/types/Method";
 import { DecodeDataOutput } from "@erc725/erc725.js/build/main/src/types/decodeData";
 import Web3 from "web3";
+import { DEFAULT_NETWORK_CONFIG } from "@/helpers/config";
 
 window.ERC725 = ERC725;
 
 const provider = new Web3.providers.HttpProvider(
-  "https://rpc.l14.lukso.network"
+  DEFAULT_NETWORK_CONFIG.rpc.url
 );
 const config = {
-  ipfsGateway: DEFAULT_IPFS_URL,
+  ipfsGateway: DEFAULT_NETWORK_CONFIG.ipfs.url,
 };
 const schema = [
   {
