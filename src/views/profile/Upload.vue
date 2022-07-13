@@ -27,8 +27,7 @@ const uploadedProfiles = ref(getAndPrepareAllIpfsItems());
 
 const { uploadUniversalProfileMetaData } = useLspFactory();
 
-const upload = async (event: Event) => {
-  event.preventDefault();
+const upload = async () => {
   clearNotification();
   isUploading.value = true;
 
@@ -116,13 +115,13 @@ const backgroundImageSize = computed(() => {
 });
 
 const removeProfileImage = () => {
-  profileImage.value = {} as any;
-  profileImageUrl.value = null as any;
+  profileImage.value = {} as File;
+  profileImageUrl.value = "";
 };
 
 const removeBackgroundImage = () => {
-  backgroundImage.value = {} as any;
-  backgroundImageUrl.value = null as any;
+  backgroundImage.value = {} as File;
+  backgroundImageUrl.value = "";
 };
 </script>
 
@@ -344,7 +343,7 @@ const removeBackgroundImage = () => {
               :class="{ 'is-loading': isUploading }"
               :disabled="isUploading || hasNotification"
               data-testid="upload-button"
-              @click="upload"
+              @click.stop="upload"
             >
               Upload Profile
             </button>
