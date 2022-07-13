@@ -4,13 +4,6 @@ import ProfileUpload from "../Upload.vue";
 
 const mockUploadUniversalProfileMetadata = jest.fn();
 
-jest.mock("@/compositions/useLspFactory", () => ({
-  __esModule: true,
-  default: () => ({
-    uploadUniversalProfileMetadata: () => mockUploadUniversalProfileMetadata(),
-  }),
-}));
-
 type MockMetaData = {
   name: string;
   description: string;
@@ -20,30 +13,35 @@ type MockMetaData = {
   backgroundImage: File;
 };
 
-describe("ProfileUpload", () => {
-  beforeEach(() => {
-    jest.resetAllMocks();
-  });
-  it("can upload a profile", async () => {
-    const mockData: MockMetaData = {
-      name: "Test",
-      description: "Test",
-      links: [],
-      tags: [],
-      profileImage: new File([], "test.png"),
-      backgroundImage: new File([], "test.png"),
-    };
-    mockUploadUniversalProfileMetadata.mockResolvedValue(mockData);
+const mockData: MockMetaData = {
+  name: "Test",
+  description: "Test",
+  links: [],
+  tags: [],
+  profileImage: new File([], "test.png"),
+  backgroundImage: new File([], "test.png"),
+};
 
-    const { getByTestId } = render(ProfileUpload);
+jest.mock("@/compositions/useLspFactory", () => ({
+  useLspFactory: () => ({
+    uploadUniversalProfileMetaData: mockUploadUniversalProfileMetadata,
+  }),
+}));
+
+describe("ProfileUpload", () => {
+  test("can upload a profile", async () => {
+    const { getByLabelText, getByTestId } = render(ProfileUpload);
+    const nameInput = getByLabelText(/name/i);
+    const descriptionInput = getByLabelText(/description/i);
     const uploadButton = getByTestId("upload-button");
 
-    await fireEvent.click(uploadButton, {
-      bubbles: true,
-    });
-    mockUploadUniversalProfileMetadata.mockReturnValue(mockData);
-    waitFor(() => {
-      expect(mockUploadUniversalProfileMetadata).toBeCalled();
+    await fireEvent.update(nameInput, mockData.name);
+    await fireEvent.update(descriptionInput, mockData.description);
+
+    await fireEvent.click(uploadButton);
+
+    await waitFor(async () => {
+      expect(mockUploadUniversalProfileMetadata).toHaveBeenCalledTimes(1);
     });
   });
 });

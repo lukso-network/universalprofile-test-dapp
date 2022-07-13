@@ -10,6 +10,7 @@ import {
 } from "@lukso/lsp-factory.js-alpha";
 
 import { UploadOptions } from "@lukso/lsp-factory.js/build/main/src/lib/interfaces/profile-upload-options";
+import { debug } from "console";
 
 let lspFactory: LSPFactory;
 
@@ -37,7 +38,7 @@ const uploadUniversalProfileMetaData = async (
   );
 };
 
-export default function useLspFactory(): {
+type LSPFactoryProps = {
   deployUniversalProfile: (
     profileDeploymentOptions: ProfileDeploymentOptions,
     contractDeploymentOptions?: ContractDeploymentOptions | undefined
@@ -47,12 +48,15 @@ export default function useLspFactory(): {
     uploadOptions?: UploadOptions
   ) => Promise<ProfileDataForEncoding>;
   getFactory: () => LSPFactory;
-} {
+};
+
+export function useLspFactory(): LSPFactoryProps {
   const hasExtension = !!window.ethereum;
   if (!hasExtension) {
     throw new Error("Extension not installed");
   }
   lspFactory = new LSPFactory(window.ethereum);
+
   return {
     deployUniversalProfile,
     uploadUniversalProfileMetaData,

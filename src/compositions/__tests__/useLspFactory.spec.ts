@@ -1,4 +1,4 @@
-import useLspFactory from "@/compositions/useLspFactory";
+import { useLspFactory } from "@/compositions/useLspFactory";
 import { LSPFactory } from "@lukso/lsp-factory.js";
 
 jest.mock("@lukso/lsp-factory.js", () => ({

@@ -4,9 +4,12 @@ import { LSP3ProfileLink } from "@lukso/lsp-factory.js-alpha";
 import { getAndPrepareAllIpfsItems } from "@/helpers/localstorage";
 import fileSize from "filesize";
 import { DEFAULT_IPFS_URL } from "@/helpers/config";
-import useLspFactory from "@/compositions/useLspFactory";
+import Notifications from "@/components/Notification.vue";
+import useNotifications from "@/compositions/useNotifications";
+import { useLspFactory } from "@/compositions/useLspFactory";
 
-const { uploadUniversalProfileMetaData } = useLspFactory();
+const { notification, clearNotification, hasNotification, setNotification } =
+  useNotifications();
 
 const isUploading = ref(false);
 const showError = ref(false);
@@ -22,15 +25,20 @@ const uploadTarget = ref(DEFAULT_IPFS_URL);
 const uploadResult = ref();
 const uploadedProfiles = ref(getAndPrepareAllIpfsItems());
 
+const { uploadUniversalProfileMetaData } = useLspFactory();
+
 const upload = async (event: Event) => {
   event.preventDefault();
+  clearNotification();
   isUploading.value = true;
 
   if (!name.value) {
     showError.value = true;
     isUploading.value = false;
-  } else {
-    uploadUniversalProfileMetaData({
+    return;
+  }
+  try {
+    uploadResult.value = await uploadUniversalProfileMetaData({
       profileImage: profileImage.value,
       backgroundImage: backgroundImage.value,
       name: name.value,
@@ -40,10 +48,17 @@ const upload = async (event: Event) => {
     });
 
     isUploading.value = false;
+    name.value = "";
+    description.value = "";
     localStorage.setItem(
-      uploadResult.value.url,
+      uploadResult.value?.url,
       JSON.stringify(uploadResult.value)
     );
+    setNotification("Profile uploaded successfully", "primary");
+  } catch (error) {
+    console.error("Error: ", error);
+    showError.value = true;
+    isUploading.value = false;
   }
 };
 
@@ -143,6 +158,12 @@ const removeBackgroundImage = () => {
         </div>
       </div>
     </article>
+    <Notifications
+      v-if="hasNotification"
+      :notification="notification"
+      class="mt-4"
+      @hide="clearNotification"
+    ></Notifications>
 
     <article v-if="showError" class="message is-danger">
       <div class="message-header">
@@ -225,25 +246,29 @@ const removeBackgroundImage = () => {
           </div>
 
           <div class="field">
-            <label class="label">Name</label>
+            <label class="label" for="name">Name</label>
             <div class="control">
               <input
+                id="name"
                 v-model="name"
                 class="input"
                 type="text"
                 placeholder="Knock knock who's there?"
                 required
+                data-testid="name"
               />
             </div>
           </div>
 
           <div class="field">
-            <label class="label">Description</label>
+            <label class="label" for="description">Description</label>
             <div class="control">
               <textarea
+                id="description"
                 v-model="description"
                 class="textarea"
                 placeholder="Once upon a time..."
+                data-testid="description"
               ></textarea>
             </div>
           </div>
@@ -317,7 +342,7 @@ const removeBackgroundImage = () => {
               class="button is-success"
               type="submit"
               :class="{ 'is-loading': isUploading }"
-              :disabled="isUploading"
+              :disabled="isUploading || hasNotification"
               data-testid="upload-button"
               @click="upload"
             >
