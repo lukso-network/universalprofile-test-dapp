@@ -7,6 +7,7 @@ import useWeb3 from "@/compositions/useWeb3";
 import { ref, watchEffect } from "vue";
 import { Contract } from "web3-eth-contract";
 import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from "@/helpers/config";
+import { createBlockScoutLink } from "@/utils/createBlockScoutLink";
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications();
@@ -206,7 +207,7 @@ const mint = async () => {
             Token address:
             <b
               ><a
-                :href="`https://blockscout.com/lukso/l14/address/${myToken?.options.address}/transactions`"
+                :href="createBlockScoutLink(myToken?.options.address ?? '')"
                 target="_blank"
                 data-testid="token-address"
                 >{{ myToken?.options.address }}</a
@@ -221,7 +222,8 @@ const mint = async () => {
           :notification="notification"
           class="mt-4"
           @hide="clearNotification"
-        ></Notifications>
+        >
+        </Notifications>
       </div>
     </div>
   </div>

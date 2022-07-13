@@ -10,6 +10,7 @@ import { defineComponent } from "vue";
 import ProfileListIpfs from "@/components/profile/profile-list-ipfs/ProfileListIpfs.vue";
 import { getDeployedBaseContracts } from "@/helpers/deployment.helper";
 import { getSigner } from "@/services/provider.service";
+import { createBlockScoutLink } from "@/utils/createBlockScoutLink";
 
 export default defineComponent({
   components: {
@@ -32,6 +33,7 @@ export default defineComponent({
   computed: {},
   methods: {
     formatNumber,
+    createBlockScoutLink,
     async deploy(controllerKey: string) {
       this.closeModal();
       const signer = await getSigner();
@@ -95,10 +97,6 @@ export default defineComponent({
         "is-light": status === DeploymentStatus.PENDING,
         "is-success": status === DeploymentStatus.COMPLETE,
       };
-    },
-
-    createBlockScoutLink(hash: string) {
-      return `https://blockscout.com/lukso/l14/tx/${hash}/internal-transactions`;
     },
   },
 });
