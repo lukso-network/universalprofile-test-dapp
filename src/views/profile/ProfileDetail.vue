@@ -1,16 +1,18 @@
 <script setup lang="ts">
-import { DEFAULT_IPFS_URL } from "@/helpers/config";
+import { DEFAULT_NETWORK_CONFIG } from "@/helpers/config";
 import { onMounted, ref, watch } from "vue";
-import { useRoute } from "vue-router";
 import { isAddress } from "ethers/lib/utils";
 import useErc725 from "@/compositions/useErc725";
+import { useRoute, RouteLocationNormalizedLoaded } from "vue-router";
 
+const route = useRoute();
+
+const routeData = ref<RouteLocationNormalizedLoaded>(route);
 const dataSource = ref("");
 const loading = ref(true);
 const profileData = ref(null as any);
 const error = ref(null);
 
-const route = useRoute();
 const { fetchProfile } = useErc725();
 
 const fetchData = () => {
@@ -63,7 +65,7 @@ onMounted(async () => {
 });
 
 // call fetchData again the method if the route changes
-watch(route, fetchData);
+watch(routeData, fetchData);
 </script>
 <template name="ProfileDetail">
   <section class="section">
@@ -126,7 +128,12 @@ watch(route, fetchData);
               >{{ image }}
                 </pre
             >
-            <img :src="image.url.replace('ipfs://', DEFAULT_IPFS_URL)" alt="" />
+            <img
+              :src="
+                image.url.replace('ipfs://', DEFAULT_NETWORK_CONFIG.ipfs.url)
+              "
+              :alt="image.url"
+            />
           </div>
         </td>
       </tr>
@@ -141,7 +148,10 @@ watch(route, fetchData);
             >{{ image }}
                 </pre
           >
-          <img :src="image.url.replace('ipfs://', DEFAULT_IPFS_URL)" alt="" />
+          <img
+            :src="image.url.replace('ipfs://', DEFAULT_NETWORK_CONFIG.ipfs.url)"
+            :alt="image.url"
+          />
         </div>
       </tr>
     </table>
