@@ -31,6 +31,9 @@ beforeAll(() => {
       address: "123",
     },
   }));
+  mockFetchProfile.mockResolvedValue({
+    LSP3UniversalProfiles: [{ name: "1234" }],
+  });
 });
 
 test("can call data from ipfs", async () => {
@@ -59,11 +62,11 @@ test("can call data from ipfs", async () => {
         ],
         backgroundImage: [
           {
-            width: 258,
-            height: 195,
+            width: 640,
+            height: 360,
             hashFunction: "keccak256(bytes)",
-            hash: "0x4c5e66a9fbb0f258d2baa95392a8da1da9731d658abb0fede2ecdc826a69db1a",
-            url: "ipfs://QmZ3zDELDWSzjyLKxLe5ipM1HKPUvgHVV5c22cnKUc4byk",
+            hash: "0x6f08de0d9a0f608ef23aace0485f4d7f7541d6d35ba62c4255c7f6b16d131fa8",
+            url: "ipfs://QmT7JiaMBSbVG2hWnS4oM7nFbpuwcKc7zNzs2CcWoGqLBx",
           },
         ],
         tags: ["blockchain", "fashion"],
@@ -112,9 +115,7 @@ test("can call data from cache if address is valid", async () => {
     },
   });
   (isAddress as jest.Mock).mockReturnValue(true);
-  mockFetchProfile.mockResolvedValue({
-    LSP3UniversalProfiles: [{ name: "1234" }],
-  });
+
   const screen = render(ProfileDetail);
   expect(mockFetchProfile).toBeCalledWith("1234");
   await waitFor(() => {
@@ -131,9 +132,15 @@ test("can display both background image and profile image", async () => {
   (isAddress as jest.Mock).mockReturnValue(false);
   const screen = render(ProfileDetail);
   await waitFor(() => {
-    const images = screen.getAllByAltText(
-      "ipfs://QmZ3zDELDWSzjyLKxLe5ipM1HKPUvgHVV5c22cnKUc4byk"
-    );
-    expect(images.length).toBe(2);
+    expect(
+      screen.getAllByAltText(
+        "ipfs://QmZ3zDELDWSzjyLKxLe5ipM1HKPUvgHVV5c22cnKUc4byk"
+      )
+    ).toBeDefined();
+    expect(
+      screen.getAllByAltText(
+        "ipfs://QmT7JiaMBSbVG2hWnS4oM7nFbpuwcKc7zNzs2CcWoGqLBx"
+      )
+    ).toBeDefined();
   });
 });
