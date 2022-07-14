@@ -1,4 +1,99 @@
-<script src="./profile-deploy.component.ts" lang="ts"></script>
+<script setup lang="ts">
+import { formatNumber } from "@/helpers/ethers";
+import { getLspFactory } from "@/services/lsp-factory.service";
+import {
+  LSP3ProfileJSON,
+  DeploymentEvent,
+  DeploymentStatus,
+  DeploymentType,
+} from "@lukso/lsp-factory.js-alpha";
+import { ref } from "vue";
+import ProfileListIpfs from "@/components/profile/profile-list-ipfs/ProfileListIpfs.vue";
+import { getDeployedBaseContracts } from "@/helpers/deployment.helper";
+import { getSigner } from "@/services/provider.service";
+import { useLspFactory } from "@/compositions/useLspFactory";
+import { DeployedUniversalProfileContracts } from "@lukso/lsp-factory.js";
+
+const isOwner = ref(false);
+const isModalOpen = ref(false);
+const controllerKey = ref("");
+const balance = ref("");
+const selectedProfile = ref({ profile: {} as any, url: "" });
+const profileDeploymentEvents = ref<DeploymentEvent[]>([]);
+const profileDeploymentEventsObj = ref({});
+const status = ref({
+  isLoading: false,
+});
+const { deployUniversalProfile } = useLspFactory();
+
+const deploy = async (controllerKey: string) => {
+  closeModal();
+  const signer = await getSigner();
+  const network = await signer.provider.getNetwork();
+  const networkDetails = getDeployedBaseContracts(network.chainId);
+  const lspFactory = await getLspFactory();
+
+  status.value.isLoading = true;
+  deployUniversalProfile(
+    {
+      controllerAddresses: [controllerKey],
+      lsp3Profile: {
+        json: selectedProfile.value.profile,
+        url: selectedProfile.value.url,
+      },
+    },
+    {
+      libAddresses: {
+        lsp3AccountInit: networkDetails.baseContracts.LSP3Account["0.0.1"],
+        universalReceiverAddressStoreInit:
+          networkDetails.baseContracts.UniversalReceiverAddressStore["0.0.1"],
+      },
+    }
+  )
+    .then((deployment) => {
+      profileDeploymentEvents.value.push(deployment);
+    })
+    .catch((error: Error) => {
+      console.error(error);
+    })
+    .finally(() => {
+      status.value.isLoading = false;
+    });
+
+  return;
+};
+
+const openModal = (selectedProfileData: {
+  profile: LSP3ProfileJSON;
+  url: string;
+}) => {
+  isModalOpen.value = true;
+  selectedProfile.value = selectedProfileData;
+};
+
+const closeModal = () => {
+  isModalOpen.value = false;
+};
+
+const getTypeClass = (type: string) => {
+  return {
+    "is-primary": type === DeploymentType.PROXY,
+    "is-warning": type === DeploymentType.CONTRACT,
+    "is-info": type === DeploymentType.TRANSACTION,
+  };
+};
+
+const getStatusClass = (status: string) => {
+  return {
+    "is-light": status === DeploymentStatus.PENDING,
+    "is-success": status === DeploymentStatus.COMPLETE,
+  };
+};
+
+const createBlockScoutLink = (hash: string) => {
+  return `https://blockscout.com/lukso/l14/tx/${hash}/internal-transactions`;
+};
+</script>
 
 <template>
   <section class="section">

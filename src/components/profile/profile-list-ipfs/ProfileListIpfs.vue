@@ -14,9 +14,15 @@
         <th>Identifier</th>
         <th>Deploy</th>
       </tr>
-      <tr v-for="uploadedProfile in uploadedProfiles" :key="uploadedProfile">
+      <tr
+        v-for="uploadedProfile in uploadedProfiles"
+        :key="uploadedProfile.url"
+      >
         <td>
-          {{ uploadedProfile.profile.LSP3Profile.name }}
+          {{
+            parseLspStringToJson(uploadedProfile.profile).json?.LSP3Profile
+              ?.name
+          }}
         </td>
         <td>
           <a

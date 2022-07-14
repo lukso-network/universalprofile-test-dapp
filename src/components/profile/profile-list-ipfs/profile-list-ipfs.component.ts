@@ -1,6 +1,7 @@
 import { defineComponent } from "vue";
 import { getAndPrepareAllIpfsItems } from "@/helpers/localstorage";
 import { DEFAULT_IPFS_URL } from "@/helpers/config";
+import parseLspStringToJson from "@/utils/parseLspStringToJson";
 
 export default defineComponent({
   name: "ProfileListIpfs",
@@ -20,5 +21,6 @@ export default defineComponent({
     createProfileOnChain(profile: any) {
       this.$emit("createProfileOnChain", profile);
     },
+    parseLspStringToJson,
   },
 });

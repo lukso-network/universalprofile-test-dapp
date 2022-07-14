@@ -358,35 +358,37 @@ const removeBackgroundImage = () => {
           class="has-background-success-light p-5"
         >
           <h2 class="title is-size-4">Previously Uploaded Profiles</h2>
-          <table
-            class="
-              table
-              is-bordered is-striped is-narrow is-hoverable is-fullwidth
-            "
-          >
-            <tr>
-              <th>Identifier</th>
-              <th>Code</th>
-            </tr>
-            <tr
-              v-for="(uploadedProfile, index) in uploadedProfiles"
-              :key="index"
+          <div class="table-container">
+            <table
+              class="
+                table
+                is-bordered is-striped is-narrow is-hoverable is-fullwidth
+              "
             >
-              <td>
-                <a
-                  v-if="uploadedProfile.url"
-                  :href="uploadedProfile.url"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {{ uploadedProfile.url.replace(uploadTarget, "") }}
-                </a>
-              </td>
-              <td>
-                {{ uploadedProfile.profile }}
-              </td>
-            </tr>
-          </table>
+              <tr>
+                <th>Identifier</th>
+                <th>Code</th>
+              </tr>
+              <tr
+                v-for="(uploadedProfile, index) in uploadedProfiles"
+                :key="index"
+              >
+                <td>
+                  <a
+                    v-if="uploadedProfile.url"
+                    :href="uploadedProfile.url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {{ uploadedProfile.url.replace(uploadTarget, "") }}
+                  </a>
+                </td>
+                <td>
+                  {{ uploadedProfile.profile }}
+                </td>
+              </tr>
+            </table>
+          </div>
         </section>
       </div>
     </div>
