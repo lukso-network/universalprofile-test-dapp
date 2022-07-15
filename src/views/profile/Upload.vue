@@ -54,7 +54,11 @@ const upload = async () => {
       JSON.stringify(uploadResult.value)
     );
 
-    setNotification(uploadResult.value?.url, "primary");
+    const url = uploadResult.value?.url.replace("ipfs://", DEFAULT_IPFS_URL);
+    setNotification(
+      `Profile uploaded successfully<br/><a href=${url} target="_blank">${url}</a>`,
+      "primary"
+    );
   } catch (error) {
     showError.value = true;
     isUploading.value = false;
