@@ -10,7 +10,7 @@ import { defineComponent } from "vue";
 import ProfileListIpfs from "@/components/profile/profile-list-ipfs/ProfileListIpfs.vue";
 import { getDeployedBaseContracts } from "@/helpers/deployment.helper";
 import { getSigner } from "@/services/provider.service";
-import { createBlockScoutLink } from "@/utils/createBlockScoutLink";
+import { createBlockScoutLink } from "@/utils/createLinks";
 
 export default defineComponent({
   components: {

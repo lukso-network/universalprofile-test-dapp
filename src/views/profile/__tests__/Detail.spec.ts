@@ -1,10 +1,10 @@
-import ProfileDetail from "@/views/profile/ProfileDetail.vue";
+import Detail from "@/views/profile/Detail.vue";
 import { render, waitFor } from "@testing-library/vue";
-import { isAddress } from "ethers/lib/utils";
 import { useRoute } from "vue-router";
 
 const mockFetchProfile = jest.fn();
 const mockFetch = jest.fn();
+const mockIsAddress = jest.fn();
 
 jest.mock("@/compositions/useErc725", () => ({
   __esModule: true,
@@ -12,8 +12,11 @@ jest.mock("@/compositions/useErc725", () => ({
     fetchProfile: mockFetchProfile,
   }),
 }));
-jest.mock("ethers/lib/utils", () => ({
-  isAddress: jest.fn(),
+jest.mock("@/compositions/useWeb3", () => ({
+  __esModule: true,
+  default: () => ({
+    isAddress: () => mockIsAddress(),
+  }),
 }));
 jest.mock("vue-router", () => ({
   useRoute: jest.fn().mockImplementation(() => ({
@@ -25,7 +28,7 @@ jest.mock("vue-router", () => ({
 
 beforeAll(() => {
   window.fetch = mockFetch;
-  (isAddress as jest.Mock).mockReturnValue(false);
+  mockIsAddress.mockReturnValue(false);
   (useRoute as jest.Mock).mockImplementation(() => ({
     params: {
       address: "123",
@@ -41,7 +44,7 @@ test("can call data from ipfs", async () => {
     json: jest.fn(() => ({
       LSP3Profile: {
         name: "John",
-        value: "Unknown person",
+        description: "Unknown person",
         links: [
           {
             url: "http://lukso.network",
@@ -73,7 +76,7 @@ test("can call data from ipfs", async () => {
       },
     })),
   });
-  const screen = render(ProfileDetail);
+  const screen = render(Detail);
   expect(mockFetch).toBeCalledWith("https://2eff.lukso.dev/ipfs/123");
   expect(screen.getByText("Loading...")).toBeDefined();
   await waitFor(() => {
@@ -93,7 +96,7 @@ test("can call data from ipfs if url changes", () => {
       address: "1234",
     },
   });
-  render(ProfileDetail);
+  render(Detail);
   expect(mockFetch).toBeCalledWith("https://2eff.lukso.dev/ipfs/1234");
 });
 
@@ -104,7 +107,7 @@ test("cannot call ipfs server if ipfs address/hash is empty", () => {
     },
   });
   mockFetch.mockClear();
-  render(ProfileDetail);
+  render(Detail);
   expect(mockFetch).not.toBeCalled();
 });
 
@@ -114,9 +117,9 @@ test("can call data from cache if address is valid", async () => {
       address: "1234",
     },
   });
-  (isAddress as jest.Mock).mockReturnValue(true);
+  mockIsAddress.mockReturnValue(true);
 
-  const screen = render(ProfileDetail);
+  const screen = render(Detail);
   expect(mockFetchProfile).toBeCalledWith("1234");
   await waitFor(() => {
     expect(screen.getByText("ERC725-Cache: 1234")).toBeDefined();
@@ -129,8 +132,8 @@ test("can display both background image and profile image", async () => {
       address: "1234",
     },
   });
-  (isAddress as jest.Mock).mockReturnValue(false);
-  const screen = render(ProfileDetail);
+  mockIsAddress.mockReturnValue(false);
+  const screen = render(Detail);
   await waitFor(() => {
     expect(
       screen.getAllByAltText(

@@ -1,22 +1,44 @@
 <script setup lang="ts">
 import { DEFAULT_NETWORK_CONFIG } from "@/helpers/config";
 import { onMounted, ref, watch } from "vue";
-import { isAddress } from "ethers/lib/utils";
 import useErc725 from "@/compositions/useErc725";
 import { useRoute, RouteLocationNormalizedLoaded } from "vue-router";
+import { createIpfsLink } from "@/utils/createLinks";
+import useWeb3 from "@/compositions/useWeb3";
+
+type LSP3Profile = {
+  name: string;
+  description: string;
+  links: {
+    title: string;
+    url: string;
+  }[];
+  tags: string[];
+  profileImage: {
+    url: string;
+  }[];
+  backgroundImage: {
+    url: string;
+  }[];
+};
 
 const route = useRoute();
+const { isAddress } = useWeb3();
 
 const routeData = ref<RouteLocationNormalizedLoaded>(route);
 const dataSource = ref("");
 const loading = ref(true);
-const profileData = ref(null as any);
-const error = ref(null);
+const profileData = ref<{ LSP3Profile: LSP3Profile }>(
+  null as unknown as { LSP3Profile: LSP3Profile }
+);
+const error = ref(null as unknown as { LSP3Profile: LSP3Profile });
 
 const { fetchProfile } = useErc725();
 
 const fetchData = () => {
-  error.value = profileData.value = null;
+  error.value = profileData.value = null as unknown as {
+    LSP3Profile: LSP3Profile;
+  };
   loading.value = true;
 
   const addressOrHash = route.params.address as string;
@@ -28,34 +50,31 @@ const fetchData = () => {
   }
 };
 
-const getProfileDataFromERC725Cache = (fetchedAddress: string) => {
-  fetchProfile(fetchedAddress)
-    .then((result) => {
-      if (route.params.address !== fetchedAddress) return;
-      dataSource.value = "ERC725-Cache";
-      // @ts-ignore
-      profileData.value = result.LSP3UniversalProfiles[0];
-      loading.value = false;
-    })
-    .catch((err) => {
-      error.value = err.toString();
-    });
+const getProfileDataFromERC725Cache = async (fetchedAddress: string) => {
+  try {
+    const result = await fetchProfile(fetchedAddress);
+    if (route.params.address !== fetchedAddress) return;
+    dataSource.value = "ERC725-Cache";
+    // @ts-ignore
+    profileData.value = result.LSP3UniversalProfiles[0];
+    loading.value = false;
+  } catch (err: any) {
+    error.value = err.toString();
+  }
 };
 
-const getProfileDataFromIPFS = (ipfsHash: string) => {
+const getProfileDataFromIPFS = async (ipfsHash: string) => {
   if (!ipfsHash) {
     return false;
   }
-
-  fetch("https://2eff.lukso.dev/ipfs/" + ipfsHash)
-    .then(async (result) => {
-      dataSource.value = "IPFS";
-      profileData.value = await result.json();
-      loading.value = false;
-    })
-    .catch((err) => {
-      error.value = err.toString();
-    });
+  try {
+    const result = await fetch(DEFAULT_NETWORK_CONFIG.ipfs.url + ipfsHash);
+    dataSource.value = "IPFS";
+    profileData.value = await result.json();
+    loading.value = false;
+  } catch (err: any) {
+    error.value = err.toString();
+  }
 };
 
 onMounted(async () => {
@@ -89,14 +108,14 @@ watch(routeData, fetchData);
 
       <tr>
         <td>Description</td>
-        <td>{{ profileData?.LSP3Profile?.value }}</td>
+        <td>{{ profileData?.LSP3Profile?.description }}</td>
       </tr>
 
       <tr>
         <td>Links</td>
         <td>
           <ul class="list">
-            <li v-for="link in profileData?.LSP3Profile?.links" :key="link">
+            <li v-for="(link, i) in profileData?.LSP3Profile?.links" :key="i">
               <a :href="link.url" target="_blank" rel="noopener noreferrer">{{
                 link.title ? link.title : link.url
               }}</a>
@@ -121,19 +140,14 @@ watch(routeData, fetchData);
         <td>ProfileImage(s)</td>
         <td>
           <div
-            v-for="image in profileData?.LSP3Profile?.profileImage"
-            :key="image"
+            v-for="(image, i) in profileData?.LSP3Profile?.profileImage"
+            :key="i"
           >
             <pre
               >{{ image }}
                 </pre
             >
-            <img
-              :src="
-                image.url.replace('ipfs://', DEFAULT_NETWORK_CONFIG.ipfs.url)
-              "
-              :alt="image.url"
-            />
+            <img :src="createIpfsLink(image.url)" :alt="image.url" />
           </div>
         </td>
       </tr>
@@ -141,17 +155,14 @@ watch(routeData, fetchData);
       <tr>
         <td>BackgroundImage(s)</td>
         <div
-          v-for="image in profileData?.LSP3Profile?.backgroundImage"
-          :key="image"
+          v-for="(image, i) in profileData?.LSP3Profile?.backgroundImage"
+          :key="i"
         >
           <pre
             >{{ image }}
                 </pre
           >
-          <img
-            :src="image.url.replace('ipfs://', DEFAULT_NETWORK_CONFIG.ipfs.url)"
-            :alt="image.url"
-          />
+          <img :src="createIpfsLink(image.url)" :alt="image.url" />
         </div>
       </tr>
     </table>
