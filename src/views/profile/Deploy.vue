@@ -5,25 +5,25 @@ import {
   DeploymentEvent,
   DeploymentStatus,
   DeploymentType,
-} from "@lukso/lsp-factory.js-alpha";
+  DeployedUniversalProfileContracts,
+} from "@lukso/lsp-factory.js";
 import { ref } from "vue";
 import ProfileListIpfs from "@/components/profile/profile-list-ipfs/ProfileListIpfs.vue";
 import { getDeployedBaseContracts } from "@/helpers/deployment.helper";
 import { getSigner } from "@/services/provider.service";
 import { useLspFactory } from "@/compositions/useLspFactory";
-// import { DeployedUniversalProfileContracts } from "@lukso/lsp-factory.js";
 
 // const isOwner = ref(false);
 const isModalOpen = ref(false);
 const controllerKey = ref("");
 // const balance = ref("");
 const selectedProfile = ref({ profile: {} as any, url: "" });
-const profileDeploymentEvents = ref<DeploymentEvent[]>([]);
+const profileDeploymentEvents = ref<DeployedUniversalProfileContracts[]>([]);
 // const profileDeploymentEventsObj = ref({});
 const status = ref({
   isLoading: false,
 });
-const { deployUniversalProfile } = useLspFactory();
+const { deployUniversalProfile, getFactory } = useLspFactory();
 
 const deploy = async (controllerKey: string) => {
   closeModal();
@@ -32,23 +32,16 @@ const deploy = async (controllerKey: string) => {
   const networkDetails = getDeployedBaseContracts(network.chainId);
 
   status.value.isLoading = true;
-  deployUniversalProfile(
-    {
-      controllerAddresses: [controllerKey],
-      lsp3Profile: {
-        json: selectedProfile.value.profile,
-        url: selectedProfile.value.url,
-      },
+
+  deployUniversalProfile({
+    controllerAddresses: [controllerKey],
+    lsp3Profile: {
+      json: selectedProfile.value.profile,
+      url: selectedProfile.value.url,
     },
-    {
-      libAddresses: {
-        lsp3AccountInit: networkDetails.baseContracts.LSP3Account["0.0.1"],
-        universalReceiverAddressStoreInit:
-          networkDetails.baseContracts.UniversalReceiverAddressStore["0.0.1"],
-      },
-    }
-  )
+  })
     .then((deployment) => {
+      console.log(deployment);
       profileDeploymentEvents.value.push(deployment);
     })
     .catch((error: Error) => {
@@ -76,7 +69,7 @@ const closeModal = () => {
 const getTypeClass = (type: string) => {
   return {
     "is-primary": type === DeploymentType.PROXY,
-    "is-warning": type === DeploymentType.CONTRACT,
+    "is-warning": type === DeploymentType.BASE_CONTRACT,
     "is-info": type === DeploymentType.TRANSACTION,
   };
 };
@@ -117,17 +110,29 @@ const createBlockScoutLink = (hash: string) => {
         </tr>
         <tr
           v-for="deploymentEvent in profileDeploymentEvents"
-          :key="deploymentEvent.status"
-          :class="deploymentEvent.status"
+          :key="deploymentEvent.LSP0ERC725Account?.address"
+          :class="deploymentEvent.LSP0ERC725Account?.receipt.status"
         >
           <td>
-            <span class="tag" :class="getTypeClass(deploymentEvent.type)">
-              {{ deploymentEvent.type }}
+            <span
+              class="tag"
+              :class="
+                getTypeClass(deploymentEvent.LSP0ERC725Account?.receipt.type)
+              "
+            >
+              {{ deploymentEvent.LSP0ERC725Account?.receipt.type }}
             </span>
           </td>
           <td>
-            <span class="tag" :class="getStatusClass(deploymentEvent.status)">
-              {{ deploymentEvent.status }}
+            <span
+              class="tag"
+              :class="
+                getStatusClass(
+                  deploymentEvent.LSP0ERC725Account?.receipt.status
+                )
+              "
+            >
+              {{ deploymentEvent.LSP0ERC725Account?.receipt.status }}
             </span>
           </td>
           <td>{{ deploymentEvent.contractName }}</td>
@@ -170,7 +175,7 @@ const createBlockScoutLink = (hash: string) => {
     </div>
   </section>
 
-  <div class="modal" :class="isModalOpen ? 'is-active' : ''">
+  <div class="modal modal-container" :class="isModalOpen ? 'is-active' : ''">
     <div class="modal-background"></div>
     <div class="modal-card">
       <header class="modal-card-head">
@@ -215,6 +220,9 @@ const createBlockScoutLink = (hash: string) => {
   td {
     border: none !important;
   }
+}
+.modal-container {
+  padding: 0 20px;
 }
 
 .pending {
