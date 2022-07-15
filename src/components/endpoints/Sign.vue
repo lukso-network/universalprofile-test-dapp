@@ -54,11 +54,14 @@ const onSignatureValidation = async () => {
 
   try {
     const messageHash = getWeb3().eth.accounts.hashMessage(message.value);
-    magicValue.value =
-      window.erc725Account &&
-      ((await window.erc725Account.methods
+    if (window.erc725Account) {
+      // TODO: we should probably set the default gas price to undefined,
+      // but it is not yet clear why view functions error on L16 when gasPrice is passed
+      window.erc725Account.options.gasPrice = void 0;
+      magicValue.value = (await window.erc725Account.methods
         .isValidSignature(messageHash, signResponse.value.signature)
-        .call()) as string);
+        .call()) as string;
+    }
 
     if (magicValue.value === MAGICVALUE) {
       setNotification(`Signature validated successfully`, "info");
