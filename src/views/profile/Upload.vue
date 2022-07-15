@@ -359,7 +359,7 @@ const removeBackgroundImage = () => {
         </div>
       </div>
 
-      <div class="column is-three-fifths">
+      <div class="column is-two-thirds">
         <section
           v-if="uploadedProfiles.length > 0"
           class="has-background-success-light p-5"
@@ -391,7 +391,7 @@ const removeBackgroundImage = () => {
                   </router-link>
                 </td>
                 <td>
-                  <pre>{{ uploadedProfile.profile }}</pre>
+                  <pre class="pre">{{ uploadedProfile.profile }}</pre>
                 </td>
               </tr>
             </table>
@@ -505,5 +505,10 @@ section {
 .upload-form {
   padding: 20px;
   margin-bottom: 20px;
+}
+.pre {
+  max-height: 200px;
+  overflow-y: scroll;
+  font-family: monospace;
 }
 </style>
