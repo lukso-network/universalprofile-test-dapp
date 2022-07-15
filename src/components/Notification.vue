@@ -1,16 +1,27 @@
 <script setup lang="ts">
 import { Notification } from "@/types";
+import { h } from "vue";
 
 type Props = {
   notification: Notification;
   hideNotification?: boolean;
 };
 
-defineProps<Props>();
+const props = defineProps<Props>();
 const emits = defineEmits(["hide"]);
 
 const hide = () => {
   emits("hide");
+};
+
+const renderMessage = () => {
+  const text = new DOMParser().parseFromString(
+    props.notification.message as string,
+    "text/html"
+  ).body.innerHTML;
+  return h("div", {
+    innerHTML: text,
+  });
 };
 </script>
 
@@ -27,7 +38,7 @@ const hide = () => {
       data-testid="hide"
       @click="hide"
     ></button>
-    {{ notification.message }}
+    <render-message />
   </div>
 </template>
 
