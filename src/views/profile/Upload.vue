@@ -54,9 +54,12 @@ const upload = async () => {
       JSON.stringify(uploadResult.value)
     );
 
-    const url = uploadResult.value?.url.replace("ipfs://", DEFAULT_IPFS_URL);
+    const href = uploadResult.value?.url.replace("ipfs://", "");
+    const url = `${uploadResult.value?.url}`;
     setNotification(
-      `Profile uploaded successfully<br/><a href=${url} target="_blank">${url}</a>`,
+      `Profile uploaded successfully<br/><a href=${
+        "/profiles/" + href
+      } target="_blank">${url}</a>`,
       "primary"
     );
   } catch (error) {
@@ -378,17 +381,17 @@ const removeBackgroundImage = () => {
                 :key="index"
               >
                 <td>
-                  <a
-                    v-if="uploadedProfile.url"
-                    :href="uploadedProfile.url"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <router-link
+                    :to="`/profiles/${uploadedProfile.url.replace(
+                      uploadTarget,
+                      ''
+                    )}`"
                   >
                     {{ uploadedProfile.url.replace(uploadTarget, "") }}
-                  </a>
+                  </router-link>
                 </td>
                 <td>
-                  {{ uploadedProfile.profile }}
+                  <pre>{{ uploadedProfile.profile }}</pre>
                 </td>
               </tr>
             </table>

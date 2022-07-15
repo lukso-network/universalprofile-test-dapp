@@ -5,51 +5,55 @@ import {
   DeploymentEvent,
   DeploymentStatus,
   DeploymentType,
-  DeployedUniversalProfileContracts,
 } from "@lukso/lsp-factory.js";
 import { ref } from "vue";
+import Notifications from "@/components/Notification.vue";
 import ProfileListIpfs from "@/components/profile/profile-list-ipfs/ProfileListIpfs.vue";
-import { getDeployedBaseContracts } from "@/helpers/deployment.helper";
-import { getSigner } from "@/services/provider.service";
+import useNotifications from "@/compositions/useNotifications";
 import { useLspFactory } from "@/compositions/useLspFactory";
 
-// const isOwner = ref(false);
+const { notification, clearNotification, hasNotification, setNotification } =
+  useNotifications();
 const isModalOpen = ref(false);
 const controllerKey = ref("");
-// const balance = ref("");
 const selectedProfile = ref({ profile: {} as any, url: "" });
-const profileDeploymentEvents = ref<DeployedUniversalProfileContracts[]>([]);
-// const profileDeploymentEventsObj = ref({});
+const profileDeploymentEvents = ref<DeploymentEvent[]>([]);
 const status = ref({
   isLoading: false,
 });
-const { deployUniversalProfile, getFactory } = useLspFactory();
+const { deployUniversalProfile } = useLspFactory();
 
 const deploy = async (controllerKey: string) => {
   closeModal();
-  const signer = await getSigner();
-  const network = await signer.provider.getNetwork();
-  const networkDetails = getDeployedBaseContracts(network.chainId);
-
   status.value.isLoading = true;
 
-  deployUniversalProfile({
-    controllerAddresses: [controllerKey],
-    lsp3Profile: {
-      json: selectedProfile.value.profile,
-      url: selectedProfile.value.url,
+  await deployUniversalProfile(
+    {
+      controllerAddresses: [controllerKey],
+      lsp3Profile: {
+        json: selectedProfile.value.profile,
+        url: selectedProfile.value.url,
+      },
     },
-  })
-    .then((deployment) => {
-      console.log(deployment);
-      profileDeploymentEvents.value.push(deployment);
-    })
-    .catch((error: Error) => {
-      console.error(error);
-    })
-    .finally(() => {
-      status.value.isLoading = false;
-    });
+    {
+      onDeployEvents: {
+        next: (deploymentEvent) => {
+          console.log(deploymentEvent);
+          profileDeploymentEvents.value.push(deploymentEvent);
+          return deploymentEvent;
+        },
+        error: (err) => {
+          status.value.isLoading = false;
+          setNotification(`Error deploying profile`, "danger");
+          console.error(err);
+        },
+        complete: (contracts) => {
+          status.value.isLoading = false;
+          return contracts;
+        },
+      },
+    }
+  );
 
   return;
 };
@@ -88,6 +92,12 @@ const createBlockScoutLink = (hash: string) => {
 
 <template>
   <section class="section">
+    <Notifications
+      v-if="hasNotification"
+      :notification="notification"
+      class="mt-4"
+      @hide="clearNotification"
+    ></Notifications>
     <h1 class="title">Deploy Profile</h1>
     <ProfileListIpfs
       :loading="status.isLoading"
@@ -110,33 +120,22 @@ const createBlockScoutLink = (hash: string) => {
         </tr>
         <tr
           v-for="deploymentEvent in profileDeploymentEvents"
-          :key="deploymentEvent.LSP0ERC725Account?.address"
-          :class="deploymentEvent.LSP0ERC725Account?.receipt.status"
+          :key="deploymentEvent.status"
+          :class="deploymentEvent.status"
         >
           <td>
-            <span
-              class="tag"
-              :class="
-                getTypeClass(deploymentEvent.LSP0ERC725Account?.receipt.type)
-              "
-            >
-              {{ deploymentEvent.LSP0ERC725Account?.receipt.type }}
+            <span class="tag" :class="getTypeClass(deploymentEvent.type)">
+              {{ deploymentEvent.type }}
             </span>
           </td>
           <td>
-            <span
-              class="tag"
-              :class="
-                getStatusClass(
-                  deploymentEvent.LSP0ERC725Account?.receipt.status
-                )
-              "
-            >
-              {{ deploymentEvent.LSP0ERC725Account?.receipt.status }}
+            <span class="tag" :class="getStatusClass(deploymentEvent.status)">
+              {{ deploymentEvent.status }}
             </span>
           </td>
           <td>{{ deploymentEvent.contractName }}</td>
-          <td>{{ deploymentEvent?.functionName }}</td>
+          <!-- <td>{{ deploymentEvent?.functionName }}</td> -->
+          <td>{{ deploymentEvent.contractName }}</td>
           <td>
             <code v-if="deploymentEvent?.receipt?.contractAddress">
               {{ deploymentEvent?.receipt?.contractAddress }}
