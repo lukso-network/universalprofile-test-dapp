@@ -25,6 +25,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/profiles",
     component: Profile,
+    redirect: "/profiles/upload",
     children: [
       {
         path: "upload",

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { formatNumber } from "@/helpers/ethers";
-import { getLspFactory } from "@/services/lsp-factory.service";
 import {
   LSP3ProfileJSON,
   DeploymentEvent,
@@ -12,15 +11,15 @@ import ProfileListIpfs from "@/components/profile/profile-list-ipfs/ProfileListI
 import { getDeployedBaseContracts } from "@/helpers/deployment.helper";
 import { getSigner } from "@/services/provider.service";
 import { useLspFactory } from "@/compositions/useLspFactory";
-import { DeployedUniversalProfileContracts } from "@lukso/lsp-factory.js";
+// import { DeployedUniversalProfileContracts } from "@lukso/lsp-factory.js";
 
-const isOwner = ref(false);
+// const isOwner = ref(false);
 const isModalOpen = ref(false);
 const controllerKey = ref("");
-const balance = ref("");
+// const balance = ref("");
 const selectedProfile = ref({ profile: {} as any, url: "" });
 const profileDeploymentEvents = ref<DeploymentEvent[]>([]);
-const profileDeploymentEventsObj = ref({});
+// const profileDeploymentEventsObj = ref({});
 const status = ref({
   isLoading: false,
 });
@@ -31,7 +30,6 @@ const deploy = async (controllerKey: string) => {
   const signer = await getSigner();
   const network = await signer.provider.getNetwork();
   const networkDetails = getDeployedBaseContracts(network.chainId);
-  const lspFactory = await getLspFactory();
 
   status.value.isLoading = true;
   deployUniversalProfile(
@@ -104,68 +102,72 @@ const createBlockScoutLink = (hash: string) => {
     ></ProfileListIpfs>
     <br />
     <h2 class="title">Deployment Events</h2>
-    <table
-      class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
-    >
-      <tr>
-        <th>Type</th>
-        <th>Status</th>
-        <th>Name</th>
-        <th>Function</th>
-        <th>Address</th>
-        <th class="has-text-right pr-4">Gas</th>
-        <th>TransactionHash</th>
-      </tr>
-      <tr
-        v-for="deploymentEvent in profileDeploymentEvents"
-        :key="deploymentEvent.status"
-        :class="deploymentEvent.status"
+    <div class="table-container">
+      <table
+        class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
       >
-        <td>
-          <span class="tag" :class="getTypeClass(deploymentEvent.type)">
-            {{ deploymentEvent.type }}
-          </span>
-        </td>
-        <td>
-          <span class="tag" :class="getStatusClass(deploymentEvent.status)">
-            {{ deploymentEvent.status }}
-          </span>
-        </td>
-        <td>{{ deploymentEvent.contractName }}</td>
-        <td>{{ deploymentEvent?.functionName }}</td>
-        <td>
-          <code v-if="deploymentEvent?.receipt?.contractAddress">
-            {{ deploymentEvent?.receipt?.contractAddress }}
-          </code>
-        </td>
+        <tr>
+          <th>Type</th>
+          <th>Status</th>
+          <th>Name</th>
+          <th>Function</th>
+          <th>Address</th>
+          <th class="has-text-right pr-4">Gas</th>
+          <th>TransactionHash</th>
+        </tr>
+        <tr
+          v-for="deploymentEvent in profileDeploymentEvents"
+          :key="deploymentEvent.status"
+          :class="deploymentEvent.status"
+        >
+          <td>
+            <span class="tag" :class="getTypeClass(deploymentEvent.type)">
+              {{ deploymentEvent.type }}
+            </span>
+          </td>
+          <td>
+            <span class="tag" :class="getStatusClass(deploymentEvent.status)">
+              {{ deploymentEvent.status }}
+            </span>
+          </td>
+          <td>{{ deploymentEvent.contractName }}</td>
+          <td>{{ deploymentEvent?.functionName }}</td>
+          <td>
+            <code v-if="deploymentEvent?.receipt?.contractAddress">
+              {{ deploymentEvent?.receipt?.contractAddress }}
+            </code>
+          </td>
 
-        <td class="has-text-right">
-          {{
-            deploymentEvent?.receipt
-              ? formatNumber(+deploymentEvent?.receipt.gasUsed)
-              : ""
-          }}
-        </td>
-        <td>
-          <a
-            v-if="deploymentEvent?.receipt"
-            :href="
-              createBlockScoutLink(deploymentEvent?.receipt?.transactionHash)
-            "
-            class="button is-small mb-1"
-          >
-            {{ deploymentEvent?.receipt?.transactionHash.substring(0, 16) }}...
-          </a>
-          <a
-            v-if="deploymentEvent?.transaction"
-            :href="createBlockScoutLink(deploymentEvent?.transaction?.hash)"
-            class="button is-small mb-1"
-          >
-            {{ deploymentEvent?.transaction?.hash.substring(0, 16) }}...
-          </a>
-        </td>
-      </tr>
-    </table>
+          <td class="has-text-right">
+            {{
+              deploymentEvent?.receipt
+                ? formatNumber(+deploymentEvent?.receipt.gasUsed)
+                : ""
+            }}
+          </td>
+          <td>
+            <a
+              v-if="deploymentEvent?.receipt"
+              :href="
+                createBlockScoutLink(deploymentEvent?.receipt?.transactionHash)
+              "
+              class="button is-small mb-1"
+            >
+              {{
+                deploymentEvent?.receipt?.transactionHash.substring(0, 16)
+              }}...
+            </a>
+            <a
+              v-if="deploymentEvent?.transaction"
+              :href="createBlockScoutLink(deploymentEvent?.transaction?.hash)"
+              class="button is-small mb-1"
+            >
+              {{ deploymentEvent?.transaction?.hash.substring(0, 16) }}...
+            </a>
+          </td>
+        </tr>
+      </table>
+    </div>
   </section>
 
   <div class="modal" :class="isModalOpen ? 'is-active' : ''">
@@ -204,7 +206,7 @@ const createBlockScoutLink = (hash: string) => {
   </div>
 </template>
 
-<style lang="scss">
+<style scoped lang="scss">
 .placeholder {
   opacity: 0.1;
 }

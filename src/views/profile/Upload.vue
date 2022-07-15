@@ -233,7 +233,7 @@ const removeBackgroundImage = () => {
                 <img
                   :src="backgroundImageUrl"
                   :alt="backgroundImage?.name"
-                  class="img-profile"
+                  class="image-profile"
                 />
               </div>
               <div class="column">
@@ -352,7 +352,7 @@ const removeBackgroundImage = () => {
         </div>
       </div>
 
-      <div class="column">
+      <div class="column is-three-fifths">
         <section
           v-if="uploadedProfiles.length > 0"
           class="has-background-success-light p-5"
@@ -422,6 +422,9 @@ const removeBackgroundImage = () => {
   display: flex;
   background: red;
   max-height: 200px;
+  width: 300px;
+  object-fit: contain;
+  border-radius: 3px;
 }
 
 .image-file {
@@ -489,6 +492,7 @@ section.images {
 
 section {
   overflow: hidden;
+  padding: 0px 20px;
 }
 
 .upload-form {
