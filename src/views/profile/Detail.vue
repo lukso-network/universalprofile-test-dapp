@@ -5,22 +5,7 @@ import useErc725 from "@/compositions/useErc725";
 import { useRoute, RouteLocationNormalizedLoaded } from "vue-router";
 import { createIpfsLink } from "@/utils/createLinks";
 import useWeb3 from "@/compositions/useWeb3";
-
-type LSP3Profile = {
-  name: string;
-  description: string;
-  links: {
-    title: string;
-    url: string;
-  }[];
-  tags: string[];
-  profileImage: {
-    url: string;
-  }[];
-  backgroundImage: {
-    url: string;
-  }[];
-};
+import { LSP3ProfileJSON } from "@lukso/lsp-factory.js";
 
 const route = useRoute();
 const { isAddress } = useWeb3();
@@ -28,17 +13,13 @@ const { isAddress } = useWeb3();
 const routeData = ref<RouteLocationNormalizedLoaded>(route);
 const dataSource = ref("");
 const loading = ref(true);
-const profileData = ref<{ LSP3Profile: LSP3Profile }>(
-  null as unknown as { LSP3Profile: LSP3Profile }
-);
-const error = ref(null as unknown as { LSP3Profile: LSP3Profile });
+const profileData = ref<LSP3ProfileJSON>(null as unknown as LSP3ProfileJSON);
+const error = ref(null as unknown as LSP3ProfileJSON);
 
 const { fetchProfile } = useErc725();
 
 const fetchData = () => {
-  error.value = profileData.value = null as unknown as {
-    LSP3Profile: LSP3Profile;
-  };
+  error.value = profileData.value = null as unknown as LSP3ProfileJSON;
   loading.value = true;
 
   const addressOrHash = route.params.address as string;
