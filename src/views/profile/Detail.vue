@@ -86,7 +86,7 @@ onMounted(async () => {
 // call fetchData again the method if the route changes
 watch(routeData, fetchData);
 </script>
-<template name="ProfileDetail">
+<template name="Detail">
   <section class="section">
     <h1 v-if="!loading" class="title">
       {{ dataSource ? dataSource : "" }}: {{ route.params.address }}

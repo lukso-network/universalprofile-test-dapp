@@ -2,7 +2,7 @@ import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import Home from "../views/Home.vue";
 import Profile from "../views/Profile.vue";
 import ProfileUpload from "../components/profile/profile-upload/ProfileUpload.vue";
-import ProfileDetail from "@/views/profile/ProfileDetail.vue";
+import Detail from "@/views/profile/Detail.vue";
 import ProfileDeploy from "../components/profile/profile-deploy/ProfileDeploy.vue";
 import ProfileEdit from "../components/profile/profile-edit/ProfileEdit.vue";
 
@@ -37,7 +37,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: ":address",
         name: "profile-detail",
-        component: ProfileDetail,
+        component: Detail,
       },
       {
         path: "deploy",
