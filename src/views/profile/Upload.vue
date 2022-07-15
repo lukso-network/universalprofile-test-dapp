@@ -177,7 +177,7 @@ const removeBackgroundImage = () => {
     </article>
 
     <div class="columns">
-      <div class="column is-two-fifths">
+      <div class="column">
         <section class="upload-form has-background-info-light card">
           <div class="file is-boxed has-name mb-5">
             <label v-if="!profileImageUrl" class="file-label">
@@ -233,7 +233,7 @@ const removeBackgroundImage = () => {
                 <img
                   :src="backgroundImageUrl"
                   :alt="backgroundImage?.name"
-                  class="img-profile"
+                  class="image-profile"
                 />
               </div>
               <div class="column">
@@ -352,41 +352,43 @@ const removeBackgroundImage = () => {
         </div>
       </div>
 
-      <div class="column">
+      <div class="column is-three-fifths">
         <section
           v-if="uploadedProfiles.length > 0"
           class="has-background-success-light p-5"
         >
           <h2 class="title is-size-4">Previously Uploaded Profiles</h2>
-          <table
-            class="
-              table
-              is-bordered is-striped is-narrow is-hoverable is-fullwidth
-            "
-          >
-            <tr>
-              <th>Identifier</th>
-              <th>Code</th>
-            </tr>
-            <tr
-              v-for="(uploadedProfile, index) in uploadedProfiles"
-              :key="index"
+          <div class="table-container">
+            <table
+              class="
+                table
+                is-bordered is-striped is-narrow is-hoverable is-fullwidth
+              "
             >
-              <td>
-                <a
-                  v-if="uploadedProfile.url"
-                  :href="uploadedProfile.url"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {{ uploadedProfile.url.replace(uploadTarget, "") }}
-                </a>
-              </td>
-              <td>
-                {{ uploadedProfile.profile }}
-              </td>
-            </tr>
-          </table>
+              <tr>
+                <th>Identifier</th>
+                <th>Code</th>
+              </tr>
+              <tr
+                v-for="(uploadedProfile, index) in uploadedProfiles"
+                :key="index"
+              >
+                <td>
+                  <a
+                    v-if="uploadedProfile.url"
+                    :href="uploadedProfile.url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {{ uploadedProfile.url.replace(uploadTarget, "") }}
+                  </a>
+                </td>
+                <td>
+                  {{ uploadedProfile.profile }}
+                </td>
+              </tr>
+            </table>
+          </div>
         </section>
       </div>
     </div>
@@ -420,6 +422,9 @@ const removeBackgroundImage = () => {
   display: flex;
   background: red;
   max-height: 200px;
+  width: 300px;
+  object-fit: contain;
+  border-radius: 3px;
 }
 
 .image-file {
@@ -487,6 +492,7 @@ section.images {
 
 section {
   overflow: hidden;
+  padding: 0px 20px;
 }
 
 .upload-form {
