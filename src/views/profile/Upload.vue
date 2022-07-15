@@ -177,7 +177,7 @@ const removeBackgroundImage = () => {
     </article>
 
     <div class="columns">
-      <div class="column">
+      <div class="column is-two-fifths">
         <section class="upload-form has-background-info-light card">
           <div class="file is-boxed has-name mb-5">
             <label v-if="!profileImageUrl" class="file-label">
