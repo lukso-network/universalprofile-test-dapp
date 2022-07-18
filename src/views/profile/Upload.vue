@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { LSP3ProfileLink } from "@lukso/lsp-factory.js-alpha";
 import { getAndPrepareAllIpfsItems } from "@/helpers/localstorage";
 import fileSize from "filesize";
 import { DEFAULT_IPFS_URL } from "@/helpers/config";
@@ -11,6 +10,11 @@ import { useLspFactory } from "@/compositions/useLspFactory";
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications();
 
+type ProfileLinks = {
+  title: string;
+  url: string;
+};
+
 const isUploading = ref(false);
 const showError = ref(false);
 const profileImage = ref<File>();
@@ -19,7 +23,7 @@ const backgroundImage = ref<File>();
 const backgroundImageUrl = ref("");
 const name = ref("");
 const description = ref("");
-const links = ref<LSP3ProfileLink[]>([]);
+const links = ref<ProfileLinks[]>([]);
 const tags = ref<string[]>([]);
 const uploadTarget = ref(DEFAULT_IPFS_URL);
 const uploadResult = ref();

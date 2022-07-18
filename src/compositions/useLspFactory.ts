@@ -2,12 +2,11 @@ import { ProfileDataForEncoding } from "@lukso/lsp-factory.js/build/main/src/lib
 import {
   DeployedUniversalProfileContracts,
   LSPFactory,
-} from "@lukso/lsp-factory.js";
-import {
   ContractDeploymentOptions,
   ProfileDataBeforeUpload,
   ProfileDeploymentOptions,
-} from "@lukso/lsp-factory.js-alpha";
+} from "@lukso/lsp-factory.js";
+
 import { UploadOptions } from "@lukso/lsp-factory.js/build/main/src/lib/interfaces/profile-upload-options";
 
 let lspFactory: LSPFactory;
