@@ -1,13 +1,17 @@
-import { LSP3ProfileLink } from "@lukso/lsp-factory.js-alpha";
 import { fireEvent, render, waitFor } from "@testing-library/vue";
 import ProfileUpload from "../Upload.vue";
 
 const mockUploadUniversalProfileMetadata = jest.fn();
 
+type Link = {
+  title: string;
+  url: string;
+};
+
 type MockMetaData = {
   name: string;
   description: string;
-  links: LSP3ProfileLink[];
+  links: Link[];
   tags: string[];
   profileImage: File;
   backgroundImage: File;
