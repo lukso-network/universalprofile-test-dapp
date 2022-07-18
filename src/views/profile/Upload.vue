@@ -57,6 +57,7 @@ const upload = async () => {
       uploadResult.value?.url,
       JSON.stringify(uploadResult.value)
     );
+    uploadedProfiles.value = getAndPrepareAllIpfsItems();
 
     const href = uploadResult.value?.url.replace("ipfs://", "");
     const url = `${uploadResult.value?.url}`;
@@ -71,6 +72,13 @@ const upload = async () => {
     isUploading.value = false;
     setNotification("Profile upload failed", "danger");
   }
+};
+
+const deleteUploadedProfile = (url: string) => {
+  const formattedUrl = url.replace(DEFAULT_IPFS_URL, "ipfs://");
+  localStorage.removeItem(formattedUrl);
+  uploadedProfiles.value = getAndPrepareAllIpfsItems();
+  setNotification("Profile removed successfully", "primary");
 };
 
 const handleProfileImage = (event: Event) => {
@@ -265,7 +273,6 @@ const removeBackgroundImage = () => {
                 class="input"
                 type="text"
                 placeholder="Knock knock who's there?"
-                required
                 data-testid="name"
               />
             </div>
@@ -353,7 +360,7 @@ const removeBackgroundImage = () => {
               class="button is-success"
               type="submit"
               :class="{ 'is-loading': isUploading }"
-              :disabled="isUploading || hasNotification"
+              :disabled="isUploading"
               data-testid="upload-button"
               @click.stop="upload"
             >
@@ -363,7 +370,12 @@ const removeBackgroundImage = () => {
         </div>
       </div>
 
-      <div class="column is-two-thirds">
+      <div
+        :class="{
+          'is-two-thirds': uploadedProfiles.length > 0,
+          column: uploadedProfiles.length > 0,
+        }"
+      >
         <section
           v-if="uploadedProfiles.length > 0"
           class="has-background-success-light p-5"
@@ -379,6 +391,7 @@ const removeBackgroundImage = () => {
               <tr>
                 <th>Identifier</th>
                 <th>Code</th>
+                <th>Delete</th>
               </tr>
               <tr
                 v-for="(uploadedProfile, index) in uploadedProfiles"
@@ -396,6 +409,14 @@ const removeBackgroundImage = () => {
                 </td>
                 <td>
                   <pre class="pre">{{ uploadedProfile.profile }}</pre>
+                </td>
+                <td>
+                  <button
+                    class="button is-danger"
+                    @click="deleteUploadedProfile(uploadedProfile.url)"
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             </table>
