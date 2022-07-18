@@ -35,11 +35,6 @@ const upload = async () => {
   clearNotification();
   isUploading.value = true;
 
-  if (!name.value) {
-    showError.value = true;
-    isUploading.value = false;
-    return;
-  }
   try {
     uploadResult.value = await uploadUniversalProfileMetaData({
       profileImage: profileImage.value,
