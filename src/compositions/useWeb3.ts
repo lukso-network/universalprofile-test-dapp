@@ -61,6 +61,10 @@ const recover = async (message: string, signature: string): Promise<string> => {
   return web3.eth.accounts.recover(message, signature);
 };
 
+const isAddress = (address: string): boolean => {
+  return web3.utils.isAddress(address);
+};
+
 export default function useWeb3(): {
   setupWeb3: (provider: Provider) => void;
   getWeb3: () => Web3;
@@ -78,6 +82,7 @@ export default function useWeb3(): {
   requestAccounts: () => Promise<string[]>;
   sign: (message: string, address: string) => Promise<string>;
   recover: (message: string, signature: string) => Promise<string>;
+  isAddress: (address: string) => boolean;
 } {
   return {
     setupWeb3,
@@ -90,5 +95,6 @@ export default function useWeb3(): {
     requestAccounts,
     sign,
     recover,
+    isAddress,
   };
 }

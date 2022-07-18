@@ -51,8 +51,8 @@ const { toggle } = useDropdown();
             <router-link
               class="navbar-item"
               to="/profiles/QmaufE68Q6cdnFJk6VQvvkXgqP3x8Hfp8bhqrjijeRHrnh"
-              >Inspect</router-link
-            >
+              >Inspect
+            </router-link>
             <router-link class="navbar-item" to="/profiles/deploy"
               >Deploy</router-link
             >

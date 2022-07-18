@@ -7,7 +7,7 @@ import useWeb3 from "@/compositions/useWeb3";
 import { ref, watchEffect } from "vue";
 import { Contract } from "web3-eth-contract";
 import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from "@/helpers/config";
-import { createBlockScoutLink } from "@/utils/createBlockScoutLink";
+import { createBlockScoutLink } from "@/utils/createLinks";
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications();
