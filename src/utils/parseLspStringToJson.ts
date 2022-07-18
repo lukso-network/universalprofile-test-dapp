@@ -1,8 +1,8 @@
-import type { LSP3Profile } from "@lukso/lsp-factory.js-alpha";
+import { LSP3ProfileJSON } from "@lukso/lsp-factory.js";
 
 type LSP3ProfileJSONType = {
   json: {
-    LSP3Profile: LSP3Profile;
+    LSP3Profile: LSP3ProfileJSON;
   };
   url: string;
 };

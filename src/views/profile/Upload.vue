@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { LSP3ProfileLink } from "@lukso/lsp-factory.js-alpha";
 import { getAndPrepareAllIpfsItems } from "@/helpers/localstorage";
 import fileSize from "filesize";
 import { DEFAULT_IPFS_URL } from "@/helpers/config";
@@ -11,6 +10,11 @@ import { useLspFactory } from "@/compositions/useLspFactory";
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications();
 
+type ProfileLinks = {
+  title: string;
+  url: string;
+};
+
 const isUploading = ref(false);
 const showError = ref(false);
 const profileImage = ref<File>();
@@ -19,7 +23,7 @@ const backgroundImage = ref<File>();
 const backgroundImageUrl = ref("");
 const name = ref("");
 const description = ref("");
-const links = ref<LSP3ProfileLink[]>([]);
+const links = ref<ProfileLinks[]>([]);
 const tags = ref<string[]>([]);
 const uploadTarget = ref(DEFAULT_IPFS_URL);
 const uploadResult = ref();
@@ -359,7 +363,7 @@ const removeBackgroundImage = () => {
         </div>
       </div>
 
-      <div class="column is-three-fifths">
+      <div class="column is-two-thirds">
         <section
           v-if="uploadedProfiles.length > 0"
           class="has-background-success-light p-5"
@@ -391,7 +395,7 @@ const removeBackgroundImage = () => {
                   </router-link>
                 </td>
                 <td>
-                  <pre>{{ uploadedProfile.profile }}</pre>
+                  <pre class="pre">{{ uploadedProfile.profile }}</pre>
                 </td>
               </tr>
             </table>
@@ -505,5 +509,10 @@ section {
 .upload-form {
   padding: 20px;
   margin-bottom: 20px;
+}
+.pre {
+  max-height: 200px;
+  overflow-y: scroll;
+  font-family: monospace;
 }
 </style>
