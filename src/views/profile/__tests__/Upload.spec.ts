@@ -3,10 +3,15 @@ import ProfileUpload from "../Upload.vue";
 
 const mockUploadUniversalProfileMetadata = jest.fn();
 
+type Link = {
+  title: string;
+  url: string;
+};
+
 type MockMetaData = {
   name: string;
   description: string;
-  links: { title: string; url: string }[];
+  links: Link[];
   tags: string[];
   profileImage: File;
   backgroundImage: File;

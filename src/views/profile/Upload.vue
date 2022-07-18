@@ -58,7 +58,7 @@ const upload = async () => {
       JSON.stringify(uploadResult.value)
     );
 
-    const href: string = uploadResult.value?.url.replace("ipfs://", "");
+    const href = uploadResult.value?.url.replace("ipfs://", "");
     const url = `${uploadResult.value?.url}`;
     setNotification(
       `Profile uploaded successfully<br/><a href=${
