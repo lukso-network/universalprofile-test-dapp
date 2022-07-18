@@ -19,6 +19,6 @@ export function getAndPrepareAllIpfsItems(): {
       });
     }
   }
-  console.log(values.sort((a, b) => a.timestamp - b.timestamp));
+  values.sort((a, b) => a.timestamp - b.timestamp);
   return values;
 }
