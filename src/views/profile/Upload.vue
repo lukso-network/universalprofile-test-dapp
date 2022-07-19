@@ -70,10 +70,12 @@ const upload = async () => {
 };
 
 const deleteUploadedProfile = (url: string) => {
-  const formattedUrl = url.replace(DEFAULT_IPFS_URL, "ipfs://");
-  localStorage.removeItem(formattedUrl);
-  uploadedProfiles.value = getAndPrepareAllIpfsItems();
-  setNotification("Profile removed successfully", "primary");
+  if (window.confirm("Are you sure you want to delete this profile?")) {
+    const formattedUrl = url.replace(DEFAULT_IPFS_URL, "ipfs://");
+    localStorage.removeItem(formattedUrl);
+    uploadedProfiles.value = getAndPrepareAllIpfsItems();
+    setNotification("Profile removed successfully", "primary");
+  }
 };
 
 const handleProfileImage = (event: Event) => {
