@@ -15,7 +15,6 @@ const hide = () => {
 };
 
 const isMaxMessageLength = computed(() => {
-  console.log(props.notification.message.length);
   if (props.notification?.message) {
     return props.notification?.message.length >= 300;
   }
