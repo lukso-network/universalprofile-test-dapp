@@ -198,22 +198,18 @@ onUnmounted(() => {
   background-size: contain;
   position: relative;
   top: 3px;
-
   &.wallet-connect {
     background-image: url("~@/assets/walletconnect-logo.svg");
   }
-
   &.browser-extension {
     background-image: url("~@/assets/lukso.png");
   }
 }
-
 .dropdown-item {
   &.is-text {
     text-decoration: none;
   }
 }
-
 .address {
   .logo {
     top: 0;

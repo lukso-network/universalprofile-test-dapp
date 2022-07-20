@@ -1,10 +1,4 @@
 <script setup lang="ts">
-import {
-  LSP3ProfileJSON,
-  DeploymentEvent,
-  DeploymentStatus,
-  DeploymentType,
-} from "@lukso/lsp-factory.js";
 import { ref, onMounted } from "vue";
 import Notifications from "@/components/Notification.vue";
 import ProfileListIpfs from "@/components/profile/profile-list-ipfs/ProfileListIpfs.vue";
@@ -13,6 +7,12 @@ import { useLspFactory } from "@/compositions/useLspFactory";
 import ProfileModal from "@/components/profile/ProfileModal.vue";
 import { createBlockScoutLink } from "@/utils/createLinks";
 import { formatNumber } from "@/helpers/ethers";
+import {
+  LSP3ProfileJSON,
+  DeploymentEvent,
+  DeploymentStatus,
+  DeploymentType,
+} from "@lukso/lsp-factory.js";
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications();
@@ -29,7 +29,7 @@ const deploy = async (controllerKey: string) => {
   if (controllerKey) {
     window.onbeforeunload = function (e) {
       e.preventDefault();
-      e.returnValue = ""; // for chrome browser
+      e.returnValue = "";
     };
     await deployUniversalProfile(
       {
@@ -96,10 +96,6 @@ const getStatusClass = (status: string) => {
   };
 };
 
-// const createBlockScoutLink = (hash: string) => {
-//   return `https://blockscout.com/lukso/l14/tx/${hash}/internal-transactions`;
-// };
-
 onMounted(async () => {
   const profileDeploymentEventsData = localStorage.getItem(
     "profileDeploymentEvents"
@@ -121,7 +117,7 @@ onMounted(async () => {
     <div class="tile is-ancestor">
       <div class="tile is-vertical is-parent is-12">
         <div class="tile is-child box">
-          <h1 class="title" data-testid="deploy-title">Deploy Profile</h1>
+          <h1 class="title">Deploy Profile</h1>
           <ProfileListIpfs
             :loading="isLoading"
             @createProfileOnChain="openModal"
@@ -166,7 +162,7 @@ onMounted(async () => {
                   </span>
                 </td>
                 <td>{{ deploymentEvent.contractName }}</td>
-                <td>{{ deploymentEvent?.functionName }}</td>
+                <td>{{ deploymentEvent?.contractName }}</td>
                 <td>
                   <code v-if="deploymentEvent?.receipt?.contractAddress">
                     {{ deploymentEvent?.receipt?.contractAddress }}
@@ -175,9 +171,9 @@ onMounted(async () => {
 
                 <td class="has-text-right">
                   {{
-                    deploymentEvent?.receipt
-                      ? deploymentEvent?.receipt?.gasUsed?.hex
-                        ? formatNumber(+deploymentEvent?.receipt.gasUsed?.hex)
+                    deploymentEvent.receipt
+                      ? deploymentEvent.receipt.gasUsed?._hex
+                        ? formatNumber(+deploymentEvent.receipt.gasUsed?._hex)
                         : formatNumber(+deploymentEvent.receipt.gasUsed)
                       : ""
                   }}
@@ -228,26 +224,3 @@ onMounted(async () => {
     @update:modelValue="(value) => (controllerKey = value)"
   />
 </template>
-
-<style scoped lang="scss">
-.placeholder {
-  opacity: 0.1;
-}
-
-.table-inline {
-  td {
-    border: none !important;
-  }
-}
-.modal-container {
-  padding: 0 20px;
-}
-
-.pending {
-  background: hsl(206deg, 70%, 96%);
-}
-
-.complete {
-  background: hsl(142deg, 52%, 96%);
-}
-</style>
