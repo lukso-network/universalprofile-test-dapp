@@ -148,20 +148,6 @@ test("can display both background image and profile image", async () => {
   });
 });
 
-test("can display profile not found", async () => {
-  mockUseRoute.mockReturnValue({
-    params: {
-      address: "1234-not-found",
-    },
-  });
-  mockFetch.mockRejectedValue(new Error("Failed to fetch"));
-  mockIsAddress.mockReturnValue(false);
-  const screen = render(Detail);
-  await waitFor(() => {
-    expect(screen.getByText("Failed to fetch")).toBeDefined();
-  });
-});
-
 test("can display notification if no address is searched", async () => {
   mockIsAddress.mockReturnValue(false);
   const screen = render(Detail);
@@ -194,4 +180,18 @@ test("can display notification if error is thrown", async () => {
   );
   await fireEvent.click(screen.getByText("Search"));
   expect(screen.getByText("Fetch profile failed")).toBeDefined();
+});
+
+test("can display profile not found", async () => {
+  mockUseRoute.mockReturnValue({
+    params: {
+      address: "1234-not-found",
+    },
+  });
+  mockFetch.mockRejectedValue(new Error("Failed to fetch"));
+  mockIsAddress.mockReturnValue(false);
+  const screen = render(Detail);
+  await waitFor(() => {
+    expect(screen.getByText("Failed to fetch")).toBeDefined();
+  });
 });
