@@ -14,7 +14,7 @@
     "lint:types": "tsc --noEmit"
   },
   "dependencies": {
-    "@erc725/erc725.js": "0.14.1",
+    "@erc725/erc725.js": "0.14.2",
     "@lukso/lsp-factory.js": "^2.3.2",
     "@lukso/lsp-factory.js-alpha": "npm:@lukso/lsp-factory.js@^1.0.2-alpha.6",
     "@lukso/lsp-smart-contracts": "0.6.1",

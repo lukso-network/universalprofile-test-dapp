@@ -1,10 +1,11 @@
 import Detail from "@/views/profile/Detail.vue";
-import { render, waitFor } from "@testing-library/vue";
-import { useRoute } from "vue-router";
+import { render, waitFor, fireEvent } from "@testing-library/vue";
 
 const mockFetchProfile = jest.fn();
 const mockFetch = jest.fn();
 const mockIsAddress = jest.fn();
+const mockPush = jest.fn();
+const mockUseRoute = jest.fn();
 
 jest.mock("@/compositions/useErc725", () => ({
   __esModule: true,
@@ -19,21 +20,20 @@ jest.mock("@/compositions/useWeb3", () => ({
   }),
 }));
 jest.mock("vue-router", () => ({
-  useRoute: jest.fn().mockImplementation(() => ({
-    params: {
-      address: "123",
-    },
+  useRoute: () => mockUseRoute(),
+  useRouter: jest.fn().mockImplementation(() => ({
+    push: (val: string) => mockPush(val),
   })),
 }));
 
 beforeAll(() => {
   window.fetch = mockFetch;
-  mockIsAddress.mockReturnValue(false);
-  (useRoute as jest.Mock).mockImplementation(() => ({
+  mockUseRoute.mockImplementation(() => ({
     params: {
       address: "123",
     },
   }));
+  mockIsAddress.mockReturnValue(false);
   mockFetchProfile.mockResolvedValue({
     LSP3UniversalProfiles: [{ name: "1234" }],
   });
@@ -91,7 +91,7 @@ test("can call data from ipfs", async () => {
 });
 
 test("can call data from ipfs if url changes", () => {
-  (useRoute as jest.Mock).mockReturnValue({
+  mockUseRoute.mockReturnValue({
     params: {
       address: "1234",
     },
@@ -101,7 +101,7 @@ test("can call data from ipfs if url changes", () => {
 });
 
 test("cannot call ipfs server if ipfs address/hash is empty", () => {
-  (useRoute as jest.Mock).mockReturnValue({
+  mockUseRoute.mockReturnValue({
     params: {
       address: "",
     },
@@ -112,7 +112,7 @@ test("cannot call ipfs server if ipfs address/hash is empty", () => {
 });
 
 test("can call data from cache if address is valid", async () => {
-  (useRoute as jest.Mock).mockReturnValue({
+  mockUseRoute.mockReturnValue({
     params: {
       address: "1234",
     },
@@ -127,7 +127,7 @@ test("can call data from cache if address is valid", async () => {
 });
 
 test("can display both background image and profile image", async () => {
-  (useRoute as jest.Mock).mockReturnValue({
+  mockUseRoute.mockReturnValue({
     params: {
       address: "1234",
     },
@@ -146,4 +146,52 @@ test("can display both background image and profile image", async () => {
       )
     ).toBeDefined();
   });
+});
+
+test("can display profile not found", async () => {
+  mockUseRoute.mockReturnValue({
+    params: {
+      address: "1234-not-found",
+    },
+  });
+  mockFetch.mockRejectedValue(new Error("Failed to fetch"));
+  mockIsAddress.mockReturnValue(false);
+  const screen = render(Detail);
+  await waitFor(() => {
+    expect(screen.getByText("Failed to fetch")).toBeDefined();
+  });
+});
+
+test("can display notification if no address is searched", async () => {
+  mockIsAddress.mockReturnValue(false);
+  const screen = render(Detail);
+  await fireEvent.update(screen.getByTestId("search-address-hash"), "");
+  await fireEvent.click(screen.getByText("Search"));
+  expect(mockPush).not.toBeCalled();
+  expect(screen.getByText("Please enter valid hash or address")).toBeDefined();
+});
+
+test("can change route if address is searched", async () => {
+  mockIsAddress.mockReturnValue(false);
+  const screen = render(Detail);
+  await fireEvent.update(
+    screen.getByTestId("search-address-hash"),
+    "123-searched-address"
+  );
+  await fireEvent.click(screen.getByText("Search"));
+  await waitFor(() => {
+    expect(mockPush).toBeCalledWith("/profiles/123-searched-address");
+  });
+});
+
+test("can display notification if error is thrown", async () => {
+  mockIsAddress.mockReturnValue(true);
+  mockFetchProfile.mockRejectedValue(new Error("Fetch profile failed"));
+  const screen = render(Detail);
+  await fireEvent.update(
+    screen.getByTestId("search-address-hash"),
+    "throw-error-hash"
+  );
+  await fireEvent.click(screen.getByText("Search"));
+  expect(screen.getByText("Fetch profile failed")).toBeDefined();
 });
