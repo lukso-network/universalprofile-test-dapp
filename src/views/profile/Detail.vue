@@ -2,28 +2,30 @@
 import { DEFAULT_NETWORK_CONFIG } from "@/helpers/config";
 import { onMounted, ref, watch } from "vue";
 import useErc725 from "@/compositions/useErc725";
-import { useRoute, RouteLocationNormalizedLoaded } from "vue-router";
+import { useRoute, RouteLocationNormalizedLoaded, useRouter } from "vue-router";
 import { createIpfsLink } from "@/utils/createLinks";
 import useWeb3 from "@/compositions/useWeb3";
+import Notifications from "@/components/Notification.vue";
 import { LSP3ProfileJSON } from "@lukso/lsp-factory.js";
-
+import useNotifications from "@/compositions/useNotifications";
 const route = useRoute();
 const { isAddress } = useWeb3();
+const { notification, clearNotification, hasNotification, setNotification } =
+  useNotifications();
+const router = useRouter();
 
 const routeData = ref<RouteLocationNormalizedLoaded>(route);
 const dataSource = ref("");
 const loading = ref(true);
-const profileData = ref<LSP3ProfileJSON>(null as unknown as LSP3ProfileJSON);
-const error = ref(null as unknown as LSP3ProfileJSON);
+const profileData = ref<LSP3ProfileJSON>();
+const hash = ref(routeData.value.params.address);
 
 const { fetchProfile } = useErc725();
 
 const fetchData = () => {
-  error.value = profileData.value = null as unknown as LSP3ProfileJSON;
+  clearNotification();
   loading.value = true;
-
-  const addressOrHash = route.params.address as string;
-
+  const addressOrHash = routeData.value.params.address as string;
   if (isAddress(addressOrHash)) {
     getProfileDataFromERC725Cache(addressOrHash);
   } else {
@@ -34,13 +36,15 @@ const fetchData = () => {
 const getProfileDataFromERC725Cache = async (fetchedAddress: string) => {
   try {
     const result = await fetchProfile(fetchedAddress);
-    if (route.params.address !== fetchedAddress) return;
+    if (routeData.value.params.address !== fetchedAddress) return;
     dataSource.value = "ERC725-Cache";
-    // @ts-ignore
-    profileData.value = result.LSP3UniversalProfiles[0];
+    //@ts-ignore
+    profileData.value = result;
+  } catch (err: unknown) {
+    setNotification((err as Error).message, "danger");
+    profileData.value = undefined;
+  } finally {
     loading.value = false;
-  } catch (err: any) {
-    error.value = err.toString();
   }
 };
 
@@ -52,10 +56,20 @@ const getProfileDataFromIPFS = async (ipfsHash: string) => {
     const result = await fetch(DEFAULT_NETWORK_CONFIG.ipfs.url + ipfsHash);
     dataSource.value = "IPFS";
     profileData.value = await result.json();
+  } catch (err: unknown) {
+    setNotification((err as Error).message, "danger");
+    profileData.value = undefined;
+  } finally {
     loading.value = false;
-  } catch (err: any) {
-    error.value = err.toString();
   }
+};
+
+const searchAddress = () => {
+  if (!hash.value) {
+    loading.value = false;
+    return setNotification("Please enter valid hash or address", "danger");
+  }
+  router.push(`/profiles/${hash.value}`);
 };
 
 onMounted(async () => {
@@ -65,17 +79,53 @@ onMounted(async () => {
 });
 
 // call fetchData again the method if the route changes
-watch(routeData, fetchData);
+watch(routeData.value, fetchData);
 </script>
 <template name="Detail">
   <section class="section">
-    <h1 v-if="!loading" class="title">
+    <div class="is-child box">
+      <div v-if="hasNotification" class="field">
+        <Notifications
+          :notification="notification"
+          class="mt-4"
+          @hide="clearNotification"
+        ></Notifications>
+      </div>
+      <div class="field">
+        <label for="hash" class="label"
+          >Enter IPFS Address or Hash to view Profile</label
+        >
+        <div :class="`control has-icons-left ${loading ? 'is-loading' : ''}`">
+          <input
+            v-model="hash"
+            class="input"
+            type="text"
+            data-testid="search-address-hash"
+            placeholder="Enter Address/Hash"
+          />
+          <span class="icon is-small is-left">
+            <i class="fas fa-search"></i>
+          </span>
+        </div>
+      </div>
+      <div class="field">
+        <button
+          :class="`button is-primary is-rounded mb-3 ${
+            loading ? 'is-loading' : ''
+          }`"
+          :disabled="loading ? true : undefined"
+          @click="searchAddress"
+        >
+          Search
+        </button>
+      </div>
+    </div>
+    <h1 v-if="!loading && profileData" class="title">
       {{ dataSource ? dataSource : "" }}: {{ route.params.address }}
     </h1>
-
     <div v-if="loading">Loading...</div>
     <table
-      v-if="!loading"
+      v-if="!loading && profileData"
       class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
     >
       <tr>

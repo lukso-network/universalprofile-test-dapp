@@ -1,6 +1,6 @@
 {
   "name": "universalprofile-sample-web-app",
-  "version": "0.1.52",
+  "version": "0.1.53",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -14,7 +14,7 @@
     "lint:types": "tsc --noEmit"
   },
   "dependencies": {
-    "@erc725/erc725.js": "0.14.1",
+    "@erc725/erc725.js": "0.14.2",
     "@lukso/lsp-factory.js": "^2.3.2",
     "@lukso/lsp-smart-contracts": "0.6.1",
     "@lukso/universalprofile-smart-contracts": "0.4.1",
