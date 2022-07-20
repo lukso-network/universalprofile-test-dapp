@@ -8,6 +8,7 @@ const props = defineProps<Props>();
 type Emits = {
   (event: "closeModal"): void;
   (event: "deploy", controllerKey: string): void;
+  (event: "update:modelValue", value: string): void;
 };
 const emits = defineEmits<Emits>();
 
@@ -39,11 +40,12 @@ const handleDeploy = () => {
             <label class="label">Controller Key</label>
             <p class="control">
               <input
-                :v-model="controllerKey"
+                :value="controllerKey"
                 class="input"
                 type="text"
                 placeholder="Address (0x...)"
                 required
+                @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
               />
             </p>
           </div>

@@ -2,7 +2,7 @@
 import { ref, computed } from "vue";
 import { getAndPrepareAllIpfsItems } from "@/helpers/localstorage";
 import fileSize from "filesize";
-import { DEFAULT_IPFS_URL } from "@/helpers/config";
+import { NETWORKS } from "@/helpers/config";
 import Notifications from "@/components/Notification.vue";
 import useNotifications from "@/compositions/useNotifications";
 import { useLspFactory } from "@/compositions/useLspFactory";
@@ -25,7 +25,7 @@ const name = ref("");
 const description = ref("");
 const links = ref<ProfileLinks[]>([]);
 const tags = ref<string[]>([]);
-const uploadTarget = ref(DEFAULT_IPFS_URL);
+const uploadTarget = ref(NETWORKS.l16.ipfs.url);
 const uploadResult = ref();
 const uploadedProfiles = ref(getAndPrepareAllIpfsItems());
 
@@ -71,7 +71,7 @@ const upload = async () => {
 
 const deleteUploadedProfile = (url: string) => {
   if (window.confirm("Are you sure you want to delete this profile?")) {
-    const formattedUrl = url.replace(DEFAULT_IPFS_URL, "ipfs://");
+    const formattedUrl = url.replace(uploadTarget.value, "ipfs://");
     localStorage.removeItem(formattedUrl);
     uploadedProfiles.value = getAndPrepareAllIpfsItems();
     setNotification("Profile removed successfully", "primary");

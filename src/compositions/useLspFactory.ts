@@ -50,7 +50,9 @@ export function useLspFactory(): {
   if (!hasExtension) {
     throw new Error("Extension not installed");
   }
-  lspFactory = new LSPFactory(window.ethereum);
+  lspFactory = new LSPFactory(window.ethereum, {
+    chainId: 2828,
+  });
 
   return {
     deployUniversalProfile,

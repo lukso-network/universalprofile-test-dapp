@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { getAndPrepareAllIpfsItems } from "@/helpers/localstorage";
-import { DEFAULT_IPFS_URL } from "@/helpers/config";
+import { NETWORKS } from "@/helpers/config";
 import parseLspStringToJson from "@/utils/parseLspStringToJson";
 import { LSP3ProfileJSON } from "@lukso/lsp-factory.js";
 
@@ -20,7 +20,7 @@ withDefaults(defineProps<Props>(), {
   loading: false,
 });
 const uploadedProfiles = ref(getAndPrepareAllIpfsItems());
-const uploadTarget = ref(DEFAULT_IPFS_URL);
+const uploadTarget = ref(NETWORKS.l16.ipfs.url);
 const currentUploadedProfileUrl = ref("");
 
 const emit = defineEmits<Emits>();
@@ -87,6 +87,7 @@ const getIdFromProfileUrl = (uploadedProfile: {
               :disabled="
                 loading && currentUploadedProfileUrl === uploadedProfile.url
               "
+              data-testid="deploy-button"
               @click="createProfileOnChain(uploadedProfile as UploadedProfileType)"
             >
               Deploy
@@ -95,6 +96,7 @@ const getIdFromProfileUrl = (uploadedProfile: {
           <td>
             <button
               class="button is-danger"
+              data-testid="delete-profile"
               @click="deleteUploadedProfile(uploadedProfile.url)"
             >
               Delete

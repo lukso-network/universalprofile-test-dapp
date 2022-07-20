@@ -1,17 +1,18 @@
 <script setup lang="ts">
-import { formatNumber } from "@/helpers/ethers";
 import {
   LSP3ProfileJSON,
   DeploymentEvent,
   DeploymentStatus,
   DeploymentType,
 } from "@lukso/lsp-factory.js";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import Notifications from "@/components/Notification.vue";
 import ProfileListIpfs from "@/components/profile/profile-list-ipfs/ProfileListIpfs.vue";
 import useNotifications from "@/compositions/useNotifications";
 import { useLspFactory } from "@/compositions/useLspFactory";
 import ProfileModal from "@/components/profile/ProfileModal.vue";
+import { createBlockScoutLink } from "@/utils/createLinks";
+import { formatNumber } from "@/helpers/ethers";
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications();
@@ -23,34 +24,47 @@ const isLoading = ref(false);
 const { deployUniversalProfile } = useLspFactory();
 
 const deploy = async (controllerKey: string) => {
-  closeModal();
   isLoading.value = true;
+  closeModal();
+  if (controllerKey) {
+    window.onbeforeunload = function (e) {
+      e.preventDefault();
+      e.returnValue = ""; // for chrome browser
+    };
+    await deployUniversalProfile(
+      {
+        controllerAddresses: [controllerKey],
+        lsp3Profile: {
+          json: selectedProfile.value.profile,
+          url: selectedProfile.value.url,
+        },
+      },
+      {
+        onDeployEvents: {
+          next: (deploymentEvent) => {
+            isLoading.value = false;
+            profileDeploymentEvents.value.push(deploymentEvent);
+            localStorage.setItem(
+              "profileDeploymentEvents",
+              JSON.stringify(profileDeploymentEvents.value)
+            );
 
-  await deployUniversalProfile(
-    {
-      controllerAddresses: [controllerKey],
-      lsp3Profile: {
-        json: selectedProfile.value.profile,
-        url: selectedProfile.value.url,
-      },
-    },
-    {
-      onDeployEvents: {
-        next: (deploymentEvent) => {
-          profileDeploymentEvents.value.push(deploymentEvent);
-          return deploymentEvent;
+            return deploymentEvent;
+          },
+          error: (err) => {
+            isLoading.value = false;
+            setNotification(err as string, "danger");
+          },
+          complete: () => {
+            isLoading.value = false;
+          },
         },
-        error: (err) => {
-          isLoading.value = false;
-          setNotification(err as string, "danger");
-        },
-        complete: (contracts) => {
-          isLoading.value = false;
-          return contracts;
-        },
-      },
-    }
-  );
+      }
+    );
+  } else {
+    isLoading.value = false;
+    setNotification("Invalid controller address", "danger");
+  }
 
   return;
 };
@@ -82,9 +96,18 @@ const getStatusClass = (status: string) => {
   };
 };
 
-const createBlockScoutLink = (hash: string) => {
-  return `https://blockscout.com/lukso/l14/tx/${hash}/internal-transactions`;
-};
+// const createBlockScoutLink = (hash: string) => {
+//   return `https://blockscout.com/lukso/l14/tx/${hash}/internal-transactions`;
+// };
+
+onMounted(async () => {
+  const profileDeploymentEventsData = localStorage.getItem(
+    "profileDeploymentEvents"
+  );
+  if (profileDeploymentEventsData) {
+    profileDeploymentEvents.value = JSON.parse(profileDeploymentEventsData);
+  }
+});
 </script>
 
 <template>
@@ -98,7 +121,7 @@ const createBlockScoutLink = (hash: string) => {
     <div class="tile is-ancestor">
       <div class="tile is-vertical is-parent is-12">
         <div class="tile is-child box">
-          <h1 class="title">Deploy Profile</h1>
+          <h1 class="title" data-testid="deploy-title">Deploy Profile</h1>
           <ProfileListIpfs
             :loading="isLoading"
             @createProfileOnChain="openModal"
@@ -153,7 +176,9 @@ const createBlockScoutLink = (hash: string) => {
                 <td class="has-text-right">
                   {{
                     deploymentEvent?.receipt
-                      ? formatNumber(+deploymentEvent?.receipt.gasUsed)
+                      ? deploymentEvent?.receipt?.gasUsed?.hex
+                        ? formatNumber(+deploymentEvent?.receipt.gasUsed?.hex)
+                        : formatNumber(+deploymentEvent.receipt.gasUsed)
                       : ""
                   }}
                 </td>
@@ -165,6 +190,7 @@ const createBlockScoutLink = (hash: string) => {
                         deploymentEvent?.receipt?.transactionHash
                       )
                     "
+                    target="_blank"
                     class="button is-small mb-1"
                   >
                     {{
@@ -179,6 +205,7 @@ const createBlockScoutLink = (hash: string) => {
                     :href="
                       createBlockScoutLink(deploymentEvent?.transaction?.hash)
                     "
+                    target="_blank"
                     class="button is-small mb-1"
                   >
                     {{ deploymentEvent?.transaction?.hash.substring(0, 16) }}...
@@ -198,6 +225,7 @@ const createBlockScoutLink = (hash: string) => {
     :controller-key="controllerKey"
     @close-modal="closeModal"
     @deploy="deploy"
+    @update:modelValue="(value) => (controllerKey = value)"
   />
 </template>
 

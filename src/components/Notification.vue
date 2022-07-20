@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Notification } from "@/types";
-import { computed, h, ref } from "vue";
+import { h, ref, onMounted } from "vue";
 type Props = {
   notification: Notification;
   hideNotification?: boolean;
@@ -9,17 +9,12 @@ type Props = {
 const props = defineProps<Props>();
 const emits = defineEmits(["hide"]);
 const isShowMore = ref(false);
+const showSpan = ref(false);
+const offsetHeight = ref(0);
 
 const hide = () => {
   emits("hide");
 };
-
-const isMaxMessageLength = computed(() => {
-  if (props.notification?.message) {
-    return props.notification?.message.length >= 300;
-  }
-  return false;
-});
 
 const renderMessage = () => {
   const text = new DOMParser().parseFromString(
@@ -33,11 +28,21 @@ const renderMessage = () => {
 const onToggle = () => {
   isShowMore.value = !isShowMore.value;
 };
+onMounted(() => {
+  if (offsetHeight.value > 101) {
+    showSpan.value = true;
+    isShowMore.value = true;
+  } else {
+    showSpan.value = false;
+    isShowMore.value = false;
+  }
+});
 </script>
 
 <template>
   <div
     v-if="notification"
+    :ref="(el) => (offsetHeight = (el as HTMLDivElement)?.offsetHeight)"
     class="notification card"
     :class="'is-' + notification.type"
     data-testid="notification"
@@ -49,12 +54,11 @@ const onToggle = () => {
       @click="hide"
     ></button>
     <render-message
-      :class="{ ellipsis: !isShowMore, 'no-ellipsis': isShowMore }"
-    >
-    </render-message>
-    <span v-if="isMaxMessageLength" class="span-btn" @click="onToggle">
-      <span v-if="isShowMore">show less</span>
-      <span v-else>show more</span>
+      :class="{ ellipsis: isShowMore, 'no-ellipsis': !isShowMore }"
+    />
+    <span v-if="showSpan" class="span-btn" @click="onToggle">
+      <span v-if="isShowMore">show more</span>
+      <span v-else>show less</span>
     </span>
   </div>
 </template>
