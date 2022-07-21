@@ -69,7 +69,7 @@ const deleteUploadedProfile = (url: string) => {
             }}
           </td>
           <td>
-            <p
+            <a
               @click="
                 () =>
                   router.push(
@@ -78,11 +78,11 @@ const deleteUploadedProfile = (url: string) => {
               "
             >
               {{ getIdFromProfileUrl(uploadedProfile) }}
-            </p>
+            </a>
           </td>
           <td>
             <button
-              class="button is-success"
+              class="button is-primary is-rounded my-1"
               :class="{
                 'is-loading':
                   loading && currentUploadedProfileUrl === uploadedProfile.url,
@@ -93,12 +93,20 @@ const deleteUploadedProfile = (url: string) => {
               data-testid="deploy-button"
               @click="createProfileOnChain(uploadedProfile)"
             >
+              <span
+                v-if="
+                  loading && currentUploadedProfileUrl === uploadedProfile.url
+                "
+                aria-hidden="true"
+                aria-label="loading..."
+                data-testid="aria-loading"
+              ></span>
               Deploy
             </button>
           </td>
           <td>
             <button
-              class="button is-danger"
+              class="button is-danger is-rounded my-1"
               data-testid="delete-profile"
               @click="deleteUploadedProfile(uploadedProfile.url)"
             >

@@ -41,13 +41,15 @@ const handleInput = (event: Event) => {
       <section class="modal-card-body">
         <form>
           <div class="field">
-            <label class="label">Controller Key</label>
+            <label class="label" for="controller-key">Controller Key</label>
             <p class="control">
               <input
+                id="controller-key"
                 :value="controllerKey"
                 class="input"
                 type="text"
                 placeholder="Address (0x...)"
+                data-testid="controller-key"
                 required
                 @input="handleInput"
               />
@@ -59,7 +61,13 @@ const handleInput = (event: Event) => {
         </form>
       </section>
       <footer class="modal-card-foot">
-        <button class="button is-success" @click="handleDeploy">Deploy</button>
+        <button
+          class="button is-success"
+          data-testid="deploy-profile"
+          @click="handleDeploy"
+        >
+          Deploy
+        </button>
         <button class="button" @click="handleCloseModal">Cancel</button>
       </footer>
     </div>

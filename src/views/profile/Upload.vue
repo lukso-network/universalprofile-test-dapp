@@ -145,10 +145,9 @@ const removeBackgroundImage = () => {
 <template>
   <div class="section">
     <h1 class="title">Profile Upload</h1>
-    <article class="message is-info card">
+    <article class="message is-info card has-background-white">
       <div class="message-header">
         <p>Info</p>
-        <button class="delete" aria-label="delete"></button>
       </div>
       <div class="message-body">
         <div class="content">
@@ -194,7 +193,7 @@ const removeBackgroundImage = () => {
 
     <div class="columns">
       <div class="column">
-        <section class="upload-form has-background-info-light card">
+        <section class="upload-form card">
           <div class="file is-boxed has-name mb-5">
             <label v-if="!profileImageUrl" class="file-label">
               <input
@@ -323,7 +322,9 @@ const removeBackgroundImage = () => {
               </div>
             </div>
 
-            <button class="button is-info" @click="addNewLink">Add Link</button>
+            <button class="button is-primary is-rounded" @click="addNewLink">
+              Add Link
+            </button>
           </div>
 
           <div class="field">
@@ -341,30 +342,35 @@ const removeBackgroundImage = () => {
                   </p>
                 </div>
                 <div class="block">
-                  <button class="button is-danger" @click="removeTag(index)">
+                  <button
+                    class="button is-danger is-rounded"
+                    @click="removeTag(index)"
+                  >
                     Delete
                   </button>
                 </div>
               </div>
             </div>
 
-            <button class="button is-info" @click="addNewTag">Add Tag</button>
+            <button class="button is-primary is-rounded" @click="addNewTag">
+              Add Tag
+            </button>
+          </div>
+          <div class="field is-grouped is-grouped-right">
+            <p class="control">
+              <button
+                class="button is-primary is-rounded"
+                type="submit"
+                :class="{ 'is-loading': isUploading }"
+                :disabled="isUploading"
+                data-testid="upload-button"
+                @click.stop="upload"
+              >
+                Upload Profile
+              </button>
+            </p>
           </div>
         </section>
-        <div class="field is-grouped is-grouped-right">
-          <p class="control">
-            <button
-              class="button is-success"
-              type="submit"
-              :class="{ 'is-loading': isUploading }"
-              :disabled="isUploading"
-              data-testid="upload-button"
-              @click.stop="upload"
-            >
-              Upload Profile
-            </button>
-          </p>
-        </div>
       </div>
 
       <div
@@ -373,10 +379,7 @@ const removeBackgroundImage = () => {
           column: uploadedProfiles.length > 0,
         }"
       >
-        <section
-          v-if="uploadedProfiles.length > 0"
-          class="has-background-success-light p-5"
-        >
+        <section v-if="uploadedProfiles.length > 0" class="p-5 card">
           <h2 class="title is-size-4">Previously Uploaded Profiles</h2>
           <div class="table-container">
             <table
@@ -409,7 +412,7 @@ const removeBackgroundImage = () => {
                 </td>
                 <td>
                   <button
-                    class="button is-danger"
+                    class="button is-danger is-rounded mt-3"
                     @click="deleteUploadedProfile(uploadedProfile.url)"
                   >
                     Delete

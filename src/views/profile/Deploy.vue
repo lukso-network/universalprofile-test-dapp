@@ -52,7 +52,7 @@ const deploy = async (controllerKey: string) => {
               "profileDeploymentEvents",
               JSON.stringify(profileDeploymentEvents.value)
             );
-
+            setNotification("Profile deployed successfully", "primary");
             return deploymentEvent;
           },
           error: (err) => {

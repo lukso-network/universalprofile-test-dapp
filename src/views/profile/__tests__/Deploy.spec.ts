@@ -1,4 +1,4 @@
-import { fireEvent, render, waitFor } from "@testing-library/vue";
+import { fireEvent, render, waitFor, screen } from "@testing-library/vue";
 import Deploy from "@/views/profile/Deploy.vue";
 
 const mockDeployUniversalProfile = jest.fn();
@@ -22,7 +22,7 @@ jest.mock("@/compositions/useLspFactory", () => ({
 beforeEach(() => {
   mockGetAndPrepareAllIpfsItems.mockReturnValue([
     {
-      url: "ipfs://QmZ3zDELDWSzjyLKxLe5ipM1HKPUvgHVV5c22cnKUc4byk",
+      url: "QmZ3zDELDWSzjyLKxLe5ipM1HKPUvgHVV5c22cnKUc4byk",
       json: {
         LSP3Profile: {
           name: "John",
@@ -83,4 +83,35 @@ test("should open modal when deploy is clicked", async () => {
   await waitFor(() => {
     expect(screen.getByText("Deploy LSP3UniversalProfile")).toBeVisible();
   });
+});
+
+test("should fail to deploy profile", async () => {
+  const screen = render(Deploy);
+  const deployButton = screen.getByTestId("deploy-button");
+  await fireEvent.click(deployButton);
+  await waitFor(async () => {
+    expect(screen.getByText("Deploy LSP3UniversalProfile")).toBeVisible();
+  });
+  await fireEvent.update(screen.getByTestId("controller-key"), "");
+  await fireEvent.click(screen.getByTestId("deploy-profile"));
+
+  expect(
+    await screen.findByText("Invalid controller address")
+  ).toBeInTheDocument();
+});
+test("should deploy profile", async () => {
+  const screen = render(Deploy);
+  const deployButton = screen.getByTestId("deploy-button");
+  await fireEvent.click(deployButton);
+  await waitFor(async () => {
+    expect(screen.getByText("Deploy LSP3UniversalProfile")).toBeVisible();
+  });
+  const labelText = screen.getByLabelText(/Controller Key/i);
+  await fireEvent.update(
+    labelText,
+    "0x7Ab53a0C861fb955050A8DA109eEeA5E61fd8Aa4"
+  );
+  await fireEvent.click(screen.getByTestId("deploy-profile"));
+
+  expect(await screen.findByTestId("aria-loading")).toBeInTheDocument();
 });
