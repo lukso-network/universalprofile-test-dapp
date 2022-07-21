@@ -1,4 +1,4 @@
-import { fireEvent, render, waitFor, screen } from "@testing-library/vue";
+import { fireEvent, render, waitFor } from "@testing-library/vue";
 import Deploy from "@/views/profile/Deploy.vue";
 
 const mockDeployUniversalProfile = jest.fn();
