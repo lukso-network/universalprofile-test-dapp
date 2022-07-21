@@ -5,7 +5,7 @@ import { ref, onMounted } from "vue";
 import useNotifications from "@/compositions/useNotifications";
 import { NETWORKS } from "@/helpers/config";
 import { useLspFactory } from "@/compositions/useLspFactory";
-import ProfileModal from "@/components/profile/ProfileModal.vue";
+import ProfileModal from "@/components/modals/ProfileModal.vue";
 import { createBlockScoutLink } from "@/utils/createLinks";
 import { formatNumber } from "@/helpers/ethers";
 import {
@@ -31,10 +31,6 @@ const deploy = async (controllerKey: string) => {
   isLoading.value = true;
   closeModal();
   if (controllerKey) {
-    window.onbeforeunload = function (e) {
-      e.preventDefault();
-      e.returnValue = "";
-    };
     await deployUniversalProfile(
       {
         controllerAddresses: [controllerKey],
@@ -52,7 +48,16 @@ const deploy = async (controllerKey: string) => {
               "profileDeploymentEvents",
               JSON.stringify(profileDeploymentEvents.value)
             );
-            setNotification("Profile deployed successfully", "primary");
+            const hash = deploymentEvent?.transaction
+              ? deploymentEvent?.transaction?.hash.substring(0, 16)
+              : deploymentEvent?.receipt?.transactionHash?.substring(0, 16);
+            const href = deploymentEvent?.receipt
+              ? createBlockScoutLink(deploymentEvent?.receipt?.transactionHash)
+              : createBlockScoutLink(deploymentEvent?.transaction?.hash);
+            setNotification(
+              `Profile deployed successfully <br/> <a href="${href}" target="_blank">${hash}</a>`,
+              "primary"
+            );
             return deploymentEvent;
           },
           error: (err) => {
@@ -126,7 +131,7 @@ onMounted(async () => {
 
 <template>
   <section class="section">
-    <div>
+    <div class="mb-3">
       <Notifications
         v-if="hasNotification"
         :notification="notification"

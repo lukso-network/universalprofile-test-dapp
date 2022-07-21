@@ -1,3 +1,4 @@
+import useWeb3 from "@/compositions/useWeb3";
 import { ProfileDataForEncoding } from "@lukso/lsp-factory.js/build/main/src/lib/interfaces/lsp3-profile";
 import {
   DeployedUniversalProfileContracts,
@@ -8,6 +9,8 @@ import {
 } from "@lukso/lsp-factory.js";
 
 import { UploadOptions } from "@lukso/lsp-factory.js/build/main/src/lib/interfaces/profile-upload-options";
+
+const { getChainId } = useWeb3();
 
 let lspFactory: LSPFactory;
 
@@ -50,10 +53,20 @@ export function useLspFactory(): {
   if (!hasExtension) {
     throw new Error("Extension not installed");
   }
-  lspFactory = new LSPFactory(window.ethereum, {
-    chainId: 2828,
-  });
 
+  getChainId()
+    .then((id) => {
+      lspFactory = new LSPFactory(window.ethereum, {
+        chainId: id,
+      });
+    })
+    .catch((err) => {
+      throw new Error(err);
+    });
+
+  // lspFactory = new LSPFactory(window.ethereum, {
+  //   chainId: 2828,
+  // });
   return {
     deployUniversalProfile,
     uploadUniversalProfileMetaData,

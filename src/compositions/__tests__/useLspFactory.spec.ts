@@ -1,5 +1,8 @@
 import { useLspFactory } from "@/compositions/useLspFactory";
 import { LSPFactory } from "@lukso/lsp-factory.js";
+import useWeb3 from "../useWeb3";
+
+const { getChainId } = useWeb3();
 
 jest.mock("@lukso/lsp-factory.js", () => ({
   LSPFactory: jest.fn(),
@@ -13,7 +16,8 @@ describe("can produce LSP Factory", () => {
   });
 
   it("should be called with window.ethereum", async () => {
-    expect(LSPFactory).toBeCalledWith({}, { chainId: 2828 });
+    const chainId = await getChainId();
+    expect(LSPFactory).toBeCalledWith({}, { chainId });
   });
 
   it("should return null for empty chain id", async () => {
