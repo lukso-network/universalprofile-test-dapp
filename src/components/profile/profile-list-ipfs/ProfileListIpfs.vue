@@ -2,7 +2,7 @@
 import parseLspStringToJson from "@/utils/parseLspStringToJson";
 import { LSP3ProfileJSON } from "@lukso/lsp-factory.js";
 import { ref } from "vue";
-import { RouterLink } from "vue-router";
+import { useRouter } from "vue-router";
 
 type UploadedProfileType<T extends string | LSP3ProfileJSON> = {
   url: string;
@@ -29,6 +29,8 @@ defineProps<Props>();
 const currentUploadedProfileUrl = ref("");
 
 const emits = defineEmits<Emits>();
+
+const router = useRouter();
 
 const createProfileOnChain = (
   uploadedProfile: UploadedProfileType<LSP3ProfileJSON>
@@ -67,11 +69,16 @@ const deleteUploadedProfile = (url: string) => {
             }}
           </td>
           <td>
-            <router-link
-              :to="`/profiles/${getIdFromProfileUrl(uploadedProfile)}`"
+            <p
+              @click="
+                () =>
+                  router.push(
+                    `/profiles/${getIdFromProfileUrl(uploadedProfile)}`
+                  )
+              "
             >
               {{ getIdFromProfileUrl(uploadedProfile) }}
-            </router-link>
+            </p>
           </td>
           <td>
             <button
