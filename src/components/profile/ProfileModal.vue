@@ -3,36 +3,40 @@ type Props = {
   isModalOpen: boolean;
   controllerKey: string;
 };
-const props = defineProps<Props>();
-
 type Emits = {
   (event: "closeModal"): void;
   (event: "deploy", controllerKey: string): void;
   (event: "update:modelValue", value: string): void;
 };
-const emits = defineEmits<Emits>();
 
+const props = defineProps<Props>();
+const emits = defineEmits<Emits>();
 const handleCloseModal = () => {
   emits("closeModal");
 };
-
 const handleDeploy = () => {
   const controllerKey = props.controllerKey;
   emits("deploy", controllerKey);
 };
+
+const handleInput = (event: Event) => {
+  const value = (event.target as HTMLInputElement).value;
+  emits("update:modelValue", value);
+};
 </script>
 
 <template>
-  <div class="modal modal-container" :class="isModalOpen ? 'is-active' : ''">
-    <div class="modal-background"></div>
+  <div
+    id="modal"
+    class="modal modal-container"
+    :class="isModalOpen ? 'is-active' : ''"
+    data-testid="modal"
+  >
+    <div class="modal-background" />
     <div class="modal-card">
       <header class="modal-card-head">
         <p class="modal-card-title">Deploy LSP3UniversalProfile</p>
-        <button
-          class="delete"
-          aria-label="close"
-          @click="handleCloseModal"
-        ></button>
+        <button class="delete" aria-label="close" @click="handleCloseModal" />
       </header>
       <section class="modal-card-body">
         <form>
@@ -45,7 +49,7 @@ const handleDeploy = () => {
                 type="text"
                 placeholder="Address (0x...)"
                 required
-                @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
+                @input="handleInput"
               />
             </p>
           </div>

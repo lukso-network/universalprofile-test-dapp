@@ -23,6 +23,7 @@ export default function useNotifications(): {
       message,
       type,
     });
+
   return {
     notification,
     clearNotification,

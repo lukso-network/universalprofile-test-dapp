@@ -13,7 +13,7 @@ test("can show notification", async () => {
   });
 
   expect(utils.getByTestId("notification")).toHaveClass("is-danger");
-  expect(utils.getByTestId("notification")).toHaveTextContent("Message");
+  expect(await utils.findByTestId("message")).toHaveTextContent(/^Message$/);
 });
 
 test("can trigger hide", async () => {

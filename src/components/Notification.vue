@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Notification } from "@/types";
 import { h, ref, onMounted } from "vue";
+import { Notification } from "@/types";
+
 type Props = {
   notification: Notification;
   hideNotification?: boolean;
@@ -10,7 +11,6 @@ const props = defineProps<Props>();
 const emits = defineEmits(["hide"]);
 const isShowMore = ref(false);
 const showSpan = ref(false);
-const offsetHeight = ref(0);
 
 const hide = () => {
   emits("hide");
@@ -23,13 +23,19 @@ const renderMessage = () => {
   ).body.innerHTML;
   return h("div", {
     innerHTML: text,
+    "data-testid": "message",
   });
 };
+
 const onToggle = () => {
   isShowMore.value = !isShowMore.value;
 };
+
 onMounted(() => {
-  if (offsetHeight.value > 101) {
+  const container = document.getElementById(
+    "notification-container"
+  ) as HTMLElement;
+  if (container.offsetHeight > 101) {
     showSpan.value = true;
     isShowMore.value = true;
   } else {
@@ -39,10 +45,9 @@ onMounted(() => {
 });
 </script>
 
-<template>
+<template v-if="notification">
   <div
-    v-if="notification"
-    :ref="(el) => (offsetHeight = (el as HTMLDivElement)?.offsetHeight)"
+    id="notification-container"
     class="notification card"
     :class="'is-' + notification.type"
     data-testid="notification"
@@ -56,7 +61,12 @@ onMounted(() => {
     <render-message
       :class="{ ellipsis: isShowMore, 'no-ellipsis': !isShowMore }"
     />
-    <span v-if="showSpan" class="span-btn" @click="onToggle">
+    <span
+      v-if="showSpan"
+      class="span-btn"
+      data-testid="show-more"
+      @click="onToggle"
+    >
       <span v-if="isShowMore">show more</span>
       <span v-else>show less</span>
     </span>

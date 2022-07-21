@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
 import Notifications from "@/components/Notification.vue";
 import ProfileListIpfs from "@/components/profile/profile-list-ipfs/ProfileListIpfs.vue";
+import { ref, onMounted } from "vue";
 import useNotifications from "@/compositions/useNotifications";
+import { NETWORKS } from "@/helpers/config";
 import { useLspFactory } from "@/compositions/useLspFactory";
 import ProfileModal from "@/components/profile/ProfileModal.vue";
 import { createBlockScoutLink } from "@/utils/createLinks";
@@ -13,6 +14,7 @@ import {
   DeploymentStatus,
   DeploymentType,
 } from "@lukso/lsp-factory.js";
+import { getAndPrepareAllIpfsItems } from "@/helpers/localstorage";
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications();
@@ -22,6 +24,8 @@ const selectedProfile = ref({ profile: {} as LSP3ProfileJSON, url: "" });
 const profileDeploymentEvents = ref<DeploymentEvent[]>([]);
 const isLoading = ref(false);
 const { deployUniversalProfile } = useLspFactory();
+const uploadedProfiles = ref(getAndPrepareAllIpfsItems());
+const uploadTarget = ref(NETWORKS.l16.ipfs.url);
 
 const deploy = async (controllerKey: string) => {
   isLoading.value = true;
@@ -96,6 +100,20 @@ const getStatusClass = (status: string) => {
   };
 };
 
+const deleteUploadedProfile = (url: string) => {
+  const formattedUrl = url.replace(uploadTarget.value, "ipfs://");
+  localStorage.removeItem(formattedUrl);
+  uploadedProfiles.value = getAndPrepareAllIpfsItems();
+  setNotification("Profile deleted successfully", "primary");
+};
+
+const getIdFromProfileUrl = (uploadedProfile: {
+  profile: string;
+  url: string;
+}) => {
+  return uploadedProfile.url.replace(uploadTarget.value, "");
+};
+
 onMounted(async () => {
   const profileDeploymentEventsData = localStorage.getItem(
     "profileDeploymentEvents"
@@ -108,23 +126,25 @@ onMounted(async () => {
 
 <template>
   <section class="section">
-    <Notifications
-      v-if="hasNotification"
-      :notification="notification"
-      class="mt-4"
-      @hide="clearNotification"
-    ></Notifications>
+    <div>
+      <Notifications
+        v-if="hasNotification"
+        :notification="notification"
+        class="mt-4"
+        @hide="clearNotification"
+      />
+    </div>
     <div class="tile is-ancestor">
       <div class="tile is-vertical is-parent is-12">
-        <div class="tile is-child box">
-          <h1 class="title">Deploy Profile</h1>
-          <ProfileListIpfs
-            :loading="isLoading"
-            @createProfileOnChain="openModal"
-            @set-notification="setNotification($event)"
-          ></ProfileListIpfs>
-        </div>
-
+        <profile-list-ipfs
+          :loading="isLoading"
+          :uploaded-profiles="uploadedProfiles"
+          :get-id-from-profile-url="getIdFromProfileUrl"
+          class="tile is-child box"
+          @createProfileOnChain="openModal"
+          @set-notification="setNotification($event)"
+          @delete-uploaded-profile="deleteUploadedProfile"
+        />
         <div class="tile is-child box">
           <h2 class="title">Deployment Events</h2>
           <div class="table-container">
@@ -162,7 +182,7 @@ onMounted(async () => {
                   </span>
                 </td>
                 <td>{{ deploymentEvent.contractName }}</td>
-                <td>{{ deploymentEvent?.contractName }}</td>
+                <td>{{ deploymentEvent?.functionName }}</td>
                 <td>
                   <code v-if="deploymentEvent?.receipt?.contractAddress">
                     {{ deploymentEvent?.receipt?.contractAddress }}
@@ -172,8 +192,8 @@ onMounted(async () => {
                 <td class="has-text-right">
                   {{
                     deploymentEvent.receipt
-                      ? deploymentEvent.receipt.gasUsed?._hex
-                        ? formatNumber(+deploymentEvent.receipt.gasUsed?._hex)
+                      ? deploymentEvent.receipt.gasUsed?.hex
+                        ? formatNumber(+deploymentEvent.receipt.gasUsed?.hex)
                         : formatNumber(+deploymentEvent.receipt.gasUsed)
                       : ""
                   }}
@@ -213,14 +233,13 @@ onMounted(async () => {
         </div>
       </div>
     </div>
+    <ProfileModal
+      :is-modal-open="isModalOpen"
+      :selected-profile="selectedProfile"
+      :controller-key="controllerKey"
+      @close-modal="closeModal"
+      @deploy="deploy"
+      @update:modelValue="(value) => (controllerKey = value)"
+    />
   </section>
-
-  <ProfileModal
-    :is-modal-open="isModalOpen"
-    :selected-profile="selectedProfile"
-    :controller-key="controllerKey"
-    @close-modal="closeModal"
-    @deploy="deploy"
-    @update:modelValue="(value) => (controllerKey = value)"
-  />
 </template>

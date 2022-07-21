@@ -1,54 +1,53 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { getAndPrepareAllIpfsItems } from "@/helpers/localstorage";
-import { NETWORKS } from "@/helpers/config";
 import parseLspStringToJson from "@/utils/parseLspStringToJson";
 import { LSP3ProfileJSON } from "@lukso/lsp-factory.js";
+import { ref } from "vue";
+import { RouterLink } from "vue-router";
+
+type UploadedProfileType<T extends string | LSP3ProfileJSON> = {
+  url: string;
+  profile: T;
+};
 
 type Props = {
   loading: boolean;
+  getIdFromProfileUrl: (url: UploadedProfileType<string>) => string;
+  uploadedProfiles: UploadedProfileType<string>[];
 };
-type UploadedProfileType = {
-  url: string;
-  profile: LSP3ProfileJSON;
-};
+
 type Emits = {
-  (event: "createProfileOnChain", uploadedProfile: UploadedProfileType): void;
+  (
+    event: "createProfileOnChain",
+    uploadedProfile: UploadedProfileType<LSP3ProfileJSON>
+  ): void;
   (event: "setNotification", message: string, type: string): void;
+  (event: "deleteUploadedProfile", url: string): void;
 };
-withDefaults(defineProps<Props>(), {
-  loading: false,
-});
-const uploadedProfiles = ref(getAndPrepareAllIpfsItems());
-const uploadTarget = ref(NETWORKS.l16.ipfs.url);
+
+defineProps<Props>();
+
 const currentUploadedProfileUrl = ref("");
 
-const emit = defineEmits<Emits>();
+const emits = defineEmits<Emits>();
 
-const createProfileOnChain = (uploadedProfile: UploadedProfileType) => {
+const createProfileOnChain = (
+  uploadedProfile: UploadedProfileType<LSP3ProfileJSON>
+) => {
   currentUploadedProfileUrl.value = uploadedProfile.url;
-  emit("createProfileOnChain", uploadedProfile);
+  emits("createProfileOnChain", uploadedProfile);
 };
 
 const deleteUploadedProfile = (url: string) => {
   if (window.confirm("Are you sure you want to delete this profile?")) {
-    const formattedUrl = url.replace(uploadTarget.value, "ipfs://");
-    localStorage.removeItem(formattedUrl);
-    uploadedProfiles.value = getAndPrepareAllIpfsItems();
-    emit("setNotification", `Profile deleted from IPFS`, "success");
+    emits("deleteUploadedProfile", url);
+    emits("setNotification", "Profile deleted from IPFS", "success");
   }
-};
-
-const getIdFromProfileUrl = (uploadedProfile: {
-  profile: string;
-  url: string;
-}) => {
-  return uploadedProfile.url.replace(uploadTarget.value, "");
 };
 </script>
 
-<template>
-  <section v-if="uploadedProfiles.length > 0" class="p-5">
+<template v-if="uploadedProfiles.length > 0">
+  <section>
+    <h1 class="title" data-testid="deploy-title">Deploy Profile</h1>
     <h2 class="title is-size-4">Previously Uploaded Profiles</h2>
     <div class="table-container">
       <table
@@ -60,13 +59,10 @@ const getIdFromProfileUrl = (uploadedProfile: {
           <th>Deploy</th>
           <th></th>
         </tr>
-        <tr
-          v-for="uploadedProfile in uploadedProfiles"
-          :key="uploadedProfile.url"
-        >
+        <tr v-for="(uploadedProfile, index) in uploadedProfiles" :key="index">
           <td>
             {{
-              parseLspStringToJson(uploadedProfile.profile).json?.LSP3Profile
+              parseLspStringToJson(uploadedProfile.profile)?.json?.LSP3Profile
                 ?.name
             }}
           </td>
@@ -88,7 +84,7 @@ const getIdFromProfileUrl = (uploadedProfile: {
                 loading && currentUploadedProfileUrl === uploadedProfile.url
               "
               data-testid="deploy-button"
-              @click="createProfileOnChain(uploadedProfile as UploadedProfileType)"
+              @click="createProfileOnChain(uploadedProfile)"
             >
               Deploy
             </button>
