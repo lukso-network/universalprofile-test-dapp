@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Notifications from "@/components/Notification.vue";
 import ProfileListIpfs from "@/components/profile/profile-list-ipfs/ProfileListIpfs.vue";
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import useNotifications from "@/compositions/useNotifications";
 import { NETWORKS } from "@/helpers/config";
 import { useLspFactory } from "@/compositions/useLspFactory";
@@ -29,6 +29,7 @@ const uploadTarget = ref(NETWORKS.l16.ipfs.url);
 
 const deploy = async (controllerKey: string) => {
   isLoading.value = true;
+  profileDeploymentEvents.value = [];
   closeModal();
   if (controllerKey) {
     await deployUniversalProfile(
@@ -118,15 +119,6 @@ const getIdFromProfileUrl = (uploadedProfile: {
 }) => {
   return uploadedProfile.url.replace(uploadTarget.value, "");
 };
-
-onMounted(async () => {
-  const profileDeploymentEventsData = localStorage.getItem(
-    "profileDeploymentEvents"
-  );
-  if (profileDeploymentEventsData) {
-    profileDeploymentEvents.value = JSON.parse(profileDeploymentEventsData);
-  }
-});
 </script>
 
 <template>

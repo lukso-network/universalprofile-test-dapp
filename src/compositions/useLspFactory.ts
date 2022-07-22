@@ -59,8 +59,6 @@ export function useLspFactory(): {
   }
   setupLSPFactory();
 
-  // lspFactory = new LSPFactory(window.ethereum);
-
   return {
     deployUniversalProfile,
     uploadUniversalProfileMetaData,
