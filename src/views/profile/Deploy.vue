@@ -64,7 +64,11 @@ const deploy = async (controllerKey: string) => {
           error: (err) => {
             isLoading.value = false;
             profileDeploymentEvents.value = [];
-            setNotification(err as string, "danger");
+            if (err?.code === 4001) {
+              setNotification(err?.message, "danger");
+            } else {
+              setNotification(err as string, "danger");
+            }
           },
           complete: () => {
             isLoading.value = false;
