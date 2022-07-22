@@ -6,7 +6,6 @@ jest.mock("@lukso/lsp-factory.js", () => ({
 }));
 
 describe("can produce LSP Factory", () => {
-  let lspFactory: any;
   beforeAll(async () => {
     window.ethereum = {};
     useLspFactory();
