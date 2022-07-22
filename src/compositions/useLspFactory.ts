@@ -18,6 +18,11 @@ const getFactory = (): LSPFactory => {
   return lspFactory;
 };
 
+const setupLSPFactory = async (): Promise<void> => {
+  const chainId = await getChainId();
+  lspFactory = new LSPFactory(window.ethereum, { chainId });
+};
+
 const deployUniversalProfile = async (
   profileDeploymentOptions: ProfileDeploymentOptions,
   contractDeploymentOptions?: ContractDeploymentOptions | undefined
@@ -53,20 +58,10 @@ export function useLspFactory(): {
   if (!hasExtension) {
     throw new Error("Extension not installed");
   }
+  setupLSPFactory();
 
-  getChainId()
-    .then((id) => {
-      lspFactory = new LSPFactory(window.ethereum, {
-        chainId: id,
-      });
-    })
-    .catch((err) => {
-      throw new Error(err);
-    });
+  // lspFactory = new LSPFactory(window.ethereum);
 
-  // lspFactory = new LSPFactory(window.ethereum, {
-  //   chainId: 2828,
-  // });
   return {
     deployUniversalProfile,
     uploadUniversalProfileMetaData,
