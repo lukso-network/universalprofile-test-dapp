@@ -24,6 +24,7 @@ export const NETWORKS: { [K in NetworkType]: NetworkInfo } = {
     blockscout: {
       url: "https://explorer.execution.l16.lukso.network/tx",
     },
+    chainId: 2828,
   },
 };
 

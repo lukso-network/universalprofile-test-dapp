@@ -1,4 +1,3 @@
-import useWeb3 from "@/compositions/useWeb3";
 import { ProfileDataForEncoding } from "@lukso/lsp-factory.js/build/main/src/lib/interfaces/lsp3-profile";
 import {
   DeployedUniversalProfileContracts,
@@ -9,8 +8,7 @@ import {
 } from "@lukso/lsp-factory.js";
 
 import { UploadOptions } from "@lukso/lsp-factory.js/build/main/src/lib/interfaces/profile-upload-options";
-
-const { getChainId } = useWeb3();
+import { DEFAULT_NETWORK_CONFIG } from "@/helpers/config";
 
 let lspFactory: LSPFactory;
 
@@ -18,9 +16,10 @@ const getFactory = (): LSPFactory => {
   return lspFactory;
 };
 
-const setupLSPFactory = async (): Promise<void> => {
-  const chainId = await getChainId();
-  lspFactory = new LSPFactory(window.ethereum, { chainId });
+const setupLSPFactory = (): void => {
+  lspFactory = new LSPFactory(window.ethereum, {
+    chainId: DEFAULT_NETWORK_CONFIG.chainId,
+  });
 };
 
 const deployUniversalProfile = async (
