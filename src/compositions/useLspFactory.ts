@@ -2,18 +2,24 @@ import { ProfileDataForEncoding } from "@lukso/lsp-factory.js/build/main/src/lib
 import {
   DeployedUniversalProfileContracts,
   LSPFactory,
-} from "@lukso/lsp-factory.js";
-import {
   ContractDeploymentOptions,
   ProfileDataBeforeUpload,
   ProfileDeploymentOptions,
-} from "@lukso/lsp-factory.js-alpha";
+} from "@lukso/lsp-factory.js";
+
 import { UploadOptions } from "@lukso/lsp-factory.js/build/main/src/lib/interfaces/profile-upload-options";
+import { DEFAULT_NETWORK_CONFIG } from "@/helpers/config";
 
 let lspFactory: LSPFactory;
 
 const getFactory = (): LSPFactory => {
   return lspFactory;
+};
+
+const setupLSPFactory = (): void => {
+  lspFactory = new LSPFactory(window.ethereum, {
+    chainId: DEFAULT_NETWORK_CONFIG.chainId,
+  });
 };
 
 const deployUniversalProfile = async (
@@ -51,7 +57,8 @@ export function useLspFactory(): {
   if (!hasExtension) {
     throw new Error("Extension not installed");
   }
-  lspFactory = new LSPFactory(window.ethereum);
+  setupLSPFactory();
+
   return {
     deployUniversalProfile,
     uploadUniversalProfileMetaData,

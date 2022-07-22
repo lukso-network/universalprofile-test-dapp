@@ -4,3 +4,4 @@ declare global {
     ethereum: any;
   }
 }
+declare module "@lukso/lsp-smart-contracts/constants";

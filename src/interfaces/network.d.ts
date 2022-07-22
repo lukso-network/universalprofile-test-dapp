@@ -6,4 +6,5 @@ export type NetworkInfo = {
   cache: { url: string };
   ipfs: { url: string };
   blockscout: { url: string };
+  chainId: number;
 };

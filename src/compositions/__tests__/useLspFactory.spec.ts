@@ -6,14 +6,13 @@ jest.mock("@lukso/lsp-factory.js", () => ({
 }));
 
 describe("can produce LSP Factory", () => {
-  let lspFactory: any;
   beforeAll(async () => {
     window.ethereum = {};
     useLspFactory();
   });
 
   it("should be called with window.ethereum", async () => {
-    expect(LSPFactory).toBeCalledWith({});
+    expect(LSPFactory).toBeCalledWith({}, { chainId: 2828 });
   });
 
   it("should return null for empty chain id", async () => {

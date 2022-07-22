@@ -16,7 +16,7 @@ const getWeb3 = (): Web3 => {
 };
 
 const getChainId = async (): Promise<number> => {
-  return await web3.eth.getChainId();
+  return await web3.eth?.getChainId();
 };
 
 const contract = (
