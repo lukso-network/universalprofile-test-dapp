@@ -1,22 +1,22 @@
-import useNotifications from "../useNotifications";
+import useNotifications from '../useNotifications'
 
-test("can set notification", () => {
-  const { notification, setNotification } = useNotifications();
+test('can set notification', () => {
+  const { notification, setNotification } = useNotifications()
 
-  setNotification("some notification", "primary");
+  setNotification('some notification', 'primary')
 
   expect(notification.value).toEqual({
-    message: "some notification",
-    type: "primary",
-  });
-});
+    message: 'some notification',
+    type: 'primary',
+  })
+})
 
-test("can clear notification", () => {
+test('can clear notification', () => {
   const { notification, setNotification, clearNotification } =
-    useNotifications();
+    useNotifications()
 
-  setNotification("some notification", "primary");
-  clearNotification();
+  setNotification('some notification', 'primary')
+  clearNotification()
 
-  expect(notification.value).toEqual({});
-});
+  expect(notification.value).toEqual({})
+})

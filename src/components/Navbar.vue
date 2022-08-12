@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import Connect from "@/components/Connect.vue";
-import { ref } from "vue";
-import useDropdown from "@/compositions/useDropdown";
+import Connect from '@/components/Connect.vue'
+import { ref } from 'vue'
+import useDropdown from '@/compositions/useDropdown'
 
-const burger = ref();
-const menu = ref();
-const { toggle } = useDropdown();
+const burger = ref()
+const menu = ref()
+const { toggle } = useDropdown()
 </script>
 
 <template>
@@ -16,7 +16,7 @@ const { toggle } = useDropdown();
   >
     <div class="navbar-brand">
       <a class="navbar-item" href="https://lukso.network">
-        <img src="@/assets/lukso.png" height="28" />
+        <img src="/lukso.png" height="28" />
       </a>
 
       <a
@@ -27,8 +27,10 @@ const { toggle } = useDropdown();
         aria-expanded="false"
         data-target="navbar"
         @click="
-          toggle(burger);
-          toggle(menu);
+          () => {
+            toggle(burger)
+            toggle(menu)
+          }
         "
       >
         <span aria-hidden="true"></span>

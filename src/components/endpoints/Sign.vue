@@ -1,77 +1,77 @@
 <script setup lang="ts">
-import { getState } from "@/stores";
-import Notifications from "@/components/Notification.vue";
-import useNotifications from "@/compositions/useNotifications";
-import { ref } from "vue";
-import useWeb3 from "@/compositions/useWeb3";
-import { MAGICVALUE } from "@/helpers/config";
+import { getState } from '@/stores'
+import Notifications from '@/components/Notification.vue'
+import useNotifications from '@/compositions/useNotifications'
+import { ref } from 'vue'
+import useWeb3 from '@/compositions/useWeb3'
+import { MAGICVALUE } from '@/helpers/config'
 
 const { notification, clearNotification, hasNotification, setNotification } =
-  useNotifications();
-const { sign, recover, getWeb3 } = useWeb3();
+  useNotifications()
+const { sign, recover, getWeb3 } = useWeb3()
 
-const isPending = ref(false);
-const message = ref("sign message");
-const signResponse = ref();
-const recovery = ref<string>();
-const magicValue = ref<string>();
+const isPending = ref(false)
+const message = ref('sign message')
+const signResponse = ref()
+const recovery = ref<string>()
+const magicValue = ref<string>()
 
 const onSign = async () => {
   if (!message.value) {
-    return setNotification("Please provide message", "danger");
+    return setNotification('Please provide message', 'danger')
   }
 
-  const erc725AccountAddress = getState("address");
+  const erc725AccountAddress = getState('address')
 
   try {
-    isPending.value = true;
-    signResponse.value = await sign(message.value, erc725AccountAddress);
+    isPending.value = true
+    signResponse.value = await sign(message.value, erc725AccountAddress)
 
-    setNotification("Message signed successfully");
+    setNotification('Message signed successfully')
   } catch (error) {
-    setNotification((error as unknown as Error).message, "danger");
+    setNotification((error as unknown as Error).message, 'danger')
   } finally {
-    isPending.value = false;
+    isPending.value = false
   }
-};
+}
 
 const onRecover = async () => {
   try {
-    recovery.value = await recover(message.value, signResponse.value.signature);
+    recovery.value = await recover(message.value, signResponse.value.signature)
 
-    setNotification("Recover was successful");
+    setNotification('Recover was successful')
   } catch (error) {
-    setNotification((error as unknown as Error).message, "danger");
+    setNotification((error as unknown as Error).message, 'danger')
   }
-};
+}
 
 const onSignatureValidation = async () => {
-  const erc725AccountAddress = getState("address");
+  const erc725AccountAddress = getState('address')
 
   if (!erc725AccountAddress) {
-    return setNotification("No valid address", "danger");
+    return setNotification('No valid address', 'danger')
   }
 
   try {
-    const messageHash = getWeb3().eth.accounts.hashMessage(message.value);
+    const messageHash = getWeb3().eth.accounts.hashMessage(message.value)
     if (window.erc725Account) {
       // TODO: we should probably set the default gas price to undefined,
       // but it is not yet clear why view functions error on L16 when gasPrice is passed
-      window.erc725Account.options.gasPrice = void 0;
+      window.erc725Account.options.gasPrice = void 0
       magicValue.value = (await window.erc725Account.methods
         .isValidSignature(messageHash, signResponse.value.signature)
-        .call()) as string;
+        .call()) as string
     }
 
     if (magicValue.value === MAGICVALUE) {
-      setNotification(`Signature validated successfully`, "info");
+      setNotification(`Signature validated successfully`, 'info')
     } else {
-      setNotification("Response doesn't match magic value", "danger");
+      setNotification("Response doesn't match magic value", 'danger')
     }
   } catch (error) {
-    setNotification((error as unknown as Error).message, "danger");
+    setNotification((error as unknown as Error).message, 'danger')
   }
-};
+}
 </script>
 
 <template>

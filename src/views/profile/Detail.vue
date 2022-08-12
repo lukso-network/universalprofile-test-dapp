@@ -1,85 +1,85 @@
 <script setup lang="ts">
-import { DEFAULT_NETWORK_CONFIG } from "@/helpers/config";
-import { onMounted, ref, watch } from "vue";
-import useErc725 from "@/compositions/useErc725";
-import { useRoute, RouteLocationNormalizedLoaded, useRouter } from "vue-router";
-import { createIpfsLink } from "@/utils/createLinks";
-import useWeb3 from "@/compositions/useWeb3";
-import Notifications from "@/components/Notification.vue";
-import { LSP3ProfileJSON } from "@lukso/lsp-factory.js";
-import useNotifications from "@/compositions/useNotifications";
-const route = useRoute();
-const { isAddress } = useWeb3();
+import { DEFAULT_NETWORK_CONFIG } from '@/helpers/config'
+import { onMounted, ref, watch } from 'vue'
+import useErc725 from '@/compositions/useErc725'
+import { useRoute, RouteLocationNormalizedLoaded, useRouter } from 'vue-router'
+import { createIpfsLink } from '@/utils/createLinks'
+import useWeb3 from '@/compositions/useWeb3'
+import Notifications from '@/components/Notification.vue'
+import { LSP3ProfileJSON } from '@lukso/lsp-factory.js'
+import useNotifications from '@/compositions/useNotifications'
+const route = useRoute()
+const { isAddress } = useWeb3()
 const { notification, clearNotification, hasNotification, setNotification } =
-  useNotifications();
-const router = useRouter();
+  useNotifications()
+const router = useRouter()
 
-const routeData = ref<RouteLocationNormalizedLoaded>(route);
-const dataSource = ref("");
-const loading = ref(true);
-const profileData = ref<LSP3ProfileJSON>();
-const hash = ref(routeData.value.params.address);
+const routeData = ref<RouteLocationNormalizedLoaded>(route)
+const dataSource = ref('')
+const loading = ref(true)
+const profileData = ref<LSP3ProfileJSON>()
+const hash = ref(routeData.value.params.address)
 
-const { fetchProfile } = useErc725();
+const { fetchProfile } = useErc725()
 
 const fetchData = () => {
-  clearNotification();
-  loading.value = true;
-  const addressOrHash = routeData.value.params.address as string;
+  clearNotification()
+  loading.value = true
+  const addressOrHash = routeData.value.params.address as string
   if (isAddress(addressOrHash)) {
-    getProfileDataFromERC725Cache(addressOrHash);
+    getProfileDataFromERC725Cache(addressOrHash)
   } else {
-    getProfileDataFromIPFS(addressOrHash);
+    getProfileDataFromIPFS(addressOrHash)
   }
-};
+}
 
 const getProfileDataFromERC725Cache = async (fetchedAddress: string) => {
   try {
-    const result = await fetchProfile(fetchedAddress);
-    if (routeData.value.params.address !== fetchedAddress) return;
-    dataSource.value = "ERC725-Cache";
+    const result = await fetchProfile(fetchedAddress)
+    if (routeData.value.params.address !== fetchedAddress) return
+    dataSource.value = 'ERC725-Cache'
     //@ts-ignore
-    profileData.value = result;
+    profileData.value = result
   } catch (err: unknown) {
-    setNotification((err as Error).message, "danger");
-    profileData.value = undefined;
+    setNotification((err as Error).message, 'danger')
+    profileData.value = undefined
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 
 const getProfileDataFromIPFS = async (ipfsHash: string) => {
   if (!ipfsHash) {
-    return false;
+    return false
   }
   try {
-    const result = await fetch(DEFAULT_NETWORK_CONFIG.ipfs.url + ipfsHash);
-    dataSource.value = "IPFS";
-    profileData.value = await result.json();
+    const result = await fetch(DEFAULT_NETWORK_CONFIG.ipfs.url + ipfsHash)
+    dataSource.value = 'IPFS'
+    profileData.value = await result.json()
   } catch (err: unknown) {
-    setNotification((err as Error).message, "danger");
-    profileData.value = undefined;
+    setNotification((err as Error).message, 'danger')
+    profileData.value = undefined
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 
 const searchAddress = () => {
   if (!hash.value) {
-    loading.value = false;
-    return setNotification("Please enter valid hash or address", "danger");
+    loading.value = false
+    return setNotification('Please enter valid hash or address', 'danger')
   }
-  router.push(`/profiles/${hash.value}`);
-};
+  router.push(`/profiles/${hash.value}`)
+}
 
 onMounted(async () => {
   // fetch the data when the view is created and the data is
   // already being observed
-  fetchData();
-});
+  fetchData()
+})
 
 // call fetchData again the method if the route changes
-watch(routeData.value, fetchData);
+watch(routeData.value, fetchData)
 </script>
 <template name="Detail">
   <section class="section">
@@ -121,7 +121,7 @@ watch(routeData.value, fetchData);
       </div>
     </div>
     <h1 v-if="!loading && profileData" class="title">
-      {{ dataSource ? dataSource : "" }}: {{ route.params.address }}
+      {{ dataSource ? dataSource : '' }}: {{ route.params.address }}
     </h1>
     <div v-if="loading">Loading...</div>
     <table
