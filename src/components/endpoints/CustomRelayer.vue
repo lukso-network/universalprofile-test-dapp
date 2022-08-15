@@ -9,7 +9,6 @@ const { notification, clearNotification, hasNotification, setNotification } =
 
 const name = ref("");
 const apiUrl = ref("");
-const chainId = ref(getState("chainId"));
 
 const addCustomRelayer = async () => {
   if (!name.value) {
@@ -24,7 +23,11 @@ const addCustomRelayer = async () => {
     await window.ethereum.request({
       method: "up_addRelayService",
       params: [
-        { name: name.value, apiUrl: apiUrl.value, chainIds: [chainId.value] },
+        {
+          name: name.value,
+          apiUrl: apiUrl.value,
+          chainIds: [getState("chainId")],
+        },
       ],
     });
     setNotification("The relayer was added");
@@ -40,25 +43,29 @@ const addCustomRelayer = async () => {
       <div class="field">
         <label class="label">Name</label>
         <div class="control">
-          <input v-model="name" class="input" type="text" />
+          <input
+            v-model="name"
+            class="input"
+            type="text"
+            data-testid="relayer-name"
+          />
         </div>
       </div>
       <div class="field">
         <label class="label">API URL</label>
         <div class="control">
-          <input v-model="apiUrl" class="input" type="text" />
-        </div>
-      </div>
-      <div class="field">
-        <label class="label">Chain ID</label>
-        <div class="control">
-          <input v-model="chainId" class="input" />
+          <input
+            v-model="apiUrl"
+            class="input"
+            type="text"
+            data-testid="relayer-url"
+          />
         </div>
       </div>
       <div class="field">
         <button
           :class="`button is-primary is-rounded mt-4`"
-          data-testid="send"
+          data-testid="add-relayer"
           @click.stop="addCustomRelayer"
         >
           Create Custom Relayer
