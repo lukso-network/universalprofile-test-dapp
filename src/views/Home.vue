@@ -8,6 +8,7 @@ import Sign from "@/components/endpoints/Sign.vue";
 import CustomRelayer from "@/components/endpoints/CustomRelayer.vue";
 import Notifications from "@/components/Notification.vue";
 import { computed } from "vue";
+import ImportProfile from "@/components/endpoints/ImportProfile.vue";
 
 const hasExtension = computed(() => {
   return window.ethereum;
@@ -37,6 +38,7 @@ const hasExtension = computed(() => {
     </div>
     <div class="tile is-ancestor">
       <CustomRelayer />
+      <ImportProfile />
     </div>
   </section>
 </template>
