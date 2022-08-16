@@ -1,0 +1,38 @@
+name: Lint, Build and Test
+
+on:
+  pull_request:
+
+jobs:
+  lint-build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🛎️ Checkout
+        uses: actions/checkout@v3
+
+      - name: 🎛 Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.14
+          cache: 'npm'
+
+      - name: ⚙️ Install
+        run: npm ci
+
+      - name: 🎨 Lint JS
+        run: npm run lint:js
+
+      - name: 🎨 Lint CSS
+        run: npm run lint:css
+
+      - name: 🎨 Lint Format
+        run: npm run lint:format
+
+      - name: 🎨 Lint Types
+        run: npm run lint:types
+
+      - name: 🛠 Build
+        run: npm run build
+
+      - name: 🎯 Test
+        run: npm run test:unit
