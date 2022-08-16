@@ -1,11 +1,10 @@
 import CustomRelayer from "../CustomRelayer.vue";
 import { render, fireEvent, screen } from "@testing-library/vue";
-import { getState } from "@/stores";
 
 const data = {
   name: "my test relayer",
   apiUrl: "https://relayer.l16.staging.lukso.dev/api/v3/",
-  chainIds: [getState("chainId")],
+  chainIds: [2828],
 };
 
 window.ethereum = {
@@ -24,6 +23,8 @@ test("can add relayer", async () => {
   await fireEvent.update(screen.getByTestId("relayer-name"), data.name);
   await fireEvent.update(screen.getByTestId("relayer-url"), data.apiUrl);
   await fireEvent.click(screen.getByTestId("add-relayer"));
+
+  expect(screen.getByTestId("chain-id-list")).toHaveTextContent(/2828/);
 
   expect(windowSpy).toHaveBeenCalledWith({
     method: "up_addRelayService",
