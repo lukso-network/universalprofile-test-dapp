@@ -1,39 +1,39 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { getAndPrepareAllIpfsItems } from "@/helpers/localstorage";
-import fileSize from "filesize";
-import { NETWORKS } from "@/helpers/config";
-import Notifications from "@/components/Notification.vue";
-import useNotifications from "@/compositions/useNotifications";
-import { useLspFactory } from "@/compositions/useLspFactory";
+import { ref, computed } from 'vue'
+import { getAndPrepareAllIpfsItems } from '@/helpers/localstorage'
+import fileSize from 'filesize'
+import { NETWORKS } from '@/helpers/config'
+import Notifications from '@/components/Notification.vue'
+import useNotifications from '@/compositions/useNotifications'
+import { useLspFactory } from '@/compositions/useLspFactory'
 
 const { notification, clearNotification, hasNotification, setNotification } =
-  useNotifications();
+  useNotifications()
 
 type ProfileLinks = {
-  title: string;
-  url: string;
-};
+  title: string
+  url: string
+}
 
-const isUploading = ref(false);
-const showError = ref(false);
-const profileImage = ref<File>();
-const profileImageUrl = ref("");
-const backgroundImage = ref<File>();
-const backgroundImageUrl = ref("");
-const name = ref("");
-const description = ref("");
-const links = ref<ProfileLinks[]>([]);
-const tags = ref<string[]>([]);
-const uploadTarget = ref(NETWORKS.l16.ipfs.url);
-const uploadResult = ref();
-const uploadedProfiles = ref(getAndPrepareAllIpfsItems());
+const isUploading = ref(false)
+const showError = ref(false)
+const profileImage = ref<File>()
+const profileImageUrl = ref('')
+const backgroundImage = ref<File>()
+const backgroundImageUrl = ref('')
+const name = ref('')
+const description = ref('')
+const links = ref<ProfileLinks[]>([])
+const tags = ref<string[]>([])
+const uploadTarget = ref(NETWORKS.l16.ipfs.url)
+const uploadResult = ref()
+const uploadedProfiles = ref(getAndPrepareAllIpfsItems())
 
-const { uploadUniversalProfileMetaData } = useLspFactory();
+const { uploadUniversalProfileMetaData } = useLspFactory()
 
 const upload = async () => {
-  clearNotification();
-  isUploading.value = true;
+  clearNotification()
+  isUploading.value = true
 
   try {
     uploadResult.value = await uploadUniversalProfileMetaData({
@@ -43,103 +43,103 @@ const upload = async () => {
       description: description.value,
       links: links.value,
       tags: tags.value,
-    });
+    })
 
-    isUploading.value = false;
-    name.value = "";
-    description.value = "";
+    isUploading.value = false
+    name.value = ''
+    description.value = ''
     localStorage.setItem(
       uploadResult.value?.url,
       JSON.stringify(uploadResult.value)
-    );
-    uploadedProfiles.value = getAndPrepareAllIpfsItems();
+    )
+    uploadedProfiles.value = getAndPrepareAllIpfsItems()
 
-    const href = uploadResult.value?.url.replace("ipfs://", "");
-    const url = `${uploadResult.value?.url}`;
+    const href = uploadResult.value?.url.replace('ipfs://', '')
+    const url = `${uploadResult.value?.url}`
     setNotification(
       `Profile uploaded successfully<br/><a href=${
-        "/profiles/" + href
+        '/profiles/' + href
       } target="_blank">${url}</a>`,
-      "primary"
-    );
+      'primary'
+    )
   } catch (error) {
-    showError.value = true;
-    isUploading.value = false;
-    setNotification("Profile upload failed", "danger");
+    showError.value = true
+    isUploading.value = false
+    setNotification('Profile upload failed', 'danger')
   }
-};
+}
 
 const deleteUploadedProfile = (url: string) => {
-  if (window.confirm("Are you sure you want to delete this profile?")) {
-    const formattedUrl = url.replace(uploadTarget.value, "ipfs://");
-    localStorage.removeItem(formattedUrl);
-    uploadedProfiles.value = getAndPrepareAllIpfsItems();
-    setNotification("Profile removed successfully", "primary");
+  if (window.confirm('Are you sure you want to delete this profile?')) {
+    const formattedUrl = url.replace(uploadTarget.value, 'ipfs://')
+    localStorage.removeItem(formattedUrl)
+    uploadedProfiles.value = getAndPrepareAllIpfsItems()
+    setNotification('Profile removed successfully', 'primary')
   }
-};
+}
 
 const handleProfileImage = (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  profileImage.value = (target.files as FileList)[0];
-  profileImageUrl.value = URL.createObjectURL(profileImage.value);
-};
+  const target = event.target as HTMLInputElement
+  profileImage.value = (target.files as FileList)[0]
+  profileImageUrl.value = URL.createObjectURL(profileImage.value)
+}
 
 const handleBackgroundImage = (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  backgroundImage.value = (target.files as FileList)[0];
-  backgroundImageUrl.value = URL.createObjectURL(backgroundImage.value);
-};
+  const target = event.target as HTMLInputElement
+  backgroundImage.value = (target.files as FileList)[0]
+  backgroundImageUrl.value = URL.createObjectURL(backgroundImage.value)
+}
 
 const addNewLink = () => {
   links.value.push({
-    title: "",
-    url: "",
-  });
-};
+    title: '',
+    url: '',
+  })
+}
 
 const addNewTag = () => {
-  tags.value.push("");
-};
+  tags.value.push('')
+}
 
 const removeLink = (index: number) => {
-  links.value.splice(index, 1);
-};
+  links.value.splice(index, 1)
+}
 
 const removeTag = (index: number) => {
-  tags.value.splice(index, 1);
-};
+  tags.value.splice(index, 1)
+}
 
 const getFileSize = (file: File) => {
   if (file.size) {
-    return fileSize(file.size);
+    return fileSize(file.size)
   }
-};
+}
 
 const profileImageSize = computed(() => {
   if (profileImage.value) {
-    return getFileSize(profileImage.value);
+    return getFileSize(profileImage.value)
   } else {
-    return "";
+    return ''
   }
-});
+})
 
 const backgroundImageSize = computed(() => {
   if (backgroundImage.value) {
-    return getFileSize(backgroundImage.value);
+    return getFileSize(backgroundImage.value)
   } else {
-    return "";
+    return ''
   }
-});
+})
 
 const removeProfileImage = () => {
-  profileImage.value = {} as File;
-  profileImageUrl.value = "";
-};
+  profileImage.value = {} as File
+  profileImageUrl.value = ''
+}
 
 const removeBackgroundImage = () => {
-  backgroundImage.value = {} as File;
-  backgroundImageUrl.value = "";
-};
+  backgroundImage.value = {} as File
+  backgroundImageUrl.value = ''
+}
 </script>
 
 <template>
@@ -383,10 +383,7 @@ const removeBackgroundImage = () => {
           <h2 class="title is-size-4">Previously Uploaded Profiles</h2>
           <div class="table-container">
             <table
-              class="
-                table
-                is-bordered is-striped is-narrow is-hoverable is-fullwidth
-              "
+              class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
             >
               <tr>
                 <th>Identifier</th>
@@ -404,7 +401,7 @@ const removeBackgroundImage = () => {
                       ''
                     )}`"
                   >
-                    {{ uploadedProfile.url.replace(uploadTarget, "") }}
+                    {{ uploadedProfile.url.replace(uploadTarget, '') }}
                   </router-link>
                 </td>
                 <td>
@@ -524,13 +521,14 @@ section.images {
 
 section {
   overflow: hidden;
-  padding: 0px 20px;
+  padding: 0 20px;
 }
 
 .upload-form {
   padding: 20px;
   margin-bottom: 20px;
 }
+
 .pre {
   max-height: 200px;
   overflow-y: scroll;

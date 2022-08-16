@@ -1,12 +1,12 @@
 <script lang="ts">
-import Deployment from "@/components/deployment/Deployment.vue";
+import Deployment from '@/components/deployment/Deployment.vue'
 
 export default {
-  name: "Deployment",
+  name: 'Deployment',
   components: {
     Deployment,
   },
-};
+}
 </script>
 
 <template>

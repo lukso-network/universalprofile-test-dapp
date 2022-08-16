@@ -1,50 +1,51 @@
 <script setup lang="ts">
-import parseLspStringToJson from "@/utils/parseLspStringToJson";
-import { LSP3ProfileJSON } from "@lukso/lsp-factory.js";
-import { ref } from "vue";
-import { useRouter } from "vue-router";
+// @ts-nocheck
+import parseLspStringToJson from '@/utils/parseLspStringToJson'
+import { LSP3ProfileJSON } from '@lukso/lsp-factory.js'
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 type UploadedProfileType<T extends string | LSP3ProfileJSON> = {
-  url: string;
-  profile: T;
-};
+  url: string
+  profile: T
+}
 
 type Props = {
-  loading: boolean;
-  getIdFromProfileUrl: (url: UploadedProfileType<string>) => string;
-  uploadedProfiles: UploadedProfileType<string>[];
-};
+  loading: boolean
+  getIdFromProfileUrl: (url: UploadedProfileType<string>) => string
+  uploadedProfiles: UploadedProfileType<string>[]
+}
 
 type Emits = {
   (
-    event: "createProfileOnChain",
+    event: 'createProfileOnChain',
     uploadedProfile: UploadedProfileType<LSP3ProfileJSON>
-  ): void;
-  (event: "setNotification", message: string, type: string): void;
-  (event: "deleteUploadedProfile", url: string): void;
-};
+  ): void
+  (event: 'setNotification', message: string, type: string): void
+  (event: 'deleteUploadedProfile', url: string): void
+}
 
-defineProps<Props>();
+defineProps<Props>()
 
-const currentUploadedProfileUrl = ref("");
+const currentUploadedProfileUrl = ref('')
 
-const emits = defineEmits<Emits>();
+const emits = defineEmits<Emits>()
 
-const router = useRouter();
+const router = useRouter()
 
 const createProfileOnChain = (
   uploadedProfile: UploadedProfileType<LSP3ProfileJSON>
 ) => {
-  currentUploadedProfileUrl.value = uploadedProfile.url;
-  emits("createProfileOnChain", uploadedProfile);
-};
+  currentUploadedProfileUrl.value = uploadedProfile.url
+  emits('createProfileOnChain', uploadedProfile)
+}
 
 const deleteUploadedProfile = (url: string) => {
-  if (window.confirm("Are you sure you want to delete this profile?")) {
-    emits("deleteUploadedProfile", url);
-    emits("setNotification", "Profile deleted from IPFS", "success");
+  if (window.confirm('Are you sure you want to delete this profile?')) {
+    emits('deleteUploadedProfile', url)
+    emits('setNotification', 'Profile deleted from IPFS', 'success')
   }
-};
+}
 </script>
 
 <template v-if="uploadedProfiles.length > 0">

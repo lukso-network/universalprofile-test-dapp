@@ -1,28 +1,28 @@
 <script setup lang="ts">
 type Props = {
-  isModalOpen: boolean;
-  controllerKey: string;
-};
+  isModalOpen: boolean
+  controllerKey: string
+}
 type Emits = {
-  (event: "closeModal"): void;
-  (event: "deploy", controllerKey: string): void;
-  (event: "update:modelValue", value: string): void;
-};
+  (event: 'closeModal'): void
+  (event: 'deploy', controllerKey: string): void
+  (event: 'update:modelValue', value: string): void
+}
 
-const props = defineProps<Props>();
-const emits = defineEmits<Emits>();
+const props = defineProps<Props>()
+const emits = defineEmits<Emits>()
 const handleCloseModal = () => {
-  emits("closeModal");
-};
+  emits('closeModal')
+}
 const handleDeploy = () => {
-  const controllerKey = props.controllerKey;
-  emits("deploy", controllerKey);
-};
+  const controllerKey = props.controllerKey
+  emits('deploy', controllerKey)
+}
 
 const handleInput = (event: Event) => {
-  const value = (event.target as HTMLInputElement).value;
-  emits("update:modelValue", value);
-};
+  const value = (event.target as HTMLInputElement).value
+  emits('update:modelValue', value)
+}
 </script>
 
 <template>

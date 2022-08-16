@@ -1,25 +1,25 @@
 <script setup lang="ts">
-import { getState } from "@/stores";
-import Notifications from "@/components/Notification.vue";
-import useNotifications from "@/compositions/useNotifications";
+import { getState } from '@/stores'
+import Notifications from '@/components/Notification.vue'
+import useNotifications from '@/compositions/useNotifications'
 import {
   ERC725YKeys,
   ALL_PERMISSIONS,
   PERMISSIONS,
-} from "@lukso/lsp-smart-contracts/constants";
-import { computed, ref } from "vue";
-import useErc725 from "@/compositions/useErc725";
-import { sliceAddress } from "@/utils/sliceAddress";
-import { hexToBytes } from "@/utils/hexToBytes";
-import Web3Utils, { hexToNumber, numberToHex, padLeft } from "web3-utils";
-import type { Permissions } from "@erc725/erc725.js/build/main/src/types/Method";
+  // @ts-ignore
+} from '@lukso/lsp-smart-contracts/constants.js'
+
+import { computed, ref } from 'vue'
+import useErc725 from '@/compositions/useErc725'
+import { sliceAddress } from '@/utils/sliceAddress'
+import { hexToBytes } from '@/utils/hexToBytes'
+import Web3Utils, { hexToNumber, numberToHex, padLeft } from 'web3-utils'
+import type { Permissions } from '@erc725/erc725.js/build/main/src/types/Method'
 
 const { notification, clearNotification, hasNotification, setNotification } =
-  useNotifications();
-const { encodePermissions, decodePermissions } = useErc725();
-const grantPermissionAddress = ref(
-  "0xaf3bf2ffb025098b79caddfbdd113b3681817744"
-);
+  useNotifications()
+const { encodePermissions, decodePermissions } = useErc725()
+const grantPermissionAddress = ref('0xaf3bf2ffb025098b79caddfbdd113b3681817744')
 const permissions: Permissions = {
   CHANGEOWNER: false,
   CHANGEPERMISSIONS: false,
@@ -36,72 +36,72 @@ const permissions: Permissions = {
   SUPER_CALL: false,
   SUPER_STATICCALL: false,
   SUPER_DELEGATECALL: false,
-};
-const selectedPermissions = ref(permissions);
-const isPending = ref(false);
+}
+const selectedPermissions = ref(permissions)
+const isPending = ref(false)
 const ALL_PERMISSIONS_WITH_DELEGATECALL = padLeft(
   numberToHex(
     hexToNumber(ALL_PERMISSIONS) + hexToNumber(PERMISSIONS.DELEGATECALL)
   ),
   64
-);
+)
 
 const setPermissions = async () => {
-  const erc725AccountAddress = getState("address");
+  const erc725AccountAddress = getState('address')
 
   if (!erc725AccountAddress) {
-    return setNotification("No valid address", "danger");
+    return setNotification('No valid address', 'danger')
   }
 
   if (!grantPermissionAddress.value) {
-    return setNotification("Enter address", "danger");
+    return setNotification('Enter address', 'danger')
   }
 
   const key =
-    ERC725YKeys["LSP6"]["AddressPermissions:Permissions"] +
-    grantPermissionAddress.value.slice(2);
-  const value = encodePermissions(selectedPermissions.value);
+    ERC725YKeys['LSP6']['AddressPermissions:Permissions'] +
+    grantPermissionAddress.value.slice(2)
+  const value = encodePermissions(selectedPermissions.value)
 
   try {
-    isPending.value = true;
+    isPending.value = true
     window.erc725Account &&
       (await window.erc725Account.methods
         .setData([key], [value])
         .send({
           from: erc725AccountAddress,
         })
-        .on("receipt", function (receipt: any) {
-          console.log(receipt);
+        .on('receipt', function (receipt: any) {
+          console.log(receipt)
         })
-        .once("sending", (payload: any) => {
-          console.log(JSON.stringify(payload, null, 2));
-        }));
+        .once('sending', (payload: any) => {
+          console.log(JSON.stringify(payload, null, 2))
+        }))
 
-    setNotification("Permissions set", "info");
+    setNotification('Permissions set', 'info')
   } catch (error) {
-    setNotification((error as unknown as Error).message, "danger");
+    setNotification((error as unknown as Error).message, 'danger')
   } finally {
-    isPending.value = false;
+    isPending.value = false
   }
-};
+}
 
 const allPermissionsToggle = () => {
   if (allPermissionsSelected.value) {
-    selectedPermissions.value = decodePermissions(padLeft(numberToHex(0), 64));
+    selectedPermissions.value = decodePermissions(padLeft(numberToHex(0), 64))
   } else {
     selectedPermissions.value = decodePermissions(
       ALL_PERMISSIONS_WITH_DELEGATECALL
-    );
+    )
   }
-  console.log();
-};
+  console.log()
+}
 
 const allPermissionsSelected = computed(() => {
   return (
     encodePermissions(selectedPermissions.value) ===
     ALL_PERMISSIONS_WITH_DELEGATECALL
-  );
-});
+  )
+})
 </script>
 
 <template>

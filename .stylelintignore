@@ -1,3 +1,4 @@
 **/*.min.css
 **/dist/
 **/node_modules/
+**/coverage/

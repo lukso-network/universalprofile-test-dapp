@@ -1,8 +1,8 @@
-import versions from "./../../versions.json";
+import versions from './../../versions.json'
 
 export function getDeployedBaseContracts(networkId: number): NetworkInfo {
-  const masterContractVersions = JSON.parse(JSON.stringify(versions));
-  return masterContractVersions[networkId];
+  const masterContractVersions = JSON.parse(JSON.stringify(versions))
+  return masterContractVersions[networkId]
 }
 
 // prettier-ignore

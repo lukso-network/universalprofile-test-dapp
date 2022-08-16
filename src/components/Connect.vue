@@ -1,116 +1,116 @@
 <script setup lang="ts">
-import { getState, useState } from "@/stores";
-import { ref, onMounted, onUnmounted } from "vue";
-import { EthereumProviderError } from "eth-rpc-errors";
-import useDropdown from "@/compositions/useDropdown";
-import useWeb3 from "@/compositions/useWeb3";
+import { getState, useState } from '@/stores'
+import { ref, onMounted, onUnmounted } from 'vue'
+import { EthereumProviderError } from 'eth-rpc-errors'
+import useDropdown from '@/compositions/useDropdown'
+import useWeb3 from '@/compositions/useWeb3'
 import useWalletConnect, {
   WALLET_CONNECT_VERSION as walletConnectVersion,
-} from "@/compositions/useWalletConnect";
-import { UP_CONNECTED_ADDRESS } from "@/helpers/config";
-import { sliceAddress } from "@/utils/sliceAddress";
+} from '@/compositions/useWalletConnect'
+import { UP_CONNECTED_ADDRESS } from '@/helpers/config'
+import { sliceAddress } from '@/utils/sliceAddress'
 
-const { setupWeb3, accounts, requestAccounts } = useWeb3();
+const { setupWeb3, accounts, requestAccounts } = useWeb3()
 const { resetProvider, setupProvider, enableProvider, getProvider } =
-  useWalletConnect();
-const { setDisconnected, setConnected } = useState();
-const { close, toggle } = useDropdown();
-const dropdown = ref();
-const browserExtensionConnected = localStorage.getItem(UP_CONNECTED_ADDRESS);
-const hasExtension = !!window.ethereum;
+  useWalletConnect()
+const { setDisconnected, setConnected } = useState()
+const { close, toggle } = useDropdown()
+const dropdown = ref()
+const browserExtensionConnected = localStorage.getItem(UP_CONNECTED_ADDRESS)
+const hasExtension = !!window.ethereum
 
 const connectWalletConnect = async () => {
-  close(dropdown.value);
-  await setupProvider();
-  await enableProvider();
-};
+  close(dropdown.value)
+  await setupProvider()
+  await enableProvider()
+}
 
 const connectExtension = async () => {
   try {
-    close(dropdown.value);
-    setupWeb3(window.ethereum);
-    let address = await accounts();
+    close(dropdown.value)
+    setupWeb3(window.ethereum)
+    let address = await accounts()
 
     if (!address) {
-      [address] = await requestAccounts();
+      ;[address] = await requestAccounts()
     }
 
-    setConnected(address, "browserExtension");
-    localStorage.setItem(UP_CONNECTED_ADDRESS, address);
-    close(dropdown.value);
+    setConnected(address, 'browserExtension')
+    localStorage.setItem(UP_CONNECTED_ADDRESS, address)
+    close(dropdown.value)
   } catch (error) {
-    const epError = error as EthereumProviderError<Error>;
+    const epError = error as EthereumProviderError<Error>
 
     if (epError.code === 4100) {
-      const address = (await requestAccounts())[0];
-      setConnected(address, "browserExtension");
-      localStorage.setItem(UP_CONNECTED_ADDRESS, address);
+      const address = (await requestAccounts())[0]
+      setConnected(address, 'browserExtension')
+      localStorage.setItem(UP_CONNECTED_ADDRESS, address)
     }
   }
-};
+}
 
 const disconnect = async () => {
-  if (getState("channel") == "walletConnect") {
-    await resetProvider();
+  if (getState('channel') == 'walletConnect') {
+    await resetProvider()
   } else {
-    localStorage.removeItem(UP_CONNECTED_ADDRESS);
+    localStorage.removeItem(UP_CONNECTED_ADDRESS)
   }
 
-  setDisconnected();
-  setupWeb3(null);
-};
+  setDisconnected()
+  setupWeb3(null)
+}
 
 const handleAccountsChanged = (accounts: string[]) => {
-  console.log("Account changed", accounts);
+  console.log('Account changed', accounts)
 
-  if (accounts.length === 0 && getState("isConnected")) {
-    disconnect();
+  if (accounts.length === 0 && getState('isConnected')) {
+    disconnect()
   }
-};
+}
 
 const handleChainChanged = (chainId: string) => {
-  console.log("Chain changed", chainId);
+  console.log('Chain changed', chainId)
 
-  window.location.reload();
-};
+  window.location.reload()
+}
 
 const handleConnect = () => {
-  console.log("Connected");
-};
+  console.log('Connected')
+}
 
 const handleDisconnect = () => {
-  console.log("Disconnected");
-};
+  console.log('Disconnected')
+}
 
 const addEventListeners = () => {
-  window.ethereum?.on("accountsChanged", handleAccountsChanged);
-  window.ethereum?.on("chainChanged", handleChainChanged);
-  window.ethereum?.on("connect", handleConnect);
-  window.ethereum?.on("disconnect", handleDisconnect);
-};
+  window.ethereum?.on('accountsChanged', handleAccountsChanged)
+  window.ethereum?.on('chainChanged', handleChainChanged)
+  window.ethereum?.on('connect', handleConnect)
+  window.ethereum?.on('disconnect', handleDisconnect)
+}
 
 const removeEventListeners = () => {
-  window.ethereum?.removeListener("accountsChanged", handleAccountsChanged);
-  window.ethereum?.removeListener("chainChanged", handleChainChanged);
-  window.ethereum?.removeListener("connect", handleConnect);
-  window.ethereum?.removeListener("disconnect", handleDisconnect);
-};
+  window.ethereum?.removeListener('accountsChanged', handleAccountsChanged)
+  window.ethereum?.removeListener('chainChanged', handleChainChanged)
+  window.ethereum?.removeListener('connect', handleConnect)
+  window.ethereum?.removeListener('disconnect', handleDisconnect)
+}
 
 onMounted(async () => {
-  await setupProvider();
+  await setupProvider()
 
   if (getProvider().wc.connected) {
-    await enableProvider();
+    await enableProvider()
   } else if (browserExtensionConnected) {
-    await connectExtension();
+    await connectExtension()
   }
 
-  addEventListeners();
-});
+  addEventListeners()
+})
 
 onUnmounted(() => {
-  removeEventListeners();
-});
+  removeEventListeners()
+})
 </script>
 
 <template>
@@ -120,7 +120,7 @@ onUnmounted(() => {
         class="button is-static is-small is-rounded"
         data-testid="balance"
       >
-        <span>{{ getState("balance") }} LYX</span>
+        <span>{{ getState('balance') }} LYX</span>
       </button>
     </p>
     <p class="control">
@@ -135,7 +135,7 @@ onUnmounted(() => {
               : 'wallet-connect'
           }`"
         />
-        <span>{{ sliceAddress(getState("address")) }}</span>
+        <span>{{ sliceAddress(getState('address')) }}</span>
       </button>
     </p>
     <p class="control">
@@ -200,11 +200,11 @@ onUnmounted(() => {
   top: 3px;
 
   &.wallet-connect {
-    background-image: url("~@/assets/walletconnect-logo.svg");
+    background-image: url('/walletconnect-logo.svg');
   }
 
   &.browser-extension {
-    background-image: url("~@/assets/lukso.png");
+    background-image: url('/lukso.png');
   }
 }
 

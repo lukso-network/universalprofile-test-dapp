@@ -1,67 +1,67 @@
 <script setup lang="ts">
-import Notifications from "@/components/Notification.vue";
-import useNotifications from "@/compositions/useNotifications";
+import Notifications from '@/components/Notification.vue'
+import useNotifications from '@/compositions/useNotifications'
 import useWalletConnect, {
   WALLET_CONNECT_VERSION as walletConnectVersion,
-} from "@/compositions/useWalletConnect";
-import { getState, useState } from "@/stores";
-import useWeb3 from "@/compositions/useWeb3";
-import { UP_CONNECTED_ADDRESS } from "@/helpers/config";
-import { createBlockScoutLink } from "@/utils/createLinks";
-import Web3Utils from "web3-utils";
-import { computed } from "vue";
+} from '@/compositions/useWalletConnect'
+import { getState, useState } from '@/stores'
+import useWeb3 from '@/compositions/useWeb3'
+import { UP_CONNECTED_ADDRESS } from '@/helpers/config'
+import { createBlockScoutLink } from '@/utils/createLinks'
+import Web3Utils from 'web3-utils'
+import { computed } from 'vue'
 
 const { notification, clearNotification, hasNotification, setNotification } =
-  useNotifications();
-const { setDisconnected, setConnected } = useState();
-const { setupWeb3, requestAccounts } = useWeb3();
-const { resetProvider, enableProvider, setupProvider } = useWalletConnect();
-const hasExtension = !!window.ethereum;
+  useNotifications()
+const { setDisconnected, setConnected } = useState()
+const { setupWeb3, requestAccounts } = useWeb3()
+const { resetProvider, enableProvider, setupProvider } = useWalletConnect()
+const hasExtension = !!window.ethereum
 
 const hexChainId = computed(() => {
-  return Web3Utils.numberToHex(getState("chainId"));
-});
+  return Web3Utils.numberToHex(getState('chainId'))
+})
 
 const connectExtension = async () => {
-  clearNotification();
-  setupWeb3(window.ethereum);
+  clearNotification()
+  setupWeb3(window.ethereum)
 
   try {
-    const [address] = await requestAccounts();
-    setConnected(address, "browserExtension");
-    localStorage.setItem(UP_CONNECTED_ADDRESS, address);
+    const [address] = await requestAccounts()
+    setConnected(address, 'browserExtension')
+    localStorage.setItem(UP_CONNECTED_ADDRESS, address)
   } catch (error) {
-    setNotification((error as unknown as Error).message, "danger");
+    setNotification((error as unknown as Error).message, 'danger')
   }
-};
+}
 
 const connectWalletconnect = async () => {
-  clearNotification();
+  clearNotification()
 
   try {
-    await setupProvider();
-    await enableProvider();
-    setConnected(getState("address"), "walletConnect");
-    setNotification(`Connected to address: ${getState("address")}`, "info");
+    await setupProvider()
+    await enableProvider()
+    setConnected(getState('address'), 'walletConnect')
+    setNotification(`Connected to address: ${getState('address')}`, 'info')
   } catch (error) {
-    setNotification((error as unknown as Error).message, "danger");
+    setNotification((error as unknown as Error).message, 'danger')
   }
-};
+}
 
 const disconnect = async () => {
-  clearNotification();
+  clearNotification()
 
-  if (getState("channel") == "walletConnect") {
-    await resetProvider();
+  if (getState('channel') == 'walletConnect') {
+    await resetProvider()
   } else {
-    localStorage.removeItem(UP_CONNECTED_ADDRESS);
+    localStorage.removeItem(UP_CONNECTED_ADDRESS)
   }
 
-  setNotification(`Disconnected ${getState("channel")} channel`, "info");
+  setNotification(`Disconnected ${getState('channel')} channel`, 'info')
 
-  setDisconnected();
-  setupWeb3(null);
-};
+  setDisconnected()
+  setupWeb3(null)
+}
 </script>
 
 <template>
@@ -136,15 +136,15 @@ const disconnect = async () => {
               ><a
                 :href="createBlockScoutLink(getState('address'))"
                 target="_blank"
-                >{{ getState("address") }}</a
+                >{{ getState('address') }}</a
               ></b
             >
           </p>
           <p class="mb-3">
-            Balance: <b>{{ getState("balance") }} LYX</b>
+            Balance: <b>{{ getState('balance') }} LYX</b>
           </p>
           <p data-testid="chain">
-            Chain ID: <b>{{ getState("chainId") }} ({{ hexChainId }})</b>
+            Chain ID: <b>{{ getState('chainId') }} ({{ hexChainId }})</b>
           </p>
         </div>
       </div>

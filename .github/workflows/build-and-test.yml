@@ -6,14 +6,14 @@ name: Build and Test
 on:
   push:
     branches:
-      - "*"
+      - '*'
   pull_request:
     branches:
-      - "*"
+      - '*'
 
 env:
   cache_version: v1
-  node-version: 16.14.0
+  node-version: 16.16.0
 
 jobs:
   dependencies:

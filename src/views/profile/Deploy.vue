@@ -1,36 +1,37 @@
 <script setup lang="ts">
-import Notifications from "@/components/Notification.vue";
-import ProfileListIpfs from "@/components/profile/profile-list-ipfs/ProfileListIpfs.vue";
-import { ref } from "vue";
-import useNotifications from "@/compositions/useNotifications";
-import { NETWORKS } from "@/helpers/config";
-import { useLspFactory } from "@/compositions/useLspFactory";
-import ProfileModal from "@/components/modals/ProfileModal.vue";
-import { createBlockScoutLink } from "@/utils/createLinks";
-import { formatNumber } from "@/helpers/ethers";
+// @ts-nocheck
+import Notifications from '@/components/Notification.vue'
+import ProfileListIpfs from '@/components/profile/profile-list-ipfs/ProfileListIpfs.vue'
+import { ref } from 'vue'
+import useNotifications from '@/compositions/useNotifications'
+import { NETWORKS } from '@/helpers/config'
+import { useLspFactory } from '@/compositions/useLspFactory'
+import ProfileModal from '@/components/modals/ProfileModal.vue'
+import { createBlockScoutLink } from '@/utils/createLinks'
+import { formatNumber } from '@/helpers/ethers'
 import {
   LSP3ProfileJSON,
   DeploymentEvent,
   DeploymentStatus,
   DeploymentType,
-} from "@lukso/lsp-factory.js";
-import { getAndPrepareAllIpfsItems } from "@/helpers/localstorage";
+} from '@lukso/lsp-factory.js'
+import { getAndPrepareAllIpfsItems } from '@/helpers/localstorage'
 
 const { notification, clearNotification, hasNotification, setNotification } =
-  useNotifications();
-const isModalOpen = ref(false);
-const controllerKey = ref("");
-const selectedProfile = ref({ profile: {} as LSP3ProfileJSON, url: "" });
-const profileDeploymentEvents = ref<DeploymentEvent[]>([]);
-const isLoading = ref(false);
-const { deployUniversalProfile } = useLspFactory();
-const uploadedProfiles = ref(getAndPrepareAllIpfsItems());
-const uploadTarget = ref(NETWORKS.l16.ipfs.url);
+  useNotifications()
+const isModalOpen = ref(false)
+const controllerKey = ref('')
+const selectedProfile = ref({ profile: {} as LSP3ProfileJSON, url: '' })
+const profileDeploymentEvents = ref<DeploymentEvent[]>([])
+const isLoading = ref(false)
+const { deployUniversalProfile } = useLspFactory()
+const uploadedProfiles = ref(getAndPrepareAllIpfsItems())
+const uploadTarget = ref(NETWORKS.l16.ipfs.url)
 
 const deploy = async (controllerKey: string) => {
-  isLoading.value = true;
-  profileDeploymentEvents.value = [];
-  closeModal();
+  isLoading.value = true
+  profileDeploymentEvents.value = []
+  closeModal()
   if (controllerKey) {
     await deployUniversalProfile(
       {
@@ -42,88 +43,88 @@ const deploy = async (controllerKey: string) => {
       },
       {
         onDeployEvents: {
-          next: (deploymentEvent) => {
-            isLoading.value = false;
-            profileDeploymentEvents.value.push(deploymentEvent);
+          next: deploymentEvent => {
+            isLoading.value = false
+            profileDeploymentEvents.value.push(deploymentEvent)
             localStorage.setItem(
-              "profileDeploymentEvents",
+              'profileDeploymentEvents',
               JSON.stringify(profileDeploymentEvents.value)
-            );
+            )
             const hash = deploymentEvent?.transaction
               ? deploymentEvent?.transaction?.hash.substring(0, 16)
-              : deploymentEvent?.receipt?.transactionHash?.substring(0, 16);
+              : deploymentEvent?.receipt?.transactionHash?.substring(0, 16)
             const href = deploymentEvent?.receipt
               ? createBlockScoutLink(deploymentEvent?.receipt?.transactionHash)
-              : createBlockScoutLink(deploymentEvent?.transaction?.hash);
+              : createBlockScoutLink(deploymentEvent?.transaction?.hash)
             setNotification(
               `Profile deployed successfully <br/> <a href="${href}" target="_blank">${hash}</a>`,
-              "primary"
-            );
-            return deploymentEvent;
+              'primary'
+            )
+            return deploymentEvent
           },
-          error: (err) => {
-            isLoading.value = false;
-            profileDeploymentEvents.value = [];
+          error: err => {
+            isLoading.value = false
+            profileDeploymentEvents.value = []
             if (err?.code === 4001) {
-              setNotification(err?.message, "danger");
+              setNotification(err?.message, 'danger')
             } else {
-              setNotification(err as string, "danger");
+              setNotification(err as string, 'danger')
             }
           },
           complete: () => {
-            isLoading.value = false;
+            isLoading.value = false
           },
         },
       }
-    );
+    )
   } else {
-    isLoading.value = false;
-    setNotification("Invalid controller address", "danger");
+    isLoading.value = false
+    setNotification('Invalid controller address', 'danger')
   }
 
-  return;
-};
+  return
+}
 
 const openModal = (selectedProfileData: {
-  profile: LSP3ProfileJSON;
-  url: string;
+  profile: LSP3ProfileJSON
+  url: string
 }) => {
-  isModalOpen.value = true;
-  selectedProfile.value = selectedProfileData;
-};
+  isModalOpen.value = true
+  selectedProfile.value = selectedProfileData
+}
 
 const closeModal = () => {
-  isModalOpen.value = false;
-};
+  isModalOpen.value = false
+}
 
 const getTypeClass = (type: string) => {
   return {
-    "is-primary": type === DeploymentType.PROXY,
-    "is-warning": type === DeploymentType.BASE_CONTRACT,
-    "is-info": type === DeploymentType.TRANSACTION,
-  };
-};
+    'is-primary': type === DeploymentType.PROXY,
+    'is-warning': type === DeploymentType.BASE_CONTRACT,
+    'is-info': type === DeploymentType.TRANSACTION,
+  }
+}
 
 const getStatusClass = (status: string) => {
   return {
-    "is-light": status === DeploymentStatus.PENDING,
-    "is-success": status === DeploymentStatus.COMPLETE,
-  };
-};
+    'is-light': status === DeploymentStatus.PENDING,
+    'is-success': status === DeploymentStatus.COMPLETE,
+  }
+}
 
 const deleteUploadedProfile = (url: string) => {
-  const formattedUrl = url.replace(uploadTarget.value, "ipfs://");
-  localStorage.removeItem(formattedUrl);
-  uploadedProfiles.value = getAndPrepareAllIpfsItems();
-  setNotification("Profile deleted successfully", "primary");
-};
+  const formattedUrl = url.replace(uploadTarget.value, 'ipfs://')
+  localStorage.removeItem(formattedUrl)
+  uploadedProfiles.value = getAndPrepareAllIpfsItems()
+  setNotification('Profile deleted successfully', 'primary')
+}
 
 const getIdFromProfileUrl = (uploadedProfile: {
-  profile: string;
-  url: string;
+  profile: string
+  url: string
 }) => {
-  return uploadedProfile.url.replace(uploadTarget.value, "");
-};
+  return uploadedProfile.url.replace(uploadTarget.value, '')
+}
 </script>
 
 <template>
@@ -143,7 +144,7 @@ const getIdFromProfileUrl = (uploadedProfile: {
           :uploaded-profiles="uploadedProfiles"
           :get-id-from-profile-url="getIdFromProfileUrl"
           class="tile is-child box"
-          @createProfileOnChain="openModal"
+          @create-profile-on-chain="openModal"
           @set-notification="setNotification($event)"
           @delete-uploaded-profile="deleteUploadedProfile"
         />
@@ -151,10 +152,7 @@ const getIdFromProfileUrl = (uploadedProfile: {
           <h2 class="title">Deployment Events</h2>
           <div class="table-container">
             <table
-              class="
-                table
-                is-bordered is-striped is-narrow is-hoverable is-fullwidth
-              "
+              class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
             >
               <tr>
                 <th>Type</th>
@@ -197,7 +195,7 @@ const getIdFromProfileUrl = (uploadedProfile: {
                       ? deploymentEvent.receipt.gasUsed?.hex
                         ? formatNumber(+deploymentEvent.receipt.gasUsed?.hex)
                         : formatNumber(+deploymentEvent.receipt.gasUsed)
-                      : ""
+                      : ''
                   }}
                 </td>
                 <td>
@@ -241,7 +239,7 @@ const getIdFromProfileUrl = (uploadedProfile: {
       :controller-key="controllerKey"
       @close-modal="closeModal"
       @deploy="deploy"
-      @update:modelValue="(value) => (controllerKey = value)"
+      @update:model-value="value => (controllerKey = value)"
     />
   </section>
 </template>

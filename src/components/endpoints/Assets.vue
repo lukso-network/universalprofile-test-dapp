@@ -1,113 +1,113 @@
 <script setup lang="ts">
-import { getState } from "@/stores";
-import Notifications from "@/components/Notification.vue";
-import useNotifications from "@/compositions/useNotifications";
-import LSP7Mintable from "@lukso/universalprofile-smart-contracts/artifacts/LSP7Mintable.json";
-import useWeb3 from "@/compositions/useWeb3";
-import { ref, watchEffect } from "vue";
-import { Contract } from "web3-eth-contract";
-import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from "@/helpers/config";
-import { createBlockScoutLink } from "@/utils/createLinks";
+import { getState } from '@/stores'
+import Notifications from '@/components/Notification.vue'
+import useNotifications from '@/compositions/useNotifications'
+import LSP7Mintable from '@lukso/universalprofile-smart-contracts/artifacts/LSP7Mintable.json'
+import useWeb3 from '@/compositions/useWeb3'
+import { ref, watchEffect } from 'vue'
+import { Contract } from 'web3-eth-contract'
+import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
+import { createBlockScoutLink } from '@/utils/createLinks'
 
 const { notification, clearNotification, hasNotification, setNotification } =
-  useNotifications();
-const { contract } = useWeb3();
+  useNotifications()
+const { contract } = useWeb3()
 
-const myToken = ref<Contract>();
-const isTokenCreated = ref(false);
-const isTokenMinted = ref(false);
-const isTokenPending = ref(false);
+const myToken = ref<Contract>()
+const isTokenCreated = ref(false)
+const isTokenMinted = ref(false)
+const isTokenPending = ref(false)
 const token = ref({
-  name: "My LSP7 Token",
-  symbol: "LSP7",
+  name: 'My LSP7 Token',
+  symbol: 'LSP7',
   isNFT: false,
-});
-const mintReceiver = ref<string>();
-const mintAmount = ref(100);
+})
+const mintReceiver = ref<string>()
+const mintAmount = ref(100)
 
 watchEffect(() => {
-  mintReceiver.value = getState("address");
-});
+  mintReceiver.value = getState('address')
+})
 
 const create = async () => {
   if (isTokenPending.value) {
-    return;
+    return
   }
 
   if (!token.value.name) {
-    return setNotification("Enter token name", "danger");
+    return setNotification('Enter token name', 'danger')
   }
 
   if (!token.value.symbol) {
-    return setNotification("Enter token symbol", "danger");
+    return setNotification('Enter token symbol', 'danger')
   }
 
-  const erc725AccountAddress = getState("address");
+  const erc725AccountAddress = getState('address')
   const tokenParams = [
     token.value.name, // token name
     token.value.symbol, // token symbol
     erc725AccountAddress, // new owner
     token.value.isNFT, // make your token divisible or not
-  ];
-  isTokenPending.value = true;
+  ]
+  isTokenPending.value = true
 
   try {
     // create an instance
-    myToken.value = contract(LSP7Mintable.abi as any, "", {
+    myToken.value = contract(LSP7Mintable.abi as any, '', {
       gas: DEFAULT_GAS,
       gasPrice: DEFAULT_GAS_PRICE,
-    }); // address is empty because we are deploying the contract
+    }) // address is empty because we are deploying the contract
 
     // deploy the token contract
     myToken.value = await myToken.value
       .deploy({ data: LSP7Mintable.bytecode, arguments: tokenParams })
       .send({ from: erc725AccountAddress })
-      .on("receipt", function (receipt: any) {
-        console.log(receipt);
+      .on('receipt', function (receipt: any) {
+        console.log(receipt)
       })
-      .once("sending", (payload: any) => {
-        console.log(JSON.stringify(payload, null, 2));
-      });
-    isTokenCreated.value = true;
-    setNotification("Token created", "info");
+      .once('sending', (payload: any) => {
+        console.log(JSON.stringify(payload, null, 2))
+      })
+    isTokenCreated.value = true
+    setNotification('Token created', 'info')
   } catch (error) {
-    setNotification((error as unknown as Error).message, "danger");
+    setNotification((error as unknown as Error).message, 'danger')
   } finally {
-    isTokenPending.value = false;
+    isTokenPending.value = false
   }
-};
+}
 
 const mint = async () => {
-  const erc725AccountAddress = getState("address");
+  const erc725AccountAddress = getState('address')
 
   if (!myToken.value) {
-    return setNotification("No token specified", "danger");
+    return setNotification('No token specified', 'danger')
   }
 
   if (!mintReceiver.value) {
-    return setNotification("Enter mint address", "danger");
+    return setNotification('Enter mint address', 'danger')
   }
 
   if (!mintAmount.value) {
-    return setNotification("Enter mint amount", "danger");
+    return setNotification('Enter mint amount', 'danger')
   }
 
   try {
     await myToken.value.methods
-      .mint(mintReceiver.value, mintAmount.value, false, "0x")
+      .mint(mintReceiver.value, mintAmount.value, false, '0x')
       .send({ from: erc725AccountAddress })
-      .on("receipt", function (receipt: any) {
-        console.log(receipt);
+      .on('receipt', function (receipt: any) {
+        console.log(receipt)
       })
-      .once("sending", (payload: any) => {
-        console.log(JSON.stringify(payload, null, 2));
-      });
-    isTokenMinted.value = true;
-    setNotification("Token minted", "info");
+      .once('sending', (payload: any) => {
+        console.log(JSON.stringify(payload, null, 2))
+      })
+    isTokenMinted.value = true
+    setNotification('Token minted', 'info')
   } catch (error) {
-    setNotification((error as unknown as Error).message, "danger");
+    setNotification((error as unknown as Error).message, 'danger')
   }
-};
+}
 </script>
 
 <template>
