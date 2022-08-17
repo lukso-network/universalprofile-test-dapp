@@ -1,5 +1,5 @@
 {
-  "name": "universalprofile-sample-web-app",
+  "name": "universalprofile-test-dapp",
   "version": "0.1.54",
   "private": true,
   "type": "module",
@@ -62,6 +62,6 @@
     "vue-tsc": "^0.40.1"
   },
   "engines": {
-    "node": "16.14.0"
+    "node": "16.16.0"
   }
 }
