@@ -1,70 +1,70 @@
-import WalletConnectProvider from '@walletconnect/web3-provider'
-import { setState, useState, getState } from '@/stores'
-import useWeb3 from '@/compositions/useWeb3'
-import { provider as Provider } from 'web3-core'
-import { DEFAULT_NETWORK_CONFIG } from '@/helpers/config'
+// import WalletConnectProvider from '@walletconnect/web3-provider'
+// import { setState, useState, getState } from '@/stores'
+// import useWeb3 from '@/compositions/useWeb3'
+// import { provider as Provider } from 'web3-core'
+// import { DEFAULT_NETWORK_CONFIG } from '@/helpers/config'
 
-let provider: WalletConnectProvider
-export const WALLET_CONNECT_VERSION = '1.0'
+// let provider: WalletConnectProvider
+// export const WALLET_CONNECT_VERSION = '1.0'
 
-const setupProvider = async (): Promise<void> => {
-  const { setupWeb3 } = useWeb3()
+// const setupProvider = async (): Promise<void> => {
+//   const { setupWeb3 } = useWeb3()
 
-  provider = new WalletConnectProvider({
-    rpc: {
-      22: DEFAULT_NETWORK_CONFIG.rpc.url,
-    },
-    bridge: 'https://safe-walletconnect.gnosis.io',
-    chainId: 22,
-  })
+//   provider = new WalletConnectProvider({
+//     rpc: {
+//       22: DEFAULT_NETWORK_CONFIG.rpc.url,
+//     },
+//     bridge: 'https://safe-walletconnect.gnosis.io',
+//     chainId: 22,
+//   })
 
-  provider.on('connect', (error: any) => {
-    if (error) {
-      throw error
-    }
+//   provider.on('connect', (error: any) => {
+//     if (error) {
+//       throw error
+//     }
 
-    setState('isConnected', true)
-    setupWeb3(provider as unknown as Provider)
-  })
+//     setState('isConnected', true)
+//     setupWeb3(provider as unknown as Provider)
+//   })
 
-  provider.on('accountsChanged', async (accounts: string[]) => {
-    console.log('Account changed', accounts)
+//   provider.on('accountsChanged', async (accounts: string[]) => {
+//     console.log('Account changed', accounts)
 
-    if (accounts.length === 0 && getState('isConnected')) {
-      await resetProvider()
-    }
+//     if (accounts.length === 0 && getState('isConnected')) {
+//       await resetProvider()
+//     }
 
-    const { setConnected } = useState()
-    const [address] = accounts
+//     const { setConnected } = useState()
+//     const [address] = accounts
 
-    setConnected(address, 'walletConnect')
-  })
+//     setConnected(address, 'walletConnect')
+//   })
 
-  setupWeb3(provider as unknown as Provider)
-}
+//   setupWeb3(provider as unknown as Provider)
+// }
 
-const resetProvider = async (): Promise<void> => {
-  await provider.disconnect()
-}
+// const resetProvider = async (): Promise<void> => {
+//   await provider.disconnect()
+// }
 
-const enableProvider = async (): Promise<void> => {
-  await provider.enable()
-}
+// const enableProvider = async (): Promise<void> => {
+//   await provider.enable()
+// }
 
-const getProvider = (): WalletConnectProvider => {
-  return provider
-}
+// const getProvider = (): WalletConnectProvider => {
+//   return provider
+// }
 
-export default function useWalletConnect(): {
-  resetProvider: () => Promise<void>
-  setupProvider: () => Promise<void>
-  enableProvider: () => Promise<void>
-  getProvider: () => WalletConnectProvider
-} {
-  return {
-    resetProvider,
-    setupProvider,
-    enableProvider,
-    getProvider,
-  }
-}
+// export default function useWalletConnect(): {
+//   resetProvider: () => Promise<void>
+//   setupProvider: () => Promise<void>
+//   enableProvider: () => Promise<void>
+//   getProvider: () => WalletConnectProvider
+// } {
+//   return {
+//     resetProvider,
+//     setupProvider,
+//     enableProvider,
+//     getProvider,
+//   }
+// }
