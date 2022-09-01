@@ -5,7 +5,7 @@ import useNotifications from '@/compositions/useNotifications'
 import { ref } from 'vue'
 import useWeb3 from '@/compositions/useWeb3'
 import { MAGICVALUE } from '@/helpers/config'
-import { SiweMessage } from 'siwe'
+import { generateNonce, SiweMessage } from 'siwe'
 import { getDate, getTime } from '@/utils/dateTime'
 
 const { notification, clearNotification, hasNotification, setNotification } =
@@ -24,7 +24,7 @@ const siwe = ref({
   notBeforeDate: getDate(),
   notBeforeTime: getTime(),
   resources: ['http://some-resource1.com'],
-  nonce: '1',
+  nonce: '',
 })
 
 const onSign = async () => {
@@ -58,7 +58,7 @@ const createSiweMessage = () => {
     statement: message.value,
     uri: origin,
     version: '1',
-    nonce: siwe.value.nonce,
+    nonce: siwe.value.nonce || generateNonce(),
     chainId: getState('chainId'),
     expirationTime: new Date(
       `${siwe.value.expirationDate} ${siwe.value.expirationTime}`
@@ -150,6 +150,7 @@ const onSignatureValidation = async () => {
         </label>
       </div>
       <div v-show="isSiwe">
+        <input v-model="siwe.nonce" type="hidden" data-testid="siwe.nonce" />
         <div class="field">
           <label class="label">Expiration time (optional)</label>
           <div class="control is-flex">
