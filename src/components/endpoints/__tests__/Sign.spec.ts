@@ -147,9 +147,9 @@ URI: http://localhost
 Version: 1
 Chain ID: 2828
 Nonce: 1
-Issued At: 2022-09-01T07:00:00.000Z
-Expiration Time: 2022-09-02T09:00:00.000Z
-Not Before: 2022-09-01T08:00:00.000Z
+Issued At: 2022-09-01T09:00:00.000Z
+Expiration Time: 2022-09-02T11:00:00.000Z
+Not Before: 2022-09-01T10:00:00.000Z
 Resources:
 - http://some-resource1.com
 - http://some-resource2.com`,
