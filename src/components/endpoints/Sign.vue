@@ -60,8 +60,12 @@ const createSiweMessage = () => {
     version: '1',
     nonce: siwe.value.nonce,
     chainId: getState('chainId'),
-    expirationTime: `${siwe.value.expirationDate} ${siwe.value.expirationTime}`,
-    notBefore: `${siwe.value.notBeforeDate} ${siwe.value.notBeforeTime}`,
+    expirationTime: new Date(
+      `${siwe.value.expirationDate} ${siwe.value.expirationTime}`
+    ).toISOString(),
+    notBefore: new Date(
+      `${siwe.value.notBeforeDate} ${siwe.value.notBeforeTime}`
+    ).toISOString(),
     resources: siwe.value.resources,
   })
   return siweMessage.prepareMessage()
