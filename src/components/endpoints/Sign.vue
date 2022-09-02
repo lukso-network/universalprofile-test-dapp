@@ -5,6 +5,8 @@ import useNotifications from '@/compositions/useNotifications'
 import { ref } from 'vue'
 import useWeb3 from '@/compositions/useWeb3'
 import { MAGICVALUE } from '@/helpers/config'
+import { generateNonce, SiweMessage } from 'siwe'
+import { getDate, getTime } from '@/utils/dateTime'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
@@ -15,6 +17,15 @@ const message = ref('sign message')
 const signResponse = ref()
 const recovery = ref<string>()
 const magicValue = ref<string>()
+const isSiwe = ref(false)
+const siwe = ref({
+  expirationDate: getDate(),
+  expirationTime: getTime(),
+  notBeforeDate: getDate(),
+  notBeforeTime: getTime(),
+  resources: ['http://some-resource1.com'],
+  nonce: '',
+})
 
 const onSign = async () => {
   if (!message.value) {
@@ -25,7 +36,9 @@ const onSign = async () => {
 
   try {
     isPending.value = true
-    signResponse.value = await sign(message.value, erc725AccountAddress)
+    const signMessage = isSiwe.value ? createSiweMessage() : message.value
+    console.info(signMessage)
+    signResponse.value = await sign(signMessage, erc725AccountAddress)
 
     setNotification('Message signed successfully')
   } catch (error) {
@@ -33,6 +46,41 @@ const onSign = async () => {
   } finally {
     isPending.value = false
   }
+}
+
+const createSiweMessage = () => {
+  const domain = window.location.host
+  const origin = window.location.origin
+
+  const siweMessage = new SiweMessage({
+    domain,
+    address: getState('address'),
+    statement: message.value,
+    uri: origin,
+    version: '1',
+    nonce: siwe.value.nonce || generateNonce(),
+    chainId: getState('chainId'),
+    expirationTime: new Date(
+      `${siwe.value.expirationDate} ${siwe.value.expirationTime}`
+    ).toISOString(),
+    notBefore: new Date(
+      `${siwe.value.notBeforeDate} ${siwe.value.notBeforeTime}`
+    ).toISOString(),
+    resources: siwe.value.resources,
+  })
+  return siweMessage.prepareMessage()
+}
+
+const addResource = () => {
+  siwe.value.resources.push('')
+}
+
+const removeResource = (index: number) => {
+  siwe.value.resources.splice(index, 1)
+}
+
+const handleResourceChange = (index: number, event: Event) => {
+  siwe.value.resources[index] = (event.target as HTMLInputElement).value
 }
 
 const onRecover = async () => {
@@ -81,16 +129,92 @@ const onSignatureValidation = async () => {
       <div class="field">
         <label class="label">Message</label>
         <div class="control">
-          <input
+          <textarea
             v-model="message"
-            class="input"
-            type="text"
+            class="textarea"
+            rows="3"
             :disabled="getState('address') ? undefined : true"
           />
         </div>
       </div>
-
       <div class="field">
+        <label class="checkbox">
+          <input
+            v-model="isSiwe"
+            type="checkbox"
+            :disabled="getState('address') ? undefined : true"
+            :value="isSiwe"
+            data-testid="isSiwe"
+          />
+          Sign in with Ethereum
+        </label>
+      </div>
+      <div v-show="isSiwe">
+        <input v-model="siwe.nonce" type="hidden" data-testid="siwe.nonce" />
+        <div class="field">
+          <label class="label">Expiration time (optional)</label>
+          <div class="control is-flex">
+            <input
+              v-model="siwe.expirationDate"
+              class="input"
+              type="date"
+              :disabled="getState('address') ? undefined : true"
+              data-testid="siwe.expirationDate"
+            />
+            <input
+              v-model="siwe.expirationTime"
+              class="input ml-2"
+              type="time"
+              :disabled="getState('address') ? undefined : true"
+              data-testid="siwe.expirationTime"
+            />
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Not before (optional)</label>
+          <div class="control is-flex">
+            <input
+              v-model="siwe.notBeforeDate"
+              class="input"
+              type="date"
+              :disabled="getState('address') ? undefined : true"
+              data-testid="siwe.notBeforeDate"
+            />
+            <input
+              v-model="siwe.notBeforeTime"
+              class="input ml-2"
+              type="time"
+              :disabled="getState('address') ? undefined : true"
+              data-testid="siwe.notBeforeTime"
+            />
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Resources (optional)</label>
+          <div
+            v-for="(resource, index) in siwe.resources"
+            :key="index"
+            class="control mb-2 is-flex"
+          >
+            <input
+              :v-model="resource"
+              :value="resource"
+              class="input"
+              type="text"
+              :disabled="getState('address') ? undefined : true"
+              :data-testid="`siwe.resource-${index}`"
+              @keyup="event => handleResourceChange(index, event)"
+            />
+            <button class="button ml-2" @click="removeResource(index)">
+              Remove
+            </button>
+          </div>
+        </div>
+        <button class="button" data-testid="addResource" @click="addResource">
+          Add resource
+        </button>
+      </div>
+      <div class="field mt-5">
         <button
           :class="`button is-primary is-rounded mb-3 ${
             isPending ? 'is-loading' : ''
@@ -159,5 +283,9 @@ const onSignatureValidation = async () => {
 <style scoped lang="scss">
 .notification {
   word-break: break-all;
+}
+
+textarea {
+  resize: vertical;
 }
 </style>

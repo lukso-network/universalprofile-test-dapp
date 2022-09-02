@@ -16,7 +16,7 @@ const { setupWeb3, accounts, requestAccounts } = useWeb3()
 const { setDisconnected, setConnected } = useState()
 const { close, toggle } = useDropdown()
 const dropdown = ref()
-const browserExtensionConnected = localStorage.getItem(UP_CONNECTED_ADDRESS)
+// const browserExtensionConnected = localStorage.getItem(UP_CONNECTED_ADDRESS)
 const hasExtension = !!window.ethereum
 
 // const connectWalletConnect = async () => {
