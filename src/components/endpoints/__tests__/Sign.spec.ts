@@ -113,7 +113,6 @@ test('can sign with ethereum', async () => {
     address: '0x321',
   })
   setState('address', '0x517216362D594516c6f96Ee34b2c502d65B847E4')
-  setState('chainId', '2828')
   render(Sign)
 
   await fireEvent.click(screen.getByTestId('isSiwe'))
@@ -122,6 +121,17 @@ test('can sign with ethereum', async () => {
     '2022-09-02'
   )
   await fireEvent.update(screen.getByTestId('siwe.nonce'), '1')
+  await fireEvent.update(screen.getByTestId('siwe.domain'), 'example.com')
+  await fireEvent.update(
+    screen.getByTestId('siwe.address'),
+    '0x117216362D594516c6f96Ee34b2c502d65B847E4'
+  )
+  await fireEvent.update(
+    screen.getByTestId('siwe.origin'),
+    'http://example.com/login'
+  )
+  await fireEvent.update(screen.getByTestId('siwe.version'), '2')
+  await fireEvent.update(screen.getByTestId('siwe.chainId'), '2829')
   await fireEvent.update(screen.getByTestId('siwe.expirationTime'), '11:00')
   await fireEvent.update(screen.getByTestId('siwe.notBeforeDate'), '2022-09-01')
   await fireEvent.update(screen.getByTestId('siwe.notBeforeTime'), '10:00')
@@ -139,14 +149,14 @@ test('can sign with ethereum', async () => {
     'Message signed successfully'
   )
   expect(mockSign).toBeCalledWith(
-    `localhost wants you to sign in with your Ethereum account:
-0x517216362D594516c6f96Ee34b2c502d65B847E4
+    `example.com wants you to sign in with your Ethereum account:
+0x117216362D594516c6f96Ee34b2c502d65B847E4
 
 sign message
 
-URI: http://localhost
-Version: 1
-Chain ID: 2828
+URI: http://example.com/login
+Version: 2
+Chain ID: 2829
 Nonce: 1
 Issued At: 2022-09-01T09:00:00.000Z
 Expiration Time: 2022-09-02T11:00:00.000Z
