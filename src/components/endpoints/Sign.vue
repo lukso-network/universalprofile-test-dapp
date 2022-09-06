@@ -2,7 +2,7 @@
 import { getState } from '@/stores'
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
-import { ref } from 'vue'
+import { ref, watchEffect } from 'vue'
 import useWeb3 from '@/compositions/useWeb3'
 import { MAGICVALUE } from '@/helpers/config'
 import { generateNonce, SiweMessage } from 'siwe'
@@ -20,11 +20,21 @@ const magicValue = ref<string>()
 const isSiwe = ref(false)
 const siwe = ref({
   expirationDate: getDate(),
-  expirationTime: getTime(),
+  expirationTime: getTime(60 * 1000 * 5),
   notBeforeDate: getDate(),
-  notBeforeTime: getTime(),
+  notBeforeTime: getTime(-60 * 1000 * 5),
   resources: ['http://some-resource1.com'],
   nonce: '',
+  domain: window.location.host,
+  address: '',
+  origin: window.location.origin,
+  version: '1',
+  chainId: 0,
+})
+
+watchEffect(() => {
+  siwe.value.address = getState('address')
+  siwe.value.chainId = getState('chainId')
 })
 
 const onSign = async () => {
@@ -49,17 +59,14 @@ const onSign = async () => {
 }
 
 const createSiweMessage = () => {
-  const domain = window.location.host
-  const origin = window.location.origin
-
   const siweMessage = new SiweMessage({
-    domain,
-    address: getState('address'),
+    domain: siwe.value.domain,
+    address: siwe.value.address,
     statement: message.value,
-    uri: origin,
-    version: '1',
+    uri: siwe.value.origin,
+    version: siwe.value.version,
     nonce: siwe.value.nonce || generateNonce(),
-    chainId: getState('chainId'),
+    chainId: siwe.value.chainId,
     expirationTime: new Date(
       `${siwe.value.expirationDate} ${siwe.value.expirationTime}`
     ).toISOString(),
@@ -151,6 +158,66 @@ const onSignatureValidation = async () => {
       </div>
       <div v-show="isSiwe">
         <input v-model="siwe.nonce" type="hidden" data-testid="siwe.nonce" />
+        <div class="field">
+          <label class="label">Domain</label>
+          <div class="control">
+            <input
+              v-model="siwe.domain"
+              class="input"
+              type="text"
+              :disabled="getState('address') ? undefined : true"
+              data-testid="siwe.domain"
+            />
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Address</label>
+          <div class="control">
+            <input
+              v-model="siwe.address"
+              class="input"
+              type="text"
+              :disabled="getState('address') ? undefined : true"
+              data-testid="siwe.address"
+            />
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Origin (URI)</label>
+          <div class="control">
+            <input
+              v-model="siwe.origin"
+              class="input"
+              type="text"
+              :disabled="getState('address') ? undefined : true"
+              data-testid="siwe.origin"
+            />
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Version</label>
+          <div class="control">
+            <input
+              v-model="siwe.version"
+              class="input"
+              type="text"
+              :disabled="getState('address') ? undefined : true"
+              data-testid="siwe.version"
+            />
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Chain Id</label>
+          <div class="control">
+            <input
+              v-model="siwe.chainId"
+              class="input"
+              type="text"
+              :disabled="getState('address') ? undefined : true"
+              data-testid="siwe.chainId"
+            />
+          </div>
+        </div>
         <div class="field">
           <label class="label">Expiration time (optional)</label>
           <div class="control is-flex">
