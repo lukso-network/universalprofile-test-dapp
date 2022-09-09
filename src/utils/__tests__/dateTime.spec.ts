@@ -16,4 +16,6 @@ test('can get time', () => {
   expect(getTime()).toBe('02:30')
   jest.useFakeTimers().setSystemTime(new Date('2022-09-20 12:01'))
   expect(getTime()).toBe('12:01')
+  expect(getTime(60000)).toBe('12:02')
+  expect(getTime(-60000)).toBe('12:00')
 })

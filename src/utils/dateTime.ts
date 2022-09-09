@@ -3,7 +3,10 @@ export const getDate = () =>
     -2
   )}-${('0' + new Date().getDate()).slice(-2)}`
 
-export const getTime = () =>
-  `${('0' + new Date().getHours()).slice(-2)}:${(
-    '0' + new Date().getMinutes()
+export const getTime = (offset = 0) => {
+  const date = Date.now() + offset
+
+  return `${('0' + new Date(date).getHours()).slice(-2)}:${(
+    '0' + new Date(date).getMinutes()
   ).slice(-2)}`
+}
