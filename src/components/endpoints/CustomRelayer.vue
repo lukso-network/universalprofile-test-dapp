@@ -6,8 +6,8 @@ import useNotifications from '@/compositions/useNotifications'
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
 
-const name = ref('')
-const apiUrl = ref('')
+const name = ref('My Relayer')
+const apiUrl = ref('https://relayer-staging.example.com/api/v1')
 const chainId = ref('2828')
 const chainIds = ref<number[]>([+chainId.value])
 const showLabel = ref(false)
