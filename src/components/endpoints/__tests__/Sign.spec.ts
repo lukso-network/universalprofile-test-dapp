@@ -116,6 +116,8 @@ test('can sign with ethereum', async () => {
   render(Sign)
 
   await fireEvent.click(screen.getByTestId('isSiwe'))
+  await fireEvent.click(screen.getByTestId('siwe.hasExpirationTime'))
+  await fireEvent.click(screen.getByTestId('siwe.hasNotBefore'))
   await fireEvent.update(
     screen.getByTestId('siwe.expirationDate'),
     '2022-09-02'

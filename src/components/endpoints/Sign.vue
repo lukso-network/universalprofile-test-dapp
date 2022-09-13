@@ -18,6 +18,8 @@ const signResponse = ref()
 const recovery = ref<string>()
 const magicValue = ref<string>()
 const isSiwe = ref(false)
+const hasExpirationTime = ref(false)
+const hasNotBefore = ref(false)
 const siwe = ref({
   expirationDate: getDate(),
   expirationTime: getTime(60 * 1000 * 5),
@@ -59,7 +61,7 @@ const onSign = async () => {
 }
 
 const createSiweMessage = () => {
-  const siweMessage = new SiweMessage({
+  const siweParams = {
     domain: siwe.value.domain,
     address: siwe.value.address,
     statement: message.value,
@@ -67,14 +69,23 @@ const createSiweMessage = () => {
     version: siwe.value.version,
     nonce: siwe.value.nonce || generateNonce(),
     chainId: siwe.value.chainId,
-    expirationTime: new Date(
-      `${siwe.value.expirationDate} ${siwe.value.expirationTime}`
-    ).toISOString(),
-    notBefore: new Date(
-      `${siwe.value.notBeforeDate} ${siwe.value.notBeforeTime}`
-    ).toISOString(),
+
     resources: siwe.value.resources,
-  })
+  } as SiweMessage
+
+  if (hasExpirationTime.value) {
+    siweParams.expirationTime = new Date(
+      `${siwe.value.expirationDate} ${siwe.value.expirationTime}`
+    ).toISOString()
+  }
+
+  if (hasNotBefore.value) {
+    siweParams.notBefore = new Date(
+      `${siwe.value.notBeforeDate} ${siwe.value.notBeforeTime}`
+    ).toISOString()
+  }
+
+  const siweMessage = new SiweMessage(siweParams)
   return siweMessage.prepareMessage()
 }
 
@@ -219,8 +230,17 @@ const onSignatureValidation = async () => {
           </div>
         </div>
         <div class="field">
-          <label class="label">Expiration time (optional)</label>
-          <div class="control is-flex">
+          <label class="checkbox has-text-weight-bold">
+            <input
+              v-model="hasExpirationTime"
+              type="checkbox"
+              :disabled="getState('address') ? undefined : true"
+              :value="hasExpirationTime"
+              data-testid="siwe.hasExpirationTime"
+            />
+            Expiration time (optional)
+          </label>
+          <div v-if="hasExpirationTime" class="control is-flex">
             <input
               v-model="siwe.expirationDate"
               class="input"
@@ -238,8 +258,17 @@ const onSignatureValidation = async () => {
           </div>
         </div>
         <div class="field">
-          <label class="label">Not before (optional)</label>
-          <div class="control is-flex">
+          <label class="checkbox has-text-weight-bold">
+            <input
+              v-model="hasNotBefore"
+              type="checkbox"
+              :disabled="getState('address') ? undefined : true"
+              :value="hasNotBefore"
+              data-testid="siwe.hasNotBefore"
+            />
+            Not before (optional)
+          </label>
+          <div v-if="hasNotBefore" class="control is-flex">
             <input
               v-model="siwe.notBeforeDate"
               class="input"
