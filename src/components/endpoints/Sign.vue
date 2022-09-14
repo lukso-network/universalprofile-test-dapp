@@ -14,6 +14,7 @@ const { sign, recover, getWeb3 } = useWeb3()
 
 const isPending = ref(false)
 const message = ref('sign message')
+const signMessage = ref('')
 const signResponse = ref()
 const recovery = ref<string>()
 const magicValue = ref<string>()
@@ -48,9 +49,11 @@ const onSign = async () => {
 
   try {
     isPending.value = true
-    const signMessage = isSiwe.value ? createSiweMessage() : message.value
-    console.info(signMessage)
-    signResponse.value = await sign(signMessage, erc725AccountAddress)
+    signMessage.value = isSiwe.value ? createSiweMessage() : message.value
+    console.info(signMessage.value)
+    signResponse.value = await sign(signMessage.value, erc725AccountAddress)
+    recovery.value = undefined
+    magicValue.value = undefined
 
     setNotification('Message signed successfully')
   } catch (error) {
@@ -106,7 +109,10 @@ const handleResourceChange = (index: number, event: Event) => {
 
 const onRecover = async () => {
   try {
-    recovery.value = await recover(message.value, signResponse.value.signature)
+    recovery.value = await recover(
+      signMessage.value,
+      signResponse.value.signature
+    )
 
     setNotification('Recover was successful')
   } catch (error) {
@@ -122,7 +128,7 @@ const onSignatureValidation = async () => {
   }
 
   try {
-    const messageHash = getWeb3().eth.accounts.hashMessage(message.value)
+    const messageHash = getWeb3().eth.accounts.hashMessage(signMessage.value)
     if (window.erc725Account) {
       // TODO: we should probably set the default gas price to undefined,
       // but it is not yet clear why view functions error on L16 when gasPrice is passed
