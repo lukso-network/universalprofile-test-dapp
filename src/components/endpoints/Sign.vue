@@ -69,8 +69,6 @@ const createSiweMessage = () => {
     version: siwe.value.version,
     nonce: siwe.value.nonce || generateNonce(),
     chainId: siwe.value.chainId,
-
-    resources: siwe.value.resources,
   } as SiweMessage
 
   if (hasExpirationTime.value) {
@@ -83,6 +81,11 @@ const createSiweMessage = () => {
     siweParams.notBefore = new Date(
       `${siwe.value.notBeforeDate} ${siwe.value.notBeforeTime}`
     ).toISOString()
+  }
+
+  const resources = siwe.value.resources.filter(resource => resource !== '')
+  if (resources.length > 0) {
+    siweParams.resources = resources
   }
 
   const siweMessage = new SiweMessage(siweParams)
