@@ -163,7 +163,7 @@ const onSignatureValidation = async () => {
           />
         </div>
       </div>
-      <div class="field">
+      <div v-show="false" class="field">
         <label class="checkbox">
           <input
             v-model="isSiwe"
