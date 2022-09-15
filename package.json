@@ -18,7 +18,6 @@
     "@erc725/erc725.js": "0.14.4",
     "@lukso/lsp-factory.js": "2.3.3",
     "@lukso/lsp-smart-contracts": "0.6.2",
-    "@lukso/universalprofile-smart-contracts": "0.4.1",
     "@walletconnect/client": "1.8.0",
     "@walletconnect/qrcode-modal": "1.8.0",
     "@walletconnect/web3-provider": "1.8.0",
