@@ -10,7 +10,7 @@ import { getDate, getTime } from '@/utils/dateTime'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
-const { sign, recover, getWeb3 } = useWeb3()
+const { sign, recover, hashMessage } = useWeb3()
 
 const isPending = ref(false)
 const message = ref('sign message')
@@ -49,7 +49,9 @@ const onSign = async () => {
 
   try {
     isPending.value = true
-    signMessage.value = isSiwe.value ? createSiweMessage() : message.value
+    signMessage.value = hashMessage(
+      isSiwe.value ? createSiweMessage() : message.value
+    )
     console.info(signMessage.value)
     signResponse.value = await sign(signMessage.value, erc725AccountAddress)
     recovery.value = undefined
@@ -107,12 +109,9 @@ const handleResourceChange = (index: number, event: Event) => {
   siwe.value.resources[index] = (event.target as HTMLInputElement).value
 }
 
-const onRecover = async () => {
+const onRecover = () => {
   try {
-    recovery.value = await recover(
-      signMessage.value,
-      signResponse.value.signature
-    )
+    recovery.value = recover(signMessage.value, signResponse.value.signature)
 
     setNotification('Recover was successful')
   } catch (error) {
@@ -128,7 +127,7 @@ const onSignatureValidation = async () => {
   }
 
   try {
-    const messageHash = getWeb3().eth.accounts.hashMessage(signMessage.value)
+    const messageHash = hashMessage(signMessage.value)
     if (window.erc725Account) {
       // TODO: we should probably set the default gas price to undefined,
       // but it is not yet clear why view functions error on L16 when gasPrice is passed

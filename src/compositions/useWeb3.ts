@@ -57,12 +57,16 @@ const sign = async (message: string, address: string): Promise<string> => {
   return await web3.eth.sign(message, address)
 }
 
-const recover = async (message: string, signature: string): Promise<string> => {
+const recover = (message: string, signature: string): string => {
   return web3.eth.accounts.recover(message, signature)
 }
 
 const isAddress = (address: string): boolean => {
   return web3.utils.isAddress(address)
+}
+
+const hashMessage = (message: string): string => {
+  return web3.eth.accounts.hashMessage(message)
 }
 
 export default function useWeb3(): {
@@ -81,8 +85,9 @@ export default function useWeb3(): {
   accounts: () => Promise<string>
   requestAccounts: () => Promise<string[]>
   sign: (message: string, address: string) => Promise<string>
-  recover: (message: string, signature: string) => Promise<string>
+  recover: (message: string, signature: string) => string
   isAddress: (address: string) => boolean
+  hashMessage: (message: string) => string
 } {
   return {
     setupWeb3,
@@ -96,5 +101,6 @@ export default function useWeb3(): {
     sign,
     recover,
     isAddress,
+    hashMessage,
   }
 }
