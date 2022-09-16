@@ -15,8 +15,8 @@ const { sign, recover, hashMessage } = useWeb3()
 const isPending = ref(false)
 const message = ref('sign message')
 const signMessage = ref('')
-const signResponse = ref()
-const recovery = ref<string>()
+const signature = ref<string>()
+const recoveryEoA = ref<string>()
 const magicValue = ref<string>()
 const isSiwe = ref(false)
 const hasExpirationTime = ref(false)
@@ -51,10 +51,10 @@ const onSign = async () => {
     isPending.value = true
     signMessage.value = hashMessage(
       isSiwe.value ? createSiweMessage() : message.value
-    )
+    ) as string
     console.info(signMessage.value)
-    signResponse.value = await sign(signMessage.value, erc725AccountAddress)
-    recovery.value = undefined
+    signature.value = await sign(signMessage.value, erc725AccountAddress)
+    recoveryEoA.value = undefined
     magicValue.value = undefined
 
     setNotification('Message signed successfully')
@@ -110,8 +110,12 @@ const handleResourceChange = (index: number, event: Event) => {
 }
 
 const onRecover = () => {
+  if (!signature.value) {
+    return
+  }
+
   try {
-    recovery.value = recover(signMessage.value, signResponse.value.signature)
+    recoveryEoA.value = recover(message.value, signature.value)
 
     setNotification('Recover was successful')
   } catch (error) {
@@ -127,23 +131,35 @@ const onSignatureValidation = async () => {
   }
 
   try {
-    const messageHash = hashMessage(signMessage.value)
-    if (window.erc725Account) {
-      // TODO: we should probably set the default gas price to undefined,
-      // but it is not yet clear why view functions error on L16 when gasPrice is passed
-      window.erc725Account.options.gasPrice = void 0
-      magicValue.value = (await window.erc725Account.methods
-        .isValidSignature(messageHash, signResponse.value.signature)
-        .call()) as string
-    }
-
-    if (magicValue.value === MAGICVALUE) {
-      setNotification(`Signature validated successfully`, 'info')
+    // we compare recovery address with authenticated one
+    // same addresses means signature is valid (ie. when using MetaMask)
+    // when accounts are we check `isValidSignature` (ie. Universal Profiles)
+    if (recoveryEoA.value === getState('address')) {
+      return setNotification(`Signature validated successfully`, 'info')
     } else {
-      setNotification("Response doesn't match magic value", 'danger')
+      validateUP()
     }
   } catch (error) {
     setNotification((error as unknown as Error).message, 'danger')
+  }
+}
+
+const validateUP = async () => {
+  // const messageHash = hashMessage(signMessage.value)
+  const messageHash = signMessage.value
+  if (window.erc725Account) {
+    // TODO: we should probably set the default gas price to undefined,
+    // but it is not yet clear why view functions error on L16 when gasPrice is passed
+    window.erc725Account.options.gasPrice = void 0
+    magicValue.value = (await window.erc725Account.methods
+      .isValidSignature(messageHash, signature.value)
+      .call()) as string
+  }
+
+  if (magicValue.value === MAGICVALUE) {
+    setNotification(`Signature validated successfully`, 'info')
+  } else {
+    setNotification("Response doesn't match magic value", 'danger')
   }
 }
 </script>
@@ -333,7 +349,7 @@ const onSignatureValidation = async () => {
       <div class="field">
         <button
           class="button is-primary is-rounded mb-3"
-          :disabled="getState('address') && signResponse ? undefined : true"
+          :disabled="getState('address') && signature ? undefined : true"
           data-testid="recover"
           @click="onRecover"
         >
@@ -343,7 +359,7 @@ const onSignatureValidation = async () => {
       <div class="field">
         <button
           class="button is-primary is-rounded mb-3"
-          :disabled="getState('address') && signResponse ? undefined : true"
+          :disabled="getState('address') && signature ? undefined : true"
           data-testid="validate-signature"
           @click="onSignatureValidation"
         >
@@ -360,20 +376,16 @@ const onSignatureValidation = async () => {
       </div>
       <div class="field">
         <div
-          v-if="signResponse"
+          v-if="signature"
           class="notification is-info is-light mt-5"
           data-testid="info"
         >
           <p class="mb-3">
             Signature:
-            <b data-testid="signature">{{ signResponse.signature }}</b>
+            <b data-testid="signature">{{ signature }}</b>
           </p>
-          <p class="mb-3">
-            Sign EoA:
-            <b data-testid="sign-eoa">{{ signResponse.address }}</b>
-          </p>
-          <p v-if="recovery" class="mb-3">
-            Recover EoA: <b data-testid="recovery-eoa">{{ recovery }}</b>
+          <p v-if="recoveryEoA" class="mb-3">
+            Recover EoA: <b data-testid="recovery-eoa">{{ recoveryEoA }}</b>
           </p>
           <p v-if="magicValue" class="mb-3">
             Magic value: <b data-testid="magic-value">{{ magicValue }}</b>
