@@ -1,53 +1,53 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import Notifications from "@/components/Notification.vue";
-import useNotifications from "@/compositions/useNotifications";
+import { ref } from 'vue'
+import Notifications from '@/components/Notification.vue'
+import useNotifications from '@/compositions/useNotifications'
 
 const { notification, clearNotification, hasNotification, setNotification } =
-  useNotifications();
+  useNotifications()
 
-const name = ref("");
-const apiUrl = ref("");
-const chainId = ref("2828");
-const chainIds = ref<number[]>([+chainId.value]);
-const showLabel = ref(false);
+const name = ref('')
+const apiUrl = ref('')
+const chainId = ref('2828')
+const chainIds = ref<number[]>([+chainId.value])
+const showLabel = ref(false)
 
 const addChainIds = () => {
   if (chainId.value.length === 0) {
-    return;
+    return
   }
-  chainIds.value = [...chainIds.value, +chainId.value];
-  chainId.value = "";
-};
+  chainIds.value = [...chainIds.value, +chainId.value]
+  chainId.value = ''
+}
 
 const removeChainId = (index: number) => {
-  chainIds.value.splice(index, 1);
-};
+  chainIds.value.splice(index, 1)
+}
 
 const onFocus = () => {
-  showLabel.value = true;
-};
+  showLabel.value = true
+}
 
 const onBlur = () => {
-  showLabel.value = false;
-};
+  showLabel.value = false
+}
 
 const addCustomRelayer = async () => {
   if (!name.value) {
-    return setNotification("Enter a name", "danger");
+    return setNotification('Enter a name', 'danger')
   }
 
   if (!apiUrl.value) {
-    return setNotification("Enter an api url", "danger");
+    return setNotification('Enter an api url', 'danger')
   }
 
   if (!chainId.value) {
-    return setNotification("Enter a chain id", "danger");
+    return setNotification('Enter a chain id', 'danger')
   }
 
   try {
     await window.ethereum.request({
-      method: "up_addRelayService",
+      method: 'up_addRelayService',
       params: [
         {
           name: name.value,
@@ -55,12 +55,12 @@ const addCustomRelayer = async () => {
           chainIds: chainIds.value,
         },
       ],
-    });
-    setNotification("The relayer was added");
+    })
+    setNotification('The relayer was added')
   } catch (error) {
-    setNotification((error as unknown as Error).message, "danger");
+    setNotification((error as unknown as Error).message, 'danger')
   }
-};
+}
 </script>
 <template>
   <div class="tile is-4 is-parent">
