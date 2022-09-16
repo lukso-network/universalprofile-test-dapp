@@ -4,7 +4,7 @@
 
 A sample app to demonstrate the displaying, deploying and usage of a universal profile inside a web app.
 
-Running version: <http://up.test-dapp.lukso.tech/>
+Running version: <http://up-test-dapp.lukso.tech/>
 
 Stack:
 
