@@ -17,4 +17,5 @@ module.exports = {
   testEnvironmentOptions: {
     customExportConditions: ['node', 'node-addons'],
   },
+  globalSetup: './jest.setup.cjs',
 }
