@@ -128,7 +128,7 @@ const addCustomRelayer = async () => {
           data-testid="add-relayer"
           @click.stop="addCustomRelayer"
         >
-          Create Custom Relayer
+          Add Custom Relayer
         </button>
       </div>
       <div class="field">
