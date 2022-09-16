@@ -4,6 +4,8 @@ export function createIpfsLink(url: string): string {
   return url.replace('ipfs://', DEFAULT_NETWORK_CONFIG.ipfs.url)
 }
 
-export function createBlockScoutLink(hash: string): string {
-  return `${DEFAULT_NETWORK_CONFIG.blockscout.url}/${hash}/internal-transactions`
+export function createBlockScoutLink(hash: string, isTx = false): string {
+  return `${DEFAULT_NETWORK_CONFIG.blockscout.url}/${
+    isTx ? 'tx' : 'address'
+  }/${hash}`
 }

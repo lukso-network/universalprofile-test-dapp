@@ -54,8 +54,11 @@ const deploy = async (controllerKey: string) => {
               ? deploymentEvent?.transaction?.hash.substring(0, 16)
               : deploymentEvent?.receipt?.transactionHash?.substring(0, 16)
             const href = deploymentEvent?.receipt
-              ? createBlockScoutLink(deploymentEvent?.receipt?.transactionHash)
-              : createBlockScoutLink(deploymentEvent?.transaction?.hash)
+              ? createBlockScoutLink(
+                  deploymentEvent?.receipt?.transactionHash,
+                  true
+                )
+              : createBlockScoutLink(deploymentEvent?.transaction?.hash, true)
             setNotification(
               `Profile deployed successfully <br/> <a href="${href}" target="_blank">${hash}</a>`,
               'primary'
@@ -203,7 +206,8 @@ const getIdFromProfileUrl = (uploadedProfile: {
                     v-if="deploymentEvent?.receipt"
                     :href="
                       createBlockScoutLink(
-                        deploymentEvent?.receipt?.transactionHash
+                        deploymentEvent?.receipt?.transactionHash,
+                        true
                       )
                     "
                     target="_blank"
@@ -219,7 +223,10 @@ const getIdFromProfileUrl = (uploadedProfile: {
                   <a
                     v-if="deploymentEvent?.transaction"
                     :href="
-                      createBlockScoutLink(deploymentEvent?.transaction?.hash)
+                      createBlockScoutLink(
+                        deploymentEvent?.transaction?.hash,
+                        true
+                      )
                     "
                     target="_blank"
                     class="button is-small mb-1"
