@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
-// import useWalletConnect, {
-//   WALLET_CONNECT_VERSION as walletConnectVersion,
-// } from '@/compositions/useWalletConnect'
+import useWalletConnect, {
+  WALLET_CONNECT_VERSION as walletConnectVersion,
+} from '@/compositions/useWalletConnect'
 import { getState, useState } from '@/stores'
 import useWeb3 from '@/compositions/useWeb3'
 import { UP_CONNECTED_ADDRESS } from '@/helpers/config'
@@ -15,7 +15,7 @@ const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
 const { setDisconnected, setConnected } = useState()
 const { setupWeb3, requestAccounts } = useWeb3()
-// const { resetProvider, enableProvider, setupProvider } = useWalletConnect()
+const { resetProvider, enableProvider, setupProvider } = useWalletConnect()
 const hasExtension = !!window.ethereum
 
 const hexChainId = computed(() => {
@@ -35,24 +35,24 @@ const connectExtension = async () => {
   }
 }
 
-// const connectWalletconnect = async () => {
-//   clearNotification()
+const connectWalletconnect = async () => {
+  clearNotification()
 
-//   try {
-//     await setupProvider()
-//     await enableProvider()
-//     setConnected(getState('address'), 'walletConnect')
-//     setNotification(`Connected to address: ${getState('address')}`, 'info')
-//   } catch (error) {
-//     setNotification((error as unknown as Error).message, 'danger')
-//   }
-// }
+  try {
+    await setupProvider()
+    await enableProvider()
+    setConnected(getState('address'), 'walletConnect')
+    setNotification(`Connected to address: ${getState('address')}`, 'info')
+  } catch (error) {
+    setNotification((error as unknown as Error).message, 'danger')
+  }
+}
 
 const disconnect = async () => {
   clearNotification()
 
   if (getState('channel') == 'walletConnect') {
-    // await resetProvider()
+    await resetProvider()
   } else {
     localStorage.removeItem(UP_CONNECTED_ADDRESS)
   }
@@ -88,20 +88,13 @@ const disconnect = async () => {
         </span>
       </div>
       <div class="field">
-        <!-- <button
+        <button
           class="button is-primary is-rounded mb-3"
           :disabled="getState('address') ? true : undefined"
           data-testid="connect-wc"
           @click="connectWalletconnect"
         >
           Wallet Connect {{ walletConnectVersion }}
-        </button> -->
-        <button
-          class="button is-primary is-rounded mb-3"
-          :disabled="true"
-          data-testid="connect-wc"
-        >
-          [Disabled] Wallet Connect
         </button>
         <span
           v-if="
