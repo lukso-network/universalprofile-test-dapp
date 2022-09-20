@@ -4,26 +4,26 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { EthereumProviderError } from 'eth-rpc-errors'
 import useDropdown from '@/compositions/useDropdown'
 import useWeb3 from '@/compositions/useWeb3'
-// import useWalletConnect, {
-//   WALLET_CONNECT_VERSION as walletConnectVersion,
-// } from '@/compositions/useWalletConnect'
+import useWalletConnect, {
+  WALLET_CONNECT_VERSION as walletConnectVersion,
+} from '@/compositions/useWalletConnect'
 import { UP_CONNECTED_ADDRESS } from '@/helpers/config'
 import { sliceAddress } from '@/utils/sliceAddress'
 
 const { setupWeb3, accounts, requestAccounts } = useWeb3()
-// const { resetProvider, setupProvider, enableProvider, getProvider } =
-//   useWalletConnect()
+const { resetProvider, setupProvider, enableProvider, getProvider } =
+  useWalletConnect()
 const { setDisconnected, setConnected } = useState()
 const { close, toggle } = useDropdown()
 const dropdown = ref()
-// const browserExtensionConnected = localStorage.getItem(UP_CONNECTED_ADDRESS)
+const browserExtensionConnected = localStorage.getItem(UP_CONNECTED_ADDRESS)
 const hasExtension = !!window.ethereum
 
-// const connectWalletConnect = async () => {
-//   close(dropdown.value)
-//   await setupProvider()
-//   await enableProvider()
-// }
+const connectWalletConnect = async () => {
+  close(dropdown.value)
+  await setupProvider()
+  await enableProvider()
+}
 
 const connectExtension = async () => {
   try {
@@ -51,7 +51,7 @@ const connectExtension = async () => {
 
 const disconnect = async () => {
   if (getState('channel') == 'walletConnect') {
-    // await resetProvider()
+    await resetProvider()
   } else {
     localStorage.removeItem(UP_CONNECTED_ADDRESS)
   }
@@ -97,13 +97,13 @@ const removeEventListeners = () => {
 }
 
 onMounted(async () => {
-  // await setupProvider()
+  await setupProvider()
 
-  // if (getProvider().wc.connected) {
-  //   await enableProvider()
-  // } else if (browserExtensionConnected) {
-  await connectExtension()
-  // }
+  if (getProvider().wc.connected) {
+    await enableProvider()
+  } else if (browserExtensionConnected) {
+    await connectExtension()
+  }
 
   addEventListeners()
 })
@@ -178,18 +178,11 @@ onUnmounted(() => {
         <button
           class="dropdown-item has-text-weight-bold button is-text"
           data-testid="connect-wc"
-        >
-          <div class="logo wallet-connect" />
-          [Disabled] Wallet Connect
-        </button>
-        <!-- <button
-          class="dropdown-item has-text-weight-bold button is-text"
-          data-testid="connect-wc"
           @click="connectWalletConnect"
         >
           <div class="logo wallet-connect" />
           Wallet Connect {{ walletConnectVersion }}
-        </button> -->
+        </button>
       </div>
     </div>
   </div>

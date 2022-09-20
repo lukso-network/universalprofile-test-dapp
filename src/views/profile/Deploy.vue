@@ -8,7 +8,7 @@ import { NETWORKS } from '@/helpers/config'
 import { useLspFactory } from '@/compositions/useLspFactory'
 import ProfileModal from '@/components/modals/ProfileModal.vue'
 import { createBlockScoutLink } from '@/utils/createLinks'
-import { formatNumber } from '@/helpers/ethers'
+import { formatNumber } from '@/helpers/formatNumber'
 import {
   LSP3ProfileJSON,
   DeploymentEvent,
