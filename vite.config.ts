@@ -15,4 +15,9 @@ export default defineConfig({
       stream: 'stream-browserify',
     },
   },
+  build: {
+    commonjsOptions: {
+      transformMixedEsModules: true,
+    },
+  },
 })
