@@ -15,7 +15,7 @@
     "lint:types": "tsc --noEmit"
   },
   "dependencies": {
-    "@erc725/erc725.js": "0.14.4",
+    "@erc725/erc725.js": "^0.15.0",
     "@lukso/lsp-factory.js": "2.3.3",
     "@lukso/lsp-smart-contracts": "0.6.2",
     "@walletconnect/client": "1.8.0",
