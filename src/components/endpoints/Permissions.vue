@@ -31,6 +31,7 @@ const permissions: Permissions = {
   DEPLOY: false,
   TRANSFERVALUE: false,
   SIGN: false,
+  ENCRYPT: false,
   SUPER_SETDATA: false,
   SUPER_TRANSFERVALUE: false,
   SUPER_CALL: false,
