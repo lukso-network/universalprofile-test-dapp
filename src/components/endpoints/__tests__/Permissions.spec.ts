@@ -7,7 +7,7 @@ const mockSend = jest.fn()
 
 window.erc725Account = {
   methods: {
-    setData: (key: any[], value: any[]) => ({
+    'setData(bytes32[],bytes[])': (key: any[], value: any[]) => ({
       send: () => mockSend(key, value),
     }),
   },

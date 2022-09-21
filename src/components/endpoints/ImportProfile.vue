@@ -29,10 +29,8 @@ const onImportProfile = async () => {
       method: 'up_import',
       params: [universalProfileAddress.value],
     })
-    console.log('im here1')
     if (newControllerAddress) {
       controllerAddress.value = newControllerAddress
-      console.log('im here')
     }
   } catch (error) {
     setNotification((error as unknown as Error).message, 'danger')
