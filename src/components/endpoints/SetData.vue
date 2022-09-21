@@ -32,8 +32,10 @@ const setData = async () => {
   try {
     isPending.value = true
     window.erc725Account &&
-      (await window.erc725Account.methods
-        .setData([key.value], [value.value])
+      (await window.erc725Account.methods['setData(bytes32[],bytes[])'](
+        [key.value],
+        [value.value]
+      )
         .send({
           from: erc725AccountAddress,
         })
