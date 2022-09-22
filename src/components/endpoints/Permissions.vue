@@ -42,7 +42,9 @@ const selectedPermissions = ref(permissions)
 const isPending = ref(false)
 const ALL_PERMISSIONS_WITH_DELEGATECALL = padLeft(
   numberToHex(
-    hexToNumber(ALL_PERMISSIONS) + hexToNumber(PERMISSIONS.DELEGATECALL)
+    hexToNumber(ALL_PERMISSIONS) +
+      hexToNumber(PERMISSIONS.DELEGATECALL) +
+      hexToNumber(PERMISSIONS.SUPER_DELEGATECALL)
   ),
   64
 )
@@ -96,7 +98,6 @@ const allPermissionsToggle = () => {
       ALL_PERMISSIONS_WITH_DELEGATECALL
     )
   }
-  console.log()
 }
 
 const allPermissionsSelected = computed(() => {
