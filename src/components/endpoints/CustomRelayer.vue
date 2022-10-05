@@ -47,7 +47,7 @@ const addCustomRelayer = async () => {
 
   try {
     await window.ethereum.request({
-      method: 'up_addRelayService',
+      method: 'up_addTransactionRelayer',
       params: [
         {
           name: name.value,
