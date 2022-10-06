@@ -27,7 +27,7 @@ test('can add relayer', async () => {
   expect(screen.getByTestId('chain-id-list')).toHaveTextContent(/2828/)
 
   expect(windowSpy).toHaveBeenCalledWith({
-    method: 'up_addRelayService',
+    method: 'up_addTransactionRelayer',
     params: [data],
   })
 })
