@@ -1,8 +1,20 @@
 <script setup lang="ts">
+import Notifications from '@/components/Notification.vue'
+import useNotifications from '@/compositions/useNotifications'
+import { ref } from 'vue'
+
+const { notification, clearNotification, hasNotification, setNotification } =
+  useNotifications()
+
+const networkId = ref('')
+
 const getNetworkId = async () => {
-  const id = await window.ethereum.request({ method: 'eth_getId' })
-  //@ts-ignore
-  document.getElementById('getNetId').innerHTML = id
+  try {
+    networkId.value = await window.ethereum.request({ method: 'eth_getId' })
+    setNotification(networkId.value, 'info')
+  } catch (error) {
+    setNotification((error as unknown as Error).message, 'danger')
+  }
 }
 </script>
 
@@ -20,7 +32,15 @@ const getNetworkId = async () => {
             Get ID
           </button>
         </div>
-        <label id="getNetId" class="is-child mt-4"></label>
+      </div>
+      <div class="field">
+        <Notifications
+          v-if="hasNotification"
+          :notification="notification"
+          class="notification is-info is-light mt-5"
+          @hide="clearNotification"
+        >
+        </Notifications>
       </div>
     </div>
   </div>
