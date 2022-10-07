@@ -25,7 +25,7 @@ const getNetworkId = async () => {
       <div class="field">
         <div class="is-one-third mb-4">
           <button
-            :class="`button is-primary is-rounded mt-4 `"
+            class="button is-primary is-rounded mt-4"
             data-testid="getNetId"
             @click="getNetworkId"
           >
