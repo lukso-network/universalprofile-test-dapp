@@ -13,6 +13,7 @@ export default defineConfig({
       http: 'stream-http',
       https: 'https-browserify',
       stream: 'stream-browserify',
+      buffer: 'buffer/  '
     },
   },
   build: {
