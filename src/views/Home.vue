@@ -10,6 +10,7 @@ import Sign from '@/components/endpoints/Sign.vue'
 import CustomRelayer from '@/components/endpoints/CustomRelayer.vue'
 import Notifications from '@/components/Notification.vue'
 import ImportProfile from '@/components/endpoints/ImportProfile.vue'
+import GetNetId from '@/components/endpoints/GetNetId.vue'
 
 const hasExtension = computed(() => {
   return window.ethereum
@@ -40,6 +41,7 @@ const hasExtension = computed(() => {
     <div class="tile is-ancestor">
       <CustomRelayer />
       <ImportProfile />
+      <GetNetId />
     </div>
   </section>
 </template>
