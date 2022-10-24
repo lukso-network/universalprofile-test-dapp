@@ -15,12 +15,13 @@ const { sign, recover, getWeb3 } = useWeb3()
 const isPending = ref(false)
 const message = ref('sign message')
 const signMessage = ref('')
-const signResponse = ref()
+const signResponse = ref<string>()
 const recovery = ref<string>()
 const magicValue = ref<string>()
 const isSiwe = ref(false)
 const hasExpirationTime = ref(false)
 const hasNotBefore = ref(false)
+
 const siwe = ref({
   expirationDate: getDate(),
   expirationTime: getTime(60 * 1000 * 5),
@@ -30,7 +31,7 @@ const siwe = ref({
   nonce: '',
   domain: window.location.host,
   address: '',
-  origin: window.location.origin,
+  uri: window.location.href,
   version: '1',
   chainId: 0,
 })
@@ -68,7 +69,7 @@ const createSiweMessage = () => {
     domain: siwe.value.domain,
     address: siwe.value.address,
     statement: message.value,
-    uri: siwe.value.origin,
+    uri: siwe.value.uri,
     version: siwe.value.version,
     nonce: siwe.value.nonce || generateNonce(),
     chainId: siwe.value.chainId,
@@ -108,11 +109,12 @@ const handleResourceChange = (index: number, event: Event) => {
 }
 
 const onRecover = async () => {
+  if (!signResponse.value) {
+    return setNotification('Please sign message first', 'danger')
+  }
+
   try {
-    recovery.value = await recover(
-      signMessage.value,
-      signResponse.value.signature
-    )
+    recovery.value = await recover(signMessage.value, signResponse.value)
 
     setNotification('Recover was successful')
   } catch (error) {
@@ -134,7 +136,7 @@ const onSignatureValidation = async () => {
       // but it is not yet clear why view functions error on L16 when gasPrice is passed
       window.erc725Account.options.gasPrice = void 0
       magicValue.value = (await window.erc725Account.methods
-        .isValidSignature(messageHash, signResponse.value.signature)
+        .isValidSignature(messageHash, signResponse.value)
         .call()) as string
     }
 
@@ -203,14 +205,14 @@ const onSignatureValidation = async () => {
           </div>
         </div>
         <div class="field">
-          <label class="label">Origin (URI)</label>
+          <label class="label">URI</label>
           <div class="control">
             <input
-              v-model="siwe.origin"
+              v-model="siwe.uri"
               class="input"
               type="text"
               :disabled="getState('address') ? undefined : true"
-              data-testid="siwe.origin"
+              data-testid="siwe.uri"
             />
           </div>
         </div>
@@ -367,11 +369,7 @@ const onSignatureValidation = async () => {
         >
           <p class="mb-3">
             Signature:
-            <b data-testid="signature">{{ signResponse.signature }}</b>
-          </p>
-          <p class="mb-3">
-            Sign EoA:
-            <b data-testid="sign-eoa">{{ signResponse.address }}</b>
+            <b data-testid="signature">{{ signResponse }}</b>
           </p>
           <p v-if="recovery" class="mb-3">
             Recover EoA: <b data-testid="recovery-eoa">{{ recovery }}</b>
