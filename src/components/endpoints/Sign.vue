@@ -15,7 +15,7 @@ const { sign, recover, getWeb3 } = useWeb3()
 const isPending = ref(false)
 const message = ref('sign message')
 const signMessage = ref('')
-const signResponse = ref()
+const signResponse = ref<string>()
 const recovery = ref<string>()
 const magicValue = ref<string>()
 const isSiwe = ref(false)
@@ -109,11 +109,12 @@ const handleResourceChange = (index: number, event: Event) => {
 }
 
 const onRecover = async () => {
+  if (!signResponse.value) {
+    return setNotification('Please sign message first', 'danger')
+  }
+
   try {
-    recovery.value = await recover(
-      signMessage.value,
-      signResponse.value.signature
-    )
+    recovery.value = await recover(signMessage.value, signResponse.value)
 
     setNotification('Recover was successful')
   } catch (error) {
@@ -135,7 +136,7 @@ const onSignatureValidation = async () => {
       // but it is not yet clear why view functions error on L16 when gasPrice is passed
       window.erc725Account.options.gasPrice = void 0
       magicValue.value = (await window.erc725Account.methods
-        .isValidSignature(messageHash, signResponse.value.signature)
+        .isValidSignature(messageHash, signResponse.value)
         .call()) as string
     }
 
@@ -368,11 +369,7 @@ const onSignatureValidation = async () => {
         >
           <p class="mb-3">
             Signature:
-            <b data-testid="signature">{{ signResponse.signature }}</b>
-          </p>
-          <p class="mb-3">
-            Sign EoA:
-            <b data-testid="sign-eoa">{{ signResponse.address }}</b>
+            <b data-testid="signature">{{ signResponse }}</b>
           </p>
           <p v-if="recovery" class="mb-3">
             Recover EoA: <b data-testid="recovery-eoa">{{ recovery }}</b>

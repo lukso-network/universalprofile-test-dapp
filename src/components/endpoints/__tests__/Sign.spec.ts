@@ -42,10 +42,7 @@ beforeEach(() => {
 })
 
 test('can sign message', async () => {
-  mockSign.mockReturnValue({
-    signature: '0x123',
-    address: '0x321',
-  })
+  mockSign.mockReturnValue('0x123')
   setState('address', '0x517216362D594516c6f96Ee34b2c502d65B847E4')
   render(Sign)
 
@@ -58,19 +55,12 @@ test('can sign message', async () => {
     'sign message',
     '0x517216362D594516c6f96Ee34b2c502d65B847E4'
   )
-  expect(mockSign).toReturnWith({
-    signature: '0x123',
-    address: '0x321',
-  })
+  expect(mockSign).toReturnWith('0x123')
   expect(screen.getByTestId('signature')).toHaveTextContent('0x123')
-  expect(screen.getByTestId('sign-eoa')).toHaveTextContent('0x321')
 })
 
 test('can recovery message', async () => {
-  mockSign.mockReturnValue({
-    signature: '0x123',
-    address: '0x321',
-  })
+  mockSign.mockReturnValue('0x123')
   mockRecover.mockReturnValue('0x321')
   setState('address', '0x517216362D594516c6f96Ee34b2c502d65B847E4')
   render(Sign)
@@ -87,10 +77,7 @@ test('can recovery message', async () => {
 })
 
 test('can verify signature', async () => {
-  mockSign.mockReturnValue({
-    signature: '0x123',
-    address: '0x321',
-  })
+  mockSign.mockReturnValue('0x123')
   mockValidSignatureCall.mockReturnValue('0x1626ba7e')
   mockHashMessage.mockReturnValue('0x1626ba7e')
   setState('address', '0x517216362D594516c6f96Ee34b2c502d65B847E4')
@@ -108,10 +95,7 @@ test('can verify signature', async () => {
 })
 
 test('can sign with ethereum', async () => {
-  mockSign.mockReturnValue({
-    signature: '0x123',
-    address: '0x321',
-  })
+  mockSign.mockReturnValue('0x123')
   setState('address', '0x517216362D594516c6f96Ee34b2c502d65B847E4')
   render(Sign)
 
@@ -168,10 +152,6 @@ Resources:
 - http://some-resource2.com`,
     '0x517216362D594516c6f96Ee34b2c502d65B847E4'
   )
-  expect(mockSign).toReturnWith({
-    signature: '0x123',
-    address: '0x321',
-  })
+  expect(mockSign).toReturnWith('0x123')
   expect(screen.getByTestId('signature')).toHaveTextContent('0x123')
-  expect(screen.getByTestId('sign-eoa')).toHaveTextContent('0x321')
 })
