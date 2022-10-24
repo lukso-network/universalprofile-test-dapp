@@ -21,6 +21,7 @@ const magicValue = ref<string>()
 const isSiwe = ref(false)
 const hasExpirationTime = ref(false)
 const hasNotBefore = ref(false)
+
 const siwe = ref({
   expirationDate: getDate(),
   expirationTime: getTime(60 * 1000 * 5),
@@ -30,7 +31,7 @@ const siwe = ref({
   nonce: '',
   domain: window.location.host,
   address: '',
-  origin: window.location.origin,
+  uri: window.location.href,
   version: '1',
   chainId: 0,
 })
@@ -68,7 +69,7 @@ const createSiweMessage = () => {
     domain: siwe.value.domain,
     address: siwe.value.address,
     statement: message.value,
-    uri: siwe.value.origin,
+    uri: siwe.value.uri,
     version: siwe.value.version,
     nonce: siwe.value.nonce || generateNonce(),
     chainId: siwe.value.chainId,
@@ -203,14 +204,14 @@ const onSignatureValidation = async () => {
           </div>
         </div>
         <div class="field">
-          <label class="label">Origin (URI)</label>
+          <label class="label">URI</label>
           <div class="control">
             <input
-              v-model="siwe.origin"
+              v-model="siwe.uri"
               class="input"
               type="text"
               :disabled="getState('address') ? undefined : true"
-              data-testid="siwe.origin"
+              data-testid="siwe.uri"
             />
           </div>
         </div>
