@@ -14,7 +14,7 @@ const setupProvider = async (): Promise<void> => {
     rpc: {
       [DEFAULT_NETWORK_CONFIG.chainId]: DEFAULT_NETWORK_CONFIG.rpc.url,
     },
-    bridge: 'https://safe-walletconnect.gnosis.io',
+    bridge: 'https://bridge.walletconnect.org/',
     chainId: DEFAULT_NETWORK_CONFIG.chainId,
   })
 
