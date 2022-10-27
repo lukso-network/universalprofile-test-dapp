@@ -26,13 +26,14 @@ const getNetworkId = async () => {
         <div class="is-one-third mb-4">
           <button
             class="button is-primary is-rounded mt-4"
-            data-testid="getNetId"
+            data-testid="getNetworkId"
             @click="getNetworkId"
           >
             Get ID
           </button>
         </div>
       </div>
+      <div>Test <code>eth_getId</code> RPC call.</div>
       <div class="field">
         <Notifications
           v-if="hasNotification"
