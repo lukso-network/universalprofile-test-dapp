@@ -62,23 +62,13 @@ const setData = async () => {
       <div class="field">
         <label class="label">Key</label>
         <div class="control">
-          <input
-            v-model="key"
-            class="input"
-            type="text"
-            :disabled="getState('address') ? undefined : true"
-          />
+          <input v-model="key" class="input" type="text" />
         </div>
       </div>
       <div class="field">
         <label class="label">Value</label>
         <div class="control">
-          <input
-            v-model="value"
-            class="input"
-            type="text"
-            :disabled="getState('address') ? undefined : true"
-          />
+          <input v-model="value" class="input" type="text" />
         </div>
       </div>
       <div class="field">
@@ -86,13 +76,20 @@ const setData = async () => {
           :class="`button is-primary is-rounded mb-3 ${
             isPending ? 'is-loading' : ''
           }`"
-          :disabled="getState('address') ? undefined : true"
           data-testid="setData"
           @click="setData"
         >
           Set data
         </button>
       </div>
+
+      <div class="field">
+        How to
+        <a href="https://docs.lukso.tech/guides/universal-profile/edit-profile"
+          >edit a Universal Profile tutorial</a
+        >.
+      </div>
+
       <div class="field">
         <Notifications
           v-if="hasNotification"

@@ -61,14 +61,9 @@ const sendLyx = async () => {
     <div class="tile is-child box">
       <p class="is-size-5 has-text-weight-bold mb-4">Send LYX</p>
       <div class="field">
-        <label class="label">From</label>
+        <label class="label">From (defaults to injected address)</label>
         <div class="control">
-          <input
-            class="input"
-            type="text"
-            :value="getState('address')"
-            disabled
-          />
+          <input class="input" type="text" :value="getState('address')" />
         </div>
       </div>
       <div class="field">
@@ -79,7 +74,6 @@ const sendLyx = async () => {
             class="input"
             type="text"
             placeholder="0x123..."
-            :disabled="getState('address') ? undefined : true"
             data-testid="to"
           />
         </div>
@@ -93,7 +87,6 @@ const sendLyx = async () => {
               class="input"
               type="number"
               placeholder="0"
-              :disabled="getState('address') ? undefined : true"
               data-testid="amount"
             />
           </div>
@@ -104,7 +97,6 @@ const sendLyx = async () => {
           <input
             v-model="hasData"
             type="checkbox"
-            :disabled="getState('address') ? undefined : true"
             :value="hasData"
             data-testid="hasData"
           />
@@ -117,7 +109,6 @@ const sendLyx = async () => {
           v-model="data"
           class="textarea"
           placeholder="0x..."
-          :disabled="getState('address') ? undefined : true"
           data-testid="data"
         ></textarea>
       </div>
@@ -126,13 +117,20 @@ const sendLyx = async () => {
           :class="`button is-primary is-rounded mt-4 ${
             isPending ? 'is-loading' : ''
           }`"
-          :disabled="getState('address') ? undefined : true"
           data-testid="send"
           @click="sendLyx"
         >
           Send Transaction
         </button>
       </div>
+
+      <div class="field">
+        How to
+        <a href="https://docs.lukso.tech/guides/universal-profile/transfer-lyx"
+          >transfer LYX tutorial</a
+        >.
+      </div>
+
       <div class="field">
         <Notifications
           v-if="hasNotification"

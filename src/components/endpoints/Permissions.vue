@@ -52,13 +52,14 @@ const ALL_PERMISSIONS_WITH_DELEGATECALL = padLeft(
 const setPermissions = async () => {
   const erc725AccountAddress = getState('address')
 
-  if (!erc725AccountAddress) {
-    return setNotification('No valid address', 'danger')
-  }
+  // NOTE: We remove validation as we want to test the extension with wrong, missing parameters.
+  // if (!erc725AccountAddress) {
+  //   return setNotification('No valid address', 'danger')
+  // }
 
-  if (!grantPermissionAddress.value) {
-    return setNotification('Enter address', 'danger')
-  }
+  // if (!grantPermissionAddress.value) {
+  //   return setNotification('Enter address', 'danger')
+  // }
 
   const key =
     ERC725YKeys['LSP6']['AddressPermissions:Permissions'] +
@@ -115,12 +116,7 @@ const allPermissionsSelected = computed(() => {
       <div class="field">
         <label class="label">Address</label>
         <div class="control">
-          <input
-            v-model="grantPermissionAddress"
-            class="input"
-            type="text"
-            :disabled="getState('address') ? undefined : true"
-          />
+          <input v-model="grantPermissionAddress" class="input" type="text" />
         </div>
       </div>
       <div class="field">
@@ -134,7 +130,6 @@ const allPermissionsSelected = computed(() => {
               v-model="selectedPermissions[key]"
               type="checkbox"
               :value="value"
-              :disabled="getState('address') ? undefined : true"
             />
             {{ key }}
           </label>
@@ -146,7 +141,6 @@ const allPermissionsSelected = computed(() => {
             <input
               :checked="allPermissionsSelected"
               type="checkbox"
-              :disabled="getState('address') ? undefined : true"
               @click.stop="allPermissionsToggle"
             />
             Select all
@@ -180,13 +174,19 @@ const allPermissionsSelected = computed(() => {
           :class="`button is-primary is-rounded mb-3 ${
             isPending ? 'is-loading' : ''
           }`"
-          :disabled="getState('address') ? undefined : true"
           data-testid="setPermissions"
           @click="setPermissions"
         >
           Set permissions
         </button>
       </div>
+
+      <div class="field">
+        <a href="https://docs.lukso.tech/guides/key-manager/give-permissions"
+          >Key Manager permissions tutorial</a
+        >.
+      </div>
+
       <div class="field">
         <Notifications
           v-if="hasNotification"

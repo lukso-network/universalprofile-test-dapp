@@ -41,7 +41,7 @@ const { toggle } = useDropdown()
 
     <div id="navbar" ref="menu" class="navbar-menu">
       <div class="navbar-start">
-        <router-link class="navbar-item" to="/">Home</router-link>
+        <router-link class="navbar-item" to="/">RPC</router-link>
 
         <div class="navbar-item has-dropdown is-hoverable">
           <router-link class="navbar-item" to="/profiles">Profiles</router-link>
@@ -65,6 +65,22 @@ const { toggle } = useDropdown()
       <div class="navbar-end">
         <div class="navbar-item">
           <div class="buttons">
+            <a
+              class="button is-light"
+              target="_blank"
+              rel="noreferer"
+              href="https://docs.lukso.tech/"
+            >
+              <strong>LUKSO DOCS</strong>
+            </a>
+            <a
+              class="button is-light"
+              target="_blank"
+              rel="noreferer"
+              href="https://github.com/lukso-network/universalprofile-test-dapp"
+            >
+              <strong>GitHub</strong>
+            </a>
             <Suspense>
               <Connect />
             </Suspense>

@@ -158,12 +158,7 @@ const onSignatureValidation = async () => {
       <div class="field">
         <label class="label">Message</label>
         <div class="control">
-          <textarea
-            v-model="message"
-            class="textarea"
-            rows="3"
-            :disabled="getState('address') ? undefined : true"
-          />
+          <textarea v-model="message" class="textarea" rows="3" />
         </div>
       </div>
       <div class="field">
@@ -171,7 +166,6 @@ const onSignatureValidation = async () => {
           <input
             v-model="isSiwe"
             type="checkbox"
-            :disabled="getState('address') ? undefined : true"
             :value="isSiwe"
             data-testid="isSiwe"
           />
@@ -187,7 +181,6 @@ const onSignatureValidation = async () => {
               v-model="siwe.domain"
               class="input"
               type="text"
-              :disabled="getState('address') ? undefined : true"
               data-testid="siwe.domain"
             />
           </div>
@@ -199,7 +192,6 @@ const onSignatureValidation = async () => {
               v-model="siwe.address"
               class="input"
               type="text"
-              :disabled="getState('address') ? undefined : true"
               data-testid="siwe.address"
             />
           </div>
@@ -211,7 +203,6 @@ const onSignatureValidation = async () => {
               v-model="siwe.uri"
               class="input"
               type="text"
-              :disabled="getState('address') ? undefined : true"
               data-testid="siwe.uri"
             />
           </div>
@@ -223,7 +214,6 @@ const onSignatureValidation = async () => {
               v-model="siwe.version"
               class="input"
               type="text"
-              :disabled="getState('address') ? undefined : true"
               data-testid="siwe.version"
             />
           </div>
@@ -235,7 +225,6 @@ const onSignatureValidation = async () => {
               v-model="siwe.chainId"
               class="input"
               type="text"
-              :disabled="getState('address') ? undefined : true"
               data-testid="siwe.chainId"
             />
           </div>
@@ -245,7 +234,6 @@ const onSignatureValidation = async () => {
             <input
               v-model="hasExpirationTime"
               type="checkbox"
-              :disabled="getState('address') ? undefined : true"
               :value="hasExpirationTime"
               data-testid="siwe.hasExpirationTime"
             />
@@ -256,14 +244,12 @@ const onSignatureValidation = async () => {
               v-model="siwe.expirationDate"
               class="input"
               type="date"
-              :disabled="getState('address') ? undefined : true"
               data-testid="siwe.expirationDate"
             />
             <input
               v-model="siwe.expirationTime"
               class="input ml-2"
               type="time"
-              :disabled="getState('address') ? undefined : true"
               data-testid="siwe.expirationTime"
             />
           </div>
@@ -273,7 +259,6 @@ const onSignatureValidation = async () => {
             <input
               v-model="hasNotBefore"
               type="checkbox"
-              :disabled="getState('address') ? undefined : true"
               :value="hasNotBefore"
               data-testid="siwe.hasNotBefore"
             />
@@ -284,14 +269,12 @@ const onSignatureValidation = async () => {
               v-model="siwe.notBeforeDate"
               class="input"
               type="date"
-              :disabled="getState('address') ? undefined : true"
               data-testid="siwe.notBeforeDate"
             />
             <input
               v-model="siwe.notBeforeTime"
               class="input ml-2"
               type="time"
-              :disabled="getState('address') ? undefined : true"
               data-testid="siwe.notBeforeTime"
             />
           </div>
@@ -308,7 +291,6 @@ const onSignatureValidation = async () => {
               :value="resource"
               class="input"
               type="text"
-              :disabled="getState('address') ? undefined : true"
               :data-testid="`siwe.resource-${index}`"
               @keyup="event => handleResourceChange(index, event)"
             />
@@ -326,7 +308,6 @@ const onSignatureValidation = async () => {
           :class="`button is-primary is-rounded mb-3 ${
             isPending ? 'is-loading' : ''
           }`"
-          :disabled="getState('address') ? undefined : true"
           data-testid="sign"
           @click="onSign"
         >
@@ -336,7 +317,7 @@ const onSignatureValidation = async () => {
       <div class="field">
         <button
           class="button is-primary is-rounded mb-3"
-          :disabled="getState('address') && signResponse ? undefined : true"
+          :disabled="signResponse ? undefined : true"
           data-testid="recover"
           @click="onRecover"
         >
@@ -346,12 +327,25 @@ const onSignatureValidation = async () => {
       <div class="field">
         <button
           class="button is-primary is-rounded mb-3"
-          :disabled="getState('address') && signResponse ? undefined : true"
+          :disabled="signResponse ? undefined : true"
           data-testid="validate-signature"
           @click="onSignatureValidation"
         >
           Signature validation
         </button>
+      </div>
+      <div class="field">
+        Test <code>eth_sign</code> RPC call [<a
+          href="https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_sign"
+          >documentation</a
+        >].
+      </div>
+      <div class="field">
+        How to implement
+        <a
+          href="https://docs.lukso.tech/guides/browser-extension/sign-in-with-ethereum"
+          >Sign In With Ethereum tutorial</a
+        >.
       </div>
       <div class="field">
         <Notifications

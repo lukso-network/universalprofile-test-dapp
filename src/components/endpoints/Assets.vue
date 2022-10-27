@@ -34,13 +34,14 @@ const create = async () => {
     return
   }
 
-  if (!token.value.name) {
-    return setNotification('Enter token name', 'danger')
-  }
+  // NOTE: We remove validation as we want to test the extension with wrong, missing parameters.
+  // if (!token.value.name) {
+  //   return setNotification('Enter token name', 'danger')
+  // }
 
-  if (!token.value.symbol) {
-    return setNotification('Enter token symbol', 'danger')
-  }
+  // if (!token.value.symbol) {
+  //   return setNotification('Enter token symbol', 'danger')
+  // }
 
   const erc725AccountAddress = getState('address')
   const tokenParams = [
@@ -84,13 +85,14 @@ const mint = async () => {
     return setNotification('No token specified', 'danger')
   }
 
-  if (!mintReceiver.value) {
-    return setNotification('Enter mint address', 'danger')
-  }
+  // NOTE: We remove validation as we want to test the extension with wrong, missing parameters.
+  // if (!mintReceiver.value) {
+  //   return setNotification('Enter mint address', 'danger')
+  // }
 
-  if (!mintAmount.value) {
-    return setNotification('Enter mint amount', 'danger')
-  }
+  // if (!mintAmount.value) {
+  //   return setNotification('Enter mint amount', 'danger')
+  // }
 
   try {
     await myToken.value.methods
@@ -117,33 +119,18 @@ const mint = async () => {
       <div class="field">
         <label class="label">Token name</label>
         <div class="control">
-          <input
-            v-model="token.name"
-            class="input"
-            type="text"
-            :disabled="getState('address') ? undefined : true"
-          />
+          <input v-model="token.name" class="input" type="text" />
         </div>
       </div>
       <div class="field">
         <label class="label">Token symbol</label>
         <div class="control">
-          <input
-            v-model="token.symbol"
-            class="input"
-            type="text"
-            :disabled="getState('address') ? undefined : true"
-          />
+          <input v-model="token.symbol" class="input" type="text" />
         </div>
       </div>
       <div class="field">
         <label class="checkbox">
-          <input
-            v-model="token.isNFT"
-            type="checkbox"
-            :disabled="getState('address') ? undefined : true"
-            :value="token.isNFT"
-          />
+          <input v-model="token.isNFT" type="checkbox" :value="token.isNFT" />
           is NFT
         </label>
       </div>
@@ -152,7 +139,6 @@ const mint = async () => {
           :class="`button is-primary is-rounded mb-3 mr-3 ${
             isTokenPending ? 'is-loading' : ''
           }`"
-          :disabled="getState('address') ? undefined : true"
           data-testid="create"
           @click="create"
         >
@@ -167,7 +153,7 @@ const mint = async () => {
             class="input"
             type="text"
             data-testid="mint-address"
-            :disabled="getState('address') && isTokenCreated ? undefined : true"
+            :disabled="isTokenCreated ? undefined : true"
           />
         </div>
       </div>
@@ -180,9 +166,7 @@ const mint = async () => {
               class="input"
               type="number"
               placeholder="0"
-              :disabled="
-                getState('address') && isTokenCreated ? undefined : true
-              "
+              :disabled="isTokenCreated ? undefined : true"
             />
           </div>
         </div>
@@ -190,7 +174,7 @@ const mint = async () => {
       <div class="field">
         <button
           class="button is-primary is-rounded mb-3 mr-3"
-          :disabled="getState('address') && isTokenCreated ? undefined : true"
+          :disabled="isTokenCreated ? undefined : true"
           data-testid="mint"
           @click="mint"
         >
