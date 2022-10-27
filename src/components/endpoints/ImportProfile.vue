@@ -3,26 +3,25 @@ import { ref } from 'vue'
 
 import Notifications from '@/components/Notification.vue'
 
-import useWeb3 from '@/compositions/useWeb3'
 import useNotifications from '@/compositions/useNotifications'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
-const { isAddress } = useWeb3()
 
 const universalProfileAddress = ref('')
 const controllerAddress = ref('')
 
 const onImportProfile = async () => {
-  if (
-    !universalProfileAddress.value ||
-    !isAddress(universalProfileAddress.value)
-  ) {
-    return setNotification(
-      'Please provide a UP (ERC725 Account) address',
-      'danger'
-    )
-  }
+  // NOTE: We remove validation as we want to send broken input to the extension to test it.
+  // if (
+  //   !universalProfileAddress.value ||
+  //   !isAddress(universalProfileAddress.value)
+  // ) {
+  //   return setNotification(
+  //     'Please provide a UP (ERC725 Account) address',
+  //     'danger'
+  //   )
+  // }
 
   try {
     const newControllerAddress = await window.ethereum.request({
@@ -86,7 +85,7 @@ const onImportProfile = async () => {
       </div>
 
       <div>
-        Test up_import RPC call [<a
+        Test <code>up_import</code> RPC call [<a
           href="https://docs.lukso.tech/standards/rpc-api#up_import"
           >documentation</a
         >].

@@ -40,18 +40,6 @@ test('can update permissions for given address', async () => {
   )
 })
 
-test('can see error for set permissions when no given address', async () => {
-  setState('address', undefined)
-
-  render(Permissions)
-
-  await fireEvent.click(screen.getByTestId('setPermissions'))
-
-  expect(screen.getByTestId('notification')).toHaveTextContent(
-    'No valid address'
-  )
-})
-
 test('can see set permission error from send function', async () => {
   setState('address', '0x517216362D594516c6f96Ee34b2c502d65B847E4')
 

@@ -34,13 +34,14 @@ const create = async () => {
     return
   }
 
-  if (!token.value.name) {
-    return setNotification('Enter token name', 'danger')
-  }
+  // NOTE: We remove validation as we want to test the extension with wrong, missing parameters.
+  // if (!token.value.name) {
+  //   return setNotification('Enter token name', 'danger')
+  // }
 
-  if (!token.value.symbol) {
-    return setNotification('Enter token symbol', 'danger')
-  }
+  // if (!token.value.symbol) {
+  //   return setNotification('Enter token symbol', 'danger')
+  // }
 
   const erc725AccountAddress = getState('address')
   const tokenParams = [
@@ -84,13 +85,14 @@ const mint = async () => {
     return setNotification('No token specified', 'danger')
   }
 
-  if (!mintReceiver.value) {
-    return setNotification('Enter mint address', 'danger')
-  }
+  // NOTE: We remove validation as we want to test the extension with wrong, missing parameters.
+  // if (!mintReceiver.value) {
+  //   return setNotification('Enter mint address', 'danger')
+  // }
 
-  if (!mintAmount.value) {
-    return setNotification('Enter mint amount', 'danger')
-  }
+  // if (!mintAmount.value) {
+  //   return setNotification('Enter mint amount', 'danger')
+  // }
 
   try {
     await myToken.value.methods

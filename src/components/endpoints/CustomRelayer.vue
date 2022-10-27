@@ -33,21 +33,22 @@ const onBlur = () => {
 }
 
 const addCustomRelayer = async () => {
-  if (!name.value) {
-    return setNotification('Enter a name', 'danger')
-  }
+  // NOTE: We remove validation as we want to test the extension with wrong, missing parameters.
+  // if (!name.value) {
+  //   return setNotification('Enter a name', 'danger')
+  // }
 
-  if (!apiUrl.value) {
-    return setNotification('Enter an api url', 'danger')
-  }
+  // if (!apiUrl.value) {
+  //   return setNotification('Enter an api url', 'danger')
+  // }
 
-  if (!chainId.value) {
-    return setNotification('Enter a chain id', 'danger')
-  }
+  // if (!chainId.value) {
+  //   return setNotification('Enter a chain id', 'danger')
+  // }
 
   try {
     await window.ethereum.request({
-      method: 'up_addTransactionRelayer',
+      method: 'up_addTransactionRelayer', // https://docs.lukso.tech/standards/rpc-api#up_addtransactionrelayer
       params: [
         {
           name: name.value,
@@ -130,6 +131,12 @@ const addCustomRelayer = async () => {
         >
           Add Custom Relayer
         </button>
+      </div>
+      <div>
+        Test <code>up_addTransactionRelayer</code> RPC call [<a
+          href="https://docs.lukso.tech/standards/rpc-api#up_addtransactionrelayer"
+          >documentation</a
+        >].
       </div>
       <div class="field">
         <Notifications

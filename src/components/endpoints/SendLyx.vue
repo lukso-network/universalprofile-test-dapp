@@ -61,14 +61,9 @@ const sendLyx = async () => {
     <div class="tile is-child box">
       <p class="is-size-5 has-text-weight-bold mb-4">Send LYX</p>
       <div class="field">
-        <label class="label">From</label>
+        <label class="label">From (defaults to injected address)</label>
         <div class="control">
-          <input
-            class="input"
-            type="text"
-            :value="getState('address')"
-            disabled
-          />
+          <input class="input" type="text" :value="getState('address')" />
         </div>
       </div>
       <div class="field">

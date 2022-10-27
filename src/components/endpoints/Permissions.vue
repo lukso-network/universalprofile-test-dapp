@@ -52,13 +52,14 @@ const ALL_PERMISSIONS_WITH_DELEGATECALL = padLeft(
 const setPermissions = async () => {
   const erc725AccountAddress = getState('address')
 
-  if (!erc725AccountAddress) {
-    return setNotification('No valid address', 'danger')
-  }
+  // NOTE: We remove validation as we want to test the extension with wrong, missing parameters.
+  // if (!erc725AccountAddress) {
+  //   return setNotification('No valid address', 'danger')
+  // }
 
-  if (!grantPermissionAddress.value) {
-    return setNotification('Enter address', 'danger')
-  }
+  // if (!grantPermissionAddress.value) {
+  //   return setNotification('Enter address', 'danger')
+  // }
 
   const key =
     ERC725YKeys['LSP6']['AddressPermissions:Permissions'] +
