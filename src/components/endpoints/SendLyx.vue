@@ -123,6 +123,14 @@ const sendLyx = async () => {
           Send Transaction
         </button>
       </div>
+
+      <div class="field">
+        How to
+        <a href="https://docs.lukso.tech/guides/universal-profile/transfer-lyx"
+          >transfer LYX tutorial</a
+        >.
+      </div>
+
       <div class="field">
         <Notifications
           v-if="hasNotification"

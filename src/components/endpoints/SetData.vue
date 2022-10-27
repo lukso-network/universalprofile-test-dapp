@@ -82,6 +82,14 @@ const setData = async () => {
           Set data
         </button>
       </div>
+
+      <div class="field">
+        How to
+        <a href="https://docs.lukso.tech/guides/universal-profile/edit-profile"
+          >edit a Universal Profile tutorial</a
+        >.
+      </div>
+
       <div class="field">
         <Notifications
           v-if="hasNotification"

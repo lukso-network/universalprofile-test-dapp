@@ -65,6 +65,22 @@ const { toggle } = useDropdown()
       <div class="navbar-end">
         <div class="navbar-item">
           <div class="buttons">
+            <a
+              class="button is-light"
+              target="_blank"
+              rel="noreferer"
+              href="https://docs.lukso.tech/"
+            >
+              <strong>LUKSO DOCS</strong>
+            </a>
+            <a
+              class="button is-light"
+              target="_blank"
+              rel="noreferer"
+              href="https://github.com/lukso-network/universalprofile-test-dapp"
+            >
+              <strong>GitHub</strong>
+            </a>
             <Suspense>
               <Connect />
             </Suspense>
