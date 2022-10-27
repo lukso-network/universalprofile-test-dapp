@@ -180,6 +180,13 @@ const allPermissionsSelected = computed(() => {
           Set permissions
         </button>
       </div>
+
+      <div class="field">
+        <a href="https://docs.lukso.tech/guides/key-manager/give-permissions"
+          >Key Manager permissions tutorial</a
+        >.
+      </div>
+
       <div class="field">
         <Notifications
           v-if="hasNotification"

@@ -335,6 +335,19 @@ const onSignatureValidation = async () => {
         </button>
       </div>
       <div class="field">
+        Test <code>eth_sign</code> RPC call [<a
+          href="https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_sign"
+          >documentation</a
+        >].
+      </div>
+      <div class="field">
+        How to implement
+        <a
+          href="https://docs.lukso.tech/guides/browser-extension/sign-in-with-ethereum"
+          >Sign In With Ethereum tutorial</a
+        >.
+      </div>
+      <div class="field">
         <Notifications
           v-if="hasNotification"
           :notification="notification"
