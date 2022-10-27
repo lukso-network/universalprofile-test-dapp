@@ -116,12 +116,7 @@ const allPermissionsSelected = computed(() => {
       <div class="field">
         <label class="label">Address</label>
         <div class="control">
-          <input
-            v-model="grantPermissionAddress"
-            class="input"
-            type="text"
-            :disabled="getState('address') ? undefined : true"
-          />
+          <input v-model="grantPermissionAddress" class="input" type="text" />
         </div>
       </div>
       <div class="field">
@@ -135,7 +130,6 @@ const allPermissionsSelected = computed(() => {
               v-model="selectedPermissions[key]"
               type="checkbox"
               :value="value"
-              :disabled="getState('address') ? undefined : true"
             />
             {{ key }}
           </label>
@@ -147,7 +141,6 @@ const allPermissionsSelected = computed(() => {
             <input
               :checked="allPermissionsSelected"
               type="checkbox"
-              :disabled="getState('address') ? undefined : true"
               @click.stop="allPermissionsToggle"
             />
             Select all
@@ -181,7 +174,6 @@ const allPermissionsSelected = computed(() => {
           :class="`button is-primary is-rounded mb-3 ${
             isPending ? 'is-loading' : ''
           }`"
-          :disabled="getState('address') ? undefined : true"
           data-testid="setPermissions"
           @click="setPermissions"
         >

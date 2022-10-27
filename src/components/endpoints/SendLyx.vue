@@ -74,7 +74,6 @@ const sendLyx = async () => {
             class="input"
             type="text"
             placeholder="0x123..."
-            :disabled="getState('address') ? undefined : true"
             data-testid="to"
           />
         </div>
@@ -88,7 +87,6 @@ const sendLyx = async () => {
               class="input"
               type="number"
               placeholder="0"
-              :disabled="getState('address') ? undefined : true"
               data-testid="amount"
             />
           </div>
@@ -99,7 +97,6 @@ const sendLyx = async () => {
           <input
             v-model="hasData"
             type="checkbox"
-            :disabled="getState('address') ? undefined : true"
             :value="hasData"
             data-testid="hasData"
           />
@@ -112,7 +109,6 @@ const sendLyx = async () => {
           v-model="data"
           class="textarea"
           placeholder="0x..."
-          :disabled="getState('address') ? undefined : true"
           data-testid="data"
         ></textarea>
       </div>
@@ -121,7 +117,6 @@ const sendLyx = async () => {
           :class="`button is-primary is-rounded mt-4 ${
             isPending ? 'is-loading' : ''
           }`"
-          :disabled="getState('address') ? undefined : true"
           data-testid="send"
           @click="sendLyx"
         >
