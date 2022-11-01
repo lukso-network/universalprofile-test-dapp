@@ -34,15 +34,6 @@ const create = async () => {
     return
   }
 
-  // NOTE: We remove validation as we want to test the extension with wrong, missing parameters.
-  // if (!token.value.name) {
-  //   return setNotification('Enter token name', 'danger')
-  // }
-
-  // if (!token.value.symbol) {
-  //   return setNotification('Enter token symbol', 'danger')
-  // }
-
   const erc725AccountAddress = getState('address')
   const tokenParams = [
     token.value.name, // token name
@@ -84,15 +75,6 @@ const mint = async () => {
   if (!myToken.value) {
     return setNotification('No token specified', 'danger')
   }
-
-  // NOTE: We remove validation as we want to test the extension with wrong, missing parameters.
-  // if (!mintReceiver.value) {
-  //   return setNotification('Enter mint address', 'danger')
-  // }
-
-  // if (!mintAmount.value) {
-  //   return setNotification('Enter mint amount', 'danger')
-  // }
 
   try {
     await myToken.value.methods
@@ -183,7 +165,7 @@ const mint = async () => {
       </div>
       <div class="field">
         <div
-          v-if="getState('isConnected') && isTokenCreated"
+          v-if="isTokenCreated"
           class="notification is-info is-light mt-5"
           data-testid="info"
         >
