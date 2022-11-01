@@ -59,7 +59,7 @@ const transfer = async () => {
     <div class="tile is-child box">
       <p class="is-size-5 has-text-weight-bold mb-4">Transfer</p>
       <div class="field">
-        <label class="label">Token</label>
+        <label class="label">Token address</label>
         <div class="control">
           <input
             v-model="tokenAddress"
