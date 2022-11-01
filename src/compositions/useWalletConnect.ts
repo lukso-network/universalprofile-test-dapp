@@ -14,7 +14,7 @@ const setupProvider = async (): Promise<void> => {
     rpc: {
       [DEFAULT_NETWORK_CONFIG.chainId]: DEFAULT_NETWORK_CONFIG.rpc.url,
     },
-    bridge: 'https://bridge.walletconnect.org/',
+    bridge: 'https://safe-walletconnect.safe.global/',
     chainId: DEFAULT_NETWORK_CONFIG.chainId,
   })
 
