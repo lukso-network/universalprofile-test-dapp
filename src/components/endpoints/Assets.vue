@@ -9,13 +9,16 @@ import { Contract } from 'web3-eth-contract'
 import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
 import { createBlockScoutLink } from '@/utils/createLinks'
 import { useLspFactory } from '@/compositions/useLspFactory'
+import type { LinkMetdata } from '@lukso/lsp-factory.js'
 
 type Token = {
   name: string
   symbol: string
   isNFT: boolean
+  description: string
+  links: LinkMetdata[]
   icon?: File
-  images?: FileList
+  images?: File[]
 }
 
 const { notification, clearNotification, hasNotification, setNotification } =
@@ -29,12 +32,19 @@ const isTokenPending = ref(false)
 const token = ref<Token>({
   name: 'My LSP7 Token',
   symbol: 'LSP7',
+  description: 'My test Token description',
+  links: [
+    {
+      title: 'LUKSO Docs',
+      url: 'https://docs.lukso.tech',
+    },
+  ],
   isNFT: false,
 })
 const mintReceiver = ref<string>()
 const mintAmount = ref(100)
 const tokenAddress = ref<string>()
-const { getFactory } = useLspFactory()
+const { deployLSP7DigitalAsset } = useLspFactory()
 
 watchEffect(() => {
   mintReceiver.value = getState('address')
@@ -45,9 +55,28 @@ const handleTokenIcon = (event: Event) => {
   token.value.icon = (target.files as FileList)[0]
 }
 
-const handleTokenIMages = (event: Event) => {
+const handleTokenImages = (event: Event) => {
   const target = event.target as HTMLInputElement
-  token.value.images = target.files as FileList
+  token.value.images = Array.from(target.files as FileList)
+}
+
+const addLink = () => {
+  token.value.links.push({
+    title: '',
+    url: '',
+  })
+}
+
+const removeLink = (index: number) => {
+  token.value.links.splice(index, 1)
+}
+
+const handleLinkTitleChange = (index: number, event: Event) => {
+  token.value.links[index].title = (event.target as HTMLInputElement).value
+}
+
+const handleLinkUrlChange = (index: number, event: Event) => {
+  token.value.links[index].url = (event.target as HTMLInputElement).value
 }
 
 const create = async () => {
@@ -56,78 +85,25 @@ const create = async () => {
   }
 
   const erc725AccountAddress = getState('address')
-  // const tokenParams = [
-  //   token.value.name, // token name
-  //   token.value.symbol, // token symbol
-  //   erc725AccountAddress, // new owner
-  //   token.value.isNFT, // make your token divisible or not
-  // ]
   isTokenPending.value = true
 
   try {
-    // create an instance
-    // myToken.value = contract(LSP7Mintable.abi as any, '', {
-    //   gas: DEFAULT_GAS,
-    //   gasPrice: DEFAULT_GAS_PRICE,
-    // }) // address is empty because we are deploying the contract
-
-    // // deploy the token contract
-    // myToken.value = await myToken.value
-    //   .deploy({ data: LSP7Mintable.bytecode, arguments: tokenParams })
-    //   .send({ from: erc725AccountAddress })
-    //   .on('receipt', function (receipt: any) {
-    //     console.log(receipt)
-    //   })
-    //   .once('sending', (payload: any) => {
-    //     console.log(JSON.stringify(payload, null, 2))
-    //   })
-
-    // const uploadedMetadata = await LSP4DigitalAssetMetadata.uploadMetadata({
-    //   description: 'Digital Asset',
-    //   links: [{ title: 'LUKSO Docs', url: 'https://docs.lukso.tech' }],
-    // })
-
-    const deployedAsset = await getFactory().LSP7DigitalAsset.deploy({
+    const deployedAsset = await deployLSP7DigitalAsset({
       isNFT: token.value.isNFT,
       controllerAddress: erc725AccountAddress,
       name: token.value.name,
       symbol: token.value.symbol,
       digitalAssetMetadata: {
         LSP4Metadata: {
-          description: 'My Token test',
-          links: [
-            {
-              title: 'LUKSO Docs',
-              url: 'https://docs.lukso.tech',
-            },
-          ],
+          description: token.value.description,
+          links: token.value.links,
           icon: token.value.icon,
+          images: token.value.images,
         },
       },
     })
-    console.log(deployedAsset.LSP7DigitalAsset)
+    console.log('Deployed asset', deployedAsset.LSP7DigitalAsset)
     tokenAddress.value = deployedAsset.LSP7DigitalAsset.address
-
-    // encode with erc725.js
-
-    // const LSP4MetadataKey =
-    //   '0x9afb95cacc9f95858ec44aa8c3b685511002e30ae54415823f406128b85b238e'
-    // // this should be a JSONURL
-    // const LSP4MetadataValue = '0xcafecafe'
-
-    // // set metadata
-    // await myToken.value.methods['setData(bytes32,bytes)'](
-    //   LSP4MetadataKey,
-    //   LSP4MetadataValue
-    // )
-    //   .send({ from: erc725AccountAddress })
-    //   .on('receipt', function (receipt: any) {
-    //     console.log(receipt)
-    //   })
-    //   .once('sending', (payload: any) => {
-    //     console.log(JSON.stringify(payload, null, 2))
-    //   })
-
     isTokenCreated.value = true
     setNotification('Token created', 'info')
   } catch (error) {
@@ -192,9 +168,44 @@ const mint = async () => {
             class="input"
             type="file"
             multiple
-            @change="handleTokenIMages"
+            @change="handleTokenImages"
           />
         </div>
+      </div>
+      <div class="field">
+        <label class="label">Token Description</label>
+        <div class="control">
+          <textarea v-model="token.description" class="input" />
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Token Links</label>
+        <div
+          v-for="(link, index) in token.links"
+          :key="index"
+          class="control mb-2 is-flex"
+        >
+          <input
+            :v-model="link.title"
+            :value="link.title"
+            class="input mr-2"
+            type="text"
+            placeholder="Title"
+            @keyup="event => handleLinkTitleChange(index, event)"
+          />
+          <input
+            :v-model="link.url"
+            :value="link.url"
+            class="input"
+            type="text"
+            placeholder="URL"
+            @keyup="event => handleLinkUrlChange(index, event)"
+          />
+          <button class="button ml-2" @click="removeLink(index)">Remove</button>
+        </div>
+        <button class="button" data-testid="addLink" @click="addLink">
+          Add link
+        </button>
       </div>
 
       <div class="field">
