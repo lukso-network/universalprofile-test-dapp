@@ -23,14 +23,6 @@ const isPending = ref(false)
 const sendLyx = async () => {
   const from = getState('address')
 
-  if (!from) {
-    return setNotification('No from address', 'danger')
-  }
-
-  if (!amount.value) {
-    return setNotification('Enter an amount', 'danger')
-  }
-
   let transaction = {
     from,
     to: to.value,

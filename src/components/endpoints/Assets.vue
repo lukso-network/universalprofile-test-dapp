@@ -271,7 +271,7 @@ const mint = async () => {
             Token address:
             <b
               ><a
-                :href="createBlockScoutLink(myToken?.options.address ?? '')"
+                :href="createBlockScoutLink(tokenAddress ?? '')"
                 target="_blank"
                 data-testid="token-address"
                 >{{ tokenAddress }}</a

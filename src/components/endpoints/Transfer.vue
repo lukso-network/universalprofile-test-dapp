@@ -6,6 +6,7 @@ import useNotifications from '@/compositions/useNotifications'
 import useWeb3 from '@/compositions/useWeb3'
 import LSP7Mintable from '@lukso/lsp-smart-contracts/artifacts/LSP7Mintable.json'
 import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
+import Notifications from '@/components/Notification.vue'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()

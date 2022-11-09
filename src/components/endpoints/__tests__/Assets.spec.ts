@@ -6,35 +6,33 @@ jest.mock('@/compositions/useWeb3', () => ({
   __esModule: true,
   default: () => ({
     contract: () => ({
-      deploy: () => ({
-        send: () => ({
-          on: () => ({
-            once: () => ({
-              options: {
-                address: '0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298',
-              },
-              methods: {
-                mint: () => ({
-                  send: () => ({
-                    on: () => ({
-                      once: () => jest.fn(),
-                    }),
-                  }),
-                }),
-                transfer: () => ({
-                  encodeABI: () => jest.fn(),
-                }),
-              },
+      methods: {
+        mint: () => ({
+          send: () => ({
+            on: () => ({
+              once: () => jest.fn(),
             }),
           }),
         }),
-      }),
+      },
     }),
+  }),
+}))
+
+const mockDeployLSP7DigitalAsset = jest.fn()
+jest.mock('@/compositions/useLspFactory', () => ({
+  useLspFactory: () => ({
+    deployLSP7DigitalAsset: () => mockDeployLSP7DigitalAsset(),
   }),
 }))
 
 test('can create token', async () => {
   setState('isConnected', true)
+  mockDeployLSP7DigitalAsset.mockReturnValue({
+    LSP7DigitalAsset: {
+      address: '0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298',
+    },
+  })
   render(Assets)
 
   await fireEvent.click(screen.getByTestId('create'))
