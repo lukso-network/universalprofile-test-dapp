@@ -60,7 +60,8 @@ const addCustomRelayer = async () => {
         },
       ],
     }
-    if (getProvider().wc.connected) {
+    const wcProvider = getProvider()
+    if (wcProvider && wcProvider.wc.connected) {
       await sendCustomWCRequest(request)
     } else {
       await window.ethereum.request(request)

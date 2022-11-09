@@ -99,7 +99,8 @@ const removeEventListeners = () => {
 onMounted(async () => {
   await setupProvider()
 
-  if (getProvider().wc.connected) {
+  const wcProvider = getProvider()
+  if (wcProvider && wcProvider.wc.connected) {
     await enableProvider()
   } else if (browserExtensionConnected) {
     await connectExtension()

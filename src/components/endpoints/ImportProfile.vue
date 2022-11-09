@@ -32,7 +32,8 @@ const onImportProfile = async () => {
       params: [universalProfileAddress.value],
     }
     let newControllerAddress: string
-    if (getProvider().wc.connected) {
+    const wcProvider = getProvider()
+    if (wcProvider && wcProvider.wc.connected) {
       newControllerAddress = await sendCustomWCRequest(request)
     } else {
       newControllerAddress = await window.ethereum.request(request)
