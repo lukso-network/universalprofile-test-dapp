@@ -2,6 +2,9 @@
 import { ref } from 'vue'
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
+import useWalletConnect from '@/compositions/useWalletConnect'
+
+const { getProvider, sendCustomWCRequest } = useWalletConnect()
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
@@ -47,7 +50,7 @@ const addCustomRelayer = async () => {
   // }
 
   try {
-    await window.ethereum.request({
+    const request = {
       method: 'up_addTransactionRelayer', // https://docs.lukso.tech/standards/rpc-api#up_addtransactionrelayer
       params: [
         {
@@ -56,7 +59,13 @@ const addCustomRelayer = async () => {
           chainIds: chainIds.value,
         },
       ],
-    })
+    }
+    const wcProvider = getProvider()
+    if (wcProvider && wcProvider.wc.connected) {
+      await sendCustomWCRequest(request)
+    } else {
+      await window.ethereum.request(request)
+    }
     setNotification('The relayer was added')
   } catch (error) {
     setNotification((error as unknown as Error).message, 'danger')

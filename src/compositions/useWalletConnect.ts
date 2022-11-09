@@ -55,16 +55,23 @@ const getProvider = (): WalletConnectProvider => {
   return provider
 }
 
+const sendCustomWCRequest = async (request: object): Promise<any> => {
+  const connector = await getProvider().getWalletConnector()
+  return connector.sendCustomRequest(request)
+}
+
 export default function useWalletConnect(): {
   resetProvider: () => Promise<void>
   setupProvider: () => Promise<void>
   enableProvider: () => Promise<void>
   getProvider: () => WalletConnectProvider
+  sendCustomWCRequest: (request: object) => Promise<any>
 } {
   return {
     resetProvider,
     setupProvider,
     enableProvider,
     getProvider,
+    sendCustomWCRequest,
   }
 }
