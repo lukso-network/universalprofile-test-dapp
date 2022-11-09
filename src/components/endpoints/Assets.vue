@@ -8,6 +8,18 @@ import { ref, watchEffect } from 'vue'
 import { Contract } from 'web3-eth-contract'
 import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
 import { createBlockScoutLink } from '@/utils/createLinks'
+import { useLspFactory } from '@/compositions/useLspFactory'
+import type { LinkMetdata } from '@lukso/lsp-factory.js'
+
+type Token = {
+  name: string
+  symbol: string
+  isNFT: boolean
+  description: string
+  links: LinkMetdata[]
+  icon?: File
+  images?: File[]
+}
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
@@ -17,58 +29,81 @@ const myToken = ref<Contract>()
 const isTokenCreated = ref(false)
 const isTokenMinted = ref(false)
 const isTokenPending = ref(false)
-const token = ref({
+const token = ref<Token>({
   name: 'My LSP7 Token',
   symbol: 'LSP7',
+  description: 'My test Token description',
+  links: [
+    {
+      title: 'LUKSO Docs',
+      url: 'https://docs.lukso.tech',
+    },
+  ],
   isNFT: false,
 })
 const mintReceiver = ref<string>()
 const mintAmount = ref(100)
+const tokenAddress = ref<string>()
+const { deployLSP7DigitalAsset } = useLspFactory()
 
 watchEffect(() => {
   mintReceiver.value = getState('address')
 })
+
+const handleTokenIcon = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  token.value.icon = (target.files as FileList)[0]
+}
+
+const handleTokenImages = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  token.value.images = Array.from(target.files as FileList)
+}
+
+const addLink = () => {
+  token.value.links.push({
+    title: '',
+    url: '',
+  })
+}
+
+const removeLink = (index: number) => {
+  token.value.links.splice(index, 1)
+}
+
+const handleLinkTitleChange = (index: number, event: Event) => {
+  token.value.links[index].title = (event.target as HTMLInputElement).value
+}
+
+const handleLinkUrlChange = (index: number, event: Event) => {
+  token.value.links[index].url = (event.target as HTMLInputElement).value
+}
 
 const create = async () => {
   if (isTokenPending.value) {
     return
   }
 
-  // NOTE: We remove validation as we want to test the extension with wrong, missing parameters.
-  // if (!token.value.name) {
-  //   return setNotification('Enter token name', 'danger')
-  // }
-
-  // if (!token.value.symbol) {
-  //   return setNotification('Enter token symbol', 'danger')
-  // }
-
   const erc725AccountAddress = getState('address')
-  const tokenParams = [
-    token.value.name, // token name
-    token.value.symbol, // token symbol
-    erc725AccountAddress, // new owner
-    token.value.isNFT, // make your token divisible or not
-  ]
   isTokenPending.value = true
 
   try {
-    // create an instance
-    myToken.value = contract(LSP7Mintable.abi as any, '', {
-      gas: DEFAULT_GAS,
-      gasPrice: DEFAULT_GAS_PRICE,
-    }) // address is empty because we are deploying the contract
-
-    // deploy the token contract
-    myToken.value = await myToken.value
-      .deploy({ data: LSP7Mintable.bytecode, arguments: tokenParams })
-      .send({ from: erc725AccountAddress })
-      .on('receipt', function (receipt: any) {
-        console.log(receipt)
-      })
-      .once('sending', (payload: any) => {
-        console.log(JSON.stringify(payload, null, 2))
-      })
+    const deployedAsset = await deployLSP7DigitalAsset({
+      isNFT: token.value.isNFT,
+      controllerAddress: erc725AccountAddress,
+      name: token.value.name,
+      symbol: token.value.symbol,
+      digitalAssetMetadata: {
+        LSP4Metadata: {
+          description: token.value.description,
+          links: token.value.links,
+          icon: token.value.icon,
+          images: token.value.images,
+        },
+      },
+    })
+    console.log('Deployed asset', deployedAsset.LSP7DigitalAsset)
+    tokenAddress.value = deployedAsset.LSP7DigitalAsset.address
     isTokenCreated.value = true
     setNotification('Token created', 'info')
   } catch (error) {
@@ -81,20 +116,12 @@ const create = async () => {
 const mint = async () => {
   const erc725AccountAddress = getState('address')
 
-  if (!myToken.value) {
-    return setNotification('No token specified', 'danger')
-  }
-
-  // NOTE: We remove validation as we want to test the extension with wrong, missing parameters.
-  // if (!mintReceiver.value) {
-  //   return setNotification('Enter mint address', 'danger')
-  // }
-
-  // if (!mintAmount.value) {
-  //   return setNotification('Enter mint amount', 'danger')
-  // }
-
   try {
+    myToken.value = contract(LSP7Mintable.abi as any, tokenAddress.value, {
+      gas: DEFAULT_GAS,
+      gasPrice: DEFAULT_GAS_PRICE,
+    })
+
     await myToken.value.methods
       .mint(mintReceiver.value, mintAmount.value, false, '0x')
       .send({ from: erc725AccountAddress })
@@ -128,6 +155,59 @@ const mint = async () => {
           <input v-model="token.symbol" class="input" type="text" />
         </div>
       </div>
+      <div class="field">
+        <label class="label">Token Icon</label>
+        <div class="control">
+          <input class="input" type="file" @change="handleTokenIcon" />
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Token Images</label>
+        <div class="control">
+          <input
+            class="input"
+            type="file"
+            multiple
+            @change="handleTokenImages"
+          />
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Token Description</label>
+        <div class="control">
+          <textarea v-model="token.description" class="input" />
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Token Links</label>
+        <div
+          v-for="(link, index) in token.links"
+          :key="index"
+          class="control mb-2 is-flex"
+        >
+          <input
+            :v-model="link.title"
+            :value="link.title"
+            class="input mr-2"
+            type="text"
+            placeholder="Title"
+            @keyup="event => handleLinkTitleChange(index, event)"
+          />
+          <input
+            :v-model="link.url"
+            :value="link.url"
+            class="input"
+            type="text"
+            placeholder="URL"
+            @keyup="event => handleLinkUrlChange(index, event)"
+          />
+          <button class="button ml-2" @click="removeLink(index)">Remove</button>
+        </div>
+        <button class="button" data-testid="addLink" @click="addLink">
+          Add link
+        </button>
+      </div>
+
       <div class="field">
         <label class="checkbox">
           <input v-model="token.isNFT" type="checkbox" :value="token.isNFT" />
@@ -183,7 +263,7 @@ const mint = async () => {
       </div>
       <div class="field">
         <div
-          v-if="getState('isConnected') && isTokenCreated"
+          v-if="isTokenCreated"
           class="notification is-info is-light mt-5"
           data-testid="info"
         >
@@ -191,10 +271,10 @@ const mint = async () => {
             Token address:
             <b
               ><a
-                :href="createBlockScoutLink(myToken?.options.address ?? '')"
+                :href="createBlockScoutLink(tokenAddress ?? '')"
                 target="_blank"
                 data-testid="token-address"
-                >{{ myToken?.options.address }}</a
+                >{{ tokenAddress }}</a
               ></b
             >
           </p>

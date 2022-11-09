@@ -9,6 +9,10 @@ import {
 
 import { UploadOptions } from '@lukso/lsp-factory.js/build/main/src/lib/interfaces/profile-upload-options'
 import { DEFAULT_NETWORK_CONFIG } from '@/helpers/config'
+import {
+  DeployedLSP7DigitalAsset,
+  LSP7DigitalAssetDeploymentOptions,
+} from '@lukso/lsp-factory.js/build/main/src/lib/interfaces/digital-asset-deployment'
 
 let lspFactory: LSPFactory
 
@@ -32,6 +36,12 @@ const deployUniversalProfile = async (
   )
 }
 
+const deployLSP7DigitalAsset = async (
+  digitalAssetDeploymentOptions: LSP7DigitalAssetDeploymentOptions
+): Promise<DeployedLSP7DigitalAsset> => {
+  return await lspFactory.LSP7DigitalAsset.deploy(digitalAssetDeploymentOptions)
+}
+
 const uploadUniversalProfileMetaData = async (
   profileData: ProfileDataBeforeUpload,
   uploadOptions?: UploadOptions
@@ -52,6 +62,9 @@ export function useLspFactory(): {
     uploadOptions?: UploadOptions
   ) => Promise<ProfileDataForEncoding>
   getFactory: () => LSPFactory
+  deployLSP7DigitalAsset: (
+    digitalAssetDeploymentOptions: LSP7DigitalAssetDeploymentOptions
+  ) => Promise<DeployedLSP7DigitalAsset>
 } {
   const hasExtension = !!window.ethereum
   if (!hasExtension) {
@@ -63,5 +76,6 @@ export function useLspFactory(): {
     deployUniversalProfile,
     uploadUniversalProfileMetaData,
     getFactory,
+    deployLSP7DigitalAsset,
   }
 }

@@ -39,18 +39,6 @@ test('can set data', async () => {
   )
 })
 
-test('can see error for set data when no from address', async () => {
-  setState('address', undefined)
-
-  render(SetData)
-
-  await fireEvent.click(screen.getByTestId('setData'))
-
-  expect(screen.getByTestId('notification')).toHaveTextContent(
-    'No valid address'
-  )
-})
-
 test('can see set data error from send function', async () => {
   setState('address', '0x517216362D594516c6f96Ee34b2c502d65B847E4')
   mockSend.mockImplementation(() => {
