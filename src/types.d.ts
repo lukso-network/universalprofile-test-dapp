@@ -18,4 +18,5 @@ export interface Store {
   chainId: number
   balance: number
   channel?: Channel
+  tokenAddress?: string
 }

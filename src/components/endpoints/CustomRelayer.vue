@@ -36,18 +36,7 @@ const onBlur = () => {
 }
 
 const addCustomRelayer = async () => {
-  // NOTE: We remove validation as we want to test the extension with wrong, missing parameters.
-  // if (!name.value) {
-  //   return setNotification('Enter a name', 'danger')
-  // }
-
-  // if (!apiUrl.value) {
-  //   return setNotification('Enter an api url', 'danger')
-  // }
-
-  // if (!chainId.value) {
-  //   return setNotification('Enter a chain id', 'danger')
-  // }
+  clearNotification()
 
   try {
     const request = {

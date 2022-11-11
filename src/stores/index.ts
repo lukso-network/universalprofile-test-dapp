@@ -11,6 +11,7 @@ export const store = reactive<Store>({
   chainId: 0,
   balance: 0,
   channel: undefined,
+  tokenAddress: undefined,
 })
 
 window.store = store

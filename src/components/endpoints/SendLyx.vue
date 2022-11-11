@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Web3Utils from 'web3-utils'
+import { toWei } from 'web3-utils'
 import { getState, setState } from '@/stores'
 import { ref } from 'vue'
 import Notifications from '@/components/Notification.vue'
@@ -21,12 +21,13 @@ const hasData = ref(false)
 const isPending = ref(false)
 
 const sendLyx = async () => {
+  clearNotification()
   const from = getState('address')
 
   let transaction = {
     from,
     to: to.value,
-    value: Web3Utils.toWei(amount.value.toString()),
+    value: toWei(amount.value.toString()),
     gas: DEFAULT_GAS,
     gasPrice: DEFAULT_GAS_PRICE,
   } as TransactionConfig

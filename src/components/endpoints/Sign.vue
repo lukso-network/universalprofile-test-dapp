@@ -42,10 +42,7 @@ watchEffect(() => {
 })
 
 const onSign = async () => {
-  if (!message.value) {
-    return setNotification('Please provide message', 'danger')
-  }
-
+  clearNotification()
   const erc725AccountAddress = getState('address')
 
   try {
@@ -109,6 +106,8 @@ const handleResourceChange = (index: number, event: Event) => {
 }
 
 const onRecover = async () => {
+  clearNotification()
+
   if (!signResponse.value) {
     return setNotification('Please sign message first', 'danger')
   }
@@ -123,11 +122,7 @@ const onRecover = async () => {
 }
 
 const onSignatureValidation = async () => {
-  const erc725AccountAddress = getState('address')
-
-  if (!erc725AccountAddress) {
-    return setNotification('No valid address', 'danger')
-  }
+  clearNotification()
 
   try {
     const messageHash = getWeb3().eth.accounts.hashMessage(signMessage.value)

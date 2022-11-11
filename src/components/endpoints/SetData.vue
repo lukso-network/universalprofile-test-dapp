@@ -15,6 +15,7 @@ const value = ref(
 const isPending = ref(false)
 
 const setData = async () => {
+  clearNotification()
   const erc725AccountAddress = getState('address')
 
   try {

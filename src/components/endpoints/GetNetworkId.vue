@@ -9,6 +9,8 @@ const { notification, clearNotification, hasNotification, setNotification } =
 const networkId = ref('')
 
 const getNetworkId = async () => {
+  clearNotification()
+
   try {
     networkId.value = await window.ethereum.request({ method: 'eth_getId' })
     setNotification(networkId.value, 'info')

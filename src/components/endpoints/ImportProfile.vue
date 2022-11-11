@@ -15,16 +15,7 @@ const universalProfileAddress = ref('')
 const controllerAddress = ref('')
 
 const onImportProfile = async () => {
-  // NOTE: We remove validation as we want to send broken input to the extension to test it.
-  // if (
-  //   !universalProfileAddress.value ||
-  //   !isAddress(universalProfileAddress.value)
-  // ) {
-  //   return setNotification(
-  //     'Please provide a UP (ERC725 Account) address',
-  //     'danger'
-  //   )
-  // }
+  clearNotification()
 
   try {
     const request = {
