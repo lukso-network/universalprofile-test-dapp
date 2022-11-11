@@ -30,8 +30,8 @@ const isTokenCreated = ref(false)
 const isTokenMinted = ref(false)
 const isTokenPending = ref(false)
 const token = ref<Token>({
-  name: 'My LSP7 Token',
-  symbol: 'LSP7',
+  name: 'My Token',
+  symbol: 'MYT',
   description: 'My test Token description',
   links: [
     {
