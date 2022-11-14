@@ -14,33 +14,27 @@ const { notification, clearNotification, hasNotification, setNotification } =
 const { contract } = useWeb3()
 
 const myToken = ref<Contract>()
-const transferToken = ref<string>()
-const transferReceiver = ref<string>()
-const transferAmount = ref(1)
-const transferForce = ref(false)
+const mintToken = ref<string>()
+const mintReceiver = ref<string>()
+const mintAmount = ref(100)
 
 watchEffect(() => {
-  transferToken.value = getState('tokenAddress')
+  mintReceiver.value = getState('address')
+  mintToken.value = getState('tokenAddress')
 })
 
-const transfer = async () => {
+const mint = async () => {
   clearNotification()
   const erc725AccountAddress = getState('address')
 
-  myToken.value = contract(LSP7Mintable.abi as any, transferToken.value, {
-    gas: DEFAULT_GAS,
-    gasPrice: DEFAULT_GAS_PRICE,
-  })
-
   try {
+    myToken.value = contract(LSP7Mintable.abi as any, mintToken.value, {
+      gas: DEFAULT_GAS,
+      gasPrice: DEFAULT_GAS_PRICE,
+    })
+
     await myToken.value.methods
-      .transfer(
-        erc725AccountAddress,
-        transferReceiver.value,
-        toWei(transferAmount.value.toString()),
-        transferForce.value,
-        '0x'
-      )
+      .mint(mintReceiver.value, toWei(mintAmount.value.toString()), false, '0x')
       .send({ from: erc725AccountAddress })
       .on('receipt', function (receipt: any) {
         console.log(receipt)
@@ -48,7 +42,7 @@ const transfer = async () => {
       .once('sending', (payload: any) => {
         console.log(JSON.stringify(payload, null, 2))
       })
-    setNotification('Token transferred', 'info')
+    setNotification('Token minted', 'info')
   } catch (error) {
     setNotification((error as unknown as Error).message, 'danger')
   }
@@ -58,12 +52,12 @@ const transfer = async () => {
 <template>
   <div class="tile is-4 is-parent">
     <div class="tile is-child box">
-      <p class="is-size-5 has-text-weight-bold mb-4">Transfer</p>
+      <p class="is-size-5 has-text-weight-bold mb-4">Mint</p>
       <div class="field">
         <label class="label">Token address</label>
         <div class="control">
           <input
-            v-model="transferToken"
+            v-model="mintToken"
             class="input"
             type="text"
             data-testid="transfer-address"
@@ -71,22 +65,22 @@ const transfer = async () => {
         </div>
       </div>
       <div class="field">
-        <label class="label">Transfer address</label>
+        <label class="label">Mint address</label>
         <div class="control">
           <input
-            v-model="transferReceiver"
+            v-model="mintReceiver"
             class="input"
             type="text"
-            data-testid="transfer-address"
+            data-testid="mint-address"
           />
         </div>
       </div>
       <div class="field">
-        <label class="label">Transfer amount</label>
+        <label class="label">Mint amount</label>
         <div class="control columns">
           <div class="column is-one-third">
             <input
-              v-model="transferAmount"
+              v-model="mintAmount"
               class="input"
               type="number"
               placeholder="0"
@@ -97,10 +91,10 @@ const transfer = async () => {
       <div class="field">
         <button
           class="button is-primary is-rounded mb-3 mr-3"
-          data-testid="transfer"
-          @click="transfer"
+          data-testid="mint"
+          @click="mint"
         >
-          Transfer
+          Mint
         </button>
       </div>
       <div class="field">

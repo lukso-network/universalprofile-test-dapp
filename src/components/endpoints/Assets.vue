@@ -1,12 +1,8 @@
 <script setup lang="ts">
-import { getState } from '@/stores'
+import { getState, setState } from '@/stores'
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
-import LSP7Mintable from '@lukso/lsp-smart-contracts/artifacts/LSP7Mintable.json'
-import useWeb3 from '@/compositions/useWeb3'
-import { ref, watchEffect } from 'vue'
-import { Contract } from 'web3-eth-contract'
-import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
+import { ref } from 'vue'
 import { createBlockScoutLink } from '@/utils/createLinks'
 import { useLspFactory } from '@/compositions/useLspFactory'
 import type { LinkMetdata } from '@lukso/lsp-factory.js'
@@ -14,7 +10,7 @@ import type { LinkMetdata } from '@lukso/lsp-factory.js'
 type Token = {
   name: string
   symbol: string
-  isNFT: boolean
+  isNonDivisible: boolean
   description: string
   links: LinkMetdata[]
   icon?: File
@@ -23,11 +19,8 @@ type Token = {
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
-const { contract } = useWeb3()
 
-const myToken = ref<Contract>()
 const isTokenCreated = ref(false)
-const isTokenMinted = ref(false)
 const isTokenPending = ref(false)
 const token = ref<Token>({
   name: 'My Token',
@@ -39,16 +32,10 @@ const token = ref<Token>({
       url: 'https://docs.lukso.tech',
     },
   ],
-  isNFT: false,
+  isNonDivisible: false,
 })
-const mintReceiver = ref<string>()
-const mintAmount = ref(100)
 const tokenAddress = ref<string>()
 const { deployLSP7DigitalAsset } = useLspFactory()
-
-watchEffect(() => {
-  mintReceiver.value = getState('address')
-})
 
 const handleTokenIcon = (event: Event) => {
   const target = event.target as HTMLInputElement
@@ -80,6 +67,8 @@ const handleLinkUrlChange = (index: number, event: Event) => {
 }
 
 const create = async () => {
+  clearNotification()
+
   if (isTokenPending.value) {
     return
   }
@@ -89,7 +78,7 @@ const create = async () => {
 
   try {
     const deployedAsset = await deployLSP7DigitalAsset({
-      isNFT: token.value.isNFT,
+      isNFT: token.value.isNonDivisible,
       controllerAddress: erc725AccountAddress,
       name: token.value.name,
       symbol: token.value.symbol,
@@ -105,36 +94,12 @@ const create = async () => {
     console.log('Deployed asset', deployedAsset.LSP7DigitalAsset)
     tokenAddress.value = deployedAsset.LSP7DigitalAsset.address
     isTokenCreated.value = true
+    setState('tokenAddress', tokenAddress.value)
     setNotification('Token created', 'info')
   } catch (error) {
     setNotification((error as unknown as Error).message, 'danger')
   } finally {
     isTokenPending.value = false
-  }
-}
-
-const mint = async () => {
-  const erc725AccountAddress = getState('address')
-
-  try {
-    myToken.value = contract(LSP7Mintable.abi as any, tokenAddress.value, {
-      gas: DEFAULT_GAS,
-      gasPrice: DEFAULT_GAS_PRICE,
-    })
-
-    await myToken.value.methods
-      .mint(mintReceiver.value, mintAmount.value, false, '0x')
-      .send({ from: erc725AccountAddress })
-      .on('receipt', function (receipt: any) {
-        console.log(receipt)
-      })
-      .once('sending', (payload: any) => {
-        console.log(JSON.stringify(payload, null, 2))
-      })
-    isTokenMinted.value = true
-    setNotification('Token minted', 'info')
-  } catch (error) {
-    setNotification((error as unknown as Error).message, 'danger')
   }
 }
 </script>
@@ -210,8 +175,12 @@ const mint = async () => {
 
       <div class="field">
         <label class="checkbox">
-          <input v-model="token.isNFT" type="checkbox" :value="token.isNFT" />
-          is NFT
+          <input
+            v-model="token.isNonDivisible"
+            type="checkbox"
+            :value="token.isNonDivisible"
+          />
+          is non divisible
         </label>
       </div>
       <div class="field">
@@ -225,42 +194,7 @@ const mint = async () => {
           Create token
         </button>
       </div>
-      <div class="field">
-        <label class="label">Mint address</label>
-        <div class="control">
-          <input
-            v-model="mintReceiver"
-            class="input"
-            type="text"
-            data-testid="mint-address"
-            :disabled="isTokenCreated ? undefined : true"
-          />
-        </div>
-      </div>
-      <div class="field">
-        <label class="label">Mint amount</label>
-        <div class="control columns">
-          <div class="column is-one-third">
-            <input
-              v-model="mintAmount"
-              class="input"
-              type="number"
-              placeholder="0"
-              :disabled="isTokenCreated ? undefined : true"
-            />
-          </div>
-        </div>
-      </div>
-      <div class="field">
-        <button
-          class="button is-primary is-rounded mb-3 mr-3"
-          :disabled="isTokenCreated ? undefined : true"
-          data-testid="mint"
-          @click="mint"
-        >
-          Mint
-        </button>
-      </div>
+
       <div class="field">
         <div
           v-if="isTokenCreated"
