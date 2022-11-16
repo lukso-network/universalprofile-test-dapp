@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { toWei } from 'web3-utils'
+import { ref, watch } from 'vue'
+import { TransactionConfig } from 'web3-core'
+
 import { getState, setState } from '@/stores'
-import { ref } from 'vue'
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
-import { TransactionConfig } from 'web3-core'
 import useWeb3 from '@/compositions/useWeb3'
 import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
 
@@ -12,6 +13,7 @@ const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
 const { sendTransaction, getBalance } = useWeb3()
 
+const from = ref(getState('address'))
 const to = ref('0x311611C9A46a192C14Ea993159a0498EDE5578aC')
 const amount = ref(0.1)
 const data = ref(
@@ -20,12 +22,18 @@ const data = ref(
 const hasData = ref(false)
 const isPending = ref(false)
 
+watch(
+  () => getState('address'),
+  newAddress => {
+    from.value = newAddress
+  }
+)
+
 const sendLyx = async () => {
   clearNotification()
-  const from = getState('address')
 
   let transaction = {
-    from,
+    from: from.value,
     to: to.value,
     value: toWei(amount.value.toString()),
     gas: DEFAULT_GAS,
@@ -56,7 +64,7 @@ const sendLyx = async () => {
       <div class="field">
         <label class="label">From (defaults to injected address)</label>
         <div class="control">
-          <input class="input" type="text" :value="getState('address')" />
+          <input v-model="from" class="input" type="text" />
         </div>
       </div>
       <div class="field">
