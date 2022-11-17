@@ -35,7 +35,7 @@ onMounted(() => {
   const container = document.getElementById(
     'notification-container'
   ) as HTMLElement
-  if (container.offsetHeight > 101) {
+  if (container?.offsetHeight > 101) {
     showSpan.value = true
     isShowMore.value = true
   } else {
