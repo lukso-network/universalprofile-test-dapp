@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { toWei } from 'web3-utils'
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { TransactionConfig } from 'web3-core'
 
 import { getState, setState } from '@/stores'
@@ -27,7 +27,8 @@ const amount = ref(0.1)
 const data = ref('')
 const hasData = ref(false)
 const isPending = ref(false)
-const sampleData: { [key: string]: TransactionSelect[] } = {
+
+const sampleData = computed<{ [key: string]: TransactionSelect[] }>(() => ({
   LYX: [
     {
       label: 'Transfer: token to EoA',
@@ -92,8 +93,18 @@ const sampleData: { [key: string]: TransactionSelect[] } = {
       hasData: true,
       data: '9bd9bbc6000000000000000000000000311611c9a46a192c14ea993159a0498ede5578ac0000000000000000000000000000000000000000000000000de0b6b3a764000000000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000',
     },
+    {
+      label: 'Mint: 100 tokens to current UP',
+      to: '0xB79cE87D0564D3034Fe79eeC9AA876AE7dC4E07D',
+      amount: 0,
+      hasData: true,
+      data: `0x40c10f19000000000000000000000000${getState('address').replace(
+        '0x',
+        ''
+      )}0000000000000000000000000000000000000000000000056bc75e2d63100000`,
+    },
   ],
-}
+}))
 
 const selectData = (event: Event) => {
   const option = JSON.parse((event.target as HTMLSelectElement).value)
