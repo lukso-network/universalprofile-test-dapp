@@ -25,7 +25,7 @@ const amount = ref(0.1)
 const data = ref('')
 const hasData = ref(false)
 const isPending = ref(false)
-const sampleData = {
+const sampleData: { [key: string]: TransactionSelect[] } = {
   LYX: [
     {
       label: 'Transfer: token to EoA',
@@ -138,17 +138,10 @@ const sendLyx = async () => {
       <div class="field">
         <div class="select is-fullwidth mb-2">
           <select @change="selectData">
-            <!-- <option
-              v-for="(option, index) in sampleData"
-              :key="index"
-              :value="index"
-            >
-              {{ option.label }}
-            </option> -->
             <optgroup
               v-for="(group, name) in sampleData"
               :key="name"
-              :label="name"
+              :label="name.toString()"
             >
               <option
                 v-for="option in group"
