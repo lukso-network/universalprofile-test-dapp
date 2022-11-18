@@ -186,7 +186,7 @@ watch(
   }
 )
 
-const sendLyx = async () => {
+const send = async () => {
   clearNotification()
 
   let transaction = {
@@ -296,7 +296,7 @@ const sendLyx = async () => {
             isPending ? 'is-loading' : ''
           }`"
           data-testid="send"
-          @click="sendLyx"
+          @click="send"
         >
           Send Transaction
         </button>
