@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import SendLyx from '@/components/endpoints/SendLyx.vue'
+import SendTransaction from '@/components/endpoints/SendTransaction.vue'
 import Accounts from '@/components/endpoints/Accounts.vue'
 import SetData from '@/components/endpoints/SetData.vue'
 import Permissions from '@/components/endpoints/Permissions.vue'
@@ -32,7 +32,7 @@ const hasExtension = computed(() => {
     ></Notifications>
     <div class="tile is-ancestor">
       <Accounts />
-      <SendLyx />
+      <SendTransaction />
       <SetData />
     </div>
     <div class="tile is-ancestor">

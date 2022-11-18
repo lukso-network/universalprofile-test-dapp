@@ -1,4 +1,4 @@
-import SendLyx from '../SendLyx.vue'
+import SendTransaction from '../SendTransaction.vue'
 import { render, fireEvent, screen } from '@testing-library/vue'
 import { setState } from '@/stores'
 
@@ -16,7 +16,7 @@ jest.mock('@/compositions/useWeb3', () => ({
 test('can send lyx transaction', async () => {
   setState('address', '0x517216362D594516c6f96Ee34b2c502d65B847E4')
 
-  render(SendLyx)
+  render(SendTransaction)
 
   await fireEvent.update(screen.getByTestId('amount'), '2')
   await fireEvent.update(
@@ -40,7 +40,7 @@ test('can send lyx transaction', async () => {
 test('can send lyx transaction with data', async () => {
   setState('address', '0x517216362D594516c6f96Ee34b2c502d65B847E4')
 
-  render(SendLyx)
+  render(SendTransaction)
 
   await fireEvent.update(screen.getByTestId('amount'), '2')
   await fireEvent.update(
