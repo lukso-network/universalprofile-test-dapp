@@ -22,7 +22,7 @@ const { notification, clearNotification, hasNotification, setNotification } =
 const { sendTransaction, getBalance } = useWeb3()
 
 const from = ref(getState('address'))
-const to = ref('0x311611C9A46a192C14Ea993159a0498EDE5578aC')
+const to = ref('0x4658F1Ac64486827f59E637bE9800Eb035b6f43C')
 const amount = ref(0.1)
 const data = ref('')
 const hasData = ref(false)
