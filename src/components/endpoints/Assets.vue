@@ -8,6 +8,7 @@ import { useLspFactory } from '@/compositions/useLspFactory'
 import type { LinkMetdata } from '@lukso/lsp-factory.js'
 
 type Token = {
+  type: 'LSP7' | 'LSP8'
   name: string
   symbol: string
   isNonDivisible: boolean
@@ -23,6 +24,7 @@ const { notification, clearNotification, hasNotification, setNotification } =
 const isTokenCreated = ref(false)
 const isTokenPending = ref(false)
 const token = ref<Token>({
+  type: 'LSP7',
   name: 'My Token',
   symbol: 'MYT',
   description: 'My test Token description',
@@ -35,7 +37,7 @@ const token = ref<Token>({
   isNonDivisible: false,
 })
 const tokenAddress = ref<string>()
-const { deployLSP7DigitalAsset } = useLspFactory()
+const { deployLSP7DigitalAsset, deployLSP8IdentifiableDigitalAsset } = useLspFactory()
 
 const handleTokenIcon = (event: Event) => {
   const target = event.target as HTMLInputElement
@@ -77,22 +79,40 @@ const create = async () => {
   isTokenPending.value = true
 
   try {
-    const deployedAsset = await deployLSP7DigitalAsset({
-      isNFT: token.value.isNonDivisible,
-      controllerAddress: erc725AccountAddress,
-      name: token.value.name,
-      symbol: token.value.symbol,
-      digitalAssetMetadata: {
-        LSP4Metadata: {
-          description: token.value.description,
-          links: token.value.links,
-          icon: token.value.icon,
-          images: token.value.images,
+    if (token.value.type === 'LSP7') {
+      const deployedAsset = await deployLSP7DigitalAsset({
+        isNFT: token.value.isNonDivisible,
+        controllerAddress: erc725AccountAddress,
+        name: token.value.name,
+        symbol: token.value.symbol,
+        digitalAssetMetadata: {
+          LSP4Metadata: {
+            description: token.value.description,
+            links: token.value.links,
+            icon: token.value.icon,
+            images: token.value.images,
+          },
         },
-      },
-    })
-    console.log('Deployed asset', deployedAsset.LSP7DigitalAsset)
-    tokenAddress.value = deployedAsset.LSP7DigitalAsset.address
+      })
+      console.log('Deployed asset', deployedAsset.LSP7DigitalAsset)
+      tokenAddress.value = deployedAsset.LSP7DigitalAsset.address
+    } else {
+      const deployedAsset = await deployLSP8IdentifiableDigitalAsset({
+        controllerAddress: erc725AccountAddress,
+        name: token.value.name,
+        symbol: token.value.symbol,
+        digitalAssetMetadata: {
+          LSP4Metadata: {
+            description: token.value.description,
+            links: token.value.links,
+            icon: token.value.icon,
+            images: token.value.images,
+          },
+        },
+      })
+      console.log('Deployed asset', deployedAsset.LSP8IdentifiableDigitalAsset)
+      tokenAddress.value = deployedAsset.LSP8IdentifiableDigitalAsset.address
+    }
     isTokenCreated.value = true
     setState('tokenAddress', tokenAddress.value)
     setNotification('Token created', 'info')
@@ -107,7 +127,19 @@ const create = async () => {
 <template>
   <div class="tile is-4 is-parent">
     <div class="tile is-child box">
-      <p class="is-size-5 has-text-weight-bold mb-4">Assets (LSP 7)</p>
+      <p class="is-size-5 has-text-weight-bold mb-4">Assets</p>
+      <div class="field">
+        <label class="select">
+          <select
+              v-model="token.type"
+              name="type"
+              :value="token.type"
+          >
+            <option value="LSP7" selected>LSP7</option>
+            <option value="LSP8">LSP8</option>
+          </select>
+        </label>
+      </div>
       <div class="field">
         <label class="label">Token name</label>
         <div class="control">
@@ -173,7 +205,7 @@ const create = async () => {
         </button>
       </div>
 
-      <div class="field">
+      <div v-if="token.type === 'LSP7'" class="field">
         <label class="checkbox">
           <input
             v-model="token.isNonDivisible"
