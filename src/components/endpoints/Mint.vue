@@ -1,27 +1,21 @@
 <script setup lang="ts">
-import { getState } from '@/stores'
-import { ref, watchEffect } from 'vue'
-import { Contract } from 'web3-eth-contract'
+
+import {getState} from '@/stores'
+import {ref, watchEffect} from 'vue'
+import {Contract} from 'web3-eth-contract'
 import useNotifications from '@/compositions/useNotifications'
 import useWeb3 from '@/compositions/useWeb3'
 import LSP7Mintable from '@lukso/lsp-smart-contracts/artifacts/LSP7Mintable.json'
 import LSP8Mintable from '@lukso/lsp-smart-contracts/artifacts/LSP8Mintable.json'
-import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
+import {DEFAULT_GAS, DEFAULT_GAS_PRICE} from '@/helpers/config'
 import Notifications from '@/components/Notification.vue'
-import { toWei } from 'web3-utils'
-import {LinkMetdata} from "@lukso/lsp-factory.js";
+import {toWei} from 'web3-utils'
 import {ERC725} from "@erc725/erc725.js";
+import {Lsp4Metadata} from "@/types";
+import Lsp4MetadataForm from "@/components/shared/Lsp4MetadataForm.vue";
 
-const { notification, clearNotification, hasNotification, setNotification } =
-  useNotifications()
-const { contract } = useWeb3()
-
-type Lsp4Metadata = {
-  description: string
-  links: LinkMetdata[]
-  icon?: File
-  images?: File[]
-}
+const {notification, clearNotification, hasNotification, setNotification} = useNotifications()
+const {contract} = useWeb3()
 
 const tokenType = ref<'LSP7' | 'LSP8'>('LSP7')
 const myToken = ref<Contract>()
@@ -29,8 +23,8 @@ const mintToken = ref<string>()
 const tokenId = ref<string>()
 const mintReceiver = ref<string>()
 const mintAmount = ref(100)
-const metadata = ref<Lsp4Metadata>({
-  description: 'My super token id description',
+const lsp4Metadata = ref<Lsp4Metadata>({
+  description: 'My super description',
   links: [
     {
       title: 'LUKSO Docs',
@@ -47,35 +41,6 @@ watchEffect(() => {
 })
 
 
-const handleTokenIcon = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  metadata.value.icon = (target.files as FileList)[0]
-}
-
-const handleTokenImages = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  metadata.value.images = Array.from(target.files as FileList)
-}
-
-const addLink = () => {
-  metadata.value.links.push({
-    title: '',
-    url: '',
-  })
-}
-
-const removeLink = (index: number) => {
-  metadata.value.links.splice(index, 1)
-}
-
-const handleLinkTitleChange = (index: number, event: Event) => {
-  metadata.value.links[index].title = (event.target as HTMLInputElement).value
-}
-
-const handleLinkUrlChange = (index: number, event: Event) => {
-  metadata.value.links[index].url = (event.target as HTMLInputElement).value
-}
-
 const mint = async () => {
   clearNotification()
   const erc725AccountAddress = getState('address')
@@ -83,13 +48,12 @@ const mint = async () => {
   try {
     if (tokenType.value === 'LSP7') {
       myToken.value = contract(LSP7Mintable.abi as any, mintToken.value, {
-        gas: DEFAULT_GAS,
-        gasPrice: DEFAULT_GAS_PRICE,
+        gas: DEFAULT_GAS, gasPrice: DEFAULT_GAS_PRICE,
       })
 
       await myToken.value.methods
           .mint(mintReceiver.value, toWei(mintAmount.value.toString()), false, '0x')
-          .send({ from: erc725AccountAddress })
+          .send({from: erc725AccountAddress})
           .on('receipt', function (receipt: any) {
             console.log(receipt)
           })
@@ -100,13 +64,12 @@ const mint = async () => {
       if (!tokenId.value) return; // TODO throw
 
       myToken.value = contract(LSP8Mintable.abi as any, mintToken.value, {
-        gas: DEFAULT_GAS,
-        gasPrice: DEFAULT_GAS_PRICE,
+        gas: DEFAULT_GAS, gasPrice: DEFAULT_GAS_PRICE,
       })
 
       await myToken.value.methods
           .mint(mintReceiver.value, tokenId.value, false, '0x')
-          .send({ from: erc725AccountAddress })
+          .send({from: erc725AccountAddress})
           .on('receipt', function (receipt: any) {
             console.log(receipt)
           })
@@ -117,7 +80,7 @@ const mint = async () => {
       const metadataKey = ERC725.encodeKeyName('LSP8MetadataJSON:<bytes32>', tokenId.value);
       await myToken.value.methods
           .setData(metadataKey, metadataJsonUrl)
-          .send({ from: erc725AccountAddress })
+          .send({from: erc725AccountAddress})
           .on('receipt', function (receipt: any) {
             console.log(receipt)
           })
@@ -195,61 +158,7 @@ const mint = async () => {
         </div>
       </div>
       <div v-else>
-        <div class="field">
-          <label class="label">Token Icon</label>
-          <div class="control">
-            <input class="input" type="file" disabled @change="handleTokenIcon"/>
-          </div>
-        </div>
-        <div class="field">
-          <label class="label">Token Images</label>
-          <div class="control">
-            <input
-                class="input"
-                type="file"
-                multiple
-                disabled
-                @change="handleTokenImages"
-            />
-          </div>
-        </div>
-        <div class="field">
-          <label class="label">Token Description</label>
-          <div class="control">
-            <textarea v-model="metadata.description" class="input" disabled/>
-          </div>
-        </div>
-        <div class="field">
-          <label class="label">Token Links</label>
-          <div
-              v-for="(link, index) in metadata.links"
-              :key="index"
-              class="control mb-2 is-flex"
-          >
-            <input
-                :v-model="link.title"
-                :value="link.title"
-                class="input mr-2"
-                type="text"
-                placeholder="Title"
-                disabled
-                @keyup="event => handleLinkTitleChange(index, event)"
-            />
-            <input
-                :v-model="link.url"
-                :value="link.url"
-                class="input"
-                type="text"
-                placeholder="URL"
-                disabled
-                @keyup="event => handleLinkUrlChange(index, event)"
-            />
-            <button class="button ml-2" disabled @click="removeLink(index)">Remove</button>
-          </div>
-          <button class="button" data-testid="addLink" disabled @click="addLink">
-            Add link
-          </button>
-        </div>
+        <Lsp4MetadataForm disabled :new-metadata="lsp4Metadata"/>
       </div>
       <div class="field">
         <button

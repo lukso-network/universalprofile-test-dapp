@@ -5,17 +5,14 @@ import useNotifications from '@/compositions/useNotifications'
 import { ref } from 'vue'
 import { createBlockScoutLink } from '@/utils/createLinks'
 import { useLspFactory } from '@/compositions/useLspFactory'
-import type { LinkMetdata } from '@lukso/lsp-factory.js'
+import Lsp4MetadataForm from "@/components/shared/Lsp4MetadataForm.vue";
+import {Lsp4Metadata} from "@/types";
 
 type Token = {
   type: 'LSP7' | 'LSP8'
   name: string
   symbol: string
   isNonDivisible: boolean
-  description: string
-  links: LinkMetdata[]
-  icon?: File
-  images?: File[]
 }
 
 const { notification, clearNotification, hasNotification, setNotification } =
@@ -27,48 +24,26 @@ const token = ref<Token>({
   type: 'LSP7',
   name: 'My Token',
   symbol: 'MYT',
-  description: 'My test Token description',
+  isNonDivisible: false,
+})
+const lsp4Metadata = ref<Lsp4Metadata>({
+  description: 'My super description',
   links: [
     {
       title: 'LUKSO Docs',
       url: 'https://docs.lukso.tech',
     },
   ],
-  isNonDivisible: false,
-})
+});
 const tokenAddress = ref<string>()
 const { deployLSP7DigitalAsset, deployLSP8IdentifiableDigitalAsset } = useLspFactory()
 
-const handleTokenIcon = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  token.value.icon = (target.files as FileList)[0]
-}
-
-const handleTokenImages = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  token.value.images = Array.from(target.files as FileList)
-}
-
-const addLink = () => {
-  token.value.links.push({
-    title: '',
-    url: '',
-  })
-}
-
-const removeLink = (index: number) => {
-  token.value.links.splice(index, 1)
-}
-
-const handleLinkTitleChange = (index: number, event: Event) => {
-  token.value.links[index].title = (event.target as HTMLInputElement).value
-}
-
-const handleLinkUrlChange = (index: number, event: Event) => {
-  token.value.links[index].url = (event.target as HTMLInputElement).value
+const handleNewLsp4Metadata = (metadata: Lsp4Metadata) => {
+  lsp4Metadata.value = metadata;
 }
 
 const create = async () => {
+  console.log(lsp4Metadata.value)
   clearNotification()
 
   if (isTokenPending.value) {
@@ -87,10 +62,7 @@ const create = async () => {
         symbol: token.value.symbol,
         digitalAssetMetadata: {
           LSP4Metadata: {
-            description: token.value.description,
-            links: token.value.links,
-            icon: token.value.icon,
-            images: token.value.images,
+            ...lsp4Metadata.value
           },
         },
       })
@@ -103,10 +75,7 @@ const create = async () => {
         symbol: token.value.symbol,
         digitalAssetMetadata: {
           LSP4Metadata: {
-            description: token.value.description,
-            links: token.value.links,
-            icon: token.value.icon,
-            images: token.value.images,
+            ...lsp4Metadata.value,
           },
         },
       })
@@ -151,58 +120,7 @@ const create = async () => {
           <input v-model="token.symbol" class="input" type="text" />
         </div>
       </div>
-      <div class="field">
-        <label class="label">Token Icon</label>
-        <div class="control">
-          <input class="input" type="file" @change="handleTokenIcon" />
-        </div>
-      </div>
-      <div class="field">
-        <label class="label">Token Images</label>
-        <div class="control">
-          <input
-            class="input"
-            type="file"
-            multiple
-            @change="handleTokenImages"
-          />
-        </div>
-      </div>
-      <div class="field">
-        <label class="label">Token Description</label>
-        <div class="control">
-          <textarea v-model="token.description" class="input" />
-        </div>
-      </div>
-      <div class="field">
-        <label class="label">Token Links</label>
-        <div
-          v-for="(link, index) in token.links"
-          :key="index"
-          class="control mb-2 is-flex"
-        >
-          <input
-            :v-model="link.title"
-            :value="link.title"
-            class="input mr-2"
-            type="text"
-            placeholder="Title"
-            @keyup="event => handleLinkTitleChange(index, event)"
-          />
-          <input
-            :v-model="link.url"
-            :value="link.url"
-            class="input"
-            type="text"
-            placeholder="URL"
-            @keyup="event => handleLinkUrlChange(index, event)"
-          />
-          <button class="button ml-2" @click="removeLink(index)">Remove</button>
-        </div>
-        <button class="button" data-testid="addLink" @click="addLink">
-          Add link
-        </button>
-      </div>
+      <Lsp4MetadataForm @new-metadata="handleNewLsp4Metadata"/>
 
       <div v-if="token.type === 'LSP7'" class="field">
         <label class="checkbox">
