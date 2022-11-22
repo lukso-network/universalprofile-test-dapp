@@ -43,7 +43,6 @@ const handleNewLsp4Metadata = (metadata: Lsp4Metadata) => {
 }
 
 const create = async () => {
-  console.log(lsp4Metadata.value)
   clearNotification()
 
   if (isTokenPending.value) {
