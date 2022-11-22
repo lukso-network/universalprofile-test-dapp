@@ -142,7 +142,6 @@ const mint = async () => {
           <select
               v-model="tokenType"
               name="type"
-              :value="tokenType"
           >
             <option value="LSP7" selected>LSP7</option>
             <option value="LSP8">LSP8</option>

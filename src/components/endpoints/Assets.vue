@@ -133,7 +133,6 @@ const create = async () => {
           <select
               v-model="token.type"
               name="type"
-              :value="token.type"
           >
             <option value="LSP7" selected>LSP7</option>
             <option value="LSP8">LSP8</option>
