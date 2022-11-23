@@ -329,7 +329,7 @@ const send = async () => {
       <p class="is-size-5 has-text-weight-bold mb-4">Transaction</p>
       <div class="field">
         <div class="select is-fullwidth mb-2">
-          <select @change="selectData">
+          <select @change="selectData" data-testid="preset">
             <optgroup
               v-for="(group, name) in sampleData"
               :key="name"
