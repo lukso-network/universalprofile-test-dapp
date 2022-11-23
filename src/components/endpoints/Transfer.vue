@@ -10,6 +10,7 @@ import {DEFAULT_GAS, DEFAULT_GAS_PRICE} from '@/helpers/config'
 import Notifications from '@/components/Notification.vue'
 import {toWei} from 'web3-utils'
 import {ContractStandard} from "@/enums";
+import CustomSelect from "@/components/shared/CustomSelect.vue";
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
@@ -26,6 +27,10 @@ const transferForce = ref(false)
 watchEffect(() => {
   transferToken.value = getState('tokenAddress')
 })
+
+const handleStandardSelected = (standard: ContractStandard) => {
+  tokenType.value = standard
+}
 
 const transfer = async () => {
   clearNotification()
@@ -59,7 +64,11 @@ const transfer = async () => {
       }
       break;
     case ContractStandard.LSP8:
-      if (!tokenId.value) return;
+      if (!tokenId.value) {
+        setNotification('Token ID needs to be filled', 'danger')
+        return;
+      }
+
       myToken.value = contract(LSP8Mintable.abi as any, transferToken.value, {
         gas: DEFAULT_GAS,
         gasPrice: DEFAULT_GAS_PRICE,
@@ -96,17 +105,19 @@ const transfer = async () => {
   <div class="tile is-4 is-parent">
     <div class="tile is-child box">
       <p class="is-size-5 has-text-weight-bold mb-4">Transfer</p>
-      <div class="field">
-        <label class="select">
-          <select
-              v-model="tokenType"
-              name="type"
-          >
-            <option :value="ContractStandard.LSP7" selected>LSP7</option>
-            <option :value="ContractStandard.LSP8">LSP8</option>
-          </select>
-        </label>
-      </div>
+      <CustomSelect
+          :options="[
+          {
+            display: ContractStandard.LSP7,
+            value: ContractStandard.LSP7
+          },
+          {
+            display: ContractStandard.LSP8,
+            value: ContractStandard.LSP8
+          }
+          ]"
+          @option-selected="handleStandardSelected"
+      />
       <div class="field">
         <label class="label">Token address</label>
         <div class="control">

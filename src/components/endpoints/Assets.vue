@@ -8,6 +8,7 @@ import {useLspFactory} from '@/compositions/useLspFactory'
 import Lsp4MetadataForm from "@/components/shared/Lsp4MetadataForm.vue";
 import {Lsp4Metadata} from "@/types";
 import {ContractStandard} from "@/enums";
+import CustomSelect from "@/components/shared/CustomSelect.vue";
 
 type Token = {
   type: ContractStandard
@@ -41,6 +42,10 @@ const { deployLSP7DigitalAsset, deployLSP8IdentifiableDigitalAsset } = useLspFac
 
 const handleNewLsp4Metadata = (metadata: Lsp4Metadata) => {
   lsp4Metadata.value = metadata;
+}
+
+const handleStandardSelected = (standard: ContractStandard) => {
+  token.value.type = standard
 }
 
 const create = async () => {
@@ -103,17 +108,19 @@ const create = async () => {
   <div class="tile is-4 is-parent">
     <div class="tile is-child box">
       <p class="is-size-5 has-text-weight-bold mb-4">Assets</p>
-      <div class="field">
-        <label class="select">
-          <select
-              v-model="token.type"
-              name="type"
-          >
-            <option :value="ContractStandard.LSP7" selected>LSP7</option>
-            <option :value="ContractStandard.LSP8">LSP8</option>
-          </select>
-        </label>
-      </div>
+      <CustomSelect
+        :options="[
+          {
+            display: ContractStandard.LSP7,
+            value: ContractStandard.LSP7
+          },
+          {
+            display: ContractStandard.LSP8,
+            value: ContractStandard.LSP8
+          }
+          ]"
+        @option-selected="handleStandardSelected"
+      />
       <div class="field">
         <label class="label">Token name</label>
         <div class="control">

@@ -14,6 +14,7 @@ import {ERC725} from "@erc725/erc725.js";
 import {Lsp4Metadata} from "@/types";
 import Lsp4MetadataForm from "@/components/shared/Lsp4MetadataForm.vue";
 import {ContractStandard} from "@/enums";
+import CustomSelect from "@/components/shared/CustomSelect.vue";
 
 const {notification, clearNotification, hasNotification, setNotification} = useNotifications()
 const {contract} = useWeb3()
@@ -41,6 +42,9 @@ watchEffect(() => {
   mintToken.value = getState('tokenAddress')
 })
 
+const handleStandardSelected = (standard: ContractStandard) => {
+  tokenType.value = standard
+}
 
 const mint = async () => {
   clearNotification()
@@ -64,7 +68,10 @@ const mint = async () => {
             })
         break;
       case ContractStandard.LSP8:
-        if (!tokenId.value) return; // TODO throw
+        if (!tokenId.value) {
+          setNotification('Token ID needs to be filled', 'danger')
+          return;
+        }
 
         myToken.value = contract(LSP8Mintable.abi as any, mintToken.value, {
           gas: DEFAULT_GAS, gasPrice: DEFAULT_GAS_PRICE,
@@ -106,17 +113,19 @@ const mint = async () => {
   <div class="tile is-4 is-parent">
     <div class="tile is-child box">
       <p class="is-size-5 has-text-weight-bold mb-4">Mint</p>
-      <div class="field">
-        <label class="select">
-          <select
-              v-model="tokenType"
-              name="type"
-          >
-            <option :value="ContractStandard.LSP7" selected>LSP7</option>
-            <option :value="ContractStandard.LSP8">LSP8</option>
-          </select>
-        </label>
-      </div>
+      <CustomSelect
+          :options="[
+          {
+            display: ContractStandard.LSP7,
+            value: ContractStandard.LSP7
+          },
+          {
+            display: ContractStandard.LSP8,
+            value: ContractStandard.LSP8
+          }
+          ]"
+          @option-selected="handleStandardSelected"
+      />
       <div class="field">
         <label class="label">Token address</label>
         <div class="control">
@@ -128,7 +137,7 @@ const mint = async () => {
           />
         </div>
       </div>
-      <div v-if="tokenType === ContractStandard.LSP7" class="field">
+      <div v-if="tokenType === ContractStandard.LSP8" class="field">
         <label class="label">Token id (!: only bytes32, no uint256)</label>
         <div class="control">
           <input
