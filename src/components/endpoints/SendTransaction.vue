@@ -33,6 +33,15 @@ const sampleData = computed<{ [key: string]: TransactionSelect[] }>(() => {
   const sampleUP = '0x410f64cdc9c95b19659ccbd35cc5933c20489f6a'
   const sampleSC = '0xcAC51571007DaAB53f26C2387b3B16420491dE18'
   const currentUP = getState('address')
+  // ERC20
+  const erc20TokenWithEip165 = '0xF5443372766a48faF098244c8C769c5AEa02f321'
+  const erc20TokenWithoutEip165 = '0xB29c50a9F3D90FA3aDF394f2960BD6D8e0Ff5E9D'
+  // ERC777
+  const erc777TokenWithEip165 = '0xC719f454C8F9a0C7eEC4203B21766B88d8a5B073'
+  const erc777TokenWithoutEip165 = '0xD7549C70A6122cA01043831f0f0c65152C4877d6'
+  // LSP7
+  const lsp7TokenDivisible = '0x314E7a56B08AF8E729612930dBAd70BB5A3575D9'
+  const lsp7TokenNonDivisible = '0xF5d8FD6599Cb1971b8EEba218FFE31da34a257a9'
 
   return {
     LYX: [
@@ -61,7 +70,7 @@ const sampleData = computed<{ [key: string]: TransactionSelect[] }>(() => {
     ERC20: [
       {
         label: '💰 Transfer: 1 token A to EoA',
-        to: '0xF5443372766a48faF098244c8C769c5AEa02f321',
+        to: erc20TokenWithEip165,
         amount: 0,
         hasData: true,
         data: `0xa9059cbb000000000000000000000000${sampleEoA.substring(
@@ -79,7 +88,7 @@ const sampleData = computed<{ [key: string]: TransactionSelect[] }>(() => {
       },
       {
         label: '💰 Transfer: 1 token A to UP',
-        to: '0xF5443372766a48faF098244c8C769c5AEa02f321',
+        to: erc20TokenWithEip165,
         amount: 0,
         hasData: true,
         data: `a9059cbb000000000000000000000000${sampleUP.substring(
@@ -88,7 +97,7 @@ const sampleData = computed<{ [key: string]: TransactionSelect[] }>(() => {
       },
       {
         label: '💰 Transfer: 1 token B to EoA (without EIP165)',
-        to: '0xB29c50a9F3D90FA3aDF394f2960BD6D8e0Ff5E9D',
+        to: erc20TokenWithoutEip165,
         amount: 0,
         hasData: true,
         data: `0xa9059cbb000000000000000000000000${sampleEoA.substring(
@@ -97,7 +106,7 @@ const sampleData = computed<{ [key: string]: TransactionSelect[] }>(() => {
       },
       {
         label: '🏦 Mint: 100 tokens A to current UP',
-        to: '0xF5443372766a48faF098244c8C769c5AEa02f321',
+        to: erc20TokenWithEip165,
         amount: 0,
         hasData: true,
         data: `0x40c10f19000000000000000000000000${currentUP.substring(
@@ -106,7 +115,7 @@ const sampleData = computed<{ [key: string]: TransactionSelect[] }>(() => {
       },
       {
         label: '🏦 Mint: 100 tokens B to current UP',
-        to: '0xB29c50a9F3D90FA3aDF394f2960BD6D8e0Ff5E9D',
+        to: erc20TokenWithoutEip165,
         amount: 0,
         hasData: true,
         data: `0x40c10f19000000000000000000000000${currentUP.substring(
@@ -117,7 +126,7 @@ const sampleData = computed<{ [key: string]: TransactionSelect[] }>(() => {
     ERC777: [
       {
         label: '💰 Transfer: 1 token A to EoA',
-        to: '0xC719f454C8F9a0C7eEC4203B21766B88d8a5B073',
+        to: erc777TokenWithEip165,
         amount: 0,
         hasData: true,
         data: `9bd9bbc6000000000000000000000000${sampleEoA.substring(
@@ -126,7 +135,7 @@ const sampleData = computed<{ [key: string]: TransactionSelect[] }>(() => {
       },
       {
         label: '💰 Transfer: 1 token A to UP',
-        to: '0xC719f454C8F9a0C7eEC4203B21766B88d8a5B073',
+        to: erc777TokenWithEip165,
         amount: 0,
         hasData: true,
         data: `9bd9bbc6000000000000000000000000${sampleUP.substring(
@@ -135,7 +144,7 @@ const sampleData = computed<{ [key: string]: TransactionSelect[] }>(() => {
       },
       {
         label: '💰 Transfer: 1 token B to EoA (without EIP165)',
-        to: '0xD7549C70A6122cA01043831f0f0c65152C4877d6',
+        to: erc777TokenWithoutEip165,
         amount: 0,
         hasData: true,
         data: `9bd9bbc6000000000000000000000000${sampleEoA.substring(
@@ -144,7 +153,7 @@ const sampleData = computed<{ [key: string]: TransactionSelect[] }>(() => {
       },
       {
         label: '🏦 Mint: 100 tokens A to current UP',
-        to: '0xC719f454C8F9a0C7eEC4203B21766B88d8a5B073',
+        to: erc777TokenWithEip165,
         amount: 0,
         hasData: true,
         data: `0x40c10f19000000000000000000000000${currentUP.substring(
@@ -153,7 +162,7 @@ const sampleData = computed<{ [key: string]: TransactionSelect[] }>(() => {
       },
       {
         label: '🏦 Mint: 100 tokens B to current UP',
-        to: '0xD7549C70A6122cA01043831f0f0c65152C4877d6',
+        to: erc777TokenWithoutEip165,
         amount: 0,
         hasData: true,
         data: `0x40c10f19000000000000000000000000${currentUP.substring(
@@ -164,7 +173,7 @@ const sampleData = computed<{ [key: string]: TransactionSelect[] }>(() => {
     LSP7: [
       {
         label: '💰 Transfer: 1 token A (divisible) to EoA',
-        to: '0x314E7a56B08AF8E729612930dBAd70BB5A3575D9',
+        to: lsp7TokenDivisible,
         amount: 0,
         hasData: true,
         data: `760d9bba000000000000000000000000${currentUP.substring(
@@ -175,7 +184,7 @@ const sampleData = computed<{ [key: string]: TransactionSelect[] }>(() => {
       },
       {
         label: '💰 Transfer: 1 token A (divisible) to EoA (without force)',
-        to: '0x314E7a56B08AF8E729612930dBAd70BB5A3575D9',
+        to: lsp7TokenDivisible,
         amount: 0,
         hasData: true,
         data: `0x760d9bba000000000000000000000000${currentUP.substring(
@@ -186,7 +195,7 @@ const sampleData = computed<{ [key: string]: TransactionSelect[] }>(() => {
       },
       {
         label: '💰 Transfer: 1 token A (divisible) to UP',
-        to: '0x314E7a56B08AF8E729612930dBAd70BB5A3575D9',
+        to: lsp7TokenDivisible,
         amount: 0,
         hasData: true,
         data: `760d9bba000000000000000000000000${currentUP.substring(
@@ -197,7 +206,7 @@ const sampleData = computed<{ [key: string]: TransactionSelect[] }>(() => {
       },
       {
         label: '💰 Transfer: 1 token A (divisible) to SC (no LSP1)',
-        to: '0x314E7a56B08AF8E729612930dBAd70BB5A3575D9',
+        to: lsp7TokenDivisible,
         amount: 0,
         hasData: true,
         data: `760d9bba000000000000000000000000${currentUP.substring(
@@ -208,7 +217,7 @@ const sampleData = computed<{ [key: string]: TransactionSelect[] }>(() => {
       },
       {
         label: '💰 Transfer: 1 token A (non divisible) to EoA',
-        to: '0xF5d8FD6599Cb1971b8EEba218FFE31da34a257a9',
+        to: lsp7TokenNonDivisible,
         amount: 0,
         hasData: true,
         data: `760d9bba000000000000000000000000${currentUP.substring(
@@ -219,7 +228,7 @@ const sampleData = computed<{ [key: string]: TransactionSelect[] }>(() => {
       },
       {
         label: '💰 Transfer: 1 token A (non divisible) to EoA (without force)',
-        to: '0xF5d8FD6599Cb1971b8EEba218FFE31da34a257a9',
+        to: lsp7TokenNonDivisible,
         amount: 0,
         hasData: true,
         data: `0x760d9bba000000000000000000000000${currentUP.substring(
@@ -230,7 +239,7 @@ const sampleData = computed<{ [key: string]: TransactionSelect[] }>(() => {
       },
       {
         label: '💰 Transfer: 1 token A (non divisible) to UP',
-        to: '0xF5d8FD6599Cb1971b8EEba218FFE31da34a257a9',
+        to: lsp7TokenNonDivisible,
         amount: 0,
         hasData: true,
         data: `760d9bba000000000000000000000000${currentUP.substring(
@@ -241,7 +250,7 @@ const sampleData = computed<{ [key: string]: TransactionSelect[] }>(() => {
       },
       {
         label: '💰 Transfer: 1 token A (non divisible) to SC (no LSP1)',
-        to: '0xF5d8FD6599Cb1971b8EEba218FFE31da34a257a9',
+        to: lsp7TokenNonDivisible,
         amount: 0,
         hasData: true,
         data: `760d9bba000000000000000000000000${currentUP.substring(
