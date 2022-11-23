@@ -138,13 +138,14 @@ const mint = async () => {
         </div>
       </div>
       <div v-if="tokenType === ContractStandard.LSP8" class="field">
-        <label class="label">Token id (!: only bytes32, no uint256)</label>
+        <label class="label">Token id (!: only token type bytes32)</label>
         <div class="control">
           <input
               v-model="tokenId"
               class="input"
               type="text"
               data-testid="transfer-address"
+              placeholder="0xbb204573da1a42ab80f38995444b17124110b946ba189157ffcc7ba2b3375bf8"
           />
         </div>
       </div>
