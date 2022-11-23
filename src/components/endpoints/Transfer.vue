@@ -1,20 +1,21 @@
 <script setup lang="ts">
-import { getState } from '@/stores'
-import { ref, watchEffect } from 'vue'
-import { Contract } from 'web3-eth-contract'
+import {getState} from '@/stores'
+import {ref, watchEffect} from 'vue'
+import {Contract} from 'web3-eth-contract'
 import useNotifications from '@/compositions/useNotifications'
 import useWeb3 from '@/compositions/useWeb3'
 import LSP7Mintable from '@lukso/lsp-smart-contracts/artifacts/LSP7Mintable.json'
 import LSP8Mintable from '@lukso/lsp-smart-contracts/artifacts/LSP8Mintable.json'
-import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
+import {DEFAULT_GAS, DEFAULT_GAS_PRICE} from '@/helpers/config'
 import Notifications from '@/components/Notification.vue'
-import { toWei } from 'web3-utils'
+import {toWei} from 'web3-utils'
+import {ContractStandard} from "@/enums";
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
 const { contract } = useWeb3()
 
-const tokenType = ref<'LSP7' | 'LSP8'>('LSP7')
+const tokenType = ref<ContractStandard>(ContractStandard.LSP7)
 const tokenId = ref<string>('')
 const myToken = ref<Contract>()
 const transferToken = ref<string>()
@@ -29,62 +30,65 @@ watchEffect(() => {
 const transfer = async () => {
   clearNotification()
   const erc725AccountAddress = getState('address')
+  switch (tokenType.value) {
+    case ContractStandard.LSP7:
+      myToken.value = contract(LSP7Mintable.abi as any, transferToken.value, {
+        gas: DEFAULT_GAS,
+        gasPrice: DEFAULT_GAS_PRICE,
+      })
 
-  if (tokenType.value === 'LSP7') {
-    myToken.value = contract(LSP7Mintable.abi as any, transferToken.value, {
-      gas: DEFAULT_GAS,
-      gasPrice: DEFAULT_GAS_PRICE,
-    })
+      try {
+        await myToken.value.methods
+            .transfer(
+                erc725AccountAddress,
+                transferReceiver.value,
+                toWei(transferAmount.value.toString()),
+                transferForce.value,
+                '0x'
+            )
+            .send({ from: erc725AccountAddress })
+            .on('receipt', function (receipt: any) {
+              console.log(receipt)
+            })
+            .once('sending', (payload: any) => {
+              console.log(JSON.stringify(payload, null, 2))
+            })
+        setNotification('Token transferred', 'info')
+      } catch (error) {
+        setNotification((error as unknown as Error).message, 'danger')
+      }
+      break;
+    case ContractStandard.LSP8:
+      if (!tokenId.value) return;
+      myToken.value = contract(LSP8Mintable.abi as any, transferToken.value, {
+        gas: DEFAULT_GAS,
+        gasPrice: DEFAULT_GAS_PRICE,
+      })
 
-    try {
-      await myToken.value.methods
-          .transfer(
-              erc725AccountAddress,
-              transferReceiver.value,
-              toWei(transferAmount.value.toString()),
-              transferForce.value,
-              '0x'
-          )
-          .send({ from: erc725AccountAddress })
-          .on('receipt', function (receipt: any) {
-            console.log(receipt)
-          })
-          .once('sending', (payload: any) => {
-            console.log(JSON.stringify(payload, null, 2))
-          })
-      setNotification('Token transferred', 'info')
-    } catch (error) {
-      setNotification((error as unknown as Error).message, 'danger')
-    }
-  } else {
-    if (!tokenId.value) return;
-    myToken.value = contract(LSP8Mintable.abi as any, transferToken.value, {
-      gas: DEFAULT_GAS,
-      gasPrice: DEFAULT_GAS_PRICE,
-    })
-
-    try {
-      await myToken.value.methods
-          .transfer(
-              erc725AccountAddress,
-              transferReceiver.value,
-              tokenId.value,
-              transferForce.value,
-              '0x'
-          )
-          .send({ from: erc725AccountAddress })
-          .on('receipt', function (receipt: any) {
-            console.log(receipt)
-          })
-          .once('sending', (payload: any) => {
-            console.log(JSON.stringify(payload, null, 2))
-          })
-      setNotification('Token transferred', 'info')
-    } catch (error) {
-      setNotification((error as unknown as Error).message, 'danger')
-    }
+      try {
+        await myToken.value.methods
+            .transfer(
+                erc725AccountAddress,
+                transferReceiver.value,
+                tokenId.value,
+                transferForce.value,
+                '0x'
+            )
+            .send({ from: erc725AccountAddress })
+            .on('receipt', function (receipt: any) {
+              console.log(receipt)
+            })
+            .once('sending', (payload: any) => {
+              console.log(JSON.stringify(payload, null, 2))
+            })
+        setNotification('Token transferred', 'info')
+      } catch (error) {
+        setNotification((error as unknown as Error).message, 'danger')
+      }
+      break;
+    default:
+      console.log('Standard not supported');
   }
-  
 }
 </script>
 
@@ -98,8 +102,8 @@ const transfer = async () => {
               v-model="tokenType"
               name="type"
           >
-            <option value="LSP7" selected>LSP7</option>
-            <option value="LSP8">LSP8</option>
+            <option :value="ContractStandard.LSP7" selected>LSP7</option>
+            <option :value="ContractStandard.LSP8">LSP8</option>
           </select>
         </label>
       </div>
@@ -125,7 +129,7 @@ const transfer = async () => {
           />
         </div>
       </div>
-      <div v-if="tokenType === 'LSP7'" class="field">
+      <div v-if="tokenType === ContractStandard.LSP7" class="field">
         <label class="label">Transfer amount</label>
         <div class="control columns">
           <div class="column is-one-third">

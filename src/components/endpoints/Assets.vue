@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import { getState, setState } from '@/stores'
+import {getState, setState} from '@/stores'
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
-import { ref } from 'vue'
-import { createBlockScoutLink } from '@/utils/createLinks'
-import { useLspFactory } from '@/compositions/useLspFactory'
+import {ref} from 'vue'
+import {createBlockScoutLink} from '@/utils/createLinks'
+import {useLspFactory} from '@/compositions/useLspFactory'
 import Lsp4MetadataForm from "@/components/shared/Lsp4MetadataForm.vue";
 import {Lsp4Metadata} from "@/types";
+import {ContractStandard} from "@/enums";
 
 type Token = {
-  type: 'LSP7' | 'LSP8'
+  type: ContractStandard
   name: string
   symbol: string
   isNonDivisible: boolean
@@ -21,7 +22,7 @@ const { notification, clearNotification, hasNotification, setNotification } =
 const isTokenCreated = ref(false)
 const isTokenPending = ref(false)
 const token = ref<Token>({
-  type: 'LSP7',
+  type: ContractStandard.LSP7,
   name: 'My Token',
   symbol: 'MYT',
   isNonDivisible: false,
@@ -53,33 +54,39 @@ const create = async () => {
   isTokenPending.value = true
 
   try {
-    if (token.value.type === 'LSP7') {
-      const deployedAsset = await deployLSP7DigitalAsset({
-        isNFT: token.value.isNonDivisible,
-        controllerAddress: erc725AccountAddress,
-        name: token.value.name,
-        symbol: token.value.symbol,
-        digitalAssetMetadata: {
-          LSP4Metadata: {
-            ...lsp4Metadata.value
+    let deployedAsset;
+    switch (token.value.type) {
+      case ContractStandard.LSP7:
+        deployedAsset = await deployLSP7DigitalAsset({
+          isNFT: token.value.isNonDivisible,
+          controllerAddress: erc725AccountAddress,
+          name: token.value.name,
+          symbol: token.value.symbol,
+          digitalAssetMetadata: {
+            LSP4Metadata: {
+              ...lsp4Metadata.value
+            },
           },
-        },
-      })
-      console.log('Deployed asset', deployedAsset.LSP7DigitalAsset)
-      tokenAddress.value = deployedAsset.LSP7DigitalAsset.address
-    } else {
-      const deployedAsset = await deployLSP8IdentifiableDigitalAsset({
-        controllerAddress: erc725AccountAddress,
-        name: token.value.name,
-        symbol: token.value.symbol,
-        digitalAssetMetadata: {
-          LSP4Metadata: {
-            ...lsp4Metadata.value,
+        })
+        console.log('Deployed asset', deployedAsset.LSP7DigitalAsset)
+        tokenAddress.value = deployedAsset.LSP7DigitalAsset.address
+        break;
+      case ContractStandard.LSP8:
+        deployedAsset = await deployLSP8IdentifiableDigitalAsset({
+          controllerAddress: erc725AccountAddress,
+          name: token.value.name,
+          symbol: token.value.symbol,
+          digitalAssetMetadata: {
+            LSP4Metadata: {
+              ...lsp4Metadata.value,
+            },
           },
-        },
-      })
-      console.log('Deployed asset', deployedAsset.LSP8IdentifiableDigitalAsset)
-      tokenAddress.value = deployedAsset.LSP8IdentifiableDigitalAsset.address
+        })
+        console.log('Deployed asset', deployedAsset.LSP8IdentifiableDigitalAsset)
+        tokenAddress.value = deployedAsset.LSP8IdentifiableDigitalAsset.address
+        break;
+      default:
+        console.log('Standard not supported')
     }
     isTokenCreated.value = true
     setState('tokenAddress', tokenAddress.value)
@@ -102,8 +109,8 @@ const create = async () => {
               v-model="token.type"
               name="type"
           >
-            <option value="LSP7" selected>LSP7</option>
-            <option value="LSP8">LSP8</option>
+            <option :value="ContractStandard.LSP7" selected>LSP7</option>
+            <option :value="ContractStandard.LSP8">LSP8</option>
           </select>
         </label>
       </div>
@@ -121,7 +128,7 @@ const create = async () => {
       </div>
       <Lsp4MetadataForm @new-metadata="handleNewLsp4Metadata"/>
 
-      <div v-if="token.type === 'LSP7'" class="field">
+      <div v-if="token.type === ContractStandard.LSP7" class="field">
         <label class="checkbox">
           <input
             v-model="token.isNonDivisible"

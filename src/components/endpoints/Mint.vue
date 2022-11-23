@@ -13,11 +13,12 @@ import {toWei} from 'web3-utils'
 import {ERC725} from "@erc725/erc725.js";
 import {Lsp4Metadata} from "@/types";
 import Lsp4MetadataForm from "@/components/shared/Lsp4MetadataForm.vue";
+import {ContractStandard} from "@/enums";
 
 const {notification, clearNotification, hasNotification, setNotification} = useNotifications()
 const {contract} = useWeb3()
 
-const tokenType = ref<'LSP7' | 'LSP8'>('LSP7')
+const tokenType = ref<ContractStandard>(ContractStandard.LSP7)
 const myToken = ref<Contract>()
 const mintToken = ref<string>()
 const tokenId = ref<string>()
@@ -46,47 +47,52 @@ const mint = async () => {
   const erc725AccountAddress = getState('address')
 
   try {
-    if (tokenType.value === 'LSP7') {
-      myToken.value = contract(LSP7Mintable.abi as any, mintToken.value, {
-        gas: DEFAULT_GAS, gasPrice: DEFAULT_GAS_PRICE,
-      })
+    switch (tokenType.value) {
+      case ContractStandard.LSP7:
+        myToken.value = contract(LSP7Mintable.abi as any, mintToken.value, {
+          gas: DEFAULT_GAS, gasPrice: DEFAULT_GAS_PRICE,
+        })
 
-      await myToken.value.methods
-          .mint(mintReceiver.value, toWei(mintAmount.value.toString()), false, '0x')
-          .send({from: erc725AccountAddress})
-          .on('receipt', function (receipt: any) {
-            console.log(receipt)
-          })
-          .once('sending', (payload: any) => {
-            console.log(JSON.stringify(payload, null, 2))
-          })
-    } else {
-      if (!tokenId.value) return; // TODO throw
+        await myToken.value.methods
+            .mint(mintReceiver.value, toWei(mintAmount.value.toString()), false, '0x')
+            .send({from: erc725AccountAddress})
+            .on('receipt', function (receipt: any) {
+              console.log(receipt)
+            })
+            .once('sending', (payload: any) => {
+              console.log(JSON.stringify(payload, null, 2))
+            })
+        break;
+      case ContractStandard.LSP8:
+        if (!tokenId.value) return; // TODO throw
 
-      myToken.value = contract(LSP8Mintable.abi as any, mintToken.value, {
-        gas: DEFAULT_GAS, gasPrice: DEFAULT_GAS_PRICE,
-      })
+        myToken.value = contract(LSP8Mintable.abi as any, mintToken.value, {
+          gas: DEFAULT_GAS, gasPrice: DEFAULT_GAS_PRICE,
+        })
 
-      await myToken.value.methods
-          .mint(mintReceiver.value, tokenId.value, false, '0x')
-          .send({from: erc725AccountAddress})
-          .on('receipt', function (receipt: any) {
-            console.log(receipt)
-          })
-          .once('sending', (payload: any) => {
-            console.log(JSON.stringify(payload, null, 2))
-          })
+        await myToken.value.methods
+            .mint(mintReceiver.value, tokenId.value, false, '0x')
+            .send({from: erc725AccountAddress})
+            .on('receipt', function (receipt: any) {
+              console.log(receipt)
+            })
+            .once('sending', (payload: any) => {
+              console.log(JSON.stringify(payload, null, 2))
+            })
 
-      const metadataKey = ERC725.encodeKeyName('LSP8MetadataJSON:<bytes32>', tokenId.value);
-      await myToken.value.methods
-          .setData(metadataKey, metadataJsonUrl)
-          .send({from: erc725AccountAddress})
-          .on('receipt', function (receipt: any) {
-            console.log(receipt)
-          })
-          .once('sending', (payload: any) => {
-            console.log(JSON.stringify(payload, null, 2))
-          })
+        const metadataKey = ERC725.encodeKeyName('LSP8MetadataJSON:<bytes32>', tokenId.value);
+        await myToken.value.methods
+            .setData(metadataKey, metadataJsonUrl)
+            .send({from: erc725AccountAddress})
+            .on('receipt', function (receipt: any) {
+              console.log(receipt)
+            })
+            .once('sending', (payload: any) => {
+              console.log(JSON.stringify(payload, null, 2))
+            })
+        break;
+      default:
+        console.log('Standard not supported')
     }
 
     setNotification('Token minted', 'info')
@@ -106,8 +112,8 @@ const mint = async () => {
               v-model="tokenType"
               name="type"
           >
-            <option value="LSP7" selected>LSP7</option>
-            <option value="LSP8">LSP8</option>
+            <option :value="ContractStandard.LSP7" selected>LSP7</option>
+            <option :value="ContractStandard.LSP8">LSP8</option>
           </select>
         </label>
       </div>
@@ -122,7 +128,7 @@ const mint = async () => {
           />
         </div>
       </div>
-      <div v-if="tokenType === 'LSP8'" class="field">
+      <div v-if="tokenType === ContractStandard.LSP7" class="field">
         <label class="label">Token id (!: only bytes32, no uint256)</label>
         <div class="control">
           <input
@@ -144,7 +150,7 @@ const mint = async () => {
           />
         </div>
       </div>
-      <div v-if="tokenType === 'LSP7'" class="field">
+      <div v-if="tokenType === ContractStandard.LSP7" class="field">
         <label class="label">Mint amount</label>
         <div class="control columns">
           <div class="column is-one-third">
