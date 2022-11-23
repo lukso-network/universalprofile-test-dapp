@@ -1,6 +1,7 @@
 import SendTransaction from '../SendTransaction.vue'
 import { render, fireEvent, screen } from '@testing-library/vue'
 import { setState } from '@/stores'
+import userEvent from '@testing-library/user-event'
 
 const mockGetBalance = jest.fn()
 const mockSendTransaction = jest.fn()
@@ -62,6 +63,30 @@ test('can send lyx transaction with data', async () => {
     from: '0x517216362D594516c6f96Ee34b2c502d65B847E4',
     to: '0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298',
     value: '2000000000000000000',
+    gas: 5000000,
+    gasPrice: '10000000000',
+  })
+})
+
+test('can send transaction from preset', async () => {
+  setState('address', '0x517216362D594516c6f96Ee34b2c502d65B847E4')
+
+  render(SendTransaction)
+
+  await userEvent.selectOptions(
+    screen.getByTestId('preset'),
+    '🏦 Mint: 100 tokens B to current UP'
+  )
+  await fireEvent.click(screen.getByTestId('send'))
+
+  expect(screen.getByTestId('notification')).toHaveTextContent(
+    'The transaction was successful'
+  )
+  expect(mockSendTransaction).toBeCalledWith({
+    data: '0x40c10f19000000000000000000000000517216362D594516c6f96Ee34b2c502d65B847E40000000000000000000000000000000000000000000000056bc75e2d63100000',
+    from: '0x517216362D594516c6f96Ee34b2c502d65B847E4',
+    to: '0xB29c50a9F3D90FA3aDF394f2960BD6D8e0Ff5E9D',
+    value: '0',
     gas: 5000000,
     gasPrice: '10000000000',
   })
