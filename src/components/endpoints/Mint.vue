@@ -42,8 +42,8 @@ watchEffect(() => {
   mintToken.value = getState('tokenAddress')
 })
 
-const handleStandardSelected = (standard: ContractStandard) => {
-  tokenType.value = standard
+const handleStandardSelected = (standard: string) => {
+  tokenType.value = standard as ContractStandard
 }
 
 const mint = async () => {

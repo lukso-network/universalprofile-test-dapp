@@ -44,8 +44,8 @@ const handleNewLsp4Metadata = (metadata: Lsp4Metadata) => {
   lsp4Metadata.value = metadata;
 }
 
-const handleStandardSelected = (standard: ContractStandard) => {
-  token.value.type = standard
+const handleStandardSelected = (standard: string) => {
+  token.value.type = standard as ContractStandard
 }
 
 const create = async () => {
