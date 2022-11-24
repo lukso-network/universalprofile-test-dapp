@@ -11,7 +11,7 @@
     "lint": "npm-run-all --aggregate-output --continue-on-error --parallel 'lint:!(fix)'",
     "lint:js": "eslint src --ext .js,.ts,.vue",
     "lint:css": "stylelint \"**/*.{css,scss,vue}\"",
-    "lint:format": "prettier --check --loglevel=warn --write .",
+    "lint:format": "prettier --check --loglevel=warn .",
     "lint:types": "tsc --noEmit"
   },
   "dependencies": {
