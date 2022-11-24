@@ -77,6 +77,14 @@ const { toggle } = useDropdown()
               class="button is-light"
               target="_blank"
               rel="noreferer"
+              href="https://erc725-inspect.lukso.tech/"
+            >
+              <strong>ERC725 Inspect</strong>
+            </a>
+            <a
+              class="button is-light"
+              target="_blank"
+              rel="noreferer"
               href="https://github.com/lukso-network/universalprofile-test-dapp"
             >
               <strong>GitHub</strong>

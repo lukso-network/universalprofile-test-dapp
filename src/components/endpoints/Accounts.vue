@@ -131,20 +131,24 @@ const disconnect = async () => {
           data-testid="info"
         >
           <p class="mb-3">
-            Connected to address:
+            Connected to address:<br />
             <b
               ><a
                 :href="createBlockScoutLink(getState('address'))"
                 target="_blank"
+                class="is-family-code is-size-7"
                 >{{ getState('address') }}</a
               ></b
             >
           </p>
           <p class="mb-3">
-            Balance: <b>{{ getState('balance') }} LYX</b>
+            Balance: <b class="is-family-code">{{ getState('balance') }} LYX</b>
           </p>
           <p data-testid="chain">
-            Chain ID: <b>{{ getState('chainId') }} ({{ hexChainId }})</b>
+            Chain ID:
+            <b class="is-family-code"
+              >{{ getState('chainId') }} ({{ hexChainId }})</b
+            >
           </p>
         </div>
       </div>

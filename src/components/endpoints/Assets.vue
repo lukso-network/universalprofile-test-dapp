@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import {getState, setState} from '@/stores'
+import { getState, setState } from '@/stores'
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
-import {ref} from 'vue'
-import {createBlockScoutLink} from '@/utils/createLinks'
-import {useLspFactory} from '@/compositions/useLspFactory'
-import Lsp4MetadataForm from "@/components/shared/Lsp4MetadataForm.vue";
-import {Lsp4Metadata} from "@/types";
-import {ContractStandard} from "@/enums";
-import CustomSelect from "@/components/shared/CustomSelect.vue";
+import { ref } from 'vue'
+import { createBlockScoutLink } from '@/utils/createLinks'
+import { useLspFactory } from '@/compositions/useLspFactory'
+import Lsp4MetadataForm from '@/components/shared/Lsp4MetadataForm.vue'
+import { Lsp4Metadata } from '@/types'
+import { ContractStandard } from '@/enums'
+import CustomSelect from '@/components/shared/CustomSelect.vue'
 
 type Token = {
   type: ContractStandard
@@ -36,12 +36,13 @@ const lsp4Metadata = ref<Lsp4Metadata>({
       url: 'https://docs.lukso.tech',
     },
   ],
-});
+})
 const tokenAddress = ref<string>()
-const { deployLSP7DigitalAsset, deployLSP8IdentifiableDigitalAsset } = useLspFactory()
+const { deployLSP7DigitalAsset, deployLSP8IdentifiableDigitalAsset } =
+  useLspFactory()
 
 const handleNewLsp4Metadata = (metadata: Lsp4Metadata) => {
-  lsp4Metadata.value = metadata;
+  lsp4Metadata.value = metadata
 }
 
 const handleStandardSelected = (standard: string) => {
@@ -59,7 +60,7 @@ const create = async () => {
   isTokenPending.value = true
 
   try {
-    let deployedAsset;
+    let deployedAsset
     switch (token.value.type) {
       case ContractStandard.LSP7:
         deployedAsset = await deployLSP7DigitalAsset({
@@ -69,13 +70,13 @@ const create = async () => {
           symbol: token.value.symbol,
           digitalAssetMetadata: {
             LSP4Metadata: {
-              ...lsp4Metadata.value
+              ...lsp4Metadata.value,
             },
           },
         })
         console.log('Deployed asset', deployedAsset.LSP7DigitalAsset)
         tokenAddress.value = deployedAsset.LSP7DigitalAsset.address
-        break;
+        break
       case ContractStandard.LSP8:
         deployedAsset = await deployLSP8IdentifiableDigitalAsset({
           controllerAddress: erc725AccountAddress,
@@ -87,9 +88,12 @@ const create = async () => {
             },
           },
         })
-        console.log('Deployed asset', deployedAsset.LSP8IdentifiableDigitalAsset)
+        console.log(
+          'Deployed asset',
+          deployedAsset.LSP8IdentifiableDigitalAsset
+        )
         tokenAddress.value = deployedAsset.LSP8IdentifiableDigitalAsset.address
-        break;
+        break
       default:
         console.log('Standard not supported')
     }
@@ -112,13 +116,13 @@ const create = async () => {
         :options="[
           {
             display: ContractStandard.LSP7,
-            value: ContractStandard.LSP7
+            value: ContractStandard.LSP7,
           },
           {
             display: ContractStandard.LSP8,
-            value: ContractStandard.LSP8
-          }
-          ]"
+            value: ContractStandard.LSP8,
+          },
+        ]"
         @option-selected="handleStandardSelected"
       />
       <div class="field">
@@ -133,7 +137,7 @@ const create = async () => {
           <input v-model="token.symbol" class="input" type="text" />
         </div>
       </div>
-      <Lsp4MetadataForm @new-metadata="handleNewLsp4Metadata"/>
+      <Lsp4MetadataForm @new-metadata="handleNewLsp4Metadata" />
 
       <div v-if="token.type === ContractStandard.LSP7" class="field">
         <label class="checkbox">

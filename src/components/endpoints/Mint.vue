@@ -1,23 +1,23 @@
 <script setup lang="ts">
-
-import {getState} from '@/stores'
-import {ref, watchEffect} from 'vue'
-import {Contract} from 'web3-eth-contract'
+import { getState } from '@/stores'
+import { ref, watchEffect } from 'vue'
+import { Contract } from 'web3-eth-contract'
 import useNotifications from '@/compositions/useNotifications'
 import useWeb3 from '@/compositions/useWeb3'
 import LSP7Mintable from '@lukso/lsp-smart-contracts/artifacts/LSP7Mintable.json'
 import LSP8Mintable from '@lukso/lsp-smart-contracts/artifacts/LSP8Mintable.json'
-import {DEFAULT_GAS, DEFAULT_GAS_PRICE} from '@/helpers/config'
+import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
 import Notifications from '@/components/Notification.vue'
-import {toWei} from 'web3-utils'
-import {ERC725} from "@erc725/erc725.js";
-import {Lsp4Metadata} from "@/types";
-import Lsp4MetadataForm from "@/components/shared/Lsp4MetadataForm.vue";
-import {ContractStandard} from "@/enums";
-import CustomSelect from "@/components/shared/CustomSelect.vue";
+import { toWei } from 'web3-utils'
+import { ERC725 } from '@erc725/erc725.js'
+import { Lsp4Metadata } from '@/types'
+import Lsp4MetadataForm from '@/components/shared/Lsp4MetadataForm.vue'
+import { ContractStandard } from '@/enums'
+import CustomSelect from '@/components/shared/CustomSelect.vue'
 
-const {notification, clearNotification, hasNotification, setNotification} = useNotifications()
-const {contract} = useWeb3()
+const { notification, clearNotification, hasNotification, setNotification } =
+  useNotifications()
+const { contract } = useWeb3()
 
 const tokenType = ref<ContractStandard>(ContractStandard.LSP7)
 const myToken = ref<Contract>()
@@ -33,9 +33,10 @@ const lsp4Metadata = ref<Lsp4Metadata>({
       url: 'https://docs.lukso.tech',
     },
   ],
-});
+})
 
-const metadataJsonUrl = '0x6f357c6a6143da573459ba01321df3eb223e96b0015c2914a1907df319804573d538c311697066733a2f2f516d51357071797167637a6d6b736e4e434a734a76333453664469776e4676426d64456f74704254337642464865'
+const metadataJsonUrl =
+  '0x6f357c6a6143da573459ba01321df3eb223e96b0015c2914a1907df319804573d538c311697066733a2f2f516d51357071797167637a6d6b736e4e434a734a76333453664469776e4676426d64456f74704254337642464865'
 
 watchEffect(() => {
   mintReceiver.value = getState('address')
@@ -54,50 +55,60 @@ const mint = async () => {
     switch (tokenType.value) {
       case ContractStandard.LSP7:
         myToken.value = contract(LSP7Mintable.abi as any, mintToken.value, {
-          gas: DEFAULT_GAS, gasPrice: DEFAULT_GAS_PRICE,
+          gas: DEFAULT_GAS,
+          gasPrice: DEFAULT_GAS_PRICE,
         })
 
         await myToken.value.methods
-            .mint(mintReceiver.value, toWei(mintAmount.value.toString()), false, '0x')
-            .send({from: erc725AccountAddress})
-            .on('receipt', function (receipt: any) {
-              console.log(receipt)
-            })
-            .once('sending', (payload: any) => {
-              console.log(JSON.stringify(payload, null, 2))
-            })
-        break;
+          .mint(
+            mintReceiver.value,
+            toWei(mintAmount.value.toString()),
+            false,
+            '0x'
+          )
+          .send({ from: erc725AccountAddress })
+          .on('receipt', function (receipt: any) {
+            console.log(receipt)
+          })
+          .once('sending', (payload: any) => {
+            console.log(JSON.stringify(payload, null, 2))
+          })
+        break
       case ContractStandard.LSP8:
         if (!tokenId.value) {
           setNotification('Token ID needs to be filled', 'danger')
-          return;
+          return
         }
 
         myToken.value = contract(LSP8Mintable.abi as any, mintToken.value, {
-          gas: DEFAULT_GAS, gasPrice: DEFAULT_GAS_PRICE,
+          gas: DEFAULT_GAS,
+          gasPrice: DEFAULT_GAS_PRICE,
         })
 
         await myToken.value.methods
-            .mint(mintReceiver.value, tokenId.value, false, '0x')
-            .send({from: erc725AccountAddress})
-            .on('receipt', function (receipt: any) {
-              console.log(receipt)
-            })
-            .once('sending', (payload: any) => {
-              console.log(JSON.stringify(payload, null, 2))
-            })
+          .mint(mintReceiver.value, tokenId.value, false, '0x')
+          .send({ from: erc725AccountAddress })
+          .on('receipt', function (receipt: any) {
+            console.log(receipt)
+          })
+          .once('sending', (payload: any) => {
+            console.log(JSON.stringify(payload, null, 2))
+          })
 
-        const metadataKey = ERC725.encodeKeyName('LSP8MetadataJSON:<bytes32>', tokenId.value);
+        const metadataKey = ERC725.encodeKeyName(
+          'LSP8MetadataJSON:<bytes32>',
+          tokenId.value
+        )
         await myToken.value.methods
-            .setData(metadataKey, metadataJsonUrl)
-            .send({from: erc725AccountAddress})
-            .on('receipt', function (receipt: any) {
-              console.log(receipt)
-            })
-            .once('sending', (payload: any) => {
-              console.log(JSON.stringify(payload, null, 2))
-            })
-        break;
+          .setData(metadataKey, metadataJsonUrl)
+          .send({ from: erc725AccountAddress })
+          .on('receipt', function (receipt: any) {
+            console.log(receipt)
+          })
+          .once('sending', (payload: any) => {
+            console.log(JSON.stringify(payload, null, 2))
+          })
+        break
       default:
         console.log('Standard not supported')
     }
@@ -114,24 +125,24 @@ const mint = async () => {
     <div class="tile is-child box">
       <p class="is-size-5 has-text-weight-bold mb-4">Mint</p>
       <CustomSelect
-          :options="[
+        :options="[
           {
             display: ContractStandard.LSP7,
-            value: ContractStandard.LSP7
+            value: ContractStandard.LSP7,
           },
           {
             display: ContractStandard.LSP8,
-            value: ContractStandard.LSP8
-          }
-          ]"
-          @option-selected="handleStandardSelected"
+            value: ContractStandard.LSP8,
+          },
+        ]"
+        @option-selected="handleStandardSelected"
       />
       <div class="field">
         <label class="label">Token address</label>
         <div class="control">
           <input
             v-model="mintToken"
-            class="input"
+            class="input is-family-code"
             type="text"
             data-testid="transfer-address"
           />
@@ -141,11 +152,11 @@ const mint = async () => {
         <label class="label">Token id (!: only token type bytes32)</label>
         <div class="control">
           <input
-              v-model="tokenId"
-              class="input"
-              type="text"
-              data-testid="transfer-address"
-              placeholder="0xbb204573da1a42ab80f38995444b17124110b946ba189157ffcc7ba2b3375bf8"
+            v-model="tokenId"
+            class="input"
+            type="text"
+            data-testid="transfer-address"
+            placeholder="0xbb204573da1a42ab80f38995444b17124110b946ba189157ffcc7ba2b3375bf8"
           />
         </div>
       </div>
@@ -154,7 +165,7 @@ const mint = async () => {
         <div class="control">
           <input
             v-model="mintReceiver"
-            class="input"
+            class="input is-family-code"
             type="text"
             data-testid="mint-address"
           />
@@ -174,7 +185,7 @@ const mint = async () => {
         </div>
       </div>
       <div v-else>
-        <Lsp4MetadataForm disabled :new-metadata="lsp4Metadata"/>
+        <Lsp4MetadataForm disabled :new-metadata="lsp4Metadata" />
       </div>
       <div class="field">
         <button

@@ -108,7 +108,11 @@ const allPermissionsSelected = computed(() => {
       <div class="field">
         <label class="label">Address</label>
         <div class="control">
-          <input v-model="grantPermissionAddress" class="input" type="text" />
+          <input
+            v-model="grantPermissionAddress"
+            class="input is-family-code"
+            type="text"
+          />
         </div>
       </div>
       <div class="field">

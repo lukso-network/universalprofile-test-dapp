@@ -350,7 +350,7 @@ const send = async () => {
       <div class="field">
         <label class="label">From (defaults to injected address)</label>
         <div class="control">
-          <input v-model="from" class="input" type="text" />
+          <input v-model="from" class="input is-family-code" type="text" />
         </div>
       </div>
       <div class="field">
@@ -358,7 +358,7 @@ const send = async () => {
         <div class="control">
           <input
             v-model="to"
-            class="input"
+            class="input is-family-code"
             type="text"
             placeholder="0x123..."
             data-testid="to"

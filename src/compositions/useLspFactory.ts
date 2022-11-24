@@ -10,7 +10,10 @@ import {
 import { UploadOptions } from '@lukso/lsp-factory.js/build/main/src/lib/interfaces/profile-upload-options'
 import { DEFAULT_NETWORK_CONFIG } from '@/helpers/config'
 import {
-  DeployedLSP7DigitalAsset, DeployedLSP8IdentifiableDigitalAsset, DigitalAssetDeploymentOptions, LSP7DigitalAssetDeploymentOptions,
+  DeployedLSP7DigitalAsset,
+  DeployedLSP8IdentifiableDigitalAsset,
+  DigitalAssetDeploymentOptions,
+  LSP7DigitalAssetDeploymentOptions,
 } from '@lukso/lsp-factory.js/build/main/src/lib/interfaces/digital-asset-deployment'
 
 let lspFactory: LSPFactory
@@ -44,7 +47,9 @@ const deployLSP7DigitalAsset = async (
 const deployLSP8IdentifiableDigitalAsset = async (
   digitalAssetDeploymentOptions: DigitalAssetDeploymentOptions
 ): Promise<DeployedLSP8IdentifiableDigitalAsset> => {
-  return await lspFactory.LSP8IdentifiableDigitalAsset.deploy(digitalAssetDeploymentOptions)
+  return await lspFactory.LSP8IdentifiableDigitalAsset.deploy(
+    digitalAssetDeploymentOptions
+  )
 }
 
 const uploadUniversalProfileMetaData = async (

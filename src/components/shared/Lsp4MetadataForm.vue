@@ -1,7 +1,6 @@
 <script setup lang="ts">
-
-import {ref} from "vue";
-import {Lsp4Metadata} from "@/types";
+import { ref } from 'vue'
+import { Lsp4Metadata } from '@/types'
 
 type Emits = {
   (event: 'newMetadata', metadata: Lsp4Metadata): void
@@ -22,7 +21,7 @@ const metadata = ref<Lsp4Metadata>({
       url: 'https://docs.lukso.tech',
     },
   ],
-});
+})
 
 const handleTokenIcon = (event: Event) => {
   const target = event.target as HTMLInputElement
@@ -60,64 +59,84 @@ const handleLinkUrlChange = (index: number, event: Event) => {
 }
 
 const emitMetadata = () => {
-  emits('newMetadata', metadata.value);
+  emits('newMetadata', metadata.value)
 }
-
 </script>
 
 <template>
   <div class="field">
     <label class="label">Token Icon</label>
     <div class="control">
-      <input class="input" type="file" :disabled="props.disabled" @change="handleTokenIcon"/>
+      <input
+        class="input"
+        type="file"
+        :disabled="props.disabled"
+        @change="handleTokenIcon"
+      />
     </div>
   </div>
   <div class="field">
     <label class="label">Token Images</label>
     <div class="control">
       <input
-          class="input"
-          type="file"
-          multiple
-          :disabled="props.disabled"
-          @change="handleTokenImages"
+        class="input"
+        type="file"
+        multiple
+        :disabled="props.disabled"
+        @change="handleTokenImages"
       />
     </div>
   </div>
   <div class="field">
     <label class="label">Token Description</label>
     <div class="control">
-      <textarea v-model="metadata.description" class="input" :disabled="props.disabled" @keyup="emitMetadata" />
+      <textarea
+        v-model="metadata.description"
+        class="input"
+        :disabled="props.disabled"
+        @keyup="emitMetadata"
+      />
     </div>
   </div>
   <div class="field">
     <label class="label">Token Links</label>
     <div
-        v-for="(link, index) in metadata.links"
-        :key="index"
-        class="control mb-2 is-flex"
+      v-for="(link, index) in metadata.links"
+      :key="index"
+      class="control mb-2 is-flex"
     >
       <input
-          :v-model="link.title"
-          :value="link.title"
-          class="input mr-2"
-          type="text"
-          placeholder="Title"
-          :disabled="props.disabled"
-          @keyup="event => handleLinkTitleChange(index, event)"
+        :v-model="link.title"
+        :value="link.title"
+        class="input mr-2"
+        type="text"
+        placeholder="Title"
+        :disabled="props.disabled"
+        @keyup="event => handleLinkTitleChange(index, event)"
       />
       <input
-          :v-model="link.url"
-          :value="link.url"
-          class="input"
-          type="text"
-          placeholder="URL"
-          :disabled="props.disabled"
-          @keyup="event => handleLinkUrlChange(index, event)"
+        :v-model="link.url"
+        :value="link.url"
+        class="input"
+        type="text"
+        placeholder="URL"
+        :disabled="props.disabled"
+        @keyup="event => handleLinkUrlChange(index, event)"
       />
-      <button class="button ml-2" :disabled="props.disabled" @click="removeLink(index)">Remove</button>
+      <button
+        class="button ml-2"
+        :disabled="props.disabled"
+        @click="removeLink(index)"
+      >
+        Remove
+      </button>
     </div>
-    <button class="button" data-testid="addLink" :disabled="props.disabled" @click="addLink">
+    <button
+      class="button"
+      data-testid="addLink"
+      :disabled="props.disabled"
+      @click="addLink"
+    >
       Add link
     </button>
   </div>

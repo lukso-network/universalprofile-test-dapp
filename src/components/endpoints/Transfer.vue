@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import {getState} from '@/stores'
-import {ref, watchEffect} from 'vue'
-import {Contract} from 'web3-eth-contract'
+import { getState } from '@/stores'
+import { ref, watchEffect } from 'vue'
+import { Contract } from 'web3-eth-contract'
 import useNotifications from '@/compositions/useNotifications'
 import useWeb3 from '@/compositions/useWeb3'
 import LSP7Mintable from '@lukso/lsp-smart-contracts/artifacts/LSP7Mintable.json'
 import LSP8Mintable from '@lukso/lsp-smart-contracts/artifacts/LSP8Mintable.json'
-import {DEFAULT_GAS, DEFAULT_GAS_PRICE} from '@/helpers/config'
+import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
 import Notifications from '@/components/Notification.vue'
-import {toWei} from 'web3-utils'
-import {ContractStandard} from "@/enums";
-import CustomSelect from "@/components/shared/CustomSelect.vue";
+import { toWei } from 'web3-utils'
+import { ContractStandard } from '@/enums'
+import CustomSelect from '@/components/shared/CustomSelect.vue'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
@@ -44,29 +44,29 @@ const transfer = async () => {
 
       try {
         await myToken.value.methods
-            .transfer(
-                erc725AccountAddress,
-                transferReceiver.value,
-                toWei(transferAmount.value.toString()),
-                transferForce.value,
-                '0x'
-            )
-            .send({ from: erc725AccountAddress })
-            .on('receipt', function (receipt: any) {
-              console.log(receipt)
-            })
-            .once('sending', (payload: any) => {
-              console.log(JSON.stringify(payload, null, 2))
-            })
+          .transfer(
+            erc725AccountAddress,
+            transferReceiver.value,
+            toWei(transferAmount.value.toString()),
+            transferForce.value,
+            '0x'
+          )
+          .send({ from: erc725AccountAddress })
+          .on('receipt', function (receipt: any) {
+            console.log(receipt)
+          })
+          .once('sending', (payload: any) => {
+            console.log(JSON.stringify(payload, null, 2))
+          })
         setNotification('Token transferred', 'info')
       } catch (error) {
         setNotification((error as unknown as Error).message, 'danger')
       }
-      break;
+      break
     case ContractStandard.LSP8:
       if (!tokenId.value) {
         setNotification('Token ID needs to be filled', 'danger')
-        return;
+        return
       }
 
       myToken.value = contract(LSP8Mintable.abi as any, transferToken.value, {
@@ -76,27 +76,27 @@ const transfer = async () => {
 
       try {
         await myToken.value.methods
-            .transfer(
-                erc725AccountAddress,
-                transferReceiver.value,
-                tokenId.value,
-                transferForce.value,
-                '0x'
-            )
-            .send({ from: erc725AccountAddress })
-            .on('receipt', function (receipt: any) {
-              console.log(receipt)
-            })
-            .once('sending', (payload: any) => {
-              console.log(JSON.stringify(payload, null, 2))
-            })
+          .transfer(
+            erc725AccountAddress,
+            transferReceiver.value,
+            tokenId.value,
+            transferForce.value,
+            '0x'
+          )
+          .send({ from: erc725AccountAddress })
+          .on('receipt', function (receipt: any) {
+            console.log(receipt)
+          })
+          .once('sending', (payload: any) => {
+            console.log(JSON.stringify(payload, null, 2))
+          })
         setNotification('Token transferred', 'info')
       } catch (error) {
         setNotification((error as unknown as Error).message, 'danger')
       }
-      break;
+      break
     default:
-      console.log('Standard not supported');
+      console.log('Standard not supported')
   }
 }
 </script>
@@ -106,24 +106,24 @@ const transfer = async () => {
     <div class="tile is-child box">
       <p class="is-size-5 has-text-weight-bold mb-4">Transfer</p>
       <CustomSelect
-          :options="[
+        :options="[
           {
             display: ContractStandard.LSP7,
-            value: ContractStandard.LSP7
+            value: ContractStandard.LSP7,
           },
           {
             display: ContractStandard.LSP8,
-            value: ContractStandard.LSP8
-          }
-          ]"
-          @option-selected="handleStandardSelected"
+            value: ContractStandard.LSP8,
+          },
+        ]"
+        @option-selected="handleStandardSelected"
       />
       <div class="field">
         <label class="label">Token address</label>
         <div class="control">
           <input
             v-model="transferToken"
-            class="input"
+            class="input is-family-code"
             type="text"
             data-testid="transfer-address"
           />
@@ -134,7 +134,7 @@ const transfer = async () => {
         <div class="control">
           <input
             v-model="transferReceiver"
-            class="input"
+            class="input is-family-code"
             type="text"
             data-testid="transfer-address"
           />
@@ -157,11 +157,11 @@ const transfer = async () => {
         <label class="label">Token id (!: only token type bytes32)</label>
         <div class="control">
           <input
-              v-model="tokenId"
-              class="input"
-              type="text"
-              data-testid="transfer-address"
-              placeholder="0xbb204573da1a42ab80f38995444b17124110b946ba189157ffcc7ba2b3375bf8"
+            v-model="tokenId"
+            class="input"
+            type="text"
+            data-testid="transfer-address"
+            placeholder="0xbb204573da1a42ab80f38995444b17124110b946ba189157ffcc7ba2b3375bf8"
           />
         </div>
       </div>
