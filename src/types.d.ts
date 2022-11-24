@@ -1,4 +1,4 @@
-import {LinkMetdata} from "@lukso/lsp-factory.js";
+import { LinkMetdata } from '@lukso/lsp-factory.js'
 
 export interface Errors {
   search?: string
