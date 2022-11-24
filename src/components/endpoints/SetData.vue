@@ -51,13 +51,13 @@ const setData = async () => {
       <div class="field">
         <label class="label">Key</label>
         <div class="control">
-          <input v-model="key" class="input" type="text" />
+          <input v-model="key" class="input is-family-code" type="text" />
         </div>
       </div>
       <div class="field">
         <label class="label">Value</label>
         <div class="control">
-          <input v-model="value" class="input" type="text" />
+          <input v-model="value" class="input is-family-code" type="text" />
         </div>
       </div>
       <div class="field">

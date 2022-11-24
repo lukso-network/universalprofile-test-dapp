@@ -48,7 +48,7 @@ const onImportProfile = async () => {
         <div class="control">
           <input
             v-model="universalProfileAddress"
-            class="input"
+            class="input is-family-code"
             type="text"
             data-testid="controller-address"
             placeholder="0x..."
