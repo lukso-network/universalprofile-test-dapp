@@ -30,7 +30,7 @@ const isPending = ref(false)
 
 const sampleData = computed<{ [key: string]: TransactionSelect[] }>(() => {
   const sampleEoA = '0x311611C9A46a192C14Ea993159a0498EDE5578aC'
-  const sampleUP = '0x410f64cdc9c95b19659ccbd35cc5933c20489f6a'
+  const sampleUP = '0xe608aBEeB2EA0EBb59170de6CBcFFaE06437fE0c'
   const sampleSC = '0xcAC51571007DaAB53f26C2387b3B16420491dE18'
   const currentUP = getState('address')
   // ERC20
@@ -42,6 +42,8 @@ const sampleData = computed<{ [key: string]: TransactionSelect[] }>(() => {
   // LSP7
   const lsp7TokenDivisible = '0x314E7a56B08AF8E729612930dBAd70BB5A3575D9'
   const lsp7TokenNonDivisible = '0xF5d8FD6599Cb1971b8EEba218FFE31da34a257a9'
+  // ERC721
+  const erc721TokenWithEip165 = '0x57b8e4f3C96180088652dc361473bB91266bb080'
 
   return {
     LYX: [
@@ -258,6 +260,29 @@ const sampleData = computed<{ [key: string]: TransactionSelect[] }>(() => {
         )}000000000000000000000000${sampleSC.substring(
           2
         )}0000000000000000000000000000000000000000000000000de0b6b3a7640000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000`,
+      },
+    ],
+    ERC721: [
+      {
+        label: '💰 Fake Transfer: 1 NFT to EoA',
+        to: erc721TokenWithEip165,
+        amount: 0,
+        hasData: true,
+        data: `0x23b872dd000000000000000000000000${currentUP.substring(2)}000000000000000000000000${sampleEoA.substring(2)}0000000000000000000000000000000000000000000000000000000000000001`,
+      },
+      {
+        label: '💰 Fake Transfer: 1 NFT to UP',
+        to: erc721TokenWithEip165,
+        amount: 0,
+        hasData: true,
+        data: `0x23b872dd000000000000000000000000${currentUP.substring(2)}000000000000000000000000${sampleUP.substring(2)}0000000000000000000000000000000000000000000000000000000000000001`,
+      },
+      {
+        label: '🏦 Mint: 1 NFT to current UP',
+        to: erc721TokenWithEip165,
+        amount: 0,
+        hasData: true,
+        data: `0x6a627842000000000000000000000000${currentUP.substring(2)}`,
       },
     ],
     SetData: [
