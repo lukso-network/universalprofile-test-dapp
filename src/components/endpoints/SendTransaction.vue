@@ -268,14 +268,22 @@ const sampleData = computed<{ [key: string]: TransactionSelect[] }>(() => {
         to: erc721TokenWithEip165,
         amount: 0,
         hasData: true,
-        data: `0x23b872dd000000000000000000000000${currentUP.substring(2)}000000000000000000000000${sampleEoA.substring(2)}0000000000000000000000000000000000000000000000000000000000000001`,
+        data: `0x23b872dd000000000000000000000000${currentUP.substring(
+          2
+        )}000000000000000000000000${sampleEoA.substring(
+          2
+        )}0000000000000000000000000000000000000000000000000000000000000001`,
       },
       {
         label: '💰 Fake Transfer: 1 NFT to UP',
         to: erc721TokenWithEip165,
         amount: 0,
         hasData: true,
-        data: `0x23b872dd000000000000000000000000${currentUP.substring(2)}000000000000000000000000${sampleUP.substring(2)}0000000000000000000000000000000000000000000000000000000000000001`,
+        data: `0x23b872dd000000000000000000000000${currentUP.substring(
+          2
+        )}000000000000000000000000${sampleUP.substring(
+          2
+        )}0000000000000000000000000000000000000000000000000000000000000001`,
       },
       {
         label: '🏦 Mint: 1 NFT to current UP',
