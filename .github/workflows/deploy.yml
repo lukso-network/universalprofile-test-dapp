@@ -14,29 +14,29 @@ jobs:
       - name: 🎛 Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 16.16
-          cache: 'npm'
+          node-version: 18.12.1
+          cache: 'yarn'
 
       - name: ⚙️ Install
-        run: npm ci
+        run: yarn
 
       - name: 🎨 Lint JS
-        run: npm run lint:js
+        run: yarn lint:js
 
       - name: 🎨 Lint CSS
-        run: npm run lint:css
+        run: yarn lint:css
 
       - name: 🎨 Lint Format
-        run: npm run lint:format
+        run: yarn lint:format
 
       - name: 🎨 Lint Types
-        run: npm run lint:types
+        run: yarn lint:types
 
       - name: 🛠 Build
-        run: npm run build
+        run: yarn build
 
       - name: 🎯 Test
-        run: npm run test:unit
+        run: yarn test:unit
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
