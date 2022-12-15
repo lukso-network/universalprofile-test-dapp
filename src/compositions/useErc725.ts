@@ -1,7 +1,7 @@
 import { ERC725, ERC725JSONSchema } from '@erc725/erc725.js'
 import LSP3UniversalProfileMetadata from '@erc725/erc725.js/schemas/LSP3UniversalProfileMetadata.json'
 import { Permissions } from '@erc725/erc725.js/build/main/src/types/Method'
-import { DecodeDataOutput } from '@erc725/erc725.js/build/main/src/types/decodeData'
+import { FetchDataOutput } from '@erc725/erc725.js/build/main/src/types/decodeData'
 import Web3 from 'web3'
 import { DEFAULT_NETWORK_CONFIG } from '@/helpers/config'
 
@@ -25,7 +25,7 @@ const getInstance = (address: string) => {
 
 const fetchProfile = async (
   address: string
-): Promise<DecodeDataOutput['value']> => {
+): Promise<FetchDataOutput['value']> => {
   const erc725 = getInstance(address)
   const profile = await erc725.fetchData('LSP3Profile')
   return profile.value
@@ -40,7 +40,7 @@ const decodePermissions = (permissionHex: string) => {
 }
 
 export default function useErc725(): {
-  fetchProfile: (address: string) => Promise<DecodeDataOutput['value']>
+  fetchProfile: (address: string) => Promise<FetchDataOutput['value']>
   getInstance: (address: string) => ERC725
   encodePermissions: (permissions: Permissions) => string
   decodePermissions: (permissionHex: string) => Permissions

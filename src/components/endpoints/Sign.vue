@@ -14,6 +14,7 @@ const { sign, recover, getWeb3 } = useWeb3()
 
 const isPending = ref(false)
 const message = ref('sign message')
+const siweMessage = ref('By logging in, you confirm the terms and conditions')
 const signMessage = ref('')
 const signResponse = ref<string>()
 const recovery = ref<string>()
@@ -27,7 +28,7 @@ const siwe = ref({
   expirationTime: getTime(60 * 1000 * 5),
   notBeforeDate: getDate(),
   notBeforeTime: getTime(-60 * 1000 * 5),
-  resources: ['http://some-resource1.com'],
+  resources: ['https://mywebsite.com/privacy', 'https://mywebsite.com/tos'],
   nonce: '',
   domain: window.location.host,
   address: '',
@@ -65,7 +66,7 @@ const createSiweMessage = () => {
   const siweParams = {
     domain: siwe.value.domain,
     address: siwe.value.address,
-    statement: message.value,
+    statement: siweMessage.value,
     uri: siwe.value.uri,
     version: siwe.value.version,
     nonce: siwe.value.nonce || generateNonce(),
@@ -89,8 +90,8 @@ const createSiweMessage = () => {
     siweParams.resources = resources
   }
 
-  const siweMessage = new SiweMessage(siweParams)
-  return siweMessage.prepareMessage()
+  const siweOutputMessage = new SiweMessage(siweParams)
+  return siweOutputMessage.prepareMessage()
 }
 
 const addResource = () => {
@@ -153,7 +154,18 @@ const onSignatureValidation = async () => {
       <div class="field">
         <label class="label">Message</label>
         <div class="control">
-          <textarea v-model="message" class="textarea" rows="3" />
+          <textarea
+            v-if="isSiwe"
+            v-model="siweMessage"
+            class="textarea"
+            rows="3"
+          />
+          <textarea
+            v-if="!isSiwe"
+            v-model="message"
+            class="textarea"
+            rows="3"
+          />
         </div>
       </div>
       <div class="field">

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { getAndPrepareAllIpfsItems } from '@/helpers/localstorage'
-import fileSize from 'filesize'
+import { filesize } from 'filesize'
 import { NETWORKS } from '@/helpers/config'
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
@@ -111,7 +111,7 @@ const removeTag = (index: number) => {
 
 const getFileSize = (file: File) => {
   if (file.size) {
-    return fileSize(file.size)
+    return filesize(file.size)
   }
 }
 

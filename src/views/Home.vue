@@ -36,14 +36,14 @@ const hasExtension = computed(() => {
       <SetData />
     </div>
     <div class="tile is-ancestor">
-      <Permissions />
-      <CustomRelayer />
-      <ImportProfile />
-    </div>
-    <div class="tile is-ancestor">
       <Assets />
       <Mint />
       <Transfer />
+    </div>
+    <div class="tile is-ancestor">
+      <Permissions />
+      <CustomRelayer />
+      <ImportProfile />
     </div>
     <div class="tile is-ancestor">
       <Sign />
