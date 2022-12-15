@@ -29,6 +29,9 @@ export interface Store {
   balance: number
   channel?: Channel
   tokenAddress?: string
+  assets: string[]
+  lsp7: string[]
+  lsp8: string[]
 }
 
 export type Lsp4Metadata = {
