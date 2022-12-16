@@ -192,6 +192,7 @@ const disconnect = async () => {
 .notification {
   word-break: break-all;
 }
+
 .text-center {
   width: 100%;
   text-align: center;

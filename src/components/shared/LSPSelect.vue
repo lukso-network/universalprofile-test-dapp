@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { getState, LSPType, TokenInfo } from '@/stores'
-import { ref } from 'vue'
 
 type Props = {
   address?: string

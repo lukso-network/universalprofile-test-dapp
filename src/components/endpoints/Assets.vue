@@ -4,7 +4,6 @@ import {
   setState,
   recalcTokens,
   addTokenToLocalStore,
-  LSPType,
 } from '@/stores'
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
