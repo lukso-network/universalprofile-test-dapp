@@ -14,6 +14,8 @@ import lsp3Schema from '@erc725/erc725.js/schemas/LSP3UniversalProfileMetadata.j
 import lsp4Schema from '@erc725/erc725.js/schemas/LSP4DigitalAsset.json'
 import lsp9Schema from '@erc725/erc725.js/schemas/LSP9Vault.json'
 import { eip165ABI } from '../abis/eip165ABI'
+import { erc20ABI } from '@/abis/erc20ABI'
+import BN from 'bn.js'
 
 export const store = reactive<Store>({
   isConnected: false,
@@ -60,6 +62,7 @@ export enum LSPType {
 interface LspTypeOption {
   interfaceId: string // EIP-165
   lsp2Schema: ERC725JSONSchema | null
+  decimals?: string
 }
 
 const lspTypeOptions: Record<
@@ -84,48 +87,76 @@ const lspTypeOptions: Record<
   },
 }
 
-const detectLSP = async (contractAddress: string, lspType: LSPType) => {
+export type TokenInfo = {
+  type: LSPType
+  address?: string
+  name: string
+  symbol: string
+  decimals?: string
+  balance?: number
+}
+
+const detectLSP = async (
+  contractAddress: string,
+  lspType: LSPType
+): Promise<TokenInfo | undefined> => {
   if (lspType === LSPType.Unknown) {
-    return false
+    return undefined
   }
 
   const { contract: Contract } = useWeb3()
   // EIP-165 detection
-  const contract = Contract(eip165ABI as any, contractAddress)
+  const contract = Contract(eip165ABI.concat(erc20ABI) as any, contractAddress)
 
   // Check if the contract implements the LSP interface ID
   let doesSupportInterface: boolean
   try {
-    doesSupportInterface = await contract.methods.supportsInterface(
-      lspTypeOptions[lspType].interfaceId
-    )
-    console.log(
-      contractAddress,
-      (doesSupportInterface ? 'does support ' : 'does not support ') +
-        lspTypeOptions[lspType].interfaceId
-    )
+    doesSupportInterface = await contract.methods
+      .supportsInterface(lspTypeOptions[lspType].interfaceId)
+      .call()
   } catch (error) {
     doesSupportInterface = false
     console.error(error)
   }
-
-  const lsp2Schema = lspTypeOptions[lspType].lsp2Schema
-
-  if (!lsp2Schema) {
-    return doesSupportInterface
+  if (!doesSupportInterface) {
+    return undefined
   }
 
-  // ERC725 detection
-  const { getInstance } = useErc725()
-
-  const erc725 = await getInstance(contractAddress)
-
   try {
-    const lspSupportedStandards = await erc725.fetchData(lsp2Schema.name)
-    return lspSupportedStandards.value === lsp2Schema.valueContent
-  } catch (error) {
-    console.error(error)
-    return false
+    const currentDecimals = await contract.methods.decimals().call()
+
+    const _balance = await contract.methods
+      .balanceOf(store['address'])
+      .call()
+      .catch(() => undefined)
+    const balance = _balance
+      ? new BN(_balance, 10)
+          .div(new BN(10).pow(new BN(currentDecimals || '0', 10)))
+          .toNumber()
+      : 0
+
+    // ERC725 detection
+    const { getInstance } = useErc725()
+
+    const erc725 = await getInstance(contractAddress)
+    const [{ value: name }, { value: symbol }] = await erc725.fetchData([
+      'LSP4TokenName',
+      'LSP4TokenSymbol',
+    ])
+    if (typeof name !== 'string' || typeof symbol !== 'string') {
+      throw new Error('Unable to get name and/or symbol')
+    }
+    return {
+      type: lspType,
+      name,
+      symbol,
+      address: contractAddress,
+      balance,
+      decimals: currentDecimals,
+    }
+  } catch (err) {
+    console.error(err)
+    return undefined
   }
 }
 
@@ -136,9 +167,73 @@ export async function setState(
   ;(store[key] as any) = newState
 }
 
+export function getTokensCreated(): string[] {
+  let tokens: string[] = []
+  const data = localStorage.getItem('up:createdTokens')
+  if (!data) {
+    localStorage.setItem('up:createdTokens', '[]')
+  }
+  try {
+    tokens = JSON.parse(data || '[]')
+  } catch (err) {
+    // Ignore
+  }
+  return tokens
+}
+
+export function addTokenToLocalStore(address: string) {
+  const tokens = getTokensCreated()
+  const found = tokens.find(_address => _address === address)
+  if (!found) {
+    tokens.push(address)
+    localStorage.setItem('createdTokens', JSON.stringify(tokens))
+  }
+}
+
+export async function recalcTokens() {
+  const { getInstance } = useErc725()
+
+  const address = store['address']
+
+  const result = await getInstance(address).fetchData('LSP5ReceivedAssets[]')
+  const rawOwned = result.value as string[] //returns array of addresses
+  const mapAssets: Record<string, boolean> = rawOwned.reduce<
+    Record<string, boolean>
+  >((all, address) => {
+    all[address] = true
+    return all
+  }, {})
+  const tokens = getTokensCreated()
+  tokens.forEach(address => {
+    mapAssets[address] = true
+  })
+  const ownedAssets = Object.keys(mapAssets)
+  setState('assets', ownedAssets)
+
+  const lsp7Tokens: TokenInfo[] = []
+  const lsp8Tokens: TokenInfo[] = []
+
+  //fetch the different assets types
+  for (const address of ownedAssets) {
+    const isLSP7 = await detectLSP(address, LSPType.LSP7DigitalAsset)
+    if (isLSP7) {
+      lsp7Tokens.push(isLSP7)
+    }
+    const isLSP8 = await detectLSP(
+      address,
+      LSPType.LSP8IdentifiableDigitalAsset
+    )
+    if (isLSP8) {
+      lsp8Tokens.push(isLSP8)
+    }
+  }
+  setState('lsp7', lsp7Tokens)
+  setState('lsp8', lsp8Tokens)
+}
 export function useState(): {
   setConnected: (address: string, channel: Channel) => Promise<void>
   setDisconnected: () => void
+  recalcTokens: () => Promise<void>
 } {
   return {
     setConnected: async (address: string, channel: Channel) => {
@@ -160,38 +255,7 @@ export function useState(): {
         gasPrice: DEFAULT_GAS_PRICE,
       })
 
-      const { getInstance } = useErc725()
-
-      const result = await getInstance(address).fetchData(
-        'LSP5ReceivedAssets[]'
-      )
-      const ownedAssets = result.value as string[] //returns array of addresses
-      console.log('assets', ownedAssets)
-      setState('assets', ownedAssets)
-
-      const lsp7AddressesTemp: string[] = []
-      const lsp8AddressesTemp: string[] = []
-
-      //fetch the different assets types
-      for (const address of ownedAssets) {
-        const isLSP7 = await detectLSP(address, LSPType.LSP7DigitalAsset)
-
-        const isLSP8 = await detectLSP(
-          address,
-          LSPType.LSP8IdentifiableDigitalAsset
-        )
-
-        if (isLSP7 && !isLSP8) {
-          lsp7AddressesTemp.push(address)
-        } else if (isLSP8 && !isLSP7) {
-          lsp8AddressesTemp.push(address)
-        } else {
-          console.log('asset is not an LSP')
-        }
-      }
-
-      setState('lsp7', lsp7AddressesTemp)
-      setState('lsp8', lsp8AddressesTemp)
+      recalcTokens()
 
       // check for balance needs to be last as Wallet Connect doesn't support `eth_getBalance` method
       setState('balance', await getBalance(address))
@@ -203,8 +267,11 @@ export function useState(): {
       setState('chainId', 0)
       setState('balance', 0)
       setState('assets', [])
+      setState('lsp7', [])
+      setState('lsp8', [])
 
       window.erc725Account = undefined
     },
+    recalcTokens,
   }
 }

@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { getState, setState } from '@/stores'
+import {
+  getState,
+  setState,
+  recalcTokens,
+  addTokenToLocalStore,
+  LSPType,
+} from '@/stores'
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
 import { ref } from 'vue'
@@ -80,6 +86,7 @@ const create = async () => {
         })
         console.log('Deployed asset', deployedAsset.LSP7DigitalAsset)
         tokenAddress.value = deployedAsset.LSP7DigitalAsset.address
+        addTokenToLocalStore(tokenAddress.value)
         break
       case ContractStandard.LSP8:
         deployedAsset = await deployLSP8IdentifiableDigitalAsset({
@@ -117,12 +124,15 @@ const create = async () => {
           .once('sending', (payload: any) => {
             console.log(JSON.stringify(payload, null, 2))
           })
+        addTokenToLocalStore(tokenAddress.value)
         break
       default:
         console.log('Standard not supported')
     }
     isTokenCreated.value = true
-    setState('tokenAddress', tokenAddress.value)
+    recalcTokens().then(() => {
+      setState('tokenAddress', tokenAddress.value)
+    })
     setNotification('Token created', 'info')
   } catch (error) {
     setNotification((error as unknown as Error).message, 'danger')

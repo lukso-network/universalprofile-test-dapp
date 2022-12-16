@@ -1,4 +1,5 @@
 import { LinkMetdata } from '@lukso/lsp-factory.js'
+import { TokenInfo } from './stores'
 
 export interface Errors {
   search?: string
@@ -30,8 +31,8 @@ export interface Store {
   channel?: Channel
   tokenAddress?: string
   assets: string[]
-  lsp7: string[]
-  lsp8: string[]
+  lsp7: TokenInfo[]
+  lsp8: TokenInfo[]
 }
 
 export type Lsp4Metadata = {
