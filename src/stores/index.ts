@@ -194,6 +194,9 @@ export async function recalcTokens() {
   const { getInstance } = useErc725()
 
   const address = store['address']
+  if (!address) {
+    return
+  }
 
   const result = await getInstance(address).fetchData('LSP5ReceivedAssets[]')
   const rawOwned = result.value as string[] //returns array of addresses
