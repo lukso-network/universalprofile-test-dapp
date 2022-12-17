@@ -6,9 +6,12 @@ import { ref } from 'vue'
 import { createBlockScoutLink } from '@/utils/createLinks'
 import { useLspFactory } from '@/compositions/useLspFactory'
 import Lsp4MetadataForm from '@/components/shared/Lsp4MetadataForm.vue'
+import LSP8Mintable from '@lukso/lsp-smart-contracts/artifacts/LSP8Mintable.json'
 import { Lsp4Metadata } from '@/types'
 import { ContractStandard } from '@/enums'
 import CustomSelect from '@/components/shared/CustomSelect.vue'
+import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
+import useWeb3 from '@/compositions/useWeb3'
 
 type Token = {
   type: ContractStandard
@@ -19,6 +22,7 @@ type Token = {
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
+const { contract } = useWeb3()
 
 const isTokenCreated = ref(false)
 const isTokenPending = ref(false)
@@ -93,6 +97,26 @@ const create = async () => {
           deployedAsset.LSP8IdentifiableDigitalAsset
         )
         tokenAddress.value = deployedAsset.LSP8IdentifiableDigitalAsset.address
+        const deployedContract = contract(
+          LSP8Mintable.abi as any,
+          tokenAddress.value,
+          {
+            gas: DEFAULT_GAS,
+            gasPrice: DEFAULT_GAS_PRICE,
+          }
+        )
+        await deployedContract.methods
+          .setData(
+            '0x715f248956de7ce65e94d9d836bfead479f7e70d69b718d47bfe7b00e05b4fe4', //LSP8TokenIdType
+            3
+          )
+          .send({ from: erc725AccountAddress })
+          .on('receipt', function (receipt: any) {
+            console.log(receipt)
+          })
+          .once('sending', (payload: any) => {
+            console.log(JSON.stringify(payload, null, 2))
+          })
         break
       default:
         console.log('Standard not supported')
