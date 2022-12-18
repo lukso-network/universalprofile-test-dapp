@@ -1,9 +1,18 @@
 <script setup lang="ts">
-import { getState, LSPType, TokenInfo } from '@/stores'
+import {
+  getState,
+  LSPType,
+  TokenInfo,
+  sampleUP,
+  sampleEoA,
+  sampleSC,
+} from '@/stores'
 
 type Props = {
   address?: string
   type: LSPType
+  showUp: boolean
+  showAny: boolean
 }
 
 type Emits = {
@@ -33,8 +42,47 @@ const isSelected = (type: LSPType, address?: string) => {
   <div class="field">
     <div class="select is-fullwidth mb-2">
       <select data-testid="preset" @change="handleChange">
+        <optgroup label="UP">
+          <option
+            v-if="props.showAny"
+            :value="
+              JSON.stringify({ type: LSPType.UP, address: getState('address') })
+            "
+            :selected="isSelected(LSPType.UP, getState('address'))"
+          >
+            current UP
+          </option>
+          <option
+            v-if="props.showAny"
+            :value="
+              JSON.stringify({ type: LSPType.UP, address: getState('address') })
+            "
+            :selected="isSelected(LSPType.UP, sampleUP)"
+          >
+            sample UP
+          </option>
+        </optgroup>
+        <optgroup label="SC">
+          <option
+            v-if="props.showAny"
+            :value="JSON.stringify({ type: LSPType.SC, address: sampleSC })"
+            :selected="isSelected(LSPType.SC, sampleSC)"
+          >
+            sample SC
+          </option>
+        </optgroup>
+        <optgroup label="'EOA'">
+          <option
+            v-if="props.showAny"
+            :value="JSON.stringify({ type: LSPType.EoA, address: sampleEoA })"
+            :selected="isSelected(LSPType.EoA, sampleEoA)"
+          >
+            sample SC
+          </option>
+        </optgroup>
         <optgroup label="LSP7">
           <option
+            v-if="props.showAny"
             :value="JSON.stringify({ type: 'LSP7DigitalAsset' })"
             :selected="isSelected(LSPType.LSP7DigitalAsset)"
           >
@@ -51,6 +99,7 @@ const isSelected = (type: LSPType, address?: string) => {
         </optgroup>
         <optgroup label="LSP8">
           <option
+            v-if="props.showAny"
             :value="JSON.stringify({ type: 'LSP8IdentifiableDigitalAsset' })"
             :selected="isSelected(LSPType.LSP8IdentifiableDigitalAsset)"
           >

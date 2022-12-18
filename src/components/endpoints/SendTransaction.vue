@@ -1,14 +1,28 @@
 <script setup lang="ts">
 import { toWei } from 'web3-utils'
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { TransactionConfig } from 'web3-core'
 
-import { getState, setState } from '@/stores'
+import { getState, setState, sampleUP, sampleEoA, sampleSC } from '@/stores'
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
 import useWeb3 from '@/compositions/useWeb3'
 import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
 import { BN } from 'bn.js'
+import ERC725, { ERC725JSONSchema } from '@erc725/erc725.js'
+import lsp3Schema from '@erc725/erc725.js/schemas/LSP3UniversalProfileMetadata.json'
+
+type TransactionParams = {
+  toParam?: string
+  fromParam?: string
+  force?: boolean
+}
+
+type TransactionParamErrors = {
+  toParam?: string
+  fromParam?: string
+  force?: string
+}
 
 type TransactionSelect = {
   label: string
@@ -18,16 +32,13 @@ type TransactionSelect = {
   force?: boolean
   amount: number
   hasData: boolean
-  data: (args: {
-    fromParam?: string
-    toParam?: string
-    force?: boolean
-  }) => string
+  data: (args: TransactionParams) => string
 }
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
-const { sendTransaction, getBalance } = useWeb3()
+const { sendTransaction, getBalance, getWeb3 } = useWeb3()
+const { eth } = getWeb3()
 
 const from = ref<string>(getState('address'))
 const to = ref('0x4658F1Ac64486827f59E637bE9800Eb035b6f43C')
@@ -35,362 +46,6 @@ const amount = ref(0.1)
 const data = ref('')
 const hasData = ref(false)
 const isPending = ref(false)
-
-class ValueError extends Error {
-  value: string
-  constructor(value: any, name: string) {
-    super(`Invalid value ${value} for ${name}`)
-    this.name = name
-    this.value = value
-  }
-}
-
-const sampleEoA = '0x311611C9A46a192C14Ea993159a0498EDE5578aC'
-const sampleUP = '0xe608aBEeB2EA0EBb59170de6CBcFFaE06437fE0c'
-const sampleSC = '0xcAC51571007DaAB53f26C2387b3B16420491dE18'
-const currentUP = getState('address')
-// ERC20
-const erc20TokenWithEip165 = '0xF5443372766a48faF098244c8C769c5AEa02f321'
-const erc20TokenWithoutEip165 = '0xB29c50a9F3D90FA3aDF394f2960BD6D8e0Ff5E9D'
-// ERC777
-const erc777TokenWithEip165 = '0xC719f454C8F9a0C7eEC4203B21766B88d8a5B073'
-const erc777TokenWithoutEip165 = '0xD7549C70A6122cA01043831f0f0c65152C4877d6'
-// LSP7
-const lsp7TokenDivisible = '0x314E7a56B08AF8E729612930dBAd70BB5A3575D9'
-const lsp7TokenNonDivisible = '0xF5d8FD6599Cb1971b8EEba218FFE31da34a257a9'
-// ERC721
-const erc721TokenWithEip165 = '0x57b8e4f3C96180088652dc361473bB91266bb080'
-
-const assertAddress = (value: string | undefined, name: string): string => {
-  if (!value) {
-    throw new ValueError(value, name)
-  }
-  if (!/^(0x)[0-9a-z]{40}/.test(value)) {
-    throw new ValueError(value, name)
-  }
-  if (!/^0x/.test(value)) {
-    return value
-  }
-  return value.substring(2)
-}
-
-const assertBoolean = (value: boolean | undefined, name: string): string => {
-  if (value == null) {
-    throw new ValueError(value, name)
-  }
-  return new BN(value ? 1 : 0).toString(64)
-}
-
-const sampleData: { [key: string]: TransactionSelect[] } = {
-  LYX: [
-    {
-      label: '💰 Transfer LYX to UP',
-      to: sampleUP,
-      amount: 0.1,
-      hasData: false,
-      data: () => '',
-    },
-    {
-      label: '💰 Transfer LYX to EoA',
-      to: sampleEoA,
-      amount: 0.1,
-      hasData: false,
-      data: () => '',
-    },
-    {
-      label: '💰 Transfer LYX to EoA with test data',
-      to: sampleEoA,
-      amount: 0.1,
-      hasData: true,
-      data: () =>
-        '0x8fe36f1b00000000000000000000000000000000000000000000000000000000000000c040b8bec57d7b5ff0dbd9e9acd0a47dfeb0101e1a203766f5ccab00445fbf39e900000000000000000000000000000000000000000000000000000000000001200000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000018000000000000000000000000000000000000000000000000000000000000001c0000000000000000000000000000000000000000000000000000000000000000200000000000000000000000069909c12c875271adc49155cc8d01dbf67fe82f1000000000000000000000000b27f5845e6ce846c02209bd2497780099611b9a00000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000008bd02b7b000000000000000000000000000000000000000000000000000000000001e19c000000000000000000000000000000000000000000000000000000000000000648656c6c6f210000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000014e4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e000000000000000000000000000000000000',
-    },
-  ],
-  ERC20: [
-    {
-      label: '💰 Transfer: 1 token A to EoA',
-      to: erc20TokenWithEip165,
-      amount: 0,
-      toParam: sampleEoA,
-      hasData: true,
-      data: ({ toParam }) => {
-        toParam = assertAddress(toParam, 'toParam')
-        return `0xa9059cbb000000000000000000000000${toParam}0000000000000000000000000000000000000000000000000de0b6b3a7640000`
-      },
-    },
-    {
-      label: '💰 Transfer: 1 token A to SC (no LSP1)',
-      to: '0xF5443372766a48faF098244c8C769c5AEa02f321',
-      amount: 0,
-      toParam: sampleSC,
-      hasData: true,
-      data: ({ toParam }) => {
-        if (!toParam) {
-          throw Error('Missing toParam')
-        }
-        return `a9059cbb000000000000000000000000${toParam}0000000000000000000000000000000000000000000000000de0b6b3a7640000`
-      },
-    },
-    {
-      label: '💰 Transfer: 1 token A to UP',
-      to: erc20TokenWithEip165,
-      amount: 0,
-      toParam: sampleUP,
-      hasData: true,
-      data: ({ toParam }) => {
-        toParam = assertAddress(toParam, 'toParam')
-        return `a9059cbb000000000000000000000000${toParam}0000000000000000000000000000000000000000000000000de0b6b3a7640000`
-      },
-    },
-    {
-      label: '💰 Transfer: 1 token B to EoA (without EIP165)',
-      to: erc20TokenWithoutEip165,
-      amount: 0,
-      toParam: sampleEoA,
-      hasData: true,
-      data: ({ toParam }) => {
-        toParam = assertAddress(toParam, 'toParam')
-        return `0xa9059cbb000000000000000000000000${toParam}0000000000000000000000000000000000000000000000000de0b6b3a7640000`
-      },
-    },
-    {
-      label: '🏦 Mint: 100 tokens A to current UP',
-      to: erc20TokenWithEip165,
-      amount: 0,
-      toParam: currentUP,
-      hasData: true,
-      data: ({ toParam }) => {
-        toParam = assertAddress(toParam, 'toParam')
-        return `0x40c10f19000000000000000000000000${toParam}0000000000000000000000000000000000000000000000056bc75e2d63100000`
-      },
-    },
-    {
-      label: '🏦 Mint: 100 tokens B to current UP',
-      to: erc20TokenWithoutEip165,
-      amount: 0,
-      toParam: currentUP,
-      hasData: true,
-      data: ({ toParam }) => {
-        toParam = assertAddress(toParam, 'toParam')
-        return `0x40c10f19000000000000000000000000${toParam}0000000000000000000000000000000000000000000000056bc75e2d63100000`
-      },
-    },
-  ],
-  ERC777: [
-    {
-      label: '💰 Transfer: 1 token A to EoA',
-      to: erc777TokenWithEip165,
-      amount: 0,
-      toParam: sampleEoA,
-      hasData: true,
-      data: ({ toParam }) => {
-        toParam = assertAddress(toParam, 'toParam')
-        return `9bd9bbc6000000000000000000000000${toParam}0000000000000000000000000000000000000000000000000de0b6b3a764000000000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000`
-      },
-    },
-    {
-      label: '💰 Transfer: 1 token A to UP',
-      to: erc777TokenWithEip165,
-      amount: 0,
-      toParam: sampleUP,
-      hasData: true,
-      data: ({ toParam }) => {
-        toParam = assertAddress(toParam, 'toParam')
-        return `9bd9bbc6000000000000000000000000${toParam}0000000000000000000000000000000000000000000000000de0b6b3a764000000000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000`
-      },
-    },
-    {
-      label: '💰 Transfer: 1 token B to EoA (without EIP165)',
-      to: erc777TokenWithoutEip165,
-      amount: 0,
-      toParam: sampleEoA,
-      hasData: true,
-      data: ({ toParam }) => {
-        toParam = assertAddress(toParam, 'toParam')
-        return `9bd9bbc6000000000000000000000000${toParam}0000000000000000000000000000000000000000000000000de0b6b3a764000000000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000`
-      },
-    },
-    {
-      label: '🏦 Mint: 100 tokens A to current UP',
-      to: erc777TokenWithEip165,
-      amount: 0,
-      toParam: currentUP,
-      hasData: true,
-      data: ({ toParam }) => {
-        toParam = assertAddress(toParam, 'toParam')
-        return `0x40c10f19000000000000000000000000${toParam}0000000000000000000000000000000000000000000000056bc75e2d63100000`
-      },
-    },
-    {
-      label: '🏦 Mint: 100 tokens B to current UP',
-      to: erc777TokenWithoutEip165,
-      amount: 0,
-      toParam: currentUP,
-      hasData: true,
-      data: ({ toParam }) => {
-        toParam = assertAddress(toParam, 'toParam')
-        return `0x40c10f19000000000000000000000000${toParam}0000000000000000000000000000000000000000000000056bc75e2d63100000`
-      },
-    },
-  ],
-  LSP7: [
-    {
-      // 1234567890123456789012345678901234567890123456789012345678901234
-      //          1         2         3         4         5         6
-      // 0000000000000000000000000000000000000000000000000000000000000001
-
-      // 000000000000000000000000${toParam}
-      // 64-24 = 40
-
-      label: '💰 Transfer: 1 token A (divisible) to EoA',
-      to: lsp7TokenDivisible,
-      amount: 0,
-      fromParam: currentUP,
-      toParam: sampleEoA,
-      force: true,
-      hasData: true,
-      data: ({ fromParam, toParam, force }) => {
-        fromParam = assertAddress(fromParam, 'from')
-        toParam = assertAddress(toParam, 'toParam')
-        const forceValue = assertBoolean(force, 'force')
-        return `760d9bba000000000000000000000000${fromParam}000000000000000000000000${toParam}0000000000000000000000000000000000000000000000000de0b6b3a7640000${forceValue}00000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000`
-      },
-    },
-    {
-      label: '💰 Transfer: 1 token A (divisible) to UP',
-      to: lsp7TokenDivisible,
-      amount: 0,
-      fromParam: currentUP,
-      force: false,
-      toParam: sampleUP,
-      hasData: true,
-      data: ({ fromParam, toParam, force }) => {
-        fromParam = assertAddress(fromParam, 'fromParam')
-        toParam = assertAddress(toParam, 'toParam')
-        const forceValue = assertBoolean(force, 'force')
-        return `760d9bba000000000000000000000000${fromParam}000000000000000000000000${toParam}0000000000000000000000000000000000000000000000000de0b6b3a7640000${forceValue}00000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000`
-      },
-    },
-    {
-      label: '💰 Transfer: 1 token A (divisible) to SC (no LSP1)',
-      to: lsp7TokenDivisible,
-      amount: 0,
-      fromParam: currentUP,
-      toParam: sampleSC,
-      force: true,
-      hasData: true,
-      data: ({ fromParam, toParam, force }) => {
-        fromParam = assertAddress(fromParam, 'from')
-        toParam = assertAddress(toParam, 'toParam')
-        const forceValue = assertBoolean(force, 'force')
-        return `760d9bba000000000000000000000000${fromParam}000000000000000000000000${toParam}0000000000000000000000000000000000000000000000000de0b6b3a7640000${forceValue}00000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000`
-      },
-    },
-    {
-      label: '💰 Transfer: 1 token A (non divisible) to EoA',
-      to: lsp7TokenNonDivisible,
-      amount: 0,
-      fromParam: currentUP,
-      toParam: sampleEoA,
-      force: true,
-      hasData: true,
-      data: ({ fromParam, toParam, force }) => {
-        fromParam = assertAddress(fromParam, 'fromParam')
-        toParam = assertAddress(toParam, 'toParam')
-        const forceValue = assertBoolean(force, 'force')
-        return `760d9bba000000000000000000000000${fromParam}000000000000000000000000${toParam}0000000000000000000000000000000000000000000000000de0b6b3a7640000${forceValue}00000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000`
-      },
-    },
-    {
-      label: '💰 Transfer: 1 token A (non divisible) to UP',
-      to: lsp7TokenNonDivisible,
-      amount: 0,
-      fromParam: currentUP,
-      toParam: sampleUP,
-      force: false,
-      hasData: true,
-      data: ({ fromParam, toParam, force }) => {
-        fromParam = assertAddress(fromParam, 'fromParam')
-        toParam = assertAddress(toParam, 'toParam')
-        const forceValue = assertBoolean(force, 'force')
-        return `760d9bba000000000000000000000000${fromParam}000000000000000000000000${toParam}0000000000000000000000000000000000000000000000000de0b6b3a7640000${forceValue}00000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000`
-      },
-    },
-    {
-      label: '💰 Transfer: 1 token A (non divisible) to SC (no LSP1)',
-      to: lsp7TokenNonDivisible,
-      amount: 0,
-      fromParam: currentUP,
-      toParam: sampleSC,
-      force: true,
-      hasData: true,
-      data: ({ fromParam, toParam, force }) => {
-        fromParam = assertAddress(fromParam, 'fromParam')
-        toParam = assertAddress(toParam, 'toParam')
-        const forceValue = assertBoolean(force, 'force')
-        return `760d9bba000000000000000000000000${fromParam}000000000000000000000000${toParam}0000000000000000000000000000000000000000000000000de0b6b3a7640000${forceValue}00000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000`
-      },
-    },
-  ],
-  ERC721: [
-    {
-      label: '💰 Fake Transfer: 1 NFT to EoA',
-      to: erc721TokenWithEip165,
-      amount: 0,
-      hasData: true,
-      fromParam: currentUP,
-      toParam: sampleEoA,
-      data: ({ fromParam, toParam }) => {
-        fromParam = assertAddress(fromParam, 'fromParam')
-        toParam = assertAddress(toParam, 'toParam')
-        return `0x23b872dd000000000000000000000000${fromParam}000000000000000000000000${toParam}0000000000000000000000000000000000000000000000000000000000000001`
-      },
-    },
-    {
-      label: '💰 Fake Transfer: 1 NFT to UP',
-      to: erc721TokenWithEip165,
-      amount: 0,
-      fromParam: currentUP,
-      toParam: sampleUP,
-      hasData: true,
-      data: ({ fromParam, toParam }) => {
-        fromParam = assertAddress(fromParam, 'fromParam')
-        toParam = assertAddress(toParam, 'toParam')
-        return `0x23b872dd000000000000000000000000${fromParam}000000000000000000000000${toParam}0000000000000000000000000000000000000000000000000000000000000000`
-      },
-    },
-    {
-      label: '🏦 Mint: 1 NFT to current UP',
-      to: erc721TokenWithEip165,
-      amount: 0,
-      toParam: currentUP,
-      hasData: true,
-      data: ({ toParam }) => {
-        toParam = assertAddress(toParam, 'toParam')
-        return `0x6a627842000000000000000000000000${toParam.substring(2)}`
-      },
-    },
-  ],
-  SetData: [
-    {
-      label: '👤 LSP3Profile: Change profile',
-      to: currentUP,
-      amount: 0,
-      hasData: true,
-      data: () =>
-        '0x14a6e2930000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000015ef83ad9559033e6e941db7d7c495acdce616347d28e90c7ce47cbfcfcad3bc50000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000596f357c6a70546a2accab18748420b63c63b5af4cf710848ae83afc0c51dd8ad17fb5e8b3697066733a2f2f516d65637247656a555156587057347a53393438704e76636e51724a314b69416f4d36626466725663575a736e3500000000000000',
-    },
-    {
-      label: '👤 LSP3Profile: Change profile and send value',
-      to: currentUP,
-      amount: 0.1,
-      hasData: true,
-      data: () =>
-        '0x14a6e2930000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000015ef83ad9559033e6e941db7d7c495acdce616347d28e90c7ce47cbfcfcad3bc50000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000596f357c6a70546a2accab18748420b63c63b5af4cf710848ae83afc0c51dd8ad17fb5e8b3697066733a2f2f516d65637247656a555156587057347a53393438704e76636e51724a314b69416f4d36626466725663575a736e3500000000000000',
-    },
-  ],
-}
-
 const selectedData = ref<TransactionSelect>()
 const toParam = ref<string>()
 const hasToParam = ref<boolean>(false)
@@ -398,14 +53,453 @@ const force = ref<boolean>()
 const hasForce = ref<boolean>(false)
 const fromParam = ref<string>()
 const hasFromParam = ref<boolean>()
+const errors = ref<TransactionParamErrors>({})
+
+function validateAddress(value: string | undefined) {
+  if (!value) {
+    throw new Error('Value required')
+  }
+  if (!/^(0x)?[0-9a-f]{40}/i.test(value)) {
+    throw new Error('Invalid address')
+  }
+  if (!/^0x/i.test(value)) {
+    return value
+  }
+  return value.substring(2)
+}
+
+function validateBoolean(value: boolean | undefined) {
+  if (value == null) {
+    throw new Error('Missing value')
+  }
+  return value
+}
+
+function encode(fn: string, ...args: any[]) {
+  const params = fn.replace(/^[^(]*\(|\)$/g, '').split(',')
+  const data =
+    '0x' +
+    eth.abi.encodeFunctionSignature(fn).substring(2) +
+    eth.abi.encodeParameters(params, args).substring(2)
+  return data
+}
+
+function calcData(options: TransactionSelect) {
+  const params: TransactionParams = {}
+  const errors: TransactionParamErrors = {}
+  let hasError = false
+  if (options.toParam != null) {
+    try {
+      params.toParam = validateAddress(toParam.value)
+    } catch (err) {
+      console.error(err)
+      errors.toParam = (err as Error).message
+      hasError = true
+    }
+  }
+  if (options.fromParam != null) {
+    try {
+      params.fromParam = validateAddress(fromParam.value)
+    } catch (err) {
+      console.error(err)
+      errors.fromParam = (err as Error).message
+      hasError = true
+    }
+  }
+  if (options.force != null) {
+    try {
+      params.force = validateBoolean(force.value)
+    } catch (err) {
+      console.error(err)
+      errors.force = (err as Error).message
+      hasError = true
+    }
+  }
+  let data = ''
+  if (!hasError) {
+    data = options.data(params)
+  }
+  return { data, errors, hasError }
+}
+
+function boolValue(value?: boolean) {
+  return new BN(value ? 1 : 0).toString('hex', 64)
+}
+
+const sampleData = computed((): { [key: string]: TransactionSelect[] } => {
+  const currentUP = getState('address')
+  // ERC20
+  const erc20TokenWithEip165 = '0xF5443372766a48faF098244c8C769c5AEa02f321'
+  const erc20TokenWithoutEip165 = '0xB29c50a9F3D90FA3aDF394f2960BD6D8e0Ff5E9D'
+  // ERC777
+  const erc777TokenWithEip165 = '0xC719f454C8F9a0C7eEC4203B21766B88d8a5B073'
+  const erc777TokenWithoutEip165 = '0xD7549C70A6122cA01043831f0f0c65152C4877d6'
+  // LSP7
+  const lsp7TokenDivisible = '0x314E7a56B08AF8E729612930dBAd70BB5A3575D9'
+  const lsp7TokenNonDivisible = '0xF5d8FD6599Cb1971b8EEba218FFE31da34a257a9'
+  // ERC721
+  const erc721TokenWithEip165 = '0x57b8e4f3C96180088652dc361473bB91266bb080'
+
+  return {
+    LYX: [
+      {
+        label: '💰 Transfer LYX to UP',
+        to: sampleUP,
+        amount: 0.1,
+        hasData: false,
+        data: () => '',
+      },
+      {
+        label: '💰 Transfer LYX to EoA',
+        to: sampleEoA,
+        amount: 0.1,
+        hasData: false,
+        data: () => '',
+      },
+      {
+        label: '💰 Transfer LYX to EoA with test data',
+        to: sampleEoA,
+        amount: 0.1,
+        hasData: true,
+        data: () =>
+          encode(
+            'init(address[],bytes32,uint256[],bool,string,string)',
+            [
+              '0x69909C12C875271AdC49155Cc8D01dBF67FE82f1',
+              '0xB27F5845E6Ce846C02209Bd2497780099611b9a0',
+            ],
+            '0x40b8bec57d7b5ff0dbd9e9acd0a47dfeb0101e1a203766f5ccab00445fbf39e9',
+            [2345675643, 123292],
+            true,
+            'Hello!',
+            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
+          ),
+      },
+    ],
+    ERC20: [
+      {
+        label: '💰 Transfer: 1 token A to EoA',
+        to: erc20TokenWithEip165,
+        amount: 0,
+        toParam: sampleEoA,
+        hasData: true,
+        data: ({ toParam }) =>
+          encode('transfer(address,uint256)', toParam, toWei('1')),
+      },
+      {
+        label: '💰 Transfer: 1 token A to SC (no LSP1)',
+        to: '0xF5443372766a48faF098244c8C769c5AEa02f321',
+        amount: 0,
+        toParam: sampleSC,
+        hasData: true,
+        data: ({ toParam }) =>
+          encode('transfer(address,uint256)', toParam, toWei('1')),
+      },
+      {
+        label: '💰 Transfer: 1 token A to UP',
+        to: erc20TokenWithEip165,
+        amount: 0,
+        toParam: sampleUP,
+        hasData: true,
+        data: ({ toParam }) =>
+          encode('transfer(address,uint256)', toParam, toWei('1')),
+      },
+      {
+        label: '💰 Transfer: 1 token B to EoA (without EIP165)',
+        to: erc20TokenWithoutEip165,
+        amount: 0,
+        toParam: sampleEoA,
+        hasData: true,
+        data: ({ toParam }) =>
+          encode('transfer(address,uint256)', toParam, toWei('1')),
+      },
+      {
+        label: '🏦 Mint: 100 tokens A to current UP',
+        to: erc20TokenWithEip165,
+        amount: 0,
+        toParam: currentUP,
+        hasData: true,
+        data: ({ toParam }) =>
+          encode('mint(address,uint256)', toParam, toWei('100')),
+      },
+      {
+        label: '🏦 Mint: 100 tokens B to current UP',
+        to: erc20TokenWithoutEip165,
+        amount: 0,
+        toParam: currentUP,
+        hasData: true,
+        data: ({ toParam }) =>
+          encode('mint(address,uint256)', toParam, toWei('100')),
+      },
+    ],
+    ERC777: [
+      {
+        label: '💰 Transfer: 1 token A to EoA',
+        to: erc777TokenWithEip165,
+        amount: 0,
+        toParam: sampleEoA,
+        hasData: true,
+        data: ({ toParam }) =>
+          encode('send(address,uint256,bytes)', toParam, toWei('1'), '0x'),
+      },
+      {
+        label: '💰 Transfer: 1 token A to UP',
+        to: erc777TokenWithEip165,
+        amount: 0,
+        toParam: sampleUP,
+        hasData: true,
+        data: ({ toParam }) =>
+          encode('send(address,uint256,bytes)', toParam, toWei('1'), '0x'),
+      },
+      {
+        label: '💰 Transfer: 1 token B to EoA (without EIP165)',
+        to: erc777TokenWithoutEip165,
+        amount: 0,
+        toParam: sampleEoA,
+        hasData: true,
+        data: ({ toParam }) =>
+          encode('send(address,uint256,bytes)', toParam, toWei('1'), '0x'),
+      },
+      {
+        label: '🏦 Mint: 100 tokens A to current UP',
+        to: erc777TokenWithEip165,
+        amount: 0,
+        toParam: currentUP,
+        hasData: true,
+        data: ({ toParam }) =>
+          encode('mint(address,uint256)', toParam, toWei('100')),
+      },
+      {
+        label: '🏦 Mint: 100 tokens B to current UP',
+        to: erc777TokenWithoutEip165,
+        amount: 0,
+        toParam: currentUP,
+        hasData: true,
+        data: ({ toParam }) =>
+          encode('mint(address,uint256)', toParam, toWei('100')),
+      },
+    ],
+    LSP7: [
+      {
+        // 1234567890123456789012345678901234567890123456789012345678901234
+        //          1         2         3         4         5         6
+        // 0000000000000000000000000000000000000000000000000000000000000001
+        // 5ef83ad9559033e6e941db7d7c495acdce616347d28e90c7ce47cbfcfcad3bc5
+
+        // 000000000000000000000000${toParam}
+        // 64-24 = 40
+
+        label: '💰 Transfer: 1 token A (divisible) to EoA',
+        to: lsp7TokenDivisible,
+        amount: 0,
+        fromParam: currentUP,
+        toParam: sampleEoA,
+        force: true,
+        hasData: true,
+        data: ({ fromParam, toParam, force }) =>
+          encode(
+            'transfer(address,address,uint256,bool,bytes)',
+            fromParam,
+            toParam,
+            toWei('1'),
+            force,
+            '0x'
+          ),
+      },
+      {
+        label: '💰 Transfer: 1 token A (divisible) to UP',
+        to: lsp7TokenDivisible,
+        amount: 0,
+        fromParam: currentUP,
+        force: false,
+        toParam: sampleUP,
+        hasData: true,
+        data: ({ fromParam, toParam, force }) =>
+          encode(
+            'transfer(address,address,uint256,bool,bytes)',
+            fromParam,
+            toParam,
+            toWei('1'),
+            force,
+            '0x'
+          ),
+      },
+      {
+        label: '💰 Transfer: 1 token A (divisible) to SC (no LSP1)',
+        to: lsp7TokenDivisible,
+        amount: 0,
+        fromParam: currentUP,
+        toParam: sampleSC,
+        force: true,
+        hasData: true,
+        data: ({ fromParam, toParam, force }) =>
+          encode(
+            'transfer(address,address,uint256,bool,bytes)',
+            fromParam,
+            toParam,
+            toWei('1'),
+            force,
+            '0x'
+          ),
+      },
+      {
+        label: '💰 Transfer: 1 token A (non divisible) to EoA',
+        to: lsp7TokenNonDivisible,
+        amount: 0,
+        fromParam: currentUP,
+        toParam: sampleEoA,
+        force: true,
+        hasData: true,
+        data: ({ fromParam, toParam, force }) =>
+          encode(
+            'transfer(address,address,uint256,bool,bytes)',
+            fromParam,
+            toParam,
+            toWei('1'),
+            force,
+            '0x'
+          ),
+      },
+      {
+        label: '💰 Transfer: 1 token A (non divisible) to UP',
+        to: lsp7TokenNonDivisible,
+        amount: 0,
+        fromParam: currentUP,
+        toParam: sampleUP,
+        force: false,
+        hasData: true,
+        data: ({ fromParam, toParam, force }) =>
+          encode(
+            'transfer(address,address,uint256,bool,bytes)',
+            fromParam,
+            toParam,
+            toWei('1'),
+            force,
+            '0x'
+          ),
+      },
+      {
+        label: '💰 Transfer: 1 token A (non divisible) to SC (no LSP1)',
+        to: lsp7TokenNonDivisible,
+        amount: 0,
+        fromParam: currentUP,
+        toParam: sampleSC,
+        force: true,
+        hasData: true,
+        data: ({ fromParam, toParam, force }) =>
+          encode(
+            'transfer(address,address,uint256,bool,bytes)',
+            fromParam,
+            toParam,
+            toWei('1'),
+            force,
+            '0x'
+          ),
+      },
+    ],
+    ERC721: [
+      {
+        label: '💰 Fake Transfer: 1 NFT to EoA',
+        to: erc721TokenWithEip165,
+        amount: 0,
+        hasData: true,
+        fromParam: currentUP,
+        toParam: sampleEoA,
+        data: ({ fromParam, toParam }) =>
+          encode(
+            'transferFrom(address,address,uint256)',
+            fromParam,
+            toParam,
+            1
+          ),
+      },
+      {
+        label: '💰 Fake Transfer: 1 NFT to UP',
+        to: erc721TokenWithEip165,
+        amount: 0,
+        fromParam: currentUP,
+        toParam: sampleUP,
+        hasData: true,
+        data: ({ fromParam, toParam }) =>
+          encode(
+            'transferFrom(address,address,uint256)',
+            fromParam,
+            toParam,
+            0
+          ),
+      },
+      {
+        label: '🏦 Mint: 1 NFT to current UP',
+        to: erc721TokenWithEip165,
+        amount: 0,
+        toParam: currentUP,
+        hasData: true,
+        data: ({ toParam }) => encode('mint(address)', toParam),
+      },
+    ],
+    SetData: [
+      {
+        label: '👤 LSP3Profile: Change profile',
+        to: currentUP,
+        amount: 0,
+        hasData: true,
+        data: () =>
+          encode(
+            'setData(bytes32[],bytes[])',
+            [ERC725.encodeKeyName('LSP3Profile')],
+            ERC725.encodeData(
+              [
+                {
+                  keyName: ERC725.encodeKeyName('LSP3Profile'),
+                  value: {
+                    hash: '0x70546a2accab18748420b63c63b5af4cf710848ae83afc0c51dd8ad17fb5e8b3',
+                    hashFunction: 'keccak256(utf8)',
+                    url: 'ipfs://QmecrGejUQVXpW4zS948pNvcnQrJ1KiAoM6bdfrVcWZsn5',
+                  },
+                },
+              ],
+              lsp3Schema as ERC725JSONSchema[]
+            ).values
+          ),
+      },
+      {
+        label: '👤 LSP3Profile: Change profile and send value',
+        to: currentUP,
+        amount: 0.1,
+        hasData: true,
+        data: () =>
+          encode(
+            'setData(bytes32[],bytes[])',
+            [ERC725.encodeKeyName('LSP3Profile')],
+            ERC725.encodeData(
+              [
+                {
+                  keyName: ERC725.encodeKeyName('LSP3Profile'),
+                  value: {
+                    hash: '0x70546a2accab18748420b63c63b5af4cf710848ae83afc0c51dd8ad17fb5e8b3',
+                    hashFunction: 'keccak256(utf8)',
+                    url: 'ipfs://QmecrGejUQVXpW4zS948pNvcnQrJ1KiAoM6bdfrVcWZsn5',
+                  },
+                },
+              ],
+              lsp3Schema as ERC725JSONSchema[]
+            ).values
+          ),
+      },
+    ],
+  }
+})
 
 const selectData = (event: Event) => {
   const value = (event.target as HTMLSelectElement).value
   if (!value) {
     return
   }
+  if (!sampleData.value) {
+    return
+  }
   const [name, index] = value.split(':')
-  const items = sampleData[name]
+  const items = sampleData.value[name]
   if (!items) {
     return
   }
@@ -424,22 +518,24 @@ const populateData = (selected = false) => {
   }
   if (selected) {
     to.value = option.to
-    toParam.value = option.toParam
+    toParam.value = option.toParam ?? ''
     hasToParam.value = option.toParam != null
 
-    force.value = option.force
+    force.value = option.force ?? false
     hasForce.value = option.force != null
 
-    fromParam.value = option.fromParam
+    fromParam.value = option.fromParam ?? ''
     hasFromParam.value = option.fromParam != null
 
     hasData.value = option.hasData
   }
-  data.value = option.data({
-    toParam: toParam.value,
-    force: force.value,
-    fromParam: fromParam.value,
-  })
+  const { errors: currentErrors, hasError, data: newData } = calcData(option)
+  if (hasError) {
+    errors.value = currentErrors || {}
+  } else {
+    data.value = newData
+    errors.value = {}
+  }
 }
 
 watch(
@@ -519,6 +615,9 @@ const send = async () => {
         <div class="control">
           <input v-model="fromParam" class="input is-family-code" type="text" />
         </div>
+        <p v-if="errors.fromParam" class="help is-danger">
+          {{ errors.fromParam }}
+        </p>
       </div>
       <div class="field">
         <label class="label">To</label>
@@ -537,6 +636,9 @@ const send = async () => {
         <div class="control">
           <input v-model="toParam" class="input is-family-code" type="text" />
         </div>
+        <p v-if="errors.toParam" class="help is-danger">
+          {{ errors.toParam }}
+        </p>
       </div>
       <div v-if="hasForce" class="field">
         <label class="checkbox">

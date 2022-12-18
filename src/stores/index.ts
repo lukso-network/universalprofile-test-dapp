@@ -56,6 +56,9 @@ export enum LSPType {
   LSP7DigitalAsset = 'LSP7DigitalAsset',
   LSP8IdentifiableDigitalAsset = 'LSP8IdentifiableDigitalAsset',
   LSP9Vault = 'LSP9Vault',
+  UP = 'UP',
+  SC = 'SC',
+  EoA = 'EoA',
   Unknown = 'Unknown',
 }
 
@@ -85,6 +88,18 @@ const lspTypeOptions: Record<
     interfaceId: INTERFACE_IDS.LSP9Vault,
     lsp2Schema: getSupportedStandardObject(lsp9Schema as ERC725JSONSchema[]),
   },
+  [LSPType.EoA]: {
+    interfaceId: '',
+    lsp2Schema: null,
+  },
+  [LSPType.UP]: {
+    interfaceId: '',
+    lsp2Schema: null,
+  },
+  [LSPType.SC]: {
+    interfaceId: '',
+    lsp2Schema: null,
+  },
 }
 
 export type TokenInfo = {
@@ -98,9 +113,17 @@ export type TokenInfo = {
 
 const detectLSP = async (
   contractAddress: string,
-  lspType: LSPType
+  lspType: Exclude<LSPType, LSPType.Unknown>
 ): Promise<TokenInfo | undefined> => {
-  if (lspType === LSPType.Unknown) {
+  if (
+    lspType in
+    {
+      [LSPType.Unknown]: true,
+      [LSPType.EoA]: true,
+      [LSPType.SC]: true,
+      [LSPType.UP]: true,
+    }
+  ) {
     return undefined
   }
 
@@ -159,6 +182,10 @@ const detectLSP = async (
     return undefined
   }
 }
+
+export const sampleEoA = '0x311611C9A46a192C14Ea993159a0498EDE5578aC'
+export const sampleUP = '0xe608aBEeB2EA0EBb59170de6CBcFFaE06437fE0c'
+export const sampleSC = '0xcAC51571007DaAB53f26C2387b3B16420491dE18'
 
 export async function setState(
   key: keyof Store,

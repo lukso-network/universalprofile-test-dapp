@@ -9,7 +9,6 @@ import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
 import { ref } from 'vue'
 import { createBlockScoutLink } from '@/utils/createLinks'
-import { useLspFactory } from '@/compositions/useLspFactory'
 import Lsp4MetadataForm from '@/components/shared/Lsp4MetadataForm.vue'
 import LSP8Mintable from '@lukso/lsp-smart-contracts/artifacts/LSP8Mintable.json'
 import { Lsp4Metadata } from '@/types'
@@ -46,9 +45,8 @@ const lsp4Metadata = ref<Lsp4Metadata>({
     },
   ],
 })
+
 const tokenAddress = ref<string>()
-const { deployLSP7DigitalAsset, deployLSP8IdentifiableDigitalAsset } =
-  useLspFactory()
 
 const handleNewLsp4Metadata = (metadata: Lsp4Metadata) => {
   lsp4Metadata.value = metadata
@@ -64,11 +62,19 @@ const create = async () => {
   if (isTokenPending.value) {
     return
   }
+  const tokenAddr = tokenAddress.value
+  if (tokenAddr == null) {
+    return
+  }
 
   const erc725AccountAddress = getState('address')
   isTokenPending.value = true
 
   try {
+    const { useLspFactory } = require('@/compositions/useLspFactory')
+    const { deployLSP7DigitalAsset, deployLSP8IdentifiableDigitalAsset } =
+      useLspFactory()
+
     let deployedAsset
     switch (token.value.type) {
       case ContractStandard.LSP7:
@@ -85,7 +91,7 @@ const create = async () => {
         })
         console.log('Deployed asset', deployedAsset.LSP7DigitalAsset)
         tokenAddress.value = deployedAsset.LSP7DigitalAsset.address
-        addTokenToLocalStore(tokenAddress.value)
+        addTokenToLocalStore(tokenAddr)
         break
       case ContractStandard.LSP8:
         deployedAsset = await deployLSP8IdentifiableDigitalAsset({
@@ -130,7 +136,7 @@ const create = async () => {
     }
     isTokenCreated.value = true
     recalcTokens().then(() => {
-      setState('tokenAddress', tokenAddress.value)
+      setState('tokenAddress', tokenAddr)
     })
     setNotification('Token created', 'info')
   } catch (error) {
