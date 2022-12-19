@@ -273,7 +273,7 @@ export function addTokenToLocalStore(address: string) {
   const found = tokens.find(_address => _address === address)
   if (!found) {
     tokens.push(address)
-    localStorage.setItem('createdTokens', JSON.stringify(tokens))
+    localStorage.setItem('up:createdTokens', JSON.stringify(tokens))
   }
 }
 

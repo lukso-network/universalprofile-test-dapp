@@ -17,6 +17,8 @@ import CustomSelect from '@/components/shared/CustomSelect.vue'
 import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
 import useWeb3 from '@/compositions/useWeb3'
 import { useLspFactory } from '@/compositions/useLspFactory'
+import ERC725 from '@erc725/erc725.js'
+import { BN } from 'bn.js'
 
 type Token = {
   type: ContractStandard
@@ -118,10 +120,8 @@ const create = async () => {
         )
         await deployedContract.methods
           .setData(
-            [
-              '0x715f248956de7ce65e94d9d836bfead479f7e70d69b718d47bfe7b00e05b4fe4',
-            ], //LSP8TokenIdType
-            [3]
+            ERC725.encodeKeyName('LSP8TokenIdType'), //LSP8TokenIdType
+            `0x${new BN('3').toString('hex', 64)}`
           )
           .send({ from: erc725AccountAddress })
           .on('receipt', function (receipt: any) {
