@@ -129,7 +129,8 @@ export type TokenInfo = {
 
 const detectLSP = async (
   contractAddress: string,
-  lspType: Exclude<LSPType, LSPType.Unknown>
+  lspType: Exclude<LSPType, LSPType.Unknown>,
+  owned = false
 ): Promise<TokenInfo | undefined> => {
   if (
     lspType in
@@ -162,18 +163,25 @@ const detectLSP = async (
   }
 
   try {
-    const currentDecimals = await contract.methods.decimals().call()
+    let currentDecimals = '0'
+    let balance = owned ? 1 : 0
+    try {
+      currentDecimals = await contract.methods.decimals().call()
 
-    const _balance = await contract.methods
-      .balanceOf(store['address'])
-      .call()
-      .catch(() => undefined)
-    const balance = _balance
-      ? new BN(_balance, 10)
-          .div(new BN(10).pow(new BN(currentDecimals || '0', 10)))
-          .toNumber()
-      : 0
-
+      if (currentDecimals !== '0') {
+        const _balance = await contract.methods
+          .balanceOf(store['address'])
+          .call()
+          .catch(() => undefined)
+        balance = _balance
+          ? new BN(_balance, 10)
+              .div(new BN(10).pow(new BN(currentDecimals || '0', 10)))
+              .toNumber()
+          : 0
+      }
+    } catch (err) {
+      console.error(contractAddress, lspType, err, 'no balance')
+    }
     // ERC725 detection
     const { getInstance } = useErc725()
 
@@ -200,6 +208,7 @@ const detectLSP = async (
         shortType = 'LSP9'
         break
     }
+    console.log('success', contractAddress, lspType)
     return {
       type: lspType,
       name,
@@ -213,7 +222,7 @@ const detectLSP = async (
       )}...`,
     }
   } catch (err) {
-    console.error(err)
+    console.error(contractAddress, lspType, err)
     return undefined
   }
 }
@@ -287,25 +296,31 @@ export async function recalcTokens() {
     }, {})
     const tokens = getTokensCreated()
     tokens.forEach(address => {
-      mapAssets[address] = true
+      if (!(address in mapAssets)) {
+        mapAssets[address] = false
+      }
     })
-    mapAssets[lsp7TokenDivisible] = true
-    mapAssets[lsp7TokenNonDivisible]
-    const ownedAssets = Object.keys(mapAssets)
-    setState('assets', ownedAssets)
+    if (!(lsp7TokenDivisible in mapAssets)) {
+      mapAssets[lsp7TokenDivisible] = false
+    }
+    if (!(lsp7TokenNonDivisible in mapAssets)) {
+      mapAssets[lsp7TokenNonDivisible] = false
+    }
+    setState('assets', Object.keys(mapAssets))
 
     const lsp7Tokens: TokenInfo[] = []
     const lsp8Tokens: TokenInfo[] = []
 
     //fetch the different assets types
-    for (const address of ownedAssets) {
-      const isLSP7 = await detectLSP(address, LSPType.LSP7DigitalAsset)
+    for (const [address, owned] of Object.entries(mapAssets)) {
+      const isLSP7 = await detectLSP(address, LSPType.LSP7DigitalAsset, owned)
       if (isLSP7) {
         lsp7Tokens.push(isLSP7)
       }
       const isLSP8 = await detectLSP(
         address,
-        LSPType.LSP8IdentifiableDigitalAsset
+        LSPType.LSP8IdentifiableDigitalAsset,
+        owned
       )
       if (isLSP8) {
         lsp8Tokens.push(isLSP8)
