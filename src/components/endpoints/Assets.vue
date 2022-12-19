@@ -16,6 +16,7 @@ import { ContractStandard } from '@/enums'
 import CustomSelect from '@/components/shared/CustomSelect.vue'
 import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
 import useWeb3 from '@/compositions/useWeb3'
+import { useLspFactory } from '@/compositions/useLspFactory'
 
 type Token = {
   type: ContractStandard
@@ -67,7 +68,6 @@ const create = async () => {
   isTokenPending.value = true
 
   try {
-    const { useLspFactory } = require('@/compositions/useLspFactory')
     const { deployLSP7DigitalAsset, deployLSP8IdentifiableDigitalAsset } =
       useLspFactory()
 
@@ -118,8 +118,10 @@ const create = async () => {
         )
         await deployedContract.methods
           .setData(
-            '0x715f248956de7ce65e94d9d836bfead479f7e70d69b718d47bfe7b00e05b4fe4', //LSP8TokenIdType
-            3
+            [
+              '0x715f248956de7ce65e94d9d836bfead479f7e70d69b718d47bfe7b00e05b4fe4',
+            ], //LSP8TokenIdType
+            [3]
           )
           .send({ from: erc725AccountAddress })
           .on('receipt', function (receipt: any) {
