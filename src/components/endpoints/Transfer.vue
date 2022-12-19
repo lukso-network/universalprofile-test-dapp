@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { getState, LSPType, TokenInfo } from '@/stores'
-import { ref, watchEffect } from 'vue'
+import { ref } from 'vue'
 import { Contract } from 'web3-eth-contract'
 import useNotifications from '@/compositions/useNotifications'
 import useWeb3 from '@/compositions/useWeb3'
