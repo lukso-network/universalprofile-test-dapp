@@ -25,10 +25,6 @@ const transferReceiver = ref<string>()
 const transferAmount = ref(1)
 const transferForce = ref(false)
 
-watchEffect(() => {
-  transferToken.value = getState('tokenAddress')
-})
-
 const handleTokenSelected = (info: TokenInfo) => {
   tokenType.value =
     info.type === LSPType.LSP7DigitalAsset
@@ -39,6 +35,11 @@ const handleTokenSelected = (info: TokenInfo) => {
   }
 }
 
+const handleTokenReceiverSelected = (info: TokenInfo) => {
+  if (info.address) {
+    transferReceiver.value = info.address
+  }
+}
 const handleBlurTokenId = (event: Event) => {
   const value = (event?.target as HTMLInputElement)?.value
   try {
@@ -126,19 +127,13 @@ const transfer = async () => {
   <div class="tile is-4 is-parent">
     <div class="tile is-child box">
       <p class="is-size-5 has-text-weight-bold mb-4">Transfer</p>
-      <LSPSelect
-        :show-up="true"
-        :show-any="true"
-        :type="
-          tokenType === ContractStandard.LSP7
-            ? LSPType.LSP7DigitalAsset
-            : LSPType.LSP8IdentifiableDigitalAsset
-        "
-        :address="transferToken"
-        @option-selected="handleTokenSelected"
-      />
+
       <div class="field">
         <label class="label">Token address</label>
+        <LSPSelect
+          :address="transferToken"
+          @option-selected="handleTokenSelected"
+        />
         <div class="control">
           <input
             v-model="transferToken"
@@ -150,6 +145,11 @@ const transfer = async () => {
       </div>
       <div class="field">
         <label class="label">Transfer address</label>
+        <LSPSelect
+          :show-accounts="true"
+          :address="transferReceiver"
+          @option-selected="handleTokenReceiverSelected"
+        />
         <div class="control">
           <input
             v-model="transferReceiver"

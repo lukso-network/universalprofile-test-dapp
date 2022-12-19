@@ -19,6 +19,8 @@ type Props = {
   type?: LSPType
   showUp?: boolean
   showAny?: boolean
+  showLspType?: boolean
+  showAccounts?: boolean
 }
 
 type Emits = {
@@ -33,7 +35,7 @@ const data = computed<{ [key: string]: TokenInfo[] }>(() => {
   const data: { [key: string]: TokenInfo[] } = {}
   let items: TokenInfo[]
 
-  if (props.showUp) {
+  if (props.showUp || props.showAccounts) {
     items = data[LSPType.UP] = []
     items.push({
       type: LSPType.UP,
@@ -47,7 +49,7 @@ const data = computed<{ [key: string]: TokenInfo[] }>(() => {
     })
   }
 
-  if (props.showAny) {
+  if (props.showAny || props.showAccounts) {
     items = data[LSPType.SC] = []
     items.push({
       type: LSPType.SC,
@@ -61,7 +63,9 @@ const data = computed<{ [key: string]: TokenInfo[] }>(() => {
       address: sampleEoA,
       label: `Sample EoA ${sampleEoA.substring(0, 10)}...`,
     })
+  }
 
+  if (props.showAny) {
     items = data[LSPType.ERC20] = []
     items.push({
       type: LSPType.ERC20,
@@ -107,14 +111,23 @@ const data = computed<{ [key: string]: TokenInfo[] }>(() => {
   }
 
   let children = getState('lsp7')
-  if (children.length > 0) {
+  if (children.length > 0 || props.showLspType) {
     items = data[LSPType.LSP7DigitalAsset] = []
+    if (props.showLspType) {
+      items.push({ type: LSPType.LSP7DigitalAsset, label: 'Any LSP7' })
+    }
     items.push(...children)
   }
 
   children = getState('lsp8')
-  if (children.length > 0) {
+  if (children.length > 0 || props.showLspType) {
     items = data[LSPType.LSP8IdentifiableDigitalAsset] = []
+    if (props.showLspType) {
+      items.push({
+        type: LSPType.LSP8IdentifiableDigitalAsset,
+        label: 'Any LSP8',
+      })
+    }
     items.push(...children)
   }
 
@@ -124,7 +137,10 @@ const data = computed<{ [key: string]: TokenInfo[] }>(() => {
 const handleChange = (e: Event) => {
   const item: TokenInfo | undefined = Object.entries(data.value)
     .map(([, items]: [string, TokenInfo[]]) =>
-      items.find(({ address }) => address === (e?.target as any)?.value)
+      items.find(
+        ({ address, type }) =>
+          [address, type].indexOf((e?.target as any)?.value) !== -1
+      )
     )
     .find((item: TokenInfo | undefined) => item != null)
 
@@ -140,35 +156,43 @@ watch(
   }
 )
 
+const selectFirst = () => {
+  const first = Object.entries(data.value)[0]?.[1]?.find(
+    ({ address }) => address
+  )
+  if (first) {
+    selected.value = first.address
+    const e = { target: { value: first.address } }
+    handleChange(e as any)
+  } else {
+    const first = Object.entries(data.value)[0]?.[1]?.[0]
+    if (first) {
+      selected.value = first.type
+      const e = { target: { value: first.type } }
+      handleChange(e as any)
+    }
+  }
+}
+
 watch(
   () => {
     return getState('lsp7').concat(getState('lsp8'))
   },
   () => {
     if (!selected.value) {
-      const first = Object.entries(data.value)[0]?.[1]?.[0]
-      if (first && first.address) {
-        selected.value = first.address
-        const e = { target: { value: first.address } }
-        handleChange(e as any)
-      }
+      selectFirst()
     }
   }
 )
 
 onMounted(() => {
-  const first = Object.entries(data.value)[0]?.[1]?.[0]
-  if (first && first.address) {
-    selected.value = first.address
-    const e = { target: { value: first.address } }
-    handleChange(e as any)
-  }
+  selectFirst()
 })
 </script>
 
 <template>
   <div class="field">
-    <div class="select is-fullwidth mb-2">
+    <div class="select is-fullwidth">
       <select v-model="selected" data-testid="preset" @change="handleChange">
         <optgroup
           v-for="(items, label) of data"
@@ -178,7 +202,7 @@ onMounted(() => {
           <option
             v-for="option in items"
             :key="option.address"
-            :value="option.address"
+            :value="option.address || option.type"
           >
             {{ option.label }}
           </option>

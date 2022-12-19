@@ -55,6 +55,12 @@ const handleTokenSelected = (info: TokenInfo) => {
   }
 }
 
+const handleMintReceiverSelected = (info: TokenInfo) => {
+  if (info.address) {
+    mintReceiver.value = info.address
+  }
+}
+
 const handleBlurTokenId = (event: Event) => {
   const value = (event?.target as HTMLInputElement)?.value
   try {
@@ -146,17 +152,13 @@ const mint = async () => {
   <div class="tile is-4 is-parent">
     <div class="tile is-child box">
       <p class="is-size-5 has-text-weight-bold mb-4">Mint</p>
-      <LSPSelect
-        :type="
-          tokenType === ContractStandard.LSP7
-            ? LSPType.LSP7DigitalAsset
-            : LSPType.LSP8IdentifiableDigitalAsset
-        "
-        :address="mintToken"
-        @option-selected="handleTokenSelected"
-      />
       <div class="field">
         <label class="label">Token address</label>
+        <LSPSelect
+          :show-lsp-type="true"
+          :address="mintToken"
+          @option-selected="handleTokenSelected"
+        />
         <div class="control">
           <input
             v-model="mintToken"
@@ -181,6 +183,11 @@ const mint = async () => {
       </div>
       <div class="field">
         <label class="label">Mint address</label>
+        <LSPSelect
+          :show-accounts="true"
+          :address="mintReceiver"
+          @option-selected="handleMintReceiverSelected"
+        />
         <div class="control">
           <input
             v-model="mintReceiver"
