@@ -3,9 +3,18 @@ import Connect from '@/components/Connect.vue'
 import { ref } from 'vue'
 import useDropdown from '@/compositions/useDropdown'
 
-const burger = ref()
-const menu = ref()
+const burger = ref<HTMLElement | undefined>()
+const menu = ref<HTMLElement | undefined>()
 const { toggle } = useDropdown()
+
+const handleClick = () => {
+  if (burger.value) {
+    toggle(burger.value)
+  }
+  if (menu.value) {
+    toggle(menu.value)
+  }
+}
 </script>
 
 <template>
@@ -26,12 +35,7 @@ const { toggle } = useDropdown()
         aria-label="menu"
         aria-expanded="false"
         data-target="navbar"
-        @click="
-          () => {
-            toggle(burger)
-            toggle(menu)
-          }
-        "
+        @click="handleClick"
       >
         <span aria-hidden="true"></span>
         <span aria-hidden="true"></span>
