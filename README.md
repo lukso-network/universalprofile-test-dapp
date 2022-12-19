@@ -23,7 +23,10 @@ Stack:
 
 ```sh
 yarn install
+yarn prepare
 ```
+
+Yarn prepare will correctly install husky and lint-staged to validate commits pre-commit.
 
 ### Development
 
@@ -43,3 +46,12 @@ For checking production version:
 ```sh
 yarn preview
 ```
+
+### Upgrades
+
+```sh
+yarn upgrade-interactive
+```
+
+> NOTE: Current all jest related npms are still on version 28. Please do not upgrade to 29 as it's a very
+> large piece of work
