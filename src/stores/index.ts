@@ -59,6 +59,9 @@ export enum LSPType {
   UP = 'UP',
   SC = 'SC',
   EoA = 'EoA',
+  ERC20 = 'ERC20',
+  ERC777 = 'ERC777',
+  ERC721 = 'ERC721',
   Unknown = 'Unknown',
 }
 
@@ -100,15 +103,28 @@ const lspTypeOptions: Record<
     interfaceId: '',
     lsp2Schema: null,
   },
+  [LSPType.ERC20]: {
+    interfaceId: '',
+    lsp2Schema: null,
+  },
+  [LSPType.ERC777]: {
+    interfaceId: '',
+    lsp2Schema: null,
+  },
+  [LSPType.ERC721]: {
+    interfaceId: '',
+    lsp2Schema: null,
+  },
 }
 
 export type TokenInfo = {
   type: LSPType
   address?: string
-  name: string
-  symbol: string
+  name?: string
+  symbol?: string
   decimals?: string
   balance?: number
+  label?: string
 }
 
 const detectLSP = async (
@@ -169,6 +185,21 @@ const detectLSP = async (
     if (typeof name !== 'string' || typeof symbol !== 'string') {
       throw new Error('Unable to get name and/or symbol')
     }
+    let shortType: string = lspType
+    switch (shortType) {
+      case LSPType.LSP7DigitalAsset:
+        shortType = 'LSP7'
+        break
+      case LSPType.LSP8IdentifiableDigitalAsset:
+        shortType = 'LSP8'
+        break
+      case LSPType.LSP3UniversalProfileMetadata:
+        shortType = 'LSP3'
+        break
+      case LSPType.LSP9Vault:
+        shortType = 'LSP9'
+        break
+    }
     return {
       type: lspType,
       name,
@@ -176,6 +207,10 @@ const detectLSP = async (
       address: contractAddress,
       balance,
       decimals: currentDecimals,
+      label: `${shortType} ${name} (${symbol}) ${contractAddress.substring(
+        0,
+        10
+      )}...`,
     }
   } catch (err) {
     console.error(err)
@@ -186,6 +221,22 @@ const detectLSP = async (
 export const sampleEoA = '0x311611C9A46a192C14Ea993159a0498EDE5578aC'
 export const sampleUP = '0xe608aBEeB2EA0EBb59170de6CBcFFaE06437fE0c'
 export const sampleSC = '0xcAC51571007DaAB53f26C2387b3B16420491dE18'
+// ERC20
+export const erc20TokenWithEip165 = '0xF5443372766a48faF098244c8C769c5AEa02f321'
+export const erc20TokenWithoutEip165 =
+  '0xB29c50a9F3D90FA3aDF394f2960BD6D8e0Ff5E9D'
+// ERC777
+export const erc777TokenWithEip165 =
+  '0xC719f454C8F9a0C7eEC4203B21766B88d8a5B073'
+export const erc777TokenWithoutEip165 =
+  '0xD7549C70A6122cA01043831f0f0c65152C4877d6'
+// LSP7
+export const lsp7TokenDivisible = '0x314E7a56B08AF8E729612930dBAd70BB5A3575D9'
+export const lsp7TokenNonDivisible =
+  '0xF5d8FD6599Cb1971b8EEba218FFE31da34a257a9'
+// ERC721
+export const erc721TokenWithEip165 =
+  '0x57b8e4f3C96180088652dc361473bB91266bb080'
 
 export async function setState(
   key: keyof Store,
@@ -238,6 +289,8 @@ export async function recalcTokens() {
     tokens.forEach(address => {
       mapAssets[address] = true
     })
+    mapAssets[lsp7TokenDivisible] = true
+    mapAssets[lsp7TokenNonDivisible]
     const ownedAssets = Object.keys(mapAssets)
     setState('assets', ownedAssets)
 
@@ -291,10 +344,10 @@ export function useState(): {
         gasPrice: DEFAULT_GAS_PRICE,
       })
 
-      recalcTokens()
-
       // check for balance needs to be last as Wallet Connect doesn't support `eth_getBalance` method
       setState('balance', await getBalance(address))
+
+      await recalcTokens()
     },
     setDisconnected: () => {
       setState('address', '')

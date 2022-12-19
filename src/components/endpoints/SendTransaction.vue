@@ -1,15 +1,30 @@
 <script setup lang="ts">
 import { toWei } from 'web3-utils'
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, onMounted } from 'vue'
 import { TransactionConfig } from 'web3-core'
 
-import { getState, setState, sampleUP, sampleEoA, sampleSC } from '@/stores'
+import {
+  getState,
+  setState,
+  sampleUP,
+  sampleEoA,
+  sampleSC,
+  TokenInfo,
+  erc20TokenWithEip165,
+  erc20TokenWithoutEip165,
+  erc777TokenWithEip165,
+  erc777TokenWithoutEip165,
+  lsp7TokenDivisible,
+  lsp7TokenNonDivisible,
+  erc721TokenWithEip165,
+} from '@/stores'
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
 import useWeb3 from '@/compositions/useWeb3'
 import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
 import ERC725, { ERC725JSONSchema } from '@erc725/erc725.js'
 import lsp3Schema from '@erc725/erc725.js/schemas/LSP3UniversalProfileMetadata.json'
+import LSPSelect from '../shared/LSPSelect.vue'
 
 type TransactionParams = {
   toParam?: string
@@ -40,7 +55,7 @@ const { sendTransaction, getBalance, getWeb3 } = useWeb3()
 const { eth } = getWeb3()
 
 const from = ref<string>(getState('address'))
-const to = ref('0x4658F1Ac64486827f59E637bE9800Eb035b6f43C')
+const to = ref<string | undefined>('0x4658F1Ac64486827f59E637bE9800Eb035b6f43C')
 const amount = ref(0.1)
 const data = ref('')
 const hasData = ref(false)
@@ -123,17 +138,6 @@ function calcData(options: TransactionSelect) {
 
 const sampleData = computed((): { [key: string]: TransactionSelect[] } => {
   const currentUP = getState('address')
-  // ERC20
-  const erc20TokenWithEip165 = '0xF5443372766a48faF098244c8C769c5AEa02f321'
-  const erc20TokenWithoutEip165 = '0xB29c50a9F3D90FA3aDF394f2960BD6D8e0Ff5E9D'
-  // ERC777
-  const erc777TokenWithEip165 = '0xC719f454C8F9a0C7eEC4203B21766B88d8a5B073'
-  const erc777TokenWithoutEip165 = '0xD7549C70A6122cA01043831f0f0c65152C4877d6'
-  // LSP7
-  const lsp7TokenDivisible = '0x314E7a56B08AF8E729612930dBAd70BB5A3575D9'
-  const lsp7TokenNonDivisible = '0xF5d8FD6599Cb1971b8EEba218FFE31da34a257a9'
-  // ERC721
-  const erc721TokenWithEip165 = '0x57b8e4f3C96180088652dc361473bB91266bb080'
 
   return {
     LYX: [
@@ -506,6 +510,14 @@ const selectData = (event: Event) => {
   populateData(true)
 }
 
+const handleToParamSelected = (info: TokenInfo) => {
+  toParam.value = info.address
+}
+
+const handleToSelected = (info: TokenInfo) => {
+  to.value = info.address
+}
+
 const populateData = (selected = false) => {
   const option = selectedData.value
   if (!option) {
@@ -574,6 +586,10 @@ const send = async () => {
     isPending.value = false
   }
 }
+
+onMounted(() => {
+  calcData(sampleData.value.LYX[0])
+})
 </script>
 
 <template>
@@ -617,6 +633,13 @@ const send = async () => {
       </div>
       <div class="field">
         <label class="label">To</label>
+        <LSPSelect
+          :show-up="true"
+          :show-any="true"
+          :address="to"
+          @option-selected="handleToSelected"
+        />
+
         <div class="control">
           <input
             v-model="to"
@@ -627,8 +650,15 @@ const send = async () => {
           />
         </div>
       </div>
+
       <div v-if="hasToParam" class="field">
         <label class="label">To Param</label>
+        <LSPSelect
+          :show-up="true"
+          :show-any="true"
+          :address="toParam"
+          @option-selected="handleToParamSelected"
+        />
         <div class="control">
           <input v-model="toParam" class="input is-family-code" type="text" />
         </div>

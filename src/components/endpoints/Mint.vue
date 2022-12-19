@@ -147,8 +147,6 @@ const mint = async () => {
     <div class="tile is-child box">
       <p class="is-size-5 has-text-weight-bold mb-4">Mint</p>
       <LSPSelect
-        :show-up="false"
-        :show-any="false"
         :type="
           tokenType === ContractStandard.LSP7
             ? LSPType.LSP7DigitalAsset

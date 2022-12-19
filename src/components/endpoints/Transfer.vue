@@ -127,7 +127,7 @@ const transfer = async () => {
     <div class="tile is-child box">
       <p class="is-size-5 has-text-weight-bold mb-4">Transfer</p>
       <LSPSelect
-        :show-up="false"
+        :show-up="true"
         :show-any="true"
         :type="
           tokenType === ContractStandard.LSP7

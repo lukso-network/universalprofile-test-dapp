@@ -6,13 +6,19 @@ import {
   sampleUP,
   sampleEoA,
   sampleSC,
+  erc20TokenWithEip165,
+  erc20TokenWithoutEip165,
+  erc777TokenWithEip165,
+  erc777TokenWithoutEip165,
+  erc721TokenWithEip165,
 } from '@/stores'
+import { ref, computed, onMounted, watch } from 'vue'
 
 type Props = {
   address?: string
-  type: LSPType
-  showUp: boolean
-  showAny: boolean
+  type?: LSPType
+  showUp?: boolean
+  showAny?: boolean
 }
 
 type Emits = {
@@ -21,97 +27,160 @@ type Emits = {
 
 const emits = defineEmits<Emits>()
 const props = defineProps<Props>()
+const selected = ref<string | undefined>()
+
+const data = computed<{ [key: string]: TokenInfo[] }>(() => {
+  const data: { [key: string]: TokenInfo[] } = {}
+  let items: TokenInfo[]
+
+  if (props.showUp) {
+    items = data[LSPType.UP] = []
+    items.push({
+      type: LSPType.UP,
+      address: getState('address'),
+      label: 'My UP',
+    })
+    items.push({
+      type: LSPType.UP,
+      address: sampleUP,
+      label: `Sample UP ${sampleUP.substring(0, 10)}...`,
+    })
+  }
+
+  if (props.showAny) {
+    items = data[LSPType.SC] = []
+    items.push({
+      type: LSPType.SC,
+      address: sampleSC,
+      label: `Sample SC ${sampleSC.substring(0, 10)}...`,
+    })
+
+    items = data[LSPType.EoA] = []
+    items.push({
+      type: LSPType.EoA,
+      address: sampleEoA,
+      label: `Sample EoA ${sampleEoA.substring(0, 10)}...`,
+    })
+
+    items = data[LSPType.ERC20] = []
+    items.push({
+      type: LSPType.ERC20,
+      address: erc20TokenWithEip165,
+      label: `Sample ERC20+Eip165 ${erc20TokenWithEip165.substring(0, 10)}...`,
+    })
+    items.push({
+      type: LSPType.ERC20,
+      address: erc20TokenWithoutEip165,
+      label: `Sample ERC20-Eip165 ${erc20TokenWithoutEip165.substring(
+        0,
+        10
+      )}...`,
+    })
+
+    items = data[LSPType.ERC777] = []
+    items.push({
+      type: LSPType.ERC777,
+      address: erc777TokenWithEip165,
+      label: `Sample ERC777+Eip165 ${erc777TokenWithEip165.substring(
+        0,
+        10
+      )}...`,
+    })
+    items.push({
+      type: LSPType.ERC777,
+      address: erc777TokenWithoutEip165,
+      label: `Sample ERC777-Eip165 ${erc777TokenWithoutEip165.substring(
+        0,
+        10
+      )}...`,
+    })
+
+    items = data[LSPType.ERC721] = []
+    items.push({
+      type: LSPType.ERC721,
+      address: erc721TokenWithEip165,
+      label: `Sample ERC721+Eip165 ${erc721TokenWithEip165.substring(
+        0,
+        10
+      )}...`,
+    })
+  }
+
+  let children = getState('lsp7')
+  if (children.length > 0) {
+    items = data[LSPType.LSP7DigitalAsset] = []
+    items.push(...children)
+  }
+
+  children = getState('lsp8')
+  if (children.length > 0) {
+    items = data[LSPType.LSP8IdentifiableDigitalAsset] = []
+    items.push(...children)
+  }
+
+  return data
+})
 
 const handleChange = (e: Event) => {
-  emits('optionSelected', JSON.parse((e?.target as any)?.value || '{}'))
+  const item: TokenInfo | undefined = Object.entries(data.value)
+    .map(([, items]: [string, TokenInfo[]]) =>
+      items.find(({ address }) => address === (e?.target as any)?.value)
+    )
+    .find((item: TokenInfo | undefined) => item != null)
+
+  if (item) {
+    emits('optionSelected', item)
+  }
 }
 
-const isSelected = (type: LSPType, address?: string) => {
-  const foundAddress =
-    (getState('lsp7').concat(getState('lsp8')) as TokenInfo[]).find(
-      ({ address }) => props.address === address
-    ) != null
-  if (!foundAddress) {
-    return props.type === type && address == null
+watch(
+  () => props.address,
+  address => {
+    selected.value = address
   }
-  return props.type === type && props.address === address
-}
+)
+
+watch(
+  () => {
+    return getState('lsp7').concat(getState('lsp8'))
+  },
+  () => {
+    if (!selected.value) {
+      const first = Object.entries(data.value)[0]?.[1]?.[0]
+      if (first && first.address) {
+        selected.value = first.address
+        const e = { target: { value: first.address } }
+        handleChange(e as any)
+      }
+    }
+  }
+)
+
+onMounted(() => {
+  const first = Object.entries(data.value)[0]?.[1]?.[0]
+  if (first && first.address) {
+    selected.value = first.address
+    const e = { target: { value: first.address } }
+    handleChange(e as any)
+  }
+})
 </script>
 
 <template>
   <div class="field">
     <div class="select is-fullwidth mb-2">
-      <select data-testid="preset" @change="handleChange">
-        <optgroup label="UP">
+      <select v-model="selected" data-testid="preset" @change="handleChange">
+        <optgroup
+          v-for="(items, label) of data"
+          :key="label"
+          :label="`${label}`"
+        >
           <option
-            v-if="props.showAny"
-            :value="
-              JSON.stringify({ type: LSPType.UP, address: getState('address') })
-            "
-            :selected="isSelected(LSPType.UP, getState('address'))"
-          >
-            current UP
-          </option>
-          <option
-            v-if="props.showAny"
-            :value="
-              JSON.stringify({ type: LSPType.UP, address: getState('address') })
-            "
-            :selected="isSelected(LSPType.UP, sampleUP)"
-          >
-            sample UP
-          </option>
-        </optgroup>
-        <optgroup label="SC">
-          <option
-            v-if="props.showAny"
-            :value="JSON.stringify({ type: LSPType.SC, address: sampleSC })"
-            :selected="isSelected(LSPType.SC, sampleSC)"
-          >
-            sample SC
-          </option>
-        </optgroup>
-        <optgroup label="'EOA'">
-          <option
-            v-if="props.showAny"
-            :value="JSON.stringify({ type: LSPType.EoA, address: sampleEoA })"
-            :selected="isSelected(LSPType.EoA, sampleEoA)"
-          >
-            sample SC
-          </option>
-        </optgroup>
-        <optgroup label="LSP7">
-          <option
-            v-if="props.showAny"
-            :value="JSON.stringify({ type: 'LSP7DigitalAsset' })"
-            :selected="isSelected(LSPType.LSP7DigitalAsset)"
-          >
-            Any LSP7
-          </option>
-          <option
-            v-for="option in getState('lsp7')"
+            v-for="option in items"
             :key="option.address"
-            :value="JSON.stringify(option)"
-            :selected="isSelected(option.type, option.address)"
+            :value="option.address"
           >
-            LSP7 {{ option.name }} ({{ option.symbol }}) @ {{ option.address }}
-          </option>
-        </optgroup>
-        <optgroup label="LSP8">
-          <option
-            v-if="props.showAny"
-            :value="JSON.stringify({ type: 'LSP8IdentifiableDigitalAsset' })"
-            :selected="isSelected(LSPType.LSP8IdentifiableDigitalAsset)"
-          >
-            Any LSP8
-          </option>
-          <option
-            v-for="option in getState('lsp8')"
-            :key="option.address"
-            :value="JSON.stringify(option)"
-            :selected="isSelected(option.type, option.address)"
-          >
-            LSP8 {{ option.name }} ({{ option.symbol }}) @ {{ option.address }}
+            {{ option.label }}
           </option>
         </optgroup>
       </select>
