@@ -193,7 +193,7 @@ onMounted(() => {
 <template>
   <div class="field">
     <div class="select is-fullwidth">
-      <select v-model="selected" data-testid="preset" @change="handleChange">
+      <select v-model="selected" @change="handleChange">
         <optgroup
           v-for="(items, label) of data"
           :key="label"
