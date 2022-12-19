@@ -280,14 +280,6 @@ const sampleData = computed((): { [key: string]: TransactionSelect[] } => {
     ],
     LSP7: [
       {
-        // 1234567890123456789012345678901234567890123456789012345678901234
-        //          1         2         3         4         5         6
-        // 0000000000000000000000000000000000000000000000000000000000000001
-        // 5ef83ad9559033e6e941db7d7c495acdce616347d28e90c7ce47cbfcfcad3bc5
-
-        // 000000000000000000000000${toParam}
-        // 64-24 = 40
-
         label: '💰 Transfer: 1 token A (divisible) to EoA',
         to: lsp7TokenDivisible,
         amount: 0,
