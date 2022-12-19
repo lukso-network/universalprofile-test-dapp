@@ -63,3 +63,8 @@ interface ImportMeta {
     PWD: string
   }
 }
+
+declare module '@depay/web3-mock' {
+  import type { Web3 } from 'web3'
+  export function mock(name: string): Web3
+}

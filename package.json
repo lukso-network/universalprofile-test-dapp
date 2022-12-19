@@ -33,6 +33,7 @@
     "web3-eth-contract": "^1.8.1"
   },
   "devDependencies": {
+    "@depay/web3-mock": "^13.22.14",
     "@testing-library/jest-dom": "5.16.5",
     "@testing-library/user-event": "14.4.3",
     "@testing-library/vue": "6.6.1",

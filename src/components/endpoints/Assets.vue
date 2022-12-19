@@ -62,10 +62,6 @@ const create = async () => {
   if (isTokenPending.value) {
     return
   }
-  const tokenAddr = tokenAddress.value
-  if (tokenAddr == null) {
-    return
-  }
 
   const erc725AccountAddress = getState('address')
   isTokenPending.value = true
@@ -76,6 +72,7 @@ const create = async () => {
       useLspFactory()
 
     let deployedAsset
+    let tokenAddr: string
     switch (token.value.type) {
       case ContractStandard.LSP7:
         deployedAsset = await deployLSP7DigitalAsset({
@@ -90,8 +87,10 @@ const create = async () => {
           },
         })
         console.log('Deployed asset', deployedAsset.LSP7DigitalAsset)
-        tokenAddress.value = deployedAsset.LSP7DigitalAsset.address
-        addTokenToLocalStore(tokenAddr)
+        addTokenToLocalStore(
+          (tokenAddr = tokenAddress.value =
+            deployedAsset.LSP7DigitalAsset.address)
+        )
         break
       case ContractStandard.LSP8:
         deployedAsset = await deployLSP8IdentifiableDigitalAsset({
@@ -129,7 +128,10 @@ const create = async () => {
           .once('sending', (payload: any) => {
             console.log(JSON.stringify(payload, null, 2))
           })
-        addTokenToLocalStore(tokenAddress.value)
+        addTokenToLocalStore(
+          (tokenAddr = tokenAddress.value =
+            deployedAsset.LSP8IdentifiableDigitalAsset.address)
+        )
         break
       default:
         console.log('Standard not supported')

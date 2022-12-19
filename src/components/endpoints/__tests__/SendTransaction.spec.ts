@@ -6,13 +6,25 @@ import userEvent from '@testing-library/user-event'
 const mockGetBalance = jest.fn()
 const mockSendTransaction = jest.fn()
 
-jest.mock('@/compositions/useWeb3', () => ({
-  __esModule: true,
-  default: () => ({
-    getBalance: () => mockGetBalance(),
-    sendTransaction: (params: any) => mockSendTransaction(params),
-  }),
-}))
+jest.mock('@/compositions/useWeb3', () => {
+  const actual = jest.requireActual('@/compositions/useWeb3')
+  const data = actual.default()
+  const web3mock = require('@depay/web3-mock')
+  web3mock.mock('ethereum')
+  data.setupWeb3(window.ethereum)
+  const output = {
+    __esModule: true,
+    ...actual,
+    default: () => {
+      return {
+        ...data,
+        getBalance: () => mockGetBalance(),
+        sendTransaction: (params: any) => mockSendTransaction(params),
+      }
+    },
+  }
+  return output
+})
 
 test('can send lyx transaction', async () => {
   setState('address', '0x517216362D594516c6f96Ee34b2c502d65B847E4')
@@ -83,7 +95,7 @@ test('can send transaction from preset', async () => {
     'The transaction was successful'
   )
   expect(mockSendTransaction).toBeCalledWith({
-    data: '0x40c10f19000000000000000000000000517216362D594516c6f96Ee34b2c502d65B847E40000000000000000000000000000000000000000000000056bc75e2d63100000',
+    data: '0x40c10f19000000000000000000000000517216362d594516c6f96ee34b2c502d65b847e40000000000000000000000000000000000000000000000056bc75e2d63100000',
     from: '0x517216362D594516c6f96Ee34b2c502d65B847E4',
     to: '0xB29c50a9F3D90FA3aDF394f2960BD6D8e0Ff5E9D',
     value: '0',

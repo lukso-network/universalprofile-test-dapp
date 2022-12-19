@@ -1,5 +1,5 @@
 import Assets from '../Assets.vue'
-import { render, fireEvent, screen } from '@testing-library/vue'
+import { render, fireEvent, screen, waitFor } from '@testing-library/vue'
 import { setState } from '@/stores'
 
 const mockDeployLSP7DigitalAsset = jest.fn()
@@ -19,8 +19,12 @@ test('can create token', async () => {
   render(Assets)
 
   await fireEvent.click(screen.getByTestId('create'))
-  expect(screen.getByTestId('notification')).toHaveTextContent('Token created')
-  expect(screen.getByTestId('token-address')).toHaveTextContent(
-    '0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298'
-  )
-})
+  await waitFor(() => {
+    expect(screen.getByTestId('notification')).toHaveTextContent(
+      'Token created'
+    )
+    expect(screen.getByTestId('token-address')).toHaveTextContent(
+      '0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298'
+    )
+  })
+}, 120000)

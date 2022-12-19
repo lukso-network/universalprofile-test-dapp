@@ -8,7 +8,6 @@ import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
 import useWeb3 from '@/compositions/useWeb3'
 import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
-import { BN } from 'bn.js'
 import ERC725, { ERC725JSONSchema } from '@erc725/erc725.js'
 import lsp3Schema from '@erc725/erc725.js/schemas/LSP3UniversalProfileMetadata.json'
 
@@ -120,10 +119,6 @@ function calcData(options: TransactionSelect) {
     data = options.data(params)
   }
   return { data, errors, hasError }
-}
-
-function boolValue(value?: boolean) {
-  return new BN(value ? 1 : 0).toString('hex', 64)
 }
 
 const sampleData = computed((): { [key: string]: TransactionSelect[] } => {
@@ -528,6 +523,7 @@ const populateData = (selected = false) => {
     hasFromParam.value = option.fromParam != null
 
     hasData.value = option.hasData
+    amount.value = option.amount
   }
   const { errors: currentErrors, hasError, data: newData } = calcData(option)
   if (hasError) {
