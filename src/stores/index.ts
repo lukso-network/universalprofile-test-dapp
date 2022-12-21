@@ -156,7 +156,6 @@ const detectLSP = async (
       .call()
   } catch (error) {
     doesSupportInterface = false
-    console.error(error)
   }
   if (!doesSupportInterface) {
     return undefined
@@ -358,7 +357,6 @@ export function useState(): {
         gas: DEFAULT_GAS,
         gasPrice: DEFAULT_GAS_PRICE,
       })
-
       // check for balance needs to be last as Wallet Connect doesn't support `eth_getBalance` method
       setState('balance', await getBalance(address))
 

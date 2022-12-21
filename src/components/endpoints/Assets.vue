@@ -74,7 +74,6 @@ const create = async () => {
       useLspFactory()
 
     let deployedAsset
-    let tokenAddr: string
     switch (token.value.type) {
       case ContractStandard.LSP7:
         deployedAsset = await deployLSP7DigitalAsset({
@@ -90,8 +89,7 @@ const create = async () => {
         })
         console.log('Deployed asset', deployedAsset.LSP7DigitalAsset)
         addTokenToLocalStore(
-          (tokenAddr = tokenAddress.value =
-            deployedAsset.LSP7DigitalAsset.address)
+          (tokenAddress.value = deployedAsset.LSP7DigitalAsset.address)
         )
         break
       case ContractStandard.LSP8:
@@ -131,7 +129,7 @@ const create = async () => {
             console.log(JSON.stringify(payload, null, 2))
           })
         addTokenToLocalStore(
-          (tokenAddr = tokenAddress.value =
+          (tokenAddress.value =
             deployedAsset.LSP8IdentifiableDigitalAsset.address)
         )
         break
@@ -139,9 +137,8 @@ const create = async () => {
         console.log('Standard not supported')
     }
     isTokenCreated.value = true
-    recalcTokens().then(() => {
-      setState('tokenAddress', tokenAddr)
-    })
+    await recalcTokens()
+    setState('tokenAddress', tokenAddress.value)
     setNotification('Token created', 'info')
   } catch (error) {
     setNotification((error as unknown as Error).message, 'danger')
