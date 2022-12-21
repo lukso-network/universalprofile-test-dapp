@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { toWei } from 'web3-utils'
-import { ref, watch, computed, onMounted } from 'vue'
+import { toWei, Unit } from 'web3-utils'
+import { ref, watch, computed, onMounted, reactive } from 'vue'
 import { TransactionConfig } from 'web3-core'
 
 import {
@@ -26,23 +26,23 @@ import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
 import ERC725, { ERC725JSONSchema } from '@erc725/erc725.js'
 import lsp3Schema from '@erc725/erc725.js/schemas/LSP3UniversalProfileMetadata.json'
 import LSPSelect from '../shared/LSPSelect.vue'
-import ParamFields from '../shared/ParamFields.vue'
+import ContractFunction from '../shared/ContractFunction.vue'
 
 export type MethodType = {
   label?: string
   type: string
   name: string
-  isWei?: boolean | string
+  isWei?: boolean | Unit
   hasSpecs?: LSPType[]
   isPairs?: boolean
   isKey?: boolean
+  value?: any
 }
 export type MethodSelect = {
   label: string
-  call: string
-  inputs: MethodType[]
+  call?: string
+  inputs?: MethodType[]
   hasSpecs?: LSPType[]
-  defaults?: any[]
 }
 
 type TransactionParams = {
@@ -77,7 +77,7 @@ const from = ref<string>(getState('address'))
 const to = ref<string | undefined>('0x4658F1Ac64486827f59E637bE9800Eb035b6f43C')
 
 const amount = ref(0.1)
-const data = ref('')
+const data = ref<string>('')
 const hasData = ref(false)
 const isPending = ref(false)
 const selectedData = ref<TransactionSelect>()
@@ -160,50 +160,50 @@ const selectedMethod = ref<MethodSelect>()
 
 const methods: MethodSelect[] = [
   {
-    label: 'Transfer 1 ERC20',
+    label: '💰 Transfer',
+  },
+  {
+    label: '💰 Transfer 1 ERC20',
     call: 'transfer',
     inputs: [
       { type: 'address', name: 'to' },
-      { type: 'uint256', name: 'amount', isWei: true },
+      { type: 'uint256', name: 'amount', isWei: true, value: '1' },
     ],
     hasSpecs: [LSPType.ERC20],
-    defaults: [, toWei('1')],
   },
   {
-    label: 'Mint 100 ERC20/ERC777',
+    label: '🏦 Mint 100 ERC20/ERC777',
     call: 'mint',
     hasSpecs: [LSPType.ERC777, LSPType.ERC20],
     inputs: [
       { type: 'address', name: 'to' },
-      { type: 'uint256', name: 'amount' },
+      { type: 'uint256', name: 'amount', value: '100' },
     ],
-    defaults: [, toWei('100')],
   },
   {
-    label: 'TransferFrom 1 ERC721',
+    label: '💰 TransferFrom 1 ERC721',
     call: 'transferFrom',
     inputs: [
       { type: 'address', name: 'from' },
       { type: 'address', name: 'to' },
-      { type: 'uint256', name: 'amount', isWei: true },
+      { type: 'uint256', name: 'amount', isWei: true, value: '1' },
     ],
     hasSpecs: [LSPType.ERC721],
-    defaults: [, , toWei('1')],
   },
   {
-    label: 'Transfer 1 LSP7',
+    label: '💰 Transfer 1 LSP7',
     call: 'transfer',
     inputs: [
       { type: 'address', name: 'from' },
       { type: 'address', name: 'to' },
       { type: 'uint256', name: 'amount', isWei: true },
-      { type: 'bool', name: 'force' },
+      { type: 'bool', name: 'force', value: false },
       { type: 'bytes', name: 'data' },
     ],
     hasSpecs: [LSPType.LSP7DigitalAsset, LSPType.LSP8IdentifiableDigitalAsset],
   },
   {
-    label: 'Transfer 1 LSP8',
+    label: '💰 Transfer 1 LSP8',
     call: 'transfer',
     inputs: [
       {
@@ -212,24 +212,22 @@ const methods: MethodSelect[] = [
       },
       { type: 'address', name: 'to' },
       { type: 'bytes32', name: 'tokenId' },
-      { type: 'bool', name: 'force' },
-      { type: 'bytes', name: 'data' },
+      { type: 'bool', name: 'force', value: false },
+      { type: 'bytes', name: 'data', value: '0x' },
     ],
-    defaults: [, , , false, '0x'],
   },
   {
-    label: 'Send 100 ERC777',
+    label: '💰 Send 100 ERC777',
     call: 'send',
     hasSpecs: [LSPType.ERC777],
     inputs: [
       { type: 'address', name: 'to' },
-      { type: 'uint256', name: 'amount', isWei: true },
-      { type: 'bytes', name: 'data' },
+      { type: 'uint256', name: 'amount', isWei: true, value: '1' },
+      { type: 'bytes', name: 'data', value: '0x' },
     ],
-    defaults: [, toWei('1'), '0x'],
   },
   {
-    label: 'SetData',
+    label: '🎛️ SetData',
     call: 'setData',
     hasSpecs: [
       LSPType.UP,
@@ -249,26 +247,32 @@ const methods: MethodSelect[] = [
     ],
   },
   {
-    label: 'Sample call data',
+    label: '🦾 Sample call data',
     call: 'init',
     inputs: [
-      { type: 'address[]', name: 'addresses' },
-      { type: 'bytes32', name: 'data' },
-      { type: 'uint256[]', name: 'numbers' },
-      { type: 'bool', name: 'force' },
-      { type: 'string', name: 'scream' },
-      { type: 'string', name: 'description' },
-    ],
-    defaults: [
-      [
-        '0x69909C12C875271AdC49155Cc8D01dBF67FE82f1',
-        '0xB27F5845E6Ce846C02209Bd2497780099611b9a0',
-      ],
-      '0x40b8bec57d7b5ff0dbd9e9acd0a47dfeb0101e1a203766f5ccab00445fbf39e9',
-      [2345675643, 123292],
-      true,
-      'Hello!',
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.',
+      {
+        type: 'address[]',
+        name: 'addresses',
+        value: [
+          '0x69909C12C875271AdC49155Cc8D01dBF67FE82f1',
+          '0xB27F5845E6Ce846C02209Bd2497780099611b9a0',
+        ],
+      },
+      {
+        type: 'bytes32',
+        name: 'data',
+        value:
+          '0x40b8bec57d7b5ff0dbd9e9acd0a47dfeb0101e1a203766f5ccab00445fbf39e9',
+      },
+      { type: 'uint256[]', name: 'numbers', value: [2345675643, 123292] },
+      { type: 'bool', name: 'force', value: true },
+      { type: 'string', name: 'scream', value: 'Hello!' },
+      {
+        type: 'string',
+        name: 'description',
+        value:
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.',
+      },
     ],
   },
 ]
@@ -618,31 +622,6 @@ const sampleData = computed((): { [key: string]: TransactionSelect[] } => {
   }
 })
 
-const selectData = (event: Event) => {
-  const value = (event.target as HTMLSelectElement).value
-  if (!value) {
-    return
-  }
-  if (!sampleData.value) {
-    return
-  }
-  const [name, index] = value.split(':')
-  const items = sampleData.value[name]
-  if (!items) {
-    return
-  }
-  const item = items[parseInt(index, 10)]
-  if (!item) {
-    return
-  }
-  selectedData.value = item
-  populateData(true)
-}
-
-const handleToParamSelected = (info: TokenInfo) => {
-  toParam.value = info.address
-}
-
 const handleToSelected = (info: TokenInfo) => {
   to.value = info.address
 }
@@ -716,24 +695,35 @@ const send = async () => {
   }
 }
 
-const selectMethod = (e: Event) => {
-  const value = parseInt((e.target as HTMLInputElement).value, 10)
-  selectedMethod.value = methods[value]
-}
-
 onMounted(() => {
   calcData(sampleData.value.LYX[0])
 })
 
-const params = ref<any[]>([[], , [], false, 'something', 'else'])
-const paramDefs = ref<MethodType[]>([
-  { type: 'address[]', name: 'addresses' },
-  { type: 'bytes32', name: 'data' },
-  { type: 'uint256[]', name: 'numbers', isWei: 'ether' },
-  { type: 'bool', name: 'force' },
-  { type: 'string', name: 'scream' },
-  { type: 'string', name: 'description' },
+const method = reactive<MethodSelect>(methods[0])
+const params = reactive<MethodType[]>([
+  { type: 'address', name: 'from' },
+  { type: 'address', name: 'to' },
+  { type: 'uint256', isWei: true, name: 'amount', value: '0.1' },
 ])
+
+const selectMethod = (e: Event) => {
+  const value = parseInt((e.target as HTMLInputElement).value, 10)
+  Object.entries(methods[value]).forEach(([key, val]) => {
+    ;(method as any)[key] = val
+  })
+}
+
+const handleData = (e?: string) => (data.value = e || '')
+
+// const params = ref<any[]>([[], , [], false, 'something', 'else'])
+// const paramDefs = ref<MethodType[]>([
+//   { type: 'address[]', name: 'addresses' },
+//   { type: 'bytes32', name: 'data' },
+//   { type: 'uint256[]', name: 'numbers', isWei: 'ether' },
+//   { type: 'bool', name: 'force' },
+//   { type: 'string', name: 'scream' },
+//   { type: 'string', name: 'description' },
+// ])
 </script>
 
 <template>
@@ -754,40 +744,12 @@ const paramDefs = ref<MethodType[]>([
         </div>
       </div>
 
-      <div class="field">
-        <div class="select is-fullwidth mb-2">
-          <select data-testid="preset" @change="selectData">
-            <optgroup
-              v-for="(group, name) in sampleData"
-              :key="name"
-              :label="name.toString()"
-            >
-              <option
-                v-for="({ label }, index) of group"
-                :key="index"
-                :value="name + ':' + index"
-              >
-                {{ label }}
-              </option>
-            </optgroup>
-          </select>
-        </div>
-      </div>
-
+      <ContractFunction v-model="params" :only-params="true" :custom="true" />
       <div class="field">
         <label class="label">From (defaults to injected address)</label>
         <div class="control">
           <input v-model="from" class="input is-family-code" type="text" />
         </div>
-      </div>
-      <div v-if="hasFromParam" class="field">
-        <label class="label">From Param</label>
-        <div class="control">
-          <input v-model="fromParam" class="input is-family-code" type="text" />
-        </div>
-        <p v-if="errors.fromParam" class="help is-danger">
-          {{ errors.fromParam }}
-        </p>
       </div>
       <div class="field">
         <label class="label">To</label>
@@ -797,7 +759,6 @@ const paramDefs = ref<MethodType[]>([
           :address="to"
           @option-selected="handleToSelected"
         />
-
         <div class="control">
           <input
             v-model="to"
@@ -808,29 +769,6 @@ const paramDefs = ref<MethodType[]>([
           />
         </div>
       </div>
-
-      <div v-if="hasToParam" class="field">
-        <label class="label">To Param</label>
-        <LSPSelect
-          :show-up="true"
-          :show-any="true"
-          :address="toParam"
-          @option-selected="handleToParamSelected"
-        />
-        <div class="control">
-          <input v-model="toParam" class="input is-family-code" type="text" />
-        </div>
-        <p v-if="errors.toParam" class="help is-danger">
-          {{ errors.toParam }}
-        </p>
-      </div>
-      <div v-if="hasForce" class="field">
-        <label class="checkbox">
-          <input v-model="force" type="checkbox" :value="force" />
-          Force Param
-        </label>
-      </div>
-
       <div class="field">
         <label class="label">Amount</label>
         <div class="control columns">
@@ -844,17 +782,6 @@ const paramDefs = ref<MethodType[]>([
             />
           </div>
         </div>
-      </div>
-      <div class="field">
-        <label class="checkbox">
-          <input
-            v-model="hasData"
-            type="checkbox"
-            :value="hasData"
-            data-testid="hasData"
-          />
-          with data
-        </label>
       </div>
       <div v-if="hasData" class="field">
         <label class="label">Data (optional)</label>
@@ -884,7 +811,13 @@ const paramDefs = ref<MethodType[]>([
         >.
       </div>
 
-      <ParamFields v-model="params" :info="paramDefs" />
+      <ContractFunction
+        v-if="method.call"
+        v-model="method.inputs"
+        :call="method.call"
+        :on-update:data="handleData"
+        custom
+      />
       <div class="field">
         <Notifications
           v-if="hasNotification"

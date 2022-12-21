@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { TokenInfo } from '@/stores'
-import { reactive } from 'vue'
+import { reactive, computed, watch } from 'vue'
 import { toWei, Unit } from 'web3-utils'
 import ERC725 from '@erc725/erc725.js'
 import LSPSelect from './LSPSelect.vue'
@@ -8,17 +8,19 @@ import { MethodType } from '../endpoints/SendTransaction.vue'
 import { BN } from 'bn.js'
 
 interface ElementType {
-  error: string | undefined
+  error?: string | undefined
   value: any
 }
 type Props = {
   info: MethodType
   modelValue: any
+  custom?: boolean
 }
 
 type Emits = {
   (event: 'update:modelValue', value: any): void
   (event: 'update:error', value: boolean): void
+  (event: 'update:isWei', value?: boolean | Unit): void
   (event: 'remove', index: number): void
   (event: 'add', index: number): void
 }
@@ -26,13 +28,30 @@ type Emits = {
 const props = defineProps<Props>()
 const emits = defineEmits<Emits>()
 
-const isArray = props.info.type.match(/\[\]$/)
+const isArray = computed<boolean>(() => props.info.type.match(/\[\]$/) != null)
 
-function makeWei(value: string) {
-  if (typeof props.info.isWei === 'string') {
-    return toWei(value, props.info.isWei as Unit)
+function makeWei(value: string, hex = false) {
+  try {
+    const val =
+      typeof props.info.isWei === 'string'
+        ? toWei(value, props.info.isWei as Unit)
+        : toWei(value)
+    if (hex) {
+      return `0x${new BN(val).toString('hex')}`
+    }
+    return val
+  } catch (err) {
+    return ''
   }
-  return toWei(value)
+}
+
+function handleUnits(e: Event) {
+  const { value } = e.target as HTMLSelectElement
+  if (!value) {
+    emits('update:isWei')
+    return
+  }
+  emits('update:isWei', value as Unit)
 }
 
 function validate(value: any): { value: any; error?: string } {
@@ -51,6 +70,49 @@ function validate(value: any): { value: any; error?: string } {
       }
       return { value, error: 'Invalid bytes value' }
     case 'uint256':
+    case 'uint128':
+    case 'uint64':
+    case 'uint32':
+    case 'uint16':
+    case 'uint8':
+      if (props.info.isWei) {
+        try {
+          const val = makeWei(value)
+          if (/^-/.test(val)) {
+            throw new Error('Unsigned numbers cannot be negative')
+          }
+        } catch (err) {
+          return { value, error: (err as Error).message }
+        }
+        return { value }
+      }
+      if (/^(0x)?[0-9a-f]{64}$/i.test(value)) {
+        if (!/^0x/.test(value)) {
+          return { value: `0x${value}` }
+        }
+        return { value }
+      }
+      try {
+        if (!/^[0-9_]+$/.test(value)) {
+          throw new Error('Invalid number format')
+        }
+        const val = new BN(value)
+        if (val.toString() !== value) {
+          throw new Error('Number did not fully parse')
+        }
+        if (val.isNeg()) {
+          throw new Error('Unsigned numbers cannot be negative')
+        }
+      } catch (err) {
+        return { value, error: (err as Error).message }
+      }
+      return { value }
+    case 'int256':
+    case 'int128':
+    case 'int64':
+    case 'int32':
+    case 'int16':
+    case 'int8':
       if (props.info.isWei) {
         try {
           makeWei(value)
@@ -66,6 +128,9 @@ function validate(value: any): { value: any; error?: string } {
         return { value }
       }
       try {
+        if (!/^-?[0-9_]+$/.test(value)) {
+          throw new Error('Invalid number format')
+        }
         const val = new BN(value)
         if (val.toString() !== value) {
           throw new Error('Number did not fully parse')
@@ -96,22 +161,26 @@ function validate(value: any): { value: any; error?: string } {
   return { value, error: `Unsupported type ${props.info.type}` }
 }
 
-function convert() {
-  const values = isArray
-    ? ((props.modelValue || []) as any[])
-    : [props.modelValue]
-  const items = values.map(value => ({ value, error: undefined }))
-  return { items }
+function convert(modelValue: any): ElementType[] {
+  const values = isArray.value ? ((modelValue || []) as any[]) : [modelValue]
+  return values.map<ElementType>(value => validate(value))
 }
 
 const data = reactive<{
   items: ElementType[]
-}>(convert())
+}>({ items: convert(props.modelValue) })
+
+watch(
+  () => props.modelValue,
+  value => {
+    data.items = convert(value)
+  }
+)
 
 function handleAdd(index: number) {
   const { value, error } = validate(undefined)
   const items = data.items
-  items.splice(index, 0, {
+  items.splice(index + 1, 0, {
     value,
     error,
   })
@@ -124,11 +193,14 @@ function handleRemove(index: number) {
 
 const handleChange = (index: number, e: Event) => {
   let { value } = e.target as HTMLInputElement
+  const item = data.items[index]
+  if (value === item.value) {
+    return
+  }
   const { value: newValue, error: newError } = validate(value)
   if (newValue !== value) {
     value = newValue
   }
-  const item = data.items[index]
   item.value = value
   if (newError) {
     item.error = newError
@@ -136,7 +208,7 @@ const handleChange = (index: number, e: Event) => {
   } else {
     emits(
       'update:modelValue',
-      isArray ? data.items.map(({ value }) => value) : item.value
+      isArray.value ? data.items.map(({ value }) => value) : item.value
     )
     if (item.error) {
       item.error = undefined
@@ -150,7 +222,20 @@ const handleSelected = (index: number, info: TokenInfo) => {
   const item = data.items[index]
   const { value, error } = validate(info.address)
   item.value = value
-  item.error = error
+  if (error) {
+    item.error = error
+    emits('update:error', true)
+  } else {
+    emits(
+      'update:modelValue',
+      isArray.value ? data.items.map(({ value }) => value) : item.value
+    )
+    if (item.error) {
+      item.error = undefined
+      const hasError = data.items.some(({ error }) => error != null)
+      emits('update:error', hasError)
+    }
+  }
 }
 
 const shouldWei = (index: number) => {
@@ -175,14 +260,48 @@ const hasError = (index: number) => {
           : props.info.name
       }}
       ({{ props.info.type.replace(/\[\]$/, '')
-      }}{{
-        props.info.isWei
+      }}<select
+        v-if="props.custom && props.info.type.match(/^u?int256/)"
+        :value="props.info.isWei === true ? 'wei' : props.info.isWei"
+        class="ml-1"
+        @change="handleUnits"
+      >
+        <option value="">-int-</option>
+        <option value="noether">noether</option>
+        <option value="wei">wei</option>
+        <option value="kwei">kwei</option>
+        <option value="Kwei">Kwei</option>
+        <option value="babbage">babbage</option>
+        <option value="femtoether">femtoether</option>
+        <option value="mwei">mwei</option>
+        <option value="Mwei">Mwei</option>
+        <option value="lovelace">lovelace</option>
+        <option value="picoether">picoether</option>
+        <option value="gwei">gwei</option>
+        <option value="Gwei">Gwei</option>
+        <option value="shannon">shannon</option>
+        <option value="nanoether">nanoether</option>
+        <option value="nano">nano</option>
+        <option value="szabo">szabo</option>
+        <option value="microether">microether</option>
+        <option value="micro">micro</option>
+        <option value="finney">finney</option>
+        <option value="milliether">milliether</option>
+        <option value="milli">milli</option>
+        <option value="ether">ether</option>
+        <option value="kether">kether</option>
+        <option value="grand">grand</option>
+        <option value="mether">mether</option>
+        <option value="gether">gether</option>
+        <option value="tether">tether</option></select
+      >{{
+        !props.custom && props.info.isWei
           ? typeof props.info.isWei === 'string'
             ? ` ${props.info.isWei}`
             : ' WEI'
           : ''
-      }})</label
-    >
+      }})
+    </label>
     <LSPSelect
       v-if="props.info.type.match(/^address/)"
       :show-types="props.info.hasSpecs"
@@ -196,19 +315,25 @@ const hasError = (index: number) => {
         type="text"
         @input="e => handleChange(index, e)"
       />
-      <span v-if="props.info.isWei" class="icon is-small is-right">
-        <i class="fas fa-envelope">{{
-          props.info.isWei
-            ? typeof props.info.isWei === 'string'
-              ? props.info.isWei
-              : 'WEI'
-            : ''
-        }}</i>
+      <span
+        v-if="props.info.isWei"
+        class="icon is-small is-right"
+        style="width: 5em"
+      >
+        <i class="fas fa-envelope">
+          {{
+            props.info.isWei
+              ? typeof props.info.isWei === 'string'
+                ? props.info.isWei
+                : 'WEI'
+              : ''
+          }}</i
+        >
       </span>
     </div>
 
     <p v-if="shouldWei(index)" class="help">
-      actual value {{ makeWei(item.value) }}
+      actual value {{ makeWei(item.value) }} ({{ makeWei(item.value, true) }})
     </p>
     <p v-if="hasError(index)" class="help is-danger">{{ hasError(index) }}</p>
     <div v-if="isArray" class="mt-1">
