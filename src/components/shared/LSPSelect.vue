@@ -17,6 +17,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 type Props = {
   address?: string
   type?: LSPType
+  showTypes?: LSPType[]
   showUp?: boolean
   showAny?: boolean
   showLspType?: boolean
@@ -35,7 +36,12 @@ const data = computed<{ [key: string]: TokenInfo[] }>(() => {
   const data: { [key: string]: TokenInfo[] } = {}
   let items: TokenInfo[]
 
-  if (props.showUp || props.showAccounts) {
+  if (
+    props.showUp ||
+    props.showAccounts ||
+    props.showTypes?.includes(LSPType.UP) ||
+    props.showTypes == null
+  ) {
     items = data[LSPType.UP] = []
     items.push({
       type: LSPType.UP,
@@ -49,14 +55,25 @@ const data = computed<{ [key: string]: TokenInfo[] }>(() => {
     })
   }
 
-  if (props.showAny || props.showAccounts) {
+  if (
+    props.showAny ||
+    props.showAccounts ||
+    props.showTypes?.includes(LSPType.SC) ||
+    props.showTypes == null
+  ) {
     items = data[LSPType.SC] = []
     items.push({
       type: LSPType.SC,
       address: sampleSC,
       label: `Sample SC ${sampleSC.substring(0, 10)}...`,
     })
-
+  }
+  if (
+    props.showAny ||
+    props.showAccounts ||
+    props.showTypes?.includes(LSPType.EoA) ||
+    props.showTypes == null
+  ) {
     items = data[LSPType.EoA] = []
     items.push({
       type: LSPType.EoA,
@@ -65,7 +82,11 @@ const data = computed<{ [key: string]: TokenInfo[] }>(() => {
     })
   }
 
-  if (props.showAny) {
+  if (
+    props.showAny ||
+    props.showTypes?.includes(LSPType.ERC20) ||
+    props.showTypes == null
+  ) {
     items = data[LSPType.ERC20] = []
     items.push({
       type: LSPType.ERC20,
@@ -80,7 +101,12 @@ const data = computed<{ [key: string]: TokenInfo[] }>(() => {
         10
       )}...`,
     })
-
+  }
+  if (
+    props.showAny ||
+    props.showTypes?.includes(LSPType.ERC777) ||
+    props.showTypes == null
+  ) {
     items = data[LSPType.ERC777] = []
     items.push({
       type: LSPType.ERC777,
@@ -98,7 +124,12 @@ const data = computed<{ [key: string]: TokenInfo[] }>(() => {
         10
       )}...`,
     })
-
+  }
+  if (
+    props.showAny ||
+    props.showTypes?.includes(LSPType.ERC721) ||
+    props.showTypes == null
+  ) {
     items = data[LSPType.ERC721] = []
     items.push({
       type: LSPType.ERC721,
@@ -110,40 +141,56 @@ const data = computed<{ [key: string]: TokenInfo[] }>(() => {
     })
   }
 
-  let children = getState('lsp7')
-  if (children.length > 0 || props.showLspType) {
-    items = data[LSPType.LSP7DigitalAsset] = []
-    if (props.showLspType) {
-      items.push({ type: LSPType.LSP7DigitalAsset, label: 'Any LSP7' })
+  let children
+  if (
+    props.showTypes ? props.showTypes.includes(LSPType.LSP7DigitalAsset) : true
+  ) {
+    children = getState('lsp7')
+    if (children.length > 0 || props.showLspType) {
+      items = data[LSPType.LSP7DigitalAsset] = []
+      if (props.showLspType) {
+        items.push({ type: LSPType.LSP7DigitalAsset, label: 'Any LSP7' })
+      }
+      items.push(...children)
     }
-    items.push(...children)
   }
-
-  children = getState('lsp8')
-  if (children.length > 0 || props.showLspType) {
-    items = data[LSPType.LSP8IdentifiableDigitalAsset] = []
-    if (props.showLspType) {
-      items.push({
-        type: LSPType.LSP8IdentifiableDigitalAsset,
-        label: 'Any LSP8',
-      })
+  if (
+    props.showTypes
+      ? props.showTypes.includes(LSPType.LSP8IdentifiableDigitalAsset)
+      : true
+  ) {
+    children = getState('lsp8')
+    if (children.length > 0 || props.showLspType) {
+      items = data[LSPType.LSP8IdentifiableDigitalAsset] = []
+      if (props.showLspType) {
+        items.push({
+          type: LSPType.LSP8IdentifiableDigitalAsset,
+          label: 'Any LSP8',
+        })
+      }
+      items.push(...children)
     }
-    items.push(...children)
   }
-
   return data
 })
 
-const handleChange = (e: Event) => {
-  const item: TokenInfo | undefined = Object.entries(data.value)
-    .map(([, items]: [string, TokenInfo[]]) =>
-      items.find(
+const findItem = (value: string): TokenInfo | undefined => {
+  const items = Object.entries(data.value)
+    .map(([, items]: [string, TokenInfo[]]) => {
+      const found = items.find(
         ({ address, type }) =>
-          [address, type].indexOf((e?.target as any)?.value) !== -1
+          address?.toLowerCase() === value.toLowerCase() || type === value
       )
-    )
+      console.log('found', found)
+      return found
+    })
     .find((item: TokenInfo | undefined) => item != null)
+  console.log('found', items)
+  return items
+}
 
+const handleChange = (e: Event) => {
+  const item = findItem((e?.target as any)?.value)
   if (item) {
     emits('optionSelected', item)
   }
@@ -175,8 +222,19 @@ const selectFirst = () => {
 }
 
 watch(
+  () => data,
   () => {
-    return getState('lsp7').concat(getState('lsp8'))
+    if (selected.value && !findItem(selected.value)) {
+      selectFirst()
+    }
+  }
+)
+
+watch(
+  () => {
+    return getState('lsp7')
+      .concat(getState('lsp8'))
+      .concat([getState('address')])
   },
   () => {
     if (!selected.value) {

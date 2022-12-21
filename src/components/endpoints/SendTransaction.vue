@@ -17,6 +17,7 @@ import {
   lsp7TokenDivisible,
   lsp7TokenNonDivisible,
   erc721TokenWithEip165,
+  LSPType,
 } from '@/stores'
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
@@ -25,6 +26,24 @@ import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
 import ERC725, { ERC725JSONSchema } from '@erc725/erc725.js'
 import lsp3Schema from '@erc725/erc725.js/schemas/LSP3UniversalProfileMetadata.json'
 import LSPSelect from '../shared/LSPSelect.vue'
+import ParamFields from '../shared/ParamFields.vue'
+
+export type MethodType = {
+  label?: string
+  type: string
+  name: string
+  isWei?: boolean | string
+  hasSpecs?: LSPType[]
+  isPairs?: boolean
+  isKey?: boolean
+}
+export type MethodSelect = {
+  label: string
+  call: string
+  inputs: MethodType[]
+  hasSpecs?: LSPType[]
+  defaults?: any[]
+}
 
 type TransactionParams = {
   toParam?: string
@@ -56,6 +75,7 @@ const { eth } = getWeb3()
 
 const from = ref<string>(getState('address'))
 const to = ref<string | undefined>('0x4658F1Ac64486827f59E637bE9800Eb035b6f43C')
+
 const amount = ref(0.1)
 const data = ref('')
 const hasData = ref(false)
@@ -135,6 +155,123 @@ function calcData(options: TransactionSelect) {
   }
   return { data, errors, hasError }
 }
+
+const selectedMethod = ref<MethodSelect>()
+
+const methods: MethodSelect[] = [
+  {
+    label: 'Transfer 1 ERC20',
+    call: 'transfer',
+    inputs: [
+      { type: 'address', name: 'to' },
+      { type: 'uint256', name: 'amount', isWei: true },
+    ],
+    hasSpecs: [LSPType.ERC20],
+    defaults: [, toWei('1')],
+  },
+  {
+    label: 'Mint 100 ERC20/ERC777',
+    call: 'mint',
+    hasSpecs: [LSPType.ERC777, LSPType.ERC20],
+    inputs: [
+      { type: 'address', name: 'to' },
+      { type: 'uint256', name: 'amount' },
+    ],
+    defaults: [, toWei('100')],
+  },
+  {
+    label: 'TransferFrom 1 ERC721',
+    call: 'transferFrom',
+    inputs: [
+      { type: 'address', name: 'from' },
+      { type: 'address', name: 'to' },
+      { type: 'uint256', name: 'amount', isWei: true },
+    ],
+    hasSpecs: [LSPType.ERC721],
+    defaults: [, , toWei('1')],
+  },
+  {
+    label: 'Transfer 1 LSP7',
+    call: 'transfer',
+    inputs: [
+      { type: 'address', name: 'from' },
+      { type: 'address', name: 'to' },
+      { type: 'uint256', name: 'amount', isWei: true },
+      { type: 'bool', name: 'force' },
+      { type: 'bytes', name: 'data' },
+    ],
+    hasSpecs: [LSPType.LSP7DigitalAsset, LSPType.LSP8IdentifiableDigitalAsset],
+  },
+  {
+    label: 'Transfer 1 LSP8',
+    call: 'transfer',
+    inputs: [
+      {
+        type: 'address',
+        name: 'from',
+      },
+      { type: 'address', name: 'to' },
+      { type: 'bytes32', name: 'tokenId' },
+      { type: 'bool', name: 'force' },
+      { type: 'bytes', name: 'data' },
+    ],
+    defaults: [, , , false, '0x'],
+  },
+  {
+    label: 'Send 100 ERC777',
+    call: 'send',
+    hasSpecs: [LSPType.ERC777],
+    inputs: [
+      { type: 'address', name: 'to' },
+      { type: 'uint256', name: 'amount', isWei: true },
+      { type: 'bytes', name: 'data' },
+    ],
+    defaults: [, toWei('1'), '0x'],
+  },
+  {
+    label: 'SetData',
+    call: 'setData',
+    hasSpecs: [
+      LSPType.UP,
+      LSPType.LSP3UniversalProfileMetadata,
+      LSPType.LSP7DigitalAsset,
+      LSPType.LSP8IdentifiableDigitalAsset,
+      LSPType.LSP9Vault,
+    ],
+    inputs: [
+      {
+        type: 'bytes32[]',
+        name: 'keys',
+        isPairs: true,
+        isKey: true,
+      },
+      { type: 'bytes[]', name: 'values', isPairs: true },
+    ],
+  },
+  {
+    label: 'Sample call data',
+    call: 'init',
+    inputs: [
+      { type: 'address[]', name: 'addresses' },
+      { type: 'bytes32', name: 'data' },
+      { type: 'uint256[]', name: 'numbers' },
+      { type: 'bool', name: 'force' },
+      { type: 'string', name: 'scream' },
+      { type: 'string', name: 'description' },
+    ],
+    defaults: [
+      [
+        '0x69909C12C875271AdC49155Cc8D01dBF67FE82f1',
+        '0xB27F5845E6Ce846C02209Bd2497780099611b9a0',
+      ],
+      '0x40b8bec57d7b5ff0dbd9e9acd0a47dfeb0101e1a203766f5ccab00445fbf39e9',
+      [2345675643, 123292],
+      true,
+      'Hello!',
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.',
+    ],
+  },
+]
 
 const sampleData = computed((): { [key: string]: TransactionSelect[] } => {
   const currentUP = getState('address')
@@ -579,15 +716,44 @@ const send = async () => {
   }
 }
 
+const selectMethod = (e: Event) => {
+  const value = parseInt((e.target as HTMLInputElement).value, 10)
+  selectedMethod.value = methods[value]
+}
+
 onMounted(() => {
   calcData(sampleData.value.LYX[0])
 })
+
+const params = ref<any[]>([[], , [], false, 'something', 'else'])
+const paramDefs = ref<MethodType[]>([
+  { type: 'address[]', name: 'addresses' },
+  { type: 'bytes32', name: 'data' },
+  { type: 'uint256[]', name: 'numbers', isWei: 'ether' },
+  { type: 'bool', name: 'force' },
+  { type: 'string', name: 'scream' },
+  { type: 'string', name: 'description' },
+])
 </script>
 
 <template>
   <div class="tile is-4 is-parent">
     <div class="tile is-child box">
       <p class="is-size-5 has-text-weight-bold mb-4">Transaction</p>
+      <div class="field">
+        <div class="select is-fullwidth mb-2">
+          <select @change="selectMethod">
+            <option
+              v-for="({ label }, index) of methods"
+              :key="index"
+              :value="index"
+            >
+              {{ label }}
+            </option>
+          </select>
+        </div>
+      </div>
+
       <div class="field">
         <div class="select is-fullwidth mb-2">
           <select data-testid="preset" @change="selectData">
@@ -718,6 +884,7 @@ onMounted(() => {
         >.
       </div>
 
+      <ParamFields v-model="params" :info="paramDefs" />
       <div class="field">
         <Notifications
           v-if="hasNotification"
