@@ -246,6 +246,15 @@ watch(
   }
 )
 
+watch(
+  () => props.showTypes,
+  () => {
+    if (!selected.value) {
+      selectFirst()
+    }
+  }
+)
+
 onMounted(() => {
   selectFirst()
 })

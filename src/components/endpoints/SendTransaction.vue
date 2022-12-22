@@ -211,12 +211,23 @@ const selectMethod = (e: Event) => {
   Object.entries(item).forEach(([key, val]) => {
     ;(method.item as any)[key] = val
   })
+  console.log('selectMethod', item)
+  params.items = params.items.map((param, index) => {
+    if (index === 1) {
+      if (
+        param.hasSpecs?.length !== item.hasSpecs?.length ||
+        param.hasSpecs?.some((v, i) => item.hasSpecs?.[i] !== v)
+      ) {
+        param.hasSpecs = item.hasSpecs
+        param.value = undefined
+      }
+    }
+    return { ...param }
+  })
   hasData.value = item.call != null
-  params.items[1].hasSpecs = item.hasSpecs
 }
 
 const handleData = (e?: string) => {
-  console.log('data', e)
   data.value = e || ''
 }
 </script>

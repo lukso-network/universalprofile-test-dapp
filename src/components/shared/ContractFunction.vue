@@ -134,10 +134,10 @@ const decodeData = async (data: string): Promise<MethodSelect> => {
 }
 
 function convertModel(model?: MethodType[]) {
-  return (
+  model =
     model?.map((info: MethodType) => {
-      let value = info.value || undefined
-      if (info.type.match(/\[\]$/) && !value) {
+      let value = info.value ?? undefined
+      if (info.type.match(/\[\]$/) && value == null) {
         value = []
       }
       return {
@@ -146,7 +146,7 @@ function convertModel(model?: MethodType[]) {
         error: false,
       }
     }) || []
-  )
+  return model
 }
 
 const data = reactive<{ call?: string; items: ElementType[] }>({
