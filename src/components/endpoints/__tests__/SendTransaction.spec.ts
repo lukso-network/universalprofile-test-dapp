@@ -1,5 +1,5 @@
 import SendTransaction from '../SendTransaction.vue'
-import { render, fireEvent, screen, waitFor } from '@testing-library/vue'
+import { render, fireEvent, screen } from '@testing-library/vue'
 import { setState } from '@/stores'
 import userEvent from '@testing-library/user-event'
 
