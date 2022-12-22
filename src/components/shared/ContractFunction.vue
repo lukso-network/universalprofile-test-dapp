@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import useWeb3 from '@/compositions/useWeb3'
-import { reactive, computed } from 'vue'
+import { reactive, computed, watch, onMounted } from 'vue'
 import { toWei, Unit } from 'web3-utils'
 import { MethodType } from '../endpoints/SendTransaction.vue'
 import ParamField from './ParamField.vue'
@@ -13,6 +13,7 @@ type Props = {
   modelValue?: MethodType[]
   custom?: boolean
   onlyParams?: boolean
+  hideData?: boolean
 }
 
 type Emits = {
@@ -135,16 +136,20 @@ function handleCall(e: Event) {
 const output = computed<{ error: boolean; value: string }>(() => {
   try {
     const output = `${eth.abi.encodeFunctionSignature(
-        `${data.call}(${data.items.map(({ type }) => type).join(',')})`
-      )}${eth.abi
-        .encodeParameters(
-          data.items.map(({ type }) => type),
-          data.items.map(({ value, type, isWei }) =>
+      `${data.call}(${data.items.map(({ type }) => type).join(',')})`
+    )}${eth.abi
+      .encodeParameters(
+        data.items.map(({ type }) => type),
+        data.items.map(({ value, type, isWei }) => {
+          const makeItem = (value: any) =>
             /^bytes/.test(type) ? value ?? '0x' : makeValue(value, isWei) || ''
-          )
-        )
-        .substring(2)}`
-    emits('update:data', output)
+          if (/\[\]$/.test(type)) {
+            return value.map(makeItem)
+          }
+          return makeItem(value)
+        })
+      )
+      .substring(2)}`
     return {
       error: false,
       value: output,
@@ -152,6 +157,21 @@ const output = computed<{ error: boolean; value: string }>(() => {
   } catch (err) {
     console.error(err, data.items)
     return { error: true, value: (err as Error).message }
+  }
+})
+
+watch(
+  () => output.value,
+  ({ value }) => {
+    emits('update:data', value)
+    console.log('data', value)
+  }
+)
+
+onMounted(() => {
+  const { value } = output.value || {}
+  if (value) {
+    emits('update:data', value)
   }
 })
 </script>
@@ -163,7 +183,7 @@ const output = computed<{ error: boolean; value: string }>(() => {
         !props.custom ? `Function ${call}` : 'Function'
       }}</label>
       <div v-if="props.custom" class="field">
-        <textarea class="textarea" :value="call" @change="handleCall" />
+        <input class="input" :value="call" @change="handleCall" />
       </div>
     </div>
     <div
@@ -181,7 +201,7 @@ const output = computed<{ error: boolean; value: string }>(() => {
       />
     </div>
     <div
-      v-if="!props.onlyParams"
+      v-if="!props.onlyParams && !props.hideData"
       :class="{ box: true, 'is-danger': output.error }"
     >
       <div style="overflow-wrap: anywhere">{{ output.value }}</div>

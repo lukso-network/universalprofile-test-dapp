@@ -11,6 +11,7 @@ interface ElementType {
   error?: string | undefined
   value: any
 }
+
 type Props = {
   info: MethodType
   modelValue: any
@@ -266,7 +267,7 @@ const hasError = (index: number) => {
         class="ml-1"
         @change="handleUnits"
       >
-        <option value="">-int-</option>
+        <option value="">- number -</option>
         <option value="noether">noether</option>
         <option value="wei">wei</option>
         <option value="kwei">kwei</option>

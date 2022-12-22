@@ -30,7 +30,7 @@ type Emits = {
 
 const emits = defineEmits<Emits>()
 const props = defineProps<Props>()
-const selected = ref<string | undefined>()
+const selected = ref<string | undefined>(props.address)
 
 const data = computed<{ [key: string]: TokenInfo[] }>(() => {
   const data: { [key: string]: TokenInfo[] } = {}
@@ -181,11 +181,9 @@ const findItem = (value: string): TokenInfo | undefined => {
         ({ address, type }) =>
           address?.toLowerCase() === value.toLowerCase() || type === value
       )
-      console.log('found', found)
       return found
     })
     .find((item: TokenInfo | undefined) => item != null)
-  console.log('found', items)
   return items
 }
 
@@ -196,16 +194,16 @@ const handleChange = (e: Event) => {
   }
 }
 
-watch(
-  () => props.address,
-  address => {
-    selected.value = address
-  }
-)
-
 const selectFirst = () => {
-  const first = Object.entries(data.value)[0]?.[1]?.find(
-    ({ address }) => address
+  const first: undefined | TokenInfo = Object.entries(data.value).reduce(
+    (first: undefined | TokenInfo, [_ignore, items]) => {
+      if (first) {
+        return first
+      }
+      const found = items.find(({ address }) => address != null)
+      return found
+    },
+    undefined
   )
   if (first) {
     selected.value = first.address
@@ -222,9 +220,14 @@ const selectFirst = () => {
 }
 
 watch(
-  () => data,
+  () => data.value,
   () => {
-    if (selected.value && !findItem(selected.value)) {
+    if (selected.value) {
+      const item = findItem(selected.value)
+      if (item) {
+        selected.value = item.address
+      }
+    } else if (!selected.value) {
       selectFirst()
     }
   }
