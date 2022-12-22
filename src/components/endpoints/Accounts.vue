@@ -63,6 +63,7 @@ const disconnect = async () => {
   setupWeb3(null)
 }
 const handleRefresh = (e: Event) => {
+  e.stopPropagation()
   recalcTokens()
 }
 </script>

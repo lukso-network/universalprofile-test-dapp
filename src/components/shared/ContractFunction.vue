@@ -16,6 +16,7 @@ type Props = {
   onlyParams?: boolean
   hideData?: boolean
   data?: string
+  testidPrefix?: string
 }
 
 type Emits = {
@@ -279,7 +280,6 @@ const output = computed<{ error: undefined | string; value: string }>(() => {
       value: output,
     }
   } catch (err) {
-    console.error(err)
     return { error: (err as Error).message, value: '' }
   }
 })
@@ -330,6 +330,7 @@ onMounted(() => {
         :model-value="item.value"
         :info="item"
         :custom="props.custom"
+        :testid-prefix="props.testidPrefix"
         @update:error="e => handleError(index, e)"
         @update:model-value="e => handleValue(index, e)"
         @update:is-wei="e => handleUnit(index, e)"

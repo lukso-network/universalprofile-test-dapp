@@ -196,7 +196,7 @@ const handleChange = (e: Event) => {
 
 const selectFirst = () => {
   const first: undefined | TokenInfo = Object.entries(data.value).reduce(
-    (first: undefined | TokenInfo, [_ignore, items]) => {
+    (first: undefined | TokenInfo, [, items]) => {
       if (first) {
         return first
       }
@@ -230,7 +230,7 @@ function triggerSelectFirst() {
       return
     }
     selectFirst()
-  }, 100)
+  }, 2)
 }
 
 watch(

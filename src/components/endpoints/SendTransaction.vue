@@ -54,7 +54,7 @@ const methods: MethodSelect[] = [
     hasSpecs: [LSPType.ERC777, LSPType.ERC20, LSPType.LSP7DigitalAsset],
     inputs: [
       { type: 'address', name: 'to' },
-      { type: 'uint256', name: 'amount', value: '100' },
+      { type: 'uint256', name: 'amount', isWei: 'ether', value: '100' },
     ],
   },
   {
@@ -73,14 +73,14 @@ const methods: MethodSelect[] = [
     inputs: [
       { type: 'address', name: 'from' },
       { type: 'address', name: 'to' },
-      { type: 'uint256', name: 'amount', isWei: 'ether' },
+      { type: 'uint256', name: 'amount', value: '1', isWei: 'ether' },
       { type: 'bool', name: 'force', value: false },
       { type: 'bytes', name: 'data', value: '0x' },
     ],
     hasSpecs: [LSPType.LSP7DigitalAsset, LSPType.LSP8IdentifiableDigitalAsset],
   },
   {
-    label: '🏦 Mint 1 LSP8',
+    label: '🏦 Mint LSP8',
     call: 'mint',
     inputs: [
       { type: 'address', name: 'to' },
@@ -238,7 +238,7 @@ const handleData = (e?: string) => {
       <p class="is-size-5 has-text-weight-bold mb-4">Transaction</p>
       <div class="field">
         <div class="select is-fullwidth mb-2">
-          <select @change="selectMethod">
+          <select data-testid="preset" @change="selectMethod">
             <option
               v-for="({ label }, index) of methods"
               :key="index"
@@ -253,6 +253,7 @@ const handleData = (e?: string) => {
       <ContractFunction
         v-model="params.items"
         :only-params="true"
+        testid-prefix="transaction-"
         :custom="true"
       />
       <div class="field">
@@ -268,6 +269,7 @@ const handleData = (e?: string) => {
         :call="method.item.call"
         custom
         :data="data"
+        testid-prefix="params-"
         :hide-data="true"
         @update:data="handleData"
       />

@@ -16,6 +16,7 @@ type Props = {
   info: MethodType
   modelValue: any
   custom?: boolean
+  testidPrefix?: string
 }
 
 type Emits = {
@@ -340,12 +341,14 @@ const hasError = (index: number) => {
         :value="item.value"
         class="input is-family-code"
         type="text"
+        :data-testid="props.testidPrefix + methodInfo.name"
         @input="e => handleChange(index, e)"
       />
       <label v-else class="label"
         ><input
           type="checkbox"
           :checked="item.value"
+          :data-testid="props.testidPrefix + methodInfo.name"
           @input="e => handleChange(index, e)"
         />&nbsp;{{
           methodInfo.label

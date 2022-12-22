@@ -1,5 +1,5 @@
 import SendTransaction from '../SendTransaction.vue'
-import { render, fireEvent, screen } from '@testing-library/vue'
+import { render, fireEvent, screen, waitFor } from '@testing-library/vue'
 import { setState } from '@/stores'
 import userEvent from '@testing-library/user-event'
 
@@ -87,8 +87,13 @@ test('can send transaction from preset', async () => {
 
   await userEvent.selectOptions(
     screen.getByTestId('preset'),
-    '🏦 Mint: 100 tokens B to current UP'
+    '🏦 Mint 100 ERC20/ERC777/LSP7'
   )
+  await userEvent.type(
+    screen.getByTestId('transaction-to'),
+    '0xB29c50a9F3D90FA3aDF394f2960BD6D8e0Ff5E9D'
+  )
+
   await fireEvent.click(screen.getByTestId('send'))
 
   expect(screen.getByTestId('notification')).toHaveTextContent(
@@ -98,7 +103,7 @@ test('can send transaction from preset', async () => {
     data: '0x40c10f19000000000000000000000000517216362d594516c6f96ee34b2c502d65b847e40000000000000000000000000000000000000000000000056bc75e2d63100000',
     from: '0x517216362D594516c6f96Ee34b2c502d65B847E4',
     to: '0xB29c50a9F3D90FA3aDF394f2960BD6D8e0Ff5E9D',
-    value: '0',
+    value: '100000000000000000',
     gas: 5000000,
     gasPrice: '10000000000',
   })
