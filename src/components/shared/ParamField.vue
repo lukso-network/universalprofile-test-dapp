@@ -354,7 +354,7 @@ const hasError = (index: number) => {
             ? `${methodInfo.name}[${index + 1}]`
             : methodInfo.name
         }}
-        ({{ methodInfo.type.replace(/\[\]$/, '') }}</label
+        ({{ methodInfo.type.replace(/\[\]$/, '') }})</label
       >
       <span
         v-if="methodInfo.isWei"
