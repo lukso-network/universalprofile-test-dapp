@@ -170,6 +170,7 @@ const send = async () => {
   clearNotification()
 
   const from = makeValue(params.items[0])
+  console.log('from', from, params.items)
   let transaction = {
     from,
     to: makeValue(params.items[1]),
@@ -199,7 +200,7 @@ const send = async () => {
 const method = reactive<{ item: MethodSelect }>({ item: methods[0] })
 const params = reactive<{ items: MethodType[] }>({
   items: [
-    { type: 'address', name: 'from' },
+    { type: 'address', name: 'from', value: getState('address') },
     { type: 'address', name: 'to' },
     { type: 'uint256', isWei: 'ether', name: 'amount', value: '0.1' },
   ],
@@ -258,7 +259,7 @@ const handleData = (e?: string) => {
       />
       <div class="field">
         <label class="checkbox">
-          <input v-model="hasData" type="checkbox" />
+          <input v-model="hasData" data-testid="hasData" type="checkbox" />
           Enable Data
         </label>
       </div>

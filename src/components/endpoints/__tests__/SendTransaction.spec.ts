@@ -1,5 +1,5 @@
 import SendTransaction from '../SendTransaction.vue'
-import { render, fireEvent, screen } from '@testing-library/vue'
+import { render, fireEvent, screen, waitFor } from '@testing-library/vue'
 import { setState } from '@/stores'
 import userEvent from '@testing-library/user-event'
 
@@ -31,9 +31,13 @@ test('can send lyx transaction', async () => {
 
   render(SendTransaction)
 
-  await fireEvent.update(screen.getByTestId('amount'), '2')
+  await waitFor(() => {
+    expect(screen.getByTestId('transaction-from')).not.toBeFalsy()
+  })
+
+  await fireEvent.update(screen.getByTestId('transaction-amount'), '2')
   await fireEvent.update(
-    screen.getByTestId('to'),
+    screen.getByTestId('transaction-to'),
     '0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298'
   )
   await fireEvent.click(screen.getByTestId('send'))
@@ -55,9 +59,13 @@ test('can send lyx transaction with data', async () => {
 
   render(SendTransaction)
 
-  await fireEvent.update(screen.getByTestId('amount'), '2')
+  await waitFor(() => {
+    expect(screen.getByTestId('transaction-from')).not.toBeFalsy()
+  })
+
+  await fireEvent.update(screen.getByTestId('transaction-amount'), '2')
   await fireEvent.update(
-    screen.getByTestId('to'),
+    screen.getByTestId('transaction-to'),
     '0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298'
   )
   await fireEvent.click(screen.getByTestId('hasData'))
@@ -84,6 +92,10 @@ test('can send transaction from preset', async () => {
   setState('address', '0x517216362D594516c6f96Ee34b2c502d65B847E4')
 
   render(SendTransaction)
+
+  await waitFor(() => {
+    expect(screen.getByTestId('transaction-from')).not.toBeFalsy()
+  })
 
   await userEvent.selectOptions(
     screen.getByTestId('preset'),

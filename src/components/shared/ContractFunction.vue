@@ -296,9 +296,13 @@ watch(
   async value => {
     const { value: _value } = output.value
     if (value && value !== _value) {
-      const method = await decodeData(value)
-      data.call = method.call
-      data.items = method.inputs || []
+      try {
+        const method = await decodeData(value)
+        data.call = method.call
+        data.items = method.inputs || []
+      } catch (err) {
+        // Ignore
+      }
     }
   }
 )
