@@ -21,7 +21,7 @@ type Props = {
 type Emits = {
   (event: 'update:modelValue', value: any): void
   (event: 'update:error', value: boolean): void
-  (event: 'update:isWei', value?: boolean | Unit): void
+  (event: 'update:isWei', value?: Unit): void
   (event: 'remove', index: number): void
   (event: 'add', index: number): void
 }
@@ -33,10 +33,9 @@ const isArray = computed<boolean>(() => props.info.type.match(/\[\]$/) != null)
 
 function makeWei(value: string, hex = false) {
   try {
-    const val =
-      typeof props.info.isWei === 'string'
-        ? toWei(value, props.info.isWei as Unit)
-        : toWei(value)
+    const val = props.info.isWei
+      ? toWei(value, props.info.isWei as Unit)
+      : value
     if (hex) {
       return `0x${new BN(val).toString('hex')}`
     }
@@ -162,6 +161,9 @@ function validate(value: any): { value: any; error?: string } {
         }
         return { value }
       }
+      if (/[0-9]+/.test(value)) {
+        return { value }
+      }
       return { value, error: 'Invalid data format' }
   }
   return { value, error: `Unsupported type ${props.info.type}` }
@@ -250,6 +252,26 @@ const shouldWei = (index: number) => {
   return props.info.isWei && !item.error && item.value
 }
 
+const shouldBytes32 = (index: number) => {
+  const item = data.items[index]
+  if (props.info.type === 'bytes32') {
+    if (/^[0-9]+$/.test(item.value)) {
+      return true
+    }
+  }
+  return false
+}
+
+const makeBytes32 = (index: number) => {
+  const item = data.items[index]
+  if (props.info.type === 'bytes32') {
+    if (/^[0-9]*$/.test(item.value)) {
+      return `0x${new BN(item.value).toString('hex', 64)}`
+    }
+  }
+  return item.value
+}
+
 const hasError = (index: number) => {
   const item = data.items[index]
   return item.error
@@ -258,7 +280,7 @@ const hasError = (index: number) => {
 
 <template>
   <div v-for="(item, index) of data.items" :key="index" class="field">
-    <label class="label"
+    <label v-if="props.info.type !== 'bool'" class="label"
       >{{
         props.info.label
           ? props.info.label
@@ -301,13 +323,7 @@ const hasError = (index: number) => {
         <option value="mether">mether</option>
         <option value="gether">gether</option>
         <option value="tether">tether</option></select
-      >{{
-        !props.custom && props.info.isWei
-          ? typeof props.info.isWei === 'string'
-            ? ` ${props.info.isWei}`
-            : ' WEI'
-          : ''
-      }})
+      >{{ !props.custom && props.info.isWei ? props.info.isWei : '' }})
     </label>
     <LSPSelect
       v-if="props.info.type.match(/^address/)"
@@ -328,25 +344,27 @@ const hasError = (index: number) => {
           type="checkbox"
           :checked="item.value"
           @input="e => handleChange(index, e)"
-        />{{ props.info.name }}</label
+        />&nbsp;{{
+          props.info.label
+            ? props.info.label
+            : isArray
+            ? `${props.info.name}[${index + 1}]`
+            : props.info.name
+        }}
+        ({{ props.info.type.replace(/\[\]$/, '') }}</label
       >
       <span
         v-if="props.info.isWei"
         class="icon is-small is-right"
         style="width: 5em"
       >
-        <i class="fas fa-envelope">
-          {{
-            props.info.isWei
-              ? typeof props.info.isWei === 'string'
-                ? props.info.isWei
-                : 'WEI'
-              : ''
-          }}</i
-        >
+        <i class="fas fa-envelope"> {{ props.info.isWei || '' }}</i>
       </span>
     </div>
 
+    <p v-if="shouldBytes32(index)" class="help">
+      actual value {{ makeBytes32(index) }}
+    </p>
     <p v-if="shouldWei(index)" class="help">
       actual value {{ makeWei(item.value) }} ({{ makeWei(item.value, true) }})
     </p>

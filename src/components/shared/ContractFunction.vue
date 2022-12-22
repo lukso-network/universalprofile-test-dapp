@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import useWeb3 from '@/compositions/useWeb3'
+import { BN } from 'bn.js'
 import { reactive, computed, watch, onMounted } from 'vue'
 import { toWei, Unit } from 'web3-utils'
 import { MethodSelect, MethodType } from '../endpoints/SendTransaction.vue'
@@ -132,10 +133,9 @@ const decodeData = async (data: string): Promise<MethodSelect> => {
   throw new Error(`Unable to decode data`)
 }
 
-const data = reactive<{ call?: string; items: ElementType[] }>({
-  call: props.call,
-  items:
-    props.modelValue?.map((info: MethodType) => {
+function convertModel(model?: MethodType[]) {
+  return (
+    model?.map((info: MethodType) => {
       let value = info.value || undefined
       if (info.type.match(/\[\]$/) && !value) {
         value = []
@@ -145,16 +145,26 @@ const data = reactive<{ call?: string; items: ElementType[] }>({
         value,
         error: false,
       }
-    }) || [],
+    }) || []
+  )
+}
+
+const data = reactive<{ call?: string; items: ElementType[] }>({
+  call: props.call,
+  items: convertModel(props.modelValue),
 })
 
-function makeValue(value: string, isWei?: Unit | boolean) {
+watch(
+  () => props.modelValue,
+  model => {
+    data.items = convertModel(model)
+  }
+)
+
+function makeValue(value: string, isWei?: Unit) {
   if (isWei) {
     try {
-      if (typeof isWei === 'string') {
-        return toWei(value, isWei)
-      }
-      return toWei(value)
+      return toWei(value, isWei)
     } catch (err) {
       return undefined
     }
@@ -179,7 +189,7 @@ function handleError(param: number, error?: boolean) {
   }
 }
 
-function handleUnit(param: number, isWei?: boolean | Unit) {
+function handleUnit(param: number, isWei?: Unit) {
   const item = data.items[param]
   if (isWei) {
     item.isWei = isWei
@@ -232,10 +242,19 @@ function handleCall(e: Event) {
   }
 }
 
-const output = computed<{ error: boolean; value: string }>(() => {
+const makeBytes32 = (value: string, type: string) => {
+  if (type === 'bytes32') {
+    if (/^[0-9]*$/.test(value)) {
+      return `0x${new BN(value).toString('hex', 64)}`
+    }
+  }
+  return value
+}
+
+const output = computed<{ error: undefined | string; value: string }>(() => {
   try {
     if (!data.call) {
-      return { value: '0x', error: false }
+      return { value: '0x', error: undefined }
     }
     const callSig = `${data.call}(${data.items
       .map(({ type }) => type)
@@ -245,7 +264,9 @@ const output = computed<{ error: boolean; value: string }>(() => {
         data.items.map(({ type }) => type),
         data.items.map(({ value, type, isWei }) => {
           const makeItem = (value: any) =>
-            /^bytes/.test(type) ? value ?? '0x' : makeValue(value, isWei) || ''
+            /^bytes/.test(type)
+              ? makeBytes32(value, type) ?? '0x'
+              : makeValue(value, isWei) || ''
           if (/\[\]$/.test(type)) {
             return value.map(makeItem)
           }
@@ -254,12 +275,12 @@ const output = computed<{ error: boolean; value: string }>(() => {
       )
       .substring(2)}`
     return {
-      error: false,
+      error: undefined,
       value: output,
     }
   } catch (err) {
     console.error(err)
-    return { error: true, value: (err as Error).message }
+    return { error: (err as Error).message, value: '' }
   }
 })
 
@@ -320,5 +341,6 @@ onMounted(() => {
     >
       <div style="overflow-wrap: anywhere">{{ output.value }}</div>
     </div>
+    <p v-if="output.error" class="help is-danger">{{ output.error }}</p>
   </div>
 </template>

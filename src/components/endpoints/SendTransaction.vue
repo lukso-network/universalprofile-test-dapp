@@ -14,7 +14,7 @@ export type MethodType = {
   label?: string
   type: string
   name: string
-  isWei?: boolean | Unit
+  isWei?: Unit
   hasSpecs?: LSPType[]
   isPairs?: boolean
   isKey?: boolean
@@ -40,18 +40,18 @@ const methods: MethodSelect[] = [
     label: '💰 Transfer',
   },
   {
-    label: '💰 Transfer 1 ERC20',
+    label: '💰 Transfer 1 ERC20/ERC777',
     call: 'transfer',
     inputs: [
       { type: 'address', name: 'to', value: sampleUP },
-      { type: 'uint256', name: 'amount', isWei: true, value: '1' },
+      { type: 'uint256', name: 'amount', isWei: 'ether', value: '1' },
     ],
-    hasSpecs: [LSPType.ERC20],
+    hasSpecs: [LSPType.ERC20, LSPType.ERC777],
   },
   {
-    label: '🏦 Mint 100 ERC20/ERC777',
+    label: '🏦 Mint 100 ERC20/ERC777/LSP7',
     call: 'mint',
-    hasSpecs: [LSPType.ERC777, LSPType.ERC20],
+    hasSpecs: [LSPType.ERC777, LSPType.ERC20, LSPType.LSP7DigitalAsset],
     inputs: [
       { type: 'address', name: 'to' },
       { type: 'uint256', name: 'amount', value: '100' },
@@ -63,35 +63,32 @@ const methods: MethodSelect[] = [
     inputs: [
       { type: 'address', name: 'from' },
       { type: 'address', name: 'to' },
-      { type: 'uint256', name: 'amount', isWei: true, value: '1' },
+      { type: 'uint256', name: 'amount', isWei: 'ether', value: '1' },
     ],
     hasSpecs: [LSPType.ERC721],
   },
   {
-    label: '💰 Transfer 1 LSP7',
+    label: '💰 Transfer 1 LSP7/LSP8',
     call: 'transfer',
     inputs: [
       { type: 'address', name: 'from' },
       { type: 'address', name: 'to' },
-      { type: 'uint256', name: 'amount', isWei: true },
+      { type: 'uint256', name: 'amount', isWei: 'ether' },
       { type: 'bool', name: 'force', value: false },
-      { type: 'bytes', name: 'data' },
+      { type: 'bytes', name: 'data', value: '0x' },
     ],
     hasSpecs: [LSPType.LSP7DigitalAsset, LSPType.LSP8IdentifiableDigitalAsset],
   },
   {
-    label: '💰 Transfer 1 LSP8',
-    call: 'transfer',
+    label: '🏦 Mint 1 LSP8',
+    call: 'mint',
     inputs: [
-      {
-        type: 'address',
-        name: 'from',
-      },
       { type: 'address', name: 'to' },
-      { type: 'bytes32', name: 'tokenId' },
+      { type: 'bytes32', name: 'tokenId', value: '1' },
       { type: 'bool', name: 'force', value: false },
       { type: 'bytes', name: 'data', value: '0x' },
     ],
+    hasSpecs: [LSPType.LSP8IdentifiableDigitalAsset],
   },
   {
     label: '💰 Send 100 ERC777',
@@ -99,7 +96,7 @@ const methods: MethodSelect[] = [
     hasSpecs: [LSPType.ERC777],
     inputs: [
       { type: 'address', name: 'to' },
-      { type: 'uint256', name: 'amount', isWei: true, value: '1' },
+      { type: 'uint256', name: 'amount', isWei: 'ether', value: '1' },
       { type: 'bytes', name: 'data', value: '0x' },
     ],
   },
@@ -164,9 +161,7 @@ watch(
 function makeValue(param: MethodType) {
   const { value, isWei } = param
   if (isWei) {
-    return typeof isWei === 'string'
-      ? toWei(value, isWei as Unit)
-      : toWei(value)
+    return toWei(value, isWei)
   }
   return value
 }
@@ -206,7 +201,7 @@ const params = reactive<{ items: MethodType[] }>({
   items: [
     { type: 'address', name: 'from' },
     { type: 'address', name: 'to' },
-    { type: 'uint256', isWei: true, name: 'amount', value: '0.1' },
+    { type: 'uint256', isWei: 'ether', name: 'amount', value: '0.1' },
   ],
 })
 
@@ -217,6 +212,7 @@ const selectMethod = (e: Event) => {
     ;(method.item as any)[key] = val
   })
   hasData.value = item.call != null
+  params.items[1].hasSpecs = item.hasSpecs
 }
 
 const handleData = (e?: string) => {
@@ -274,7 +270,6 @@ const handleData = (e?: string) => {
           data-testid="data"
         ></textarea>
       </div>
-
       <div class="field">
         <button
           :class="`button is-primary is-rounded mt-4 ${
