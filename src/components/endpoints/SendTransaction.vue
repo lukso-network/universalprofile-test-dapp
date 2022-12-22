@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { Unit } from 'web3-utils'
+import { toWei, Unit } from 'web3-utils'
 import { ref, watch, reactive } from 'vue'
 import { TransactionConfig } from 'web3-core'
 
-import { getState, setState, LSPType } from '@/stores'
+import { getState, setState, LSPType, sampleUP } from '@/stores'
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
 import useWeb3 from '@/compositions/useWeb3'
@@ -43,7 +43,7 @@ const methods: MethodSelect[] = [
     label: '💰 Transfer 1 ERC20',
     call: 'transfer',
     inputs: [
-      { type: 'address', name: 'to' },
+      { type: 'address', name: 'to', value: sampleUP },
       { type: 'uint256', name: 'amount', isWei: true, value: '1' },
     ],
     hasSpecs: [LSPType.ERC20],
@@ -157,18 +157,28 @@ const methods: MethodSelect[] = [
 watch(
   () => getState('address'),
   newAddress => {
-    params[0].value = newAddress
+    params.items[0].value = newAddress
   }
 )
+
+function makeValue(param: MethodType) {
+  const { value, isWei } = param
+  if (isWei) {
+    return typeof isWei === 'string'
+      ? toWei(value, isWei as Unit)
+      : toWei(value)
+  }
+  return value
+}
 
 const send = async () => {
   clearNotification()
 
-  const from = params[0].value
+  const from = makeValue(params.items[0])
   let transaction = {
     from,
-    to: params[1].value,
-    value: params[2].value,
+    to: makeValue(params.items[1]),
+    value: makeValue(params.items[2]),
     gas: DEFAULT_GAS,
     gasPrice: DEFAULT_GAS_PRICE,
   } as TransactionConfig
@@ -176,6 +186,8 @@ const send = async () => {
   if (hasData.value) {
     transaction = { ...transaction, data: data.value }
   }
+
+  console.log(transaction)
 
   try {
     isPending.value = true
@@ -190,11 +202,13 @@ const send = async () => {
 }
 
 const method = reactive<{ item: MethodSelect }>({ item: methods[0] })
-const params = reactive<MethodType[]>([
-  { type: 'address', name: 'from' },
-  { type: 'address', name: 'to' },
-  { type: 'uint256', isWei: true, name: 'amount', value: '0.1' },
-])
+const params = reactive<{ items: MethodType[] }>({
+  items: [
+    { type: 'address', name: 'from' },
+    { type: 'address', name: 'to' },
+    { type: 'uint256', isWei: true, name: 'amount', value: '0.1' },
+  ],
+})
 
 const selectMethod = (e: Event) => {
   const value = parseInt((e.target as HTMLInputElement).value, 10)
@@ -229,7 +243,11 @@ const handleData = (e?: string) => {
         </div>
       </div>
 
-      <ContractFunction v-model="params" :only-params="true" :custom="true" />
+      <ContractFunction
+        v-model="params.items"
+        :only-params="true"
+        :custom="true"
+      />
       <div class="field">
         <label class="checkbox">
           <input v-model="hasData" type="checkbox" />

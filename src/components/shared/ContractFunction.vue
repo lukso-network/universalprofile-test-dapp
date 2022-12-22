@@ -165,15 +165,7 @@ function makeValue(value: string, isWei?: Unit | boolean) {
 function handleValue(param: number, value: any) {
   const item = data.items[param]
   item.value = value
-  emits(
-    'update:modelValue',
-    data.items.map(({ value, isWei }) => {
-      if (Array.isArray(value)) {
-        return value.map(value => makeValue(value, isWei))
-      }
-      return makeValue(value, isWei)
-    })
-  )
+  emits('update:modelValue', data.items)
 }
 
 function handleError(param: number, error?: boolean) {
@@ -245,9 +237,10 @@ const output = computed<{ error: boolean; value: string }>(() => {
     if (!data.call) {
       return { value: '0x', error: false }
     }
-    const output = `${eth.abi.encodeFunctionSignature(
-      `${data.call}(${data.items.map(({ type }) => type).join(',')})`
-    )}${eth.abi
+    const callSig = `${data.call}(${data.items
+      .map(({ type }) => type)
+      .join(',')})`
+    const output = `${eth.abi.encodeFunctionSignature(callSig)}${eth.abi
       .encodeParameters(
         data.items.map(({ type }) => type),
         data.items.map(({ value, type, isWei }) => {
@@ -265,7 +258,7 @@ const output = computed<{ error: boolean; value: string }>(() => {
       value: output,
     }
   } catch (err) {
-    console.error(err, data.items)
+    console.error(err)
     return { error: true, value: (err as Error).message }
   }
 })
@@ -274,7 +267,6 @@ watch(
   () => output.value,
   ({ value }) => {
     emits('update:data', value)
-    console.log('data', value)
   }
 )
 
@@ -294,6 +286,7 @@ onMounted(() => {
   if (value) {
     emits('update:data', value)
   }
+  emits('update:modelValue', data.items)
 })
 </script>
 
