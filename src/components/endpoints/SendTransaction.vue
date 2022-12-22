@@ -242,6 +242,7 @@ const handleData = (e?: string) => {
         v-model="method.item.inputs"
         :call="method.item.call"
         custom
+        :data="data"
         :hide-data="true"
         @update:data="handleData"
       />

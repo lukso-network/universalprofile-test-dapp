@@ -140,6 +140,11 @@ function validate(value: any): { value: any; error?: string } {
         return { value, error: (err as Error).message }
       }
       return { value }
+    case 'bool':
+      if (typeof value === 'boolean') {
+        return { value }
+      }
+      return { value, error: 'Invalid boolean value' }
     case 'string':
       return { value }
     case 'bytes32':
@@ -193,7 +198,8 @@ function handleRemove(index: number) {
 }
 
 const handleChange = (index: number, e: Event) => {
-  let { value } = e.target as HTMLInputElement
+  const { value: _value, checked } = e.target as HTMLInputElement
+  let value = props.info.type === 'bool' ? checked : _value
   const item = data.items[index]
   if (value === item.value) {
     return
@@ -311,11 +317,19 @@ const hasError = (index: number) => {
     />
     <div :class="{ control: true, 'has-icons-right': props.info.isWei }">
       <input
+        v-if="props.info.type !== 'bool'"
         :value="item.value"
         class="input is-family-code"
         type="text"
         @input="e => handleChange(index, e)"
       />
+      <label v-else class="label"
+        ><input
+          type="checkbox"
+          :checked="item.value"
+          @input="e => handleChange(index, e)"
+        />{{ props.info.name }}</label
+      >
       <span
         v-if="props.info.isWei"
         class="icon is-small is-right"
