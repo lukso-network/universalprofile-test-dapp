@@ -219,6 +219,20 @@ const selectFirst = () => {
   }
 }
 
+let timeout: NodeJS.Timeout | undefined
+function triggerSelectFirst() {
+  if (timeout) {
+    clearTimeout(timeout)
+  }
+  timeout = setTimeout(() => {
+    timeout = undefined
+    if (selected.value) {
+      return
+    }
+    selectFirst()
+  }, 100)
+}
+
 watch(
   () => data.value,
   () => {
@@ -227,8 +241,8 @@ watch(
       if (item) {
         selected.value = item.address
       }
-    } else if (!selected.value) {
-      selectFirst()
+    } else {
+      triggerSelectFirst()
     }
   }
 )
@@ -240,23 +254,23 @@ watch(
       .concat([getState('address')])
   },
   () => {
-    if (!selected.value) {
-      selectFirst()
-    }
+    setTimeout(() => {
+      if (!selected.value) {
+        triggerSelectFirst()
+      }
+    }, 100)
   }
 )
 
 watch(
   () => props.showTypes,
   () => {
-    if (!selected.value) {
-      selectFirst()
-    }
+    triggerSelectFirst()
   }
 )
 
 onMounted(() => {
-  selectFirst()
+  triggerSelectFirst()
 })
 </script>
 
@@ -264,6 +278,7 @@ onMounted(() => {
   <div class="field">
     <div class="select is-fullwidth">
       <select v-model="selected" @change="handleChange">
+        <option value="">- ? -</option>
         <optgroup
           v-for="(items, label) of data"
           :key="label"

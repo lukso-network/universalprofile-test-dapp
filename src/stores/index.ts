@@ -327,6 +327,11 @@ export async function recalcTokens() {
     }
     setState('lsp7', lsp7Tokens)
     setState('lsp8', lsp8Tokens)
+    localStorage?.setItem('up:tokens', {
+      assets: Object.keys(mapAssets),
+      lsp7: lsp7Tokens,
+      lsp8: lsp8Tokens,
+    })
   } catch (err) {
     // There are going to be errors here during unit tests
     // because we're not mocking the whole deployment of the UP
@@ -360,7 +365,16 @@ export function useState(): {
       // check for balance needs to be last as Wallet Connect doesn't support `eth_getBalance` method
       setState('balance', await getBalance(address))
 
-      await recalcTokens()
+      try {
+        const { assets, lsp7, lsp8 } = JSON.parse(
+          localStorage?.getItem('up:tokens') || 'null'
+        )
+        setState('assets', assets)
+        setState('lsp7', lsp7)
+        setState('lsp8', lsp8)
+      } catch (err) {
+        await recalcTokens()
+      }
     },
     setDisconnected: () => {
       setState('address', '')

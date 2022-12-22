@@ -13,7 +13,7 @@ import { computed } from 'vue'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
-const { setDisconnected, setConnected } = useState()
+const { setDisconnected, setConnected, recalcTokens } = useState()
 const { setupWeb3, requestAccounts } = useWeb3()
 const { resetProvider, enableProvider, setupProvider } = useWalletConnect()
 const hasExtension = !!window.ethereum
@@ -61,6 +61,9 @@ const disconnect = async () => {
 
   setDisconnected()
   setupWeb3(null)
+}
+const handleRefresh = (e: Event) => {
+  recalcTokens()
 }
 </script>
 
@@ -182,6 +185,13 @@ const disconnect = async () => {
               >
             </li>
           </ul>
+          <button
+            :disabled="!getState('address')"
+            class="mt-2 button is-primary is-rounded"
+            @click="handleRefresh"
+          >
+            Refresh
+          </button>
         </div>
       </div>
     </div>
