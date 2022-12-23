@@ -155,8 +155,11 @@ const mint = async () => {
       <div class="field">
         <label class="label">Token address</label>
         <LSPSelect
-          :show-lsp-type="true"
           :address="mintToken"
+          :show-types="[
+            LSPType.LSP7DigitalAsset,
+            LSPType.LSP8IdentifiableDigitalAsset,
+          ]"
           @option-selected="handleTokenSelected"
         />
         <div class="control">

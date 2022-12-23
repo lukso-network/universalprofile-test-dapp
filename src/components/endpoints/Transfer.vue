@@ -132,6 +132,12 @@ const transfer = async () => {
         <label class="label">Token address</label>
         <LSPSelect
           :address="transferToken"
+          :show-types="[
+            LSPType.LSP7DigitalAsset,
+            LSPType.LSP8IdentifiableDigitalAsset,
+            LSPType.ERC20,
+            LSPType.ERC777,
+          ]"
           @option-selected="handleTokenSelected"
         />
         <div class="control">
