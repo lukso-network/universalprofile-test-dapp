@@ -52,10 +52,10 @@ jobs:
         if: github.event.action != 'closed'
         run: yarn test:unit
 
-      - name: Rewrite <base>
+      - name: 🔃 Rewrite <base>
         run: sed -i -e 's#/assets/#/pr-preview/pr-${{ github.event.number }}/assets/#' ./dist/index.html
 
-      - name: Deploy preview
+      - name: 🚢 Deploy preview
         uses: rossjrw/pr-preview-action@v1
         with:
           source-dir: ./dist/
