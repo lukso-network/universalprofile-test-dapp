@@ -199,6 +199,15 @@ function handleUnit(param: number, isWei?: Unit) {
   }
 }
 
+function handleIsKey(param: number, isKey?: boolean) {
+  const item = data.items[param]
+  if (isKey != null) {
+    item.isKey = isKey
+  } else {
+    delete item.isKey
+  }
+}
+
 const call = computed<string>(() => {
   if (!data.call) {
     return ''
@@ -220,7 +229,7 @@ function handleCall(e: Event) {
       .split(',')
       .map((item: string) => item.trim().split(/\s+/))
       .map(([type, name], index) => {
-        const old = data.items.find(({ name: _name }) => _name === name) || {}
+        const old = data.items[index] || {}
         name = name || `input_${index + 1}`
         if (
           !/^(bytes(32)?|u?int(8|16|32|64|128|256)|string|bool|address)(\[\])?$/.test(
@@ -322,7 +331,7 @@ onMounted(() => {
         !props.custom ? `Function ${call}` : 'Function'
       }}</label>
       <div v-if="props.custom" class="field">
-        <input class="input" :value="call" @change="handleCall" />
+        <input class="input" :value="call" @input="handleCall" />
       </div>
     </div>
     <div
@@ -335,6 +344,7 @@ onMounted(() => {
         :info="item"
         :custom="props.custom"
         :testid-prefix="props.testidPrefix"
+        @update:is-key="e => handleIsKey(index, e)"
         @update:error="e => handleError(index, e)"
         @update:model-value="e => handleValue(index, e)"
         @update:is-wei="e => handleUnit(index, e)"

@@ -23,6 +23,7 @@ type Emits = {
   (event: 'update:modelValue', value: any): void
   (event: 'update:error', value: boolean): void
   (event: 'update:isWei', value?: Unit): void
+  (event: 'update:isKey', value?: boolean): void
   (event: 'remove', index: number): void
   (event: 'add', index: number): void
 }
@@ -56,6 +57,11 @@ function handleUnits(e: Event) {
     return
   }
   emits('update:isWei', value as Unit)
+}
+
+function handleIsKey(e: Event) {
+  const { checked } = e.target as HTMLInputElement
+  emits('update:isKey', checked)
 }
 
 function validate(value: any): { value: any; error?: string } {
@@ -259,7 +265,7 @@ const shouldWei = (index: number) => {
 const shouldBytes32 = (index: number) => {
   const item = data.items[index]
   if (methodInfo.value.type === 'bytes32') {
-    if (/^[0-9]+$/.test(item.value)) {
+    if (/^[0-9]+$/.test(item.value) || methodInfo.value.isKey) {
       return true
     }
   }
@@ -269,6 +275,14 @@ const shouldBytes32 = (index: number) => {
 const makeBytes32 = (index: number) => {
   const item = data.items[index]
   if (methodInfo.value.type === 'bytes32') {
+    if (methodInfo.value.isKey) {
+      const items = (item.value || '').split(',')
+      try {
+        return ERC725.encodeKeyName(items[0], items.slice(1))
+      } catch (err) {
+        return (err as Error).message
+      }
+    }
     if (/^[0-9]*$/.test(item.value)) {
       return `0x${new BN(item.value).toString('hex', 64)}`
     }
@@ -327,7 +341,15 @@ const hasError = (index: number) => {
         <option value="mether">mether</option>
         <option value="gether">gether</option>
         <option value="tether">tether</option></select
-      >{{ !props.custom && methodInfo.isWei ? methodInfo.isWei : '' }})
+      >{{ !props.custom && methodInfo.isWei ? methodInfo.isWei : ''
+      }}<label v-if="methodInfo.type === 'bytes32'" class="ml-2"
+        ><input
+          type="checkbox"
+          :checked="methodInfo.isKey"
+          :data-testid="props.testidPrefix + methodInfo.name + '_isKey'"
+          @input="handleIsKey"
+        />&nbsp;Decode LSPKey</label
+      >)
     </label>
     <LSPSelect
       v-if="methodInfo.type.match(/^address/)"
