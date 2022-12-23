@@ -44,16 +44,13 @@ jobs:
         if: github.event.action != 'closed'
         run: yarn lint:types
 
-      - name: 🛠 Build
-        if: github.event.action != 'closed'
-        run: yarn build
-
       - name: 🎯 Test
         if: github.event.action != 'closed'
         run: yarn test:unit
 
-      - name: 🔃 Rewrite <base>
-        run: sed -i -e 's#/assets/#/pr-preview/pr-${{ github.event.number }}/assets/#' ./dist/index.html
+      - name: 🛠 Build (@/pr-preview/pr-${{ github.event.number }})
+        if: github.event.action != 'closed'
+        run: PUBLIC_PATH=/pr-preview/pr-${{ github.event.number }} yarn build
 
       - name: 🚢 Deploy preview
         uses: rossjrw/pr-preview-action@v1
