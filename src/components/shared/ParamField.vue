@@ -108,6 +108,13 @@ function validate(value: any): { value: any; error?: string } {
         }
         const val = new BN(value)
         if (val.toString() !== value) {
+          console.log(
+            'not parsed',
+            val.toString(),
+            value,
+            typeof val.toString(),
+            typeof value
+          )
           throw new Error('Number did not fully parse')
         }
         if (val.isNeg()) {

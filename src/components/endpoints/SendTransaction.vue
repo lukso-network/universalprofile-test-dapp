@@ -138,7 +138,7 @@ const methods: MethodSelect[] = [
         value:
           '0x40b8bec57d7b5ff0dbd9e9acd0a47dfeb0101e1a203766f5ccab00445fbf39e9',
       },
-      { type: 'uint256[]', name: 'numbers', value: [2345675643, 123292] },
+      { type: 'uint256[]', name: 'numbers', value: ['2345675643', '123292'] },
       { type: 'bool', name: 'force', value: true },
       { type: 'string', name: 'scream', value: 'Hello!' },
       {
