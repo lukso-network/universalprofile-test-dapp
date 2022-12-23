@@ -1,6 +1,7 @@
 import { LSPType } from '@/helpers/tokenUtils'
 import Web3 from 'web3'
 import { Unit } from 'web3-utils'
+import { getSelectorLookupURL } from './config'
 
 export type MethodType = {
   label?: string
@@ -78,7 +79,7 @@ export const decodeData = async (
   const selector = data?.substring(0, 8)
   if (selector) {
     const signatureCache = await caches.open(SIGNATURE_CACHE)
-    const url = `https://www.4byte.directory/api/v1/signatures/?hex_signature=${selector}`
+    const url = getSelectorLookupURL(selector)
     const functionSignatureResponse = await signatureCache.match(url)
     if (functionSignatureResponse) {
       return await functionSignatureResponse.json()

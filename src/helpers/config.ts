@@ -32,3 +32,7 @@ export const PRIVATE_KEY =
   '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
 
 export const DEFAULT_NETWORK_CONFIG = NETWORKS[DEFAULT_NETWORK]
+
+export function getSelectorLookupURL(selector: string) {
+  return `https://www.4byte.directory/api/v1/signatures/?hex_signature=${selector}`
+}
