@@ -2,6 +2,11 @@ name: Lint, Build and Test
 
 on:
   pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - closed
 
 jobs:
   lint-build-test:
@@ -36,3 +41,8 @@ jobs:
 
       - name: 🎯 Test
         run: yarn test:unit
+
+      - name: Deploy preview
+        uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: ./dist/
