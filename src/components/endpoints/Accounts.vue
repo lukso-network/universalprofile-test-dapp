@@ -191,7 +191,7 @@ const handleRefresh = (e: Event) => {
             class="mt-2 button is-primary is-rounded"
             @click="handleRefresh"
           >
-            Refresh
+            Refetch Tokens
           </button>
         </div>
       </div>

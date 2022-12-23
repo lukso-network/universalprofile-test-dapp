@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { toWei, Unit } from 'web3-utils'
-import { ref, watch, reactive } from 'vue'
+import { ref, watch, reactive, computed } from 'vue'
 import { TransactionConfig } from 'web3-core'
 
 import { getState, setState, LSPType, sampleUP } from '@/stores'
@@ -34,6 +34,7 @@ const { sendTransaction, getBalance } = useWeb3()
 const data = ref<string>('')
 const hasData = ref(false)
 const isPending = ref(false)
+const modified = ref(false)
 
 const methods: MethodSelect[] = [
   {
@@ -208,11 +209,13 @@ const params = reactive<{ items: MethodType[] }>({
 
 const selectMethod = (e: Event) => {
   const value = parseInt((e.target as HTMLInputElement).value, 10)
-  const item: MethodSelect = methods[value]
+  const item: MethodSelect =
+    value >= methods.length
+      ? items.items[value - methods.length]
+      : methods[value]
   Object.entries(item).forEach(([key, val]) => {
     ;(method.item as any)[key] = val
   })
-  console.log('selectMethod', item)
   params.items = params.items.map((param, index) => {
     if (index === 1) {
       if (
@@ -225,12 +228,61 @@ const selectMethod = (e: Event) => {
     }
     return { ...param }
   })
+  method.item.call = item.call
   hasData.value = item.call != null
 }
 
 const handleData = (e?: string) => {
-  data.value = e || ''
+  if (data.value !== e || '') {
+    data.value = e || ''
+  }
 }
+
+function loadItems() {
+  let items = []
+  try {
+    items = JSON.parse(localStorage.getItem('up:transactionMenu') || 'bad')
+  } catch (err) {
+    // ignore
+  }
+  return items
+}
+
+const items = reactive<{ items: MethodSelect[] }>({ items: loadItems() })
+
+function saveItems() {
+  localStorage.setItem('up:transactionMenu', JSON.stringify(items.items))
+}
+
+const handleAdd = (e: Event) => {
+  const name = window.prompt('Menu title')
+  if (name) {
+    items.items.push(
+      JSON.parse(
+        JSON.stringify({ ...method.item, label: name, inputs: params.items })
+      )
+    )
+    saveItems()
+  }
+}
+
+const handleRemove = (e: Event) => {
+  const index = items.items.findIndex(
+    ({ label }) => label === method.item.label
+  )
+  if (index !== -1) {
+    items.items.splice(index, 1)
+    saveItems()
+  }
+}
+
+const hasRemove = computed<boolean>(() => {
+  const list = items.items
+  const currentLabel = method.item.label
+  const item = list.find(({ label }) => label === currentLabel)
+  console.log(list, currentLabel, item)
+  return item != null
+})
 </script>
 
 <template>
@@ -240,13 +292,24 @@ const handleData = (e?: string) => {
       <div class="field">
         <div class="select is-fullwidth mb-2">
           <select data-testid="preset" @change="selectMethod">
-            <option
-              v-for="({ label }, index) of methods"
-              :key="index"
-              :value="index"
-            >
-              {{ label }}
-            </option>
+            <optgroup label="Standard">
+              <option
+                v-for="({ label }, index) of methods"
+                :key="index"
+                :value="index"
+              >
+                {{ label }}
+              </option>
+            </optgroup>
+            <optgroup v-if="items.items.length > 0" label="Custom">
+              <option
+                v-for="({ label }, index) of items.items"
+                :key="index + methods.length"
+                :value="index + methods.length"
+              >
+                {{ label }}
+              </option>
+            </optgroup>
           </select>
         </div>
       </div>
@@ -283,6 +346,25 @@ const handleData = (e?: string) => {
           placeholder="0x..."
           data-testid="data"
         ></textarea>
+      </div>
+      <div class="field mt-2">
+        <button
+          :class="`button is-small is-rounded ${isPending ? 'is-loading' : ''}`"
+          data-testid="add"
+          @click="handleAdd"
+        >
+          Add Transaction to Menu
+        </button>
+        <button
+          v-if="hasRemove"
+          :class="`button is-small is-rounded ml-2 ${
+            isPending ? 'is-loading' : ''
+          }`"
+          data-testid="remove"
+          @click="handleRemove"
+        >
+          Remove "{{ method.item.label }}" from Menu
+        </button>
       </div>
       <div class="field">
         <button

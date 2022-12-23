@@ -301,6 +301,11 @@ watch(
 )
 
 watch(
+  () => props.call,
+  call => (data.call = call)
+)
+
+watch(
   () => props.data,
   async value => {
     const { value: _value } = output.value
