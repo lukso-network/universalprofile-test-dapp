@@ -4,7 +4,7 @@ import { reactive, computed, watch } from 'vue'
 import { toWei, Unit } from 'web3-utils'
 import ERC725 from '@erc725/erc725.js'
 import LSPSelect from './LSPSelect.vue'
-import { MethodType } from '../endpoints/SendTransaction.vue'
+import { MethodType } from '@/endpoints/SendTransaction.vue'
 import { BN } from 'bn.js'
 
 interface ElementType {

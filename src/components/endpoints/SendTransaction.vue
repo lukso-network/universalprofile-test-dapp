@@ -8,7 +8,7 @@ import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
 import useWeb3 from '@/compositions/useWeb3'
 import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
-import ContractFunction from '../shared/ContractFunction.vue'
+import ContractFunction from '@/shared/ContractFunction.vue'
 
 export type MethodType = {
   label?: string

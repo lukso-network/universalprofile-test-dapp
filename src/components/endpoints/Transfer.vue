@@ -10,7 +10,7 @@ import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
 import Notifications from '@/components/Notification.vue'
 import { toWei } from 'web3-utils'
 import { ContractStandard } from '@/enums'
-import LSPSelect from '../shared/LSPSelect.vue'
+import LSPSelect from '@/shared/LSPSelect.vue'
 import { BN } from 'bn.js'
 
 const { notification, clearNotification, hasNotification, setNotification } =

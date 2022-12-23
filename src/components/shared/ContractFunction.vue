@@ -3,7 +3,7 @@ import useWeb3 from '@/compositions/useWeb3'
 import { BN } from 'bn.js'
 import { reactive, computed, watch, onMounted } from 'vue'
 import { toWei, Unit } from 'web3-utils'
-import { MethodSelect, MethodType } from '../endpoints/SendTransaction.vue'
+import { MethodSelect, MethodType } from '@/endpoints/SendTransaction.vue'
 import ParamField from './ParamField.vue'
 
 interface ElementType extends MethodType {

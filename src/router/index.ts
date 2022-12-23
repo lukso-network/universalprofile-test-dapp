@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
-import Home from '../views/Home.vue'
-import Profile from '../views/Profile.vue'
+import Home from '@/views/Home.vue'
+import Profile from '@/views/Profile.vue'
 import ProfileUpload from '@/views/profile/Upload.vue'
 import Detail from '@/views/profile/Detail.vue'
 import ProfileDeploy from '@/views/profile/Deploy.vue'
@@ -18,7 +18,7 @@ const routes: Array<RouteRecordRaw> = [
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () =>
-      import(/* webpackChunkName: "about" */ '../views/Profile.vue'),
+      import(/* webpackChunkName: "about" */ '@/views/Profile.vue'),
   },
   {
     path: '/profiles',

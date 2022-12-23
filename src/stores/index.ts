@@ -13,7 +13,7 @@ import { ERC725JSONSchema } from '@erc725/erc725.js'
 import lsp3Schema from '@erc725/erc725.js/schemas/LSP3UniversalProfileMetadata.json'
 import lsp4Schema from '@erc725/erc725.js/schemas/LSP4DigitalAsset.json'
 import lsp9Schema from '@erc725/erc725.js/schemas/LSP9Vault.json'
-import { eip165ABI } from '../abis/eip165ABI'
+import { eip165ABI } from '@/abis/eip165ABI'
 import { erc20ABI } from '@/abis/erc20ABI'
 import BN from 'bn.js'
 

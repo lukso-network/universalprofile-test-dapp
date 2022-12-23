@@ -14,7 +14,7 @@ import { Lsp4Metadata } from '@/types'
 import Lsp4MetadataForm from '@/components/shared/Lsp4MetadataForm.vue'
 import { ContractStandard } from '@/enums'
 import { LSPType } from '@/stores'
-import LSPSelect from '../shared/LSPSelect.vue'
+import LSPSelect from '@/shared/LSPSelect.vue'
 import { BN } from 'bn.js'
 
 const { notification, clearNotification, hasNotification, setNotification } =
