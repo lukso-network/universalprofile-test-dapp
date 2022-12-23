@@ -18,38 +18,38 @@ jobs:
         uses: actions/checkout@v3
 
       - name: 🎛 Setup Node
-        if: github.event.action != "closed"
+        if: github.event.action != 'closed'
         uses: actions/setup-node@v3
         with:
           node-version: 16.16
           cache: 'yarn'
 
       - name: ⚙️ Install
-        if: github.event.action != "closed"
+        if: github.event.action != 'closed'
         run: yarn
 
       - name: 🎨 Lint JS
-        if: github.event.action != "closed"
+        if: github.event.action != 'closed'
         run: yarn lint:js
 
       - name: 🎨 Lint CSS
-        if: github.event.action != "closed"
+        if: github.event.action != 'closed'
         run: yarn lint:css
 
       - name: 🎨 Lint Format
-        if: github.event.action != "closed"
+        if: github.event.action != 'closed'
         run: yarn lint:format
 
       - name: 🎨 Lint Types
-        if: github.event.action != "closed"
+        if: github.event.action != 'closed'
         run: yarn lint:types
 
       - name: 🛠 Build
-        if: github.event.action != "closed"
+        if: github.event.action != 'closed'
         run: yarn build
 
       - name: 🎯 Test
-        if: github.event.action != "closed"
+        if: github.event.action != 'closed'
         run: yarn test:unit
 
       - name: Rewrite <base>
@@ -64,7 +64,7 @@ jobs:
 
       - name: Remove preview
         uses: rossjrw/pr-preview-action@v1
-        if: github.event.action == "closed"
+        if: github.event.action == 'closed'
         with:
           source-dir: ./dist/
           action: remove
