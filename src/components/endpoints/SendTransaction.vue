@@ -34,7 +34,6 @@ const { sendTransaction, getBalance } = useWeb3()
 const data = ref<string>('')
 const hasData = ref(false)
 const isPending = ref(false)
-const modified = ref(false)
 
 const methods: MethodSelect[] = [
   {
@@ -255,6 +254,7 @@ function saveItems() {
 }
 
 const handleAdd = (e: Event) => {
+  e.stopPropagation()
   const name = window.prompt('Menu title')
   if (name) {
     items.items.push(
@@ -267,6 +267,7 @@ const handleAdd = (e: Event) => {
 }
 
 const handleRemove = (e: Event) => {
+  e.stopPropagation()
   const index = items.items.findIndex(
     ({ label }) => label === method.item.label
   )
