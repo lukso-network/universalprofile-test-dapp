@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { TokenInfo } from '@/stores'
 import { reactive, computed, watch } from 'vue'
-import { toWei, Unit } from 'web3-utils'
+import { toWei, Unit, padLeft } from 'web3-utils'
 import ERC725 from '@erc725/erc725.js'
-import LSPSelect from './LSPSelect.vue'
-import { MethodType } from '@/endpoints/SendTransaction.vue'
+import LSPSelect from '@/components/shared/LSPSelect.vue'
 import { BN } from 'bn.js'
+import { MethodType } from '@/helpers/functionUtils'
+import { TokenInfo } from '@/helpers/tokenUtils'
 
 interface ElementType {
   error?: string | undefined
@@ -42,7 +42,7 @@ function makeWei(value: string, hex = false) {
       ? toWei(value, methodInfo.value.isWei as Unit)
       : value
     if (hex) {
-      return `0x${new BN(val).toString('hex')}`
+      return padLeft(val, 64)
     }
     return val
   } catch (err) {
@@ -106,7 +106,7 @@ function validate(value: any): { value: any; error?: string } {
         if (!/^[0-9_]+$/.test(value)) {
           throw new Error('Invalid number format')
         }
-        const val = new BN(value)
+        const val = new BN(value) // Validate parsing so no numberToHex
         if (val.toString() !== value) {
           console.log(
             'not parsed',
@@ -148,7 +148,7 @@ function validate(value: any): { value: any; error?: string } {
         if (!/^-?[0-9_]+$/.test(value)) {
           throw new Error('Invalid number format')
         }
-        const val = new BN(value)
+        const val = new BN(value) // Validate parsing so no numberToHex
         if (val.toString() !== value) {
           throw new Error('Number did not fully parse')
         }
@@ -291,7 +291,7 @@ const makeBytes32 = (index: number) => {
       }
     }
     if (/^[0-9]*$/.test(item.value)) {
-      return `0x${new BN(item.value).toString('hex', 64)}`
+      return padLeft(item.value, 64)
     }
   }
   return item.value
@@ -362,7 +362,7 @@ const hasError = (index: number) => {
       v-if="methodInfo.type.match(/^address/)"
       :show-types="methodInfo.hasSpecs"
       :address="item.value"
-      @option-selected="e => handleSelected(index, e)"
+      @option-selected="(e: TokenInfo) => handleSelected(index, e)"
     />
     <div :class="{ control: true, 'has-icons-right': methodInfo.isWei }">
       <input

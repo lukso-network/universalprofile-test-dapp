@@ -1,10 +1,5 @@
 <script setup lang="ts">
-import {
-  getState,
-  setState,
-  recalcTokens,
-  addTokenToLocalStore,
-} from '@/stores'
+import { getState, setState } from '@/stores'
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
 import { ref } from 'vue'
@@ -19,6 +14,7 @@ import useWeb3 from '@/compositions/useWeb3'
 import { useLspFactory } from '@/compositions/useLspFactory'
 import ERC725 from '@erc725/erc725.js'
 import { BN } from 'bn.js'
+import { addTokenToLocalStore, recalcTokens } from '@/helpers/tokenUtils'
 
 type Token = {
   type: ContractStandard

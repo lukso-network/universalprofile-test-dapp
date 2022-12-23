@@ -1,31 +1,17 @@
 <script setup lang="ts">
-import { toWei, Unit } from 'web3-utils'
+import { toWei } from 'web3-utils'
 import { ref, watch, reactive, computed } from 'vue'
 import { TransactionConfig } from 'web3-core'
 
-import { getState, setState, LSPType, sampleUP } from '@/stores'
+import { getState, setState } from '@/stores'
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
 import useWeb3 from '@/compositions/useWeb3'
 import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
-import ContractFunction from '@/shared/ContractFunction.vue'
-
-export type MethodType = {
-  label?: string
-  type: string
-  name: string
-  isWei?: Unit
-  hasSpecs?: LSPType[]
-  isPairs?: boolean
-  isKey?: boolean
-  value?: any
-}
-export type MethodSelect = {
-  label: string
-  call?: string
-  inputs?: MethodType[]
-  hasSpecs?: LSPType[]
-}
+import ContractFunction from '@/components/shared/ContractFunction.vue'
+import { MethodSelect, MethodType } from '@/helpers/functionUtils'
+import { sampleUP } from '@/helpers/constants'
+import { LSPType } from '@/helpers/tokenUtils'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
@@ -219,7 +205,7 @@ const selectMethod = (e: Event) => {
     if (index === 1) {
       if (
         param.hasSpecs?.length !== item.hasSpecs?.length ||
-        param.hasSpecs?.some((v, i) => item.hasSpecs?.[i] !== v)
+        param.hasSpecs?.some((v: string, i: number) => item.hasSpecs?.[i] !== v)
       ) {
         param.hasSpecs = item.hasSpecs
         param.value = undefined

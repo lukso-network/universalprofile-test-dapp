@@ -1,8 +1,7 @@
 <script setup lang="ts">
+import { getState } from '@/stores'
+import { LSPType, TokenInfo } from '@/helpers/tokenUtils'
 import {
-  getState,
-  LSPType,
-  TokenInfo,
   sampleUP,
   sampleEoA,
   sampleSC,
@@ -11,7 +10,7 @@ import {
   erc777TokenWithEip165,
   erc777TokenWithoutEip165,
   erc721TokenWithEip165,
-} from '@/stores'
+} from '@/helpers/constants'
 import { ref, computed, onMounted, watch } from 'vue'
 
 type Props = {

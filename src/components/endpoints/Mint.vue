@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getState, TokenInfo } from '@/stores'
+import { getState } from '@/stores'
 import { ref, watchEffect } from 'vue'
 import { Contract } from 'web3-eth-contract'
 import useNotifications from '@/compositions/useNotifications'
@@ -13,9 +13,9 @@ import { ERC725 } from '@erc725/erc725.js'
 import { Lsp4Metadata } from '@/types'
 import Lsp4MetadataForm from '@/components/shared/Lsp4MetadataForm.vue'
 import { ContractStandard } from '@/enums'
-import { LSPType } from '@/stores'
-import LSPSelect from '@/shared/LSPSelect.vue'
-import { BN } from 'bn.js'
+import LSPSelect from '@/components/shared/LSPSelect.vue'
+import { padLeft } from 'web3-utils'
+import { TokenInfo, LSPType } from '@/helpers/tokenUtils'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
@@ -24,7 +24,7 @@ const { contract } = useWeb3()
 const tokenType = ref<ContractStandard>(ContractStandard.LSP7)
 const myToken = ref<Contract>()
 const mintToken = ref<string>()
-const tokenId = ref<string>(`0x${new BN('1').toString('hex', 64)}`)
+const tokenId = ref<string>(padLeft(1, 64))
 const mintReceiver = ref<string>()
 const mintAmount = ref(100)
 const lsp4Metadata = ref<Lsp4Metadata>({
@@ -64,8 +64,7 @@ const handleMintReceiverSelected = (info: TokenInfo) => {
 const handleBlurTokenId = (event: Event) => {
   const value = (event?.target as HTMLInputElement)?.value
   try {
-    const val = new BN(value)
-    const newVal = '0x' + val.toString('hex', 64)
+    const newVal = padLeft(value, 64)
     if (newVal !== value) {
       tokenId.value = newVal
     }

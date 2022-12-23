@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getState, LSPType, TokenInfo } from '@/stores'
+import { getState } from '@/stores'
 import { ref } from 'vue'
 import { Contract } from 'web3-eth-contract'
 import useNotifications from '@/compositions/useNotifications'
@@ -10,8 +10,9 @@ import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
 import Notifications from '@/components/Notification.vue'
 import { toWei } from 'web3-utils'
 import { ContractStandard } from '@/enums'
-import LSPSelect from '@/shared/LSPSelect.vue'
-import { BN } from 'bn.js'
+import LSPSelect from '@/components/shared/LSPSelect.vue'
+import { padLeft } from 'web3-utils'
+import { LSPType, TokenInfo } from '@/helpers/tokenUtils'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
@@ -43,8 +44,7 @@ const handleTokenReceiverSelected = (info: TokenInfo) => {
 const handleBlurTokenId = (event: Event) => {
   const value = (event?.target as HTMLInputElement)?.value
   try {
-    const val = new BN(value)
-    const newVal = '0x' + val.toString('hex', 64)
+    const newVal = padLeft(value, 64)
     if (newVal !== value) {
       tokenId.value = newVal
     }
