@@ -57,14 +57,5 @@ jobs:
 
       - name: Deploy preview
         uses: rossjrw/pr-preview-action@v1
-        if: contains(['opened', 'reopened', 'synchronize'], github.event.action)
         with:
           source-dir: ./dist/
-          action: deploy
-
-      - name: Remove preview
-        uses: rossjrw/pr-preview-action@v1
-        if: github.event.action == 'closed'
-        with:
-          source-dir: ./dist/
-          action: remove
