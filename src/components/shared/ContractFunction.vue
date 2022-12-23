@@ -9,6 +9,7 @@ import ParamField from './ParamField.vue'
 interface ElementType extends MethodType {
   error?: boolean
 }
+
 type Props = {
   call?: string
   modelValue?: MethodType[]
