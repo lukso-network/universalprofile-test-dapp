@@ -33,6 +33,5 @@ export const PRIVATE_KEY =
 
 export const DEFAULT_NETWORK_CONFIG = NETWORKS[DEFAULT_NETWORK]
 
-export function getSelectorLookupURL(selector: string) {
-  return `https://www.4byte.directory/api/v1/signatures/?hex_signature=${selector}`
-}
+export const SIGNATURE_LOOKUP_URL =
+  'https://www.4byte.directory/api/v1/signatures/'

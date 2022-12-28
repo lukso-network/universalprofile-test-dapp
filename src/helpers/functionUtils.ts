@@ -1,7 +1,7 @@
 import { LSPType } from '@/helpers/tokenUtils'
+import { SIGNATURE_LOOKUP_URL } from '@/helpers/config'
 import Web3 from 'web3'
 import { Unit } from 'web3-utils'
-import { getSelectorLookupURL } from './config'
 
 export type MethodType = {
   label?: string
@@ -67,6 +67,10 @@ const fetcher = async <Response, Request>(config: {
       })
   }
   return await response.json()
+}
+
+export function getSelectorLookupURL(selector: string) {
+  return `${SIGNATURE_LOOKUP_URL}?hex_signature=${selector}`
 }
 
 export const decodeData = async (
