@@ -26,26 +26,6 @@ const methods: MethodSelect[] = [
     label: '💰 Default',
   },
   {
-    label: '💰 Transfer 1 ERC20/ERC777',
-    call: 'transfer',
-    inputs: [
-      { type: 'address', name: 'to', value: sampleUP },
-      { type: 'uint256', name: 'amount', isWei: 'ether', value: '1' },
-    ],
-    hasSpecs: [LSPType.ERC20, LSPType.ERC777],
-  },
-
-  {
-    label: '💰 TransferFrom 1 ERC721',
-    call: 'transferFrom',
-    inputs: [
-      { type: 'address', name: 'from' },
-      { type: 'address', name: 'to' },
-      { type: 'uint256', name: 'amount', isWei: 'ether', value: '1' },
-    ],
-    hasSpecs: [LSPType.ERC721],
-  },
-  {
     label: '💰 Transfer 1 LSP7/LSP8',
     call: 'transfer',
     inputs: [
@@ -58,6 +38,25 @@ const methods: MethodSelect[] = [
     hasSpecs: [LSPType.LSP7DigitalAsset, LSPType.LSP8IdentifiableDigitalAsset],
   },
   {
+    label: '💰 Transfer 1 ERC20/ERC777',
+    call: 'transfer',
+    inputs: [
+      { type: 'address', name: 'to', value: sampleUP },
+      { type: 'uint256', name: 'amount', isWei: 'ether', value: '1' },
+    ],
+    hasSpecs: [LSPType.ERC20, LSPType.ERC777],
+  },
+  {
+    label: '💰 TransferFrom 1 ERC721',
+    call: 'transferFrom',
+    inputs: [
+      { type: 'address', name: 'from' },
+      { type: 'address', name: 'to' },
+      { type: 'uint256', name: 'amount', isWei: 'ether', value: '1' },
+    ],
+    hasSpecs: [LSPType.ERC721],
+  },
+  {
     label: '💰 Send 100 ERC777',
     call: 'send',
     hasSpecs: [LSPType.ERC777],
@@ -68,16 +67,7 @@ const methods: MethodSelect[] = [
     ],
   },
   {
-    label: '🏦 Mint 100 ERC20/ERC777/LSP7',
-    call: 'mint',
-    hasSpecs: [LSPType.ERC777, LSPType.ERC20, LSPType.LSP7DigitalAsset],
-    inputs: [
-      { type: 'address', name: 'to' },
-      { type: 'uint256', name: 'amount', isWei: 'ether', value: '100' },
-    ],
-  },
-  {
-    label: '🏦 Mint LSP8',
+    label: '🏦 Mint 1 LSP7/LSP8',
     call: 'mint',
     inputs: [
       { type: 'address', name: 'to' },
@@ -85,7 +75,16 @@ const methods: MethodSelect[] = [
       { type: 'bool', name: 'force', value: false },
       { type: 'bytes', name: 'data', value: '0x' },
     ],
-    hasSpecs: [LSPType.LSP8IdentifiableDigitalAsset],
+    hasSpecs: [LSPType.LSP7DigitalAsset, LSPType.LSP8IdentifiableDigitalAsset],
+  },
+  {
+    label: '🏦 Mint 100 ERC20/ERC777/LSP7',
+    call: 'mint',
+    hasSpecs: [LSPType.ERC777, LSPType.ERC20, LSPType.LSP7DigitalAsset],
+    inputs: [
+      { type: 'address', name: 'to' },
+      { type: 'uint256', name: 'amount', isWei: 'ether', value: '100' },
+    ],
   },
   {
     label: '🎛️ SetData',
