@@ -4,7 +4,6 @@ import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
 import { ref } from 'vue'
 import { createBlockScoutLink } from '@/utils/createLinks'
-import { useLspFactory } from '@/compositions/useLspFactory'
 import Lsp4MetadataForm from '@/components/shared/Lsp4MetadataForm.vue'
 import LSP8Mintable from '@lukso/lsp-smart-contracts/artifacts/LSP8Mintable.json'
 import { Lsp4Metadata } from '@/types'
@@ -12,6 +11,10 @@ import { ContractStandard } from '@/enums'
 import CustomSelect from '@/components/shared/CustomSelect.vue'
 import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
 import useWeb3 from '@/compositions/useWeb3'
+import { useLspFactory } from '@/compositions/useLspFactory'
+import ERC725 from '@erc725/erc725.js'
+import { BN } from 'bn.js'
+import { addTokenToLocalStore, recalcTokens } from '@/helpers/tokenUtils'
 
 type Token = {
   type: ContractStandard
@@ -41,9 +44,8 @@ const lsp4Metadata = ref<Lsp4Metadata>({
     },
   ],
 })
+
 const tokenAddress = ref<string>()
-const { deployLSP7DigitalAsset, deployLSP8IdentifiableDigitalAsset } =
-  useLspFactory()
 
 const handleNewLsp4Metadata = (metadata: Lsp4Metadata) => {
   lsp4Metadata.value = metadata
@@ -64,6 +66,9 @@ const create = async () => {
   isTokenPending.value = true
 
   try {
+    const { deployLSP7DigitalAsset, deployLSP8IdentifiableDigitalAsset } =
+      useLspFactory()
+
     let deployedAsset
     switch (token.value.type) {
       case ContractStandard.LSP7:
@@ -79,7 +84,9 @@ const create = async () => {
           },
         })
         console.log('Deployed asset', deployedAsset.LSP7DigitalAsset)
-        tokenAddress.value = deployedAsset.LSP7DigitalAsset.address
+        addTokenToLocalStore(
+          (tokenAddress.value = deployedAsset.LSP7DigitalAsset.address)
+        )
         break
       case ContractStandard.LSP8:
         deployedAsset = await deployLSP8IdentifiableDigitalAsset({
@@ -107,8 +114,8 @@ const create = async () => {
         )
         await deployedContract.methods
           .setData(
-            '0x715f248956de7ce65e94d9d836bfead479f7e70d69b718d47bfe7b00e05b4fe4', //LSP8TokenIdType
-            3
+            ERC725.encodeKeyName('LSP8TokenIdType'), //LSP8TokenIdType
+            `0x${new BN('3').toString('hex', 64)}`
           )
           .send({ from: erc725AccountAddress })
           .on('receipt', function (receipt: any) {
@@ -117,11 +124,16 @@ const create = async () => {
           .once('sending', (payload: any) => {
             console.log(JSON.stringify(payload, null, 2))
           })
+        addTokenToLocalStore(
+          (tokenAddress.value =
+            deployedAsset.LSP8IdentifiableDigitalAsset.address)
+        )
         break
       default:
         console.log('Standard not supported')
     }
     isTokenCreated.value = true
+    await recalcTokens()
     setState('tokenAddress', tokenAddress.value)
     setNotification('Token created', 'info')
   } catch (error) {

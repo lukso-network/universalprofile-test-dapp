@@ -13,7 +13,9 @@ import { ERC725 } from '@erc725/erc725.js'
 import { Lsp4Metadata } from '@/types'
 import Lsp4MetadataForm from '@/components/shared/Lsp4MetadataForm.vue'
 import { ContractStandard } from '@/enums'
-import CustomSelect from '@/components/shared/CustomSelect.vue'
+import LSPSelect from '@/components/shared/LSPSelect.vue'
+import { padLeft } from 'web3-utils'
+import { TokenInfo, LSPType } from '@/helpers/tokenUtils'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
@@ -22,7 +24,7 @@ const { contract } = useWeb3()
 const tokenType = ref<ContractStandard>(ContractStandard.LSP7)
 const myToken = ref<Contract>()
 const mintToken = ref<string>()
-const tokenId = ref<string>()
+const tokenId = ref<string>(padLeft(1, 64))
 const mintReceiver = ref<string>()
 const mintAmount = ref(100)
 const lsp4Metadata = ref<Lsp4Metadata>({
@@ -43,8 +45,33 @@ watchEffect(() => {
   mintToken.value = getState('tokenAddress')
 })
 
-const handleStandardSelected = (standard: string) => {
-  tokenType.value = standard as ContractStandard
+const handleTokenSelected = (info: TokenInfo) => {
+  tokenType.value =
+    info.type === LSPType.LSP7DigitalAsset
+      ? ContractStandard.LSP7
+      : ContractStandard.LSP8
+  if (info.address) {
+    mintToken.value = info.address
+  }
+}
+
+const handleMintReceiverSelected = (info: TokenInfo) => {
+  if (info.address) {
+    mintReceiver.value = info.address
+  }
+}
+
+const handleBlurTokenId = (event: Event) => {
+  const value = (event?.target as HTMLInputElement)?.value
+  try {
+    const newVal = padLeft(value, 64)
+    if (newVal !== value) {
+      tokenId.value = newVal
+    }
+  } catch (err) {
+    console.error(err)
+    // ignore
+  }
 }
 
 const mint = async () => {
@@ -124,21 +151,16 @@ const mint = async () => {
   <div class="tile is-4 is-parent">
     <div class="tile is-child box">
       <p class="is-size-5 has-text-weight-bold mb-4">Mint</p>
-      <CustomSelect
-        :options="[
-          {
-            display: ContractStandard.LSP7,
-            value: ContractStandard.LSP7,
-          },
-          {
-            display: ContractStandard.LSP8,
-            value: ContractStandard.LSP8,
-          },
-        ]"
-        @option-selected="handleStandardSelected"
-      />
       <div class="field">
         <label class="label">Token address</label>
+        <LSPSelect
+          :address="mintToken"
+          :show-types="[
+            LSPType.LSP7DigitalAsset,
+            LSPType.LSP8IdentifiableDigitalAsset,
+          ]"
+          @option-selected="handleTokenSelected"
+        />
         <div class="control">
           <input
             v-model="mintToken"
@@ -149,7 +171,7 @@ const mint = async () => {
         </div>
       </div>
       <div v-if="tokenType === ContractStandard.LSP8" class="field">
-        <label class="label">Token id (!: only token type bytes32)</label>
+        <label class="label">Token id (on blur converts to bytes32)</label>
         <div class="control">
           <input
             v-model="tokenId"
@@ -157,11 +179,17 @@ const mint = async () => {
             type="text"
             data-testid="transfer-address"
             placeholder="0xbb204573da1a42ab80f38995444b17124110b946ba189157ffcc7ba2b3375bf8"
+            @blur="handleBlurTokenId"
           />
         </div>
       </div>
       <div class="field">
         <label class="label">Mint address</label>
+        <LSPSelect
+          :show-accounts="true"
+          :address="mintReceiver"
+          @option-selected="handleMintReceiverSelected"
+        />
         <div class="control">
           <input
             v-model="mintReceiver"

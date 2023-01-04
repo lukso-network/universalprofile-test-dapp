@@ -13,6 +13,13 @@ jest.mock('@/compositions/useWeb3', () => ({
             }),
           }),
         }),
+        setData: () => ({
+          send: () => ({
+            on: () => ({
+              once: () => jest.fn(),
+            }),
+          }),
+        }),
       },
     }),
   }),

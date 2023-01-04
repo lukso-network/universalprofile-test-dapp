@@ -1,27 +1,43 @@
 import SendTransaction from '../SendTransaction.vue'
-import { render, fireEvent, screen } from '@testing-library/vue'
+import { render, fireEvent, screen, waitFor } from '@testing-library/vue'
 import { setState } from '@/stores'
 import userEvent from '@testing-library/user-event'
 
 const mockGetBalance = jest.fn()
 const mockSendTransaction = jest.fn()
 
-jest.mock('@/compositions/useWeb3', () => ({
-  __esModule: true,
-  default: () => ({
-    getBalance: () => mockGetBalance(),
-    sendTransaction: (params: any) => mockSendTransaction(params),
-  }),
-}))
+jest.mock('@/compositions/useWeb3', () => {
+  const actual = jest.requireActual('@/compositions/useWeb3')
+  const data = actual.default()
+  const web3mock = require('@depay/web3-mock')
+  web3mock.mock('ethereum')
+  data.setupWeb3(window.ethereum)
+  const output = {
+    __esModule: true,
+    ...actual,
+    default: () => {
+      return {
+        ...data,
+        getBalance: () => mockGetBalance(),
+        sendTransaction: (params: any) => mockSendTransaction(params),
+      }
+    },
+  }
+  return output
+})
 
 test('can send lyx transaction', async () => {
   setState('address', '0x517216362D594516c6f96Ee34b2c502d65B847E4')
 
   render(SendTransaction)
 
-  await fireEvent.update(screen.getByTestId('amount'), '2')
+  await waitFor(() => {
+    expect(screen.getByTestId('transaction-from')).not.toBeFalsy()
+  })
+
+  await fireEvent.update(screen.getByTestId('transaction-amount'), '2')
   await fireEvent.update(
-    screen.getByTestId('to'),
+    screen.getByTestId('transaction-to'),
     '0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298'
   )
   await fireEvent.click(screen.getByTestId('send'))
@@ -43,9 +59,13 @@ test('can send lyx transaction with data', async () => {
 
   render(SendTransaction)
 
-  await fireEvent.update(screen.getByTestId('amount'), '2')
+  await waitFor(() => {
+    expect(screen.getByTestId('transaction-from')).not.toBeFalsy()
+  })
+
+  await fireEvent.update(screen.getByTestId('transaction-amount'), '2')
   await fireEvent.update(
-    screen.getByTestId('to'),
+    screen.getByTestId('transaction-to'),
     '0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298'
   )
   await fireEvent.click(screen.getByTestId('hasData'))
@@ -73,20 +93,29 @@ test('can send transaction from preset', async () => {
 
   render(SendTransaction)
 
+  await waitFor(() => {
+    expect(screen.getByTestId('transaction-from')).not.toBeFalsy()
+  })
+
   await userEvent.selectOptions(
     screen.getByTestId('preset'),
-    '🏦 Mint: 100 tokens B to current UP'
+    '🏦 Mint ERC20/ERC777/LSP7'
   )
+  await userEvent.type(
+    screen.getByTestId('transaction-to'),
+    '0xB29c50a9F3D90FA3aDF394f2960BD6D8e0Ff5E9D'
+  )
+
   await fireEvent.click(screen.getByTestId('send'))
 
   expect(screen.getByTestId('notification')).toHaveTextContent(
     'The transaction was successful'
   )
   expect(mockSendTransaction).toBeCalledWith({
-    data: '0x40c10f19000000000000000000000000517216362D594516c6f96Ee34b2c502d65B847E40000000000000000000000000000000000000000000000056bc75e2d63100000',
+    data: '0x40c10f19000000000000000000000000517216362d594516c6f96ee34b2c502d65b847e40000000000000000000000000000000000000000000000056bc75e2d63100000',
     from: '0x517216362D594516c6f96Ee34b2c502d65B847E4',
     to: '0xB29c50a9F3D90FA3aDF394f2960BD6D8e0Ff5E9D',
-    value: '0',
+    value: '100000000000000000',
     gas: 5000000,
     gasPrice: '10000000000',
   })

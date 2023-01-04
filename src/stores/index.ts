@@ -4,6 +4,7 @@ import useWeb3 from '@/compositions/useWeb3'
 import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
 import UniversalProfile from '@lukso/lsp-smart-contracts/artifacts/UniversalProfile.json'
 import KeyManager from '@lukso/lsp-smart-contracts/artifacts/LSP6KeyManager.json'
+import { recalcTokens } from '@/helpers/tokenUtils'
 
 export const store = reactive<Store>({
   isConnected: false,
@@ -12,6 +13,9 @@ export const store = reactive<Store>({
   balance: 0,
   channel: undefined,
   tokenAddress: undefined,
+  assets: [],
+  lsp7: [],
+  lsp8: [],
 })
 
 window.store = store
@@ -30,6 +34,7 @@ export async function setState(
 export function useState(): {
   setConnected: (address: string, channel: Channel) => Promise<void>
   setDisconnected: () => void
+  recalcTokens: () => Promise<void>
 } {
   return {
     setConnected: async (address: string, channel: Channel) => {
@@ -50,9 +55,19 @@ export function useState(): {
         gas: DEFAULT_GAS,
         gasPrice: DEFAULT_GAS_PRICE,
       })
-
       // check for balance needs to be last as Wallet Connect doesn't support `eth_getBalance` method
       setState('balance', await getBalance(address))
+
+      try {
+        const { assets, lsp7, lsp8 } = JSON.parse(
+          localStorage?.getItem('up:tokens') || 'null'
+        )
+        setState('assets', assets)
+        setState('lsp7', lsp7)
+        setState('lsp8', lsp8)
+      } catch (err) {
+        await recalcTokens()
+      }
     },
     setDisconnected: () => {
       setState('address', '')
@@ -60,8 +75,12 @@ export function useState(): {
       setState('channel', undefined)
       setState('chainId', 0)
       setState('balance', 0)
+      setState('assets', [])
+      setState('lsp7', [])
+      setState('lsp8', [])
 
       window.erc725Account = undefined
     },
+    recalcTokens,
   }
 }

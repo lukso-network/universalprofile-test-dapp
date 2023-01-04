@@ -13,7 +13,7 @@ import { computed } from 'vue'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
-const { setDisconnected, setConnected } = useState()
+const { setDisconnected, setConnected, recalcTokens } = useState()
 const { setupWeb3, requestAccounts } = useWeb3()
 const { resetProvider, enableProvider, setupProvider } = useWalletConnect()
 const hasExtension = !!window.ethereum
@@ -62,15 +62,19 @@ const disconnect = async () => {
   setDisconnected()
   setupWeb3(null)
 }
+const handleRefresh = (e: Event) => {
+  e.stopPropagation()
+  recalcTokens()
+}
 </script>
 
 <template>
   <div class="tile is-4 is-parent">
     <div class="tile is-child box">
-      <p class="is-size-5 has-text-weight-bold mb-4">Connect</p>
+      <p class="is-size-5 has-text-weight-bold mb-1">Connect</p>
       <div class="field">
         <button
-          class="button is-primary is-rounded mb-3"
+          class="button is-primary is-rounded mb-1"
           :disabled="getState('address') || !hasExtension ? true : undefined"
           data-testid="connect-extension"
           @click="connectExtension"
@@ -89,7 +93,7 @@ const disconnect = async () => {
       </div>
       <div class="field">
         <button
-          class="button is-primary is-rounded mb-3"
+          class="button is-primary is-rounded mb-1"
           :disabled="getState('address') ? true : undefined"
           data-testid="connect-wc"
           @click="connectWalletconnect"
@@ -127,21 +131,21 @@ const disconnect = async () => {
       <div class="field">
         <div
           v-if="getState('isConnected')"
-          class="notification is-info is-light mt-5"
+          class="notification is-info is-light mt-1"
           data-testid="info"
         >
-          <p class="mb-3">
-            Connected to address:<br />
-            <b
-              ><a
+          <p>Connected to address:</p>
+          <p class="text-center">
+            <b>
+              <a
                 :href="createBlockScoutLink(getState('address'))"
                 target="_blank"
                 class="is-family-code is-size-7"
                 >{{ getState('address') }}</a
-              ></b
-            >
+              >
+            </b>
           </p>
-          <p class="mb-3">
+          <p class="mb-1">
             Balance: <b class="is-family-code">{{ getState('balance') }} LYX</b>
           </p>
           <p data-testid="chain">
@@ -150,6 +154,45 @@ const disconnect = async () => {
               >{{ getState('chainId') }} ({{ hexChainId }})</b
             >
           </p>
+          <ul>
+            <li v-for="item in getState('lsp7')" :key="item.address + '_lsp7'">
+              <p>
+                {{ item.balance }} {{ item.symbol }} of {{ item.name }} (LSP7)
+              </p>
+              <b>
+                <p class="text-center">
+                  <a
+                    :href="createBlockScoutLink(item.address)"
+                    target="_blank"
+                    class="is-family-code is-size-7"
+                    >{{ item.address }}</a
+                  >
+                </p></b
+              >
+            </li>
+            <li v-for="item in getState('lsp8')" :key="item.address + '_lsp8'">
+              <p>
+                {{ item.balance }} {{ item.symbol }} of {{ item.name }} (LSP8)
+              </p>
+              <b>
+                <p class="text-center">
+                  <a
+                    :href="createBlockScoutLink(item.address)"
+                    target="_blank"
+                    class="is-family-code is-size-7"
+                    >{{ item.address }}</a
+                  >
+                </p></b
+              >
+            </li>
+          </ul>
+          <button
+            :disabled="!getState('address')"
+            class="mt-2 button is-primary is-rounded"
+            @click="handleRefresh"
+          >
+            Refetch Tokens
+          </button>
         </div>
       </div>
     </div>
@@ -159,5 +202,10 @@ const disconnect = async () => {
 <style scoped lang="scss">
 .notification {
   word-break: break-all;
+}
+
+.text-center {
+  width: 100%;
+  text-align: center;
 }
 </style>

@@ -3,7 +3,7 @@ const esModules = ['@lukso/lsp-smart-contracts'].join('|')
 module.exports = {
   transform: {
     '^.+\\.vue$': '@vue/vue3-jest',
-    '^.+\\.tsx?$': 'ts-jest',
+    '^.+\\.tsx?$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.json' }],
   },
   setupFilesAfterEnv: ['<rootDir>/tests/setup-env.ts'],
   transformIgnorePatterns: [`/node_modules/(?!${esModules})`],

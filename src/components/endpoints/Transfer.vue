@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { getState } from '@/stores'
-import { ref, watchEffect } from 'vue'
+import { ref } from 'vue'
 import { Contract } from 'web3-eth-contract'
 import useNotifications from '@/compositions/useNotifications'
 import useWeb3 from '@/compositions/useWeb3'
@@ -10,7 +10,9 @@ import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
 import Notifications from '@/components/Notification.vue'
 import { toWei } from 'web3-utils'
 import { ContractStandard } from '@/enums'
-import CustomSelect from '@/components/shared/CustomSelect.vue'
+import LSPSelect from '@/components/shared/LSPSelect.vue'
+import { padLeft } from 'web3-utils'
+import { LSPType, TokenInfo } from '@/helpers/tokenUtils'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
@@ -24,12 +26,32 @@ const transferReceiver = ref<string>()
 const transferAmount = ref(1)
 const transferForce = ref(false)
 
-watchEffect(() => {
-  transferToken.value = getState('tokenAddress')
-})
+const handleTokenSelected = (info: TokenInfo) => {
+  tokenType.value =
+    info.type === LSPType.LSP7DigitalAsset
+      ? ContractStandard.LSP7
+      : ContractStandard.LSP8
+  if (info.address) {
+    transferToken.value = info.address
+  }
+}
 
-const handleStandardSelected = (standard: string) => {
-  tokenType.value = standard as ContractStandard
+const handleTokenReceiverSelected = (info: TokenInfo) => {
+  if (info.address) {
+    transferReceiver.value = info.address
+  }
+}
+const handleBlurTokenId = (event: Event) => {
+  const value = (event?.target as HTMLInputElement)?.value
+  try {
+    const newVal = padLeft(value, 64)
+    if (newVal !== value) {
+      tokenId.value = newVal
+    }
+  } catch (err) {
+    console.error(err)
+    // ignore
+  }
 }
 
 const transfer = async () => {
@@ -105,21 +127,19 @@ const transfer = async () => {
   <div class="tile is-4 is-parent">
     <div class="tile is-child box">
       <p class="is-size-5 has-text-weight-bold mb-4">Transfer</p>
-      <CustomSelect
-        :options="[
-          {
-            display: ContractStandard.LSP7,
-            value: ContractStandard.LSP7,
-          },
-          {
-            display: ContractStandard.LSP8,
-            value: ContractStandard.LSP8,
-          },
-        ]"
-        @option-selected="handleStandardSelected"
-      />
+
       <div class="field">
         <label class="label">Token address</label>
+        <LSPSelect
+          :address="transferToken"
+          :show-types="[
+            LSPType.LSP7DigitalAsset,
+            LSPType.LSP8IdentifiableDigitalAsset,
+            LSPType.ERC20,
+            LSPType.ERC777,
+          ]"
+          @option-selected="handleTokenSelected"
+        />
         <div class="control">
           <input
             v-model="transferToken"
@@ -131,6 +151,11 @@ const transfer = async () => {
       </div>
       <div class="field">
         <label class="label">Transfer address</label>
+        <LSPSelect
+          :show-accounts="true"
+          :address="transferReceiver"
+          @option-selected="handleTokenReceiverSelected"
+        />
         <div class="control">
           <input
             v-model="transferReceiver"
@@ -154,7 +179,7 @@ const transfer = async () => {
         </div>
       </div>
       <div v-else class="field">
-        <label class="label">Token id (!: only token type bytes32)</label>
+        <label class="label">Token id (on blur converts to bytes32)</label>
         <div class="control">
           <input
             v-model="tokenId"
@@ -162,6 +187,7 @@ const transfer = async () => {
             type="text"
             data-testid="transfer-address"
             placeholder="0xbb204573da1a42ab80f38995444b17124110b946ba189157ffcc7ba2b3375bf8"
+            @blur="handleBlurTokenId"
           />
         </div>
       </div>
