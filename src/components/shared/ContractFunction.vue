@@ -31,11 +31,16 @@ const emits = defineEmits<Emits>()
 const { getWeb3 } = useWeb3()
 const { eth } = getWeb3()
 
+const IS_ARRAY_TYPE_REGEXP = /\[\]$/
+const SUPPORTED_TYPES_REGEXP =
+  /^(bytes(32)?|u?int(8|16|32|64|128|256)|string|bool|address)(\[\])?$/
+const FUNCTION_REGEXP = /^([a-z_]*)\(([^)]*)\)$/i
+
 function convertModel(model?: MethodType[]) {
   model =
     model?.map((info: MethodType) => {
       let value = info.value ?? undefined
-      if (info.type.match(/\[\]$/) && value == null) {
+      if (info.type.match(IS_ARRAY_TYPE_REGEXP) && value == null) {
         value = []
       }
       return {
@@ -116,8 +121,9 @@ const call = computed<string>(() => {
 
 function handleCall(e: Event) {
   const { value } = e.target as HTMLTextAreaElement
-  const [_all, newCall, newArgs] =
-    /^([a-z_]*)\(([^)]*)\)$/i.exec(value || '') || []
+  // Extract function name and content of types
+  // \1(\2)
+  const [_all, newCall, newArgs] = FUNCTION_REGEXP.exec(value || '') || []
   if (!_all) {
     return
   }
@@ -128,11 +134,7 @@ function handleCall(e: Event) {
       .map(([type, name], index) => {
         const old = data.items[index] || {}
         name = name || `input_${index + 1}`
-        if (
-          !/^(bytes(32)?|u?int(8|16|32|64|128|256)|string|bool|address)(\[\])?$/.test(
-            type
-          )
-        ) {
+        if (!SUPPORTED_TYPES_REGEXP.test(type)) {
           throw new Error('syntax error')
         }
         return {
