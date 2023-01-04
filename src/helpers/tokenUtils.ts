@@ -13,7 +13,9 @@ import useErc725 from '@/compositions/useErc725'
 import { eip165ABI } from '@/abis/eip165ABI'
 import { erc20ABI } from '@/abis/erc20ABI'
 import { store, setState } from '@/stores/index'
-import { lsp7TokenDivisible, lsp7TokenNonDivisible } from '@/helpers/constants'
+import { NETWORKS } from '@/helpers/config'
+
+const { lsp7TokenDivisible, lsp7TokenNonDivisible } = NETWORKS.l16
 
 const getSupportedStandardObject = (schemas: ERC725JSONSchema[]) => {
   try {

@@ -1,16 +1,7 @@
 <script setup lang="ts">
 import { getState } from '@/stores'
 import { LSPType, TokenInfo } from '@/helpers/tokenUtils'
-import {
-  sampleUP,
-  sampleEoA,
-  sampleSC,
-  erc20TokenWithEip165,
-  erc20TokenWithoutEip165,
-  erc777TokenWithEip165,
-  erc777TokenWithoutEip165,
-  erc721TokenWithEip165,
-} from '@/helpers/constants'
+import { NETWORKS } from '@/helpers/config'
 import { ref, computed, onMounted, watch } from 'vue'
 
 type Props = {
@@ -27,6 +18,16 @@ type Emits = {
   (event: 'optionSelected', option: TokenInfo): void
 }
 
+const {
+  sampleUP,
+  sampleEoA,
+  sampleSC,
+  erc20TokenWithEip165,
+  erc20TokenWithoutEip165,
+  erc777TokenWithEip165,
+  erc777TokenWithoutEip165,
+  erc721TokenWithEip165,
+} = NETWORKS.l16
 const emits = defineEmits<Emits>()
 const props = defineProps<Props>()
 const selected = ref<string | undefined>(props.address)
