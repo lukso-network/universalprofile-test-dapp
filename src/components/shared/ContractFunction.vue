@@ -119,10 +119,13 @@ const call = computed<string>(() => {
     .join(', ')})`
 })
 
+/**
+ * Handle updates to function text. Whenever the user changes the function name or definition
+ * this will update and create the corresponding input fields required to supply arguments
+ * to the function call.
+ */
 function handleCall(e: Event) {
   const { value } = e.target as HTMLTextAreaElement
-  // Extract function name and content of types
-  // \1(\2)
   const [_all, newCall, newArgs] = FUNCTION_REGEXP.exec(value || '') || []
   if (!_all) {
     return
