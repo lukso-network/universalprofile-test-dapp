@@ -1,9 +1,4 @@
-import useWeb3 from '@/compositions/useWeb3'
-import useErc725 from '@/compositions/useErc725'
-import { eip165ABI } from '@/abis/eip165ABI'
-import { erc20ABI } from '@/abis/erc20ABI'
 import BN from 'bn.js'
-import { store, setState } from '../stores/index'
 import { ERC725JSONSchema } from '@erc725/erc725.js'
 import {
   INTERFACE_IDS,
@@ -12,7 +7,13 @@ import {
 import lsp3Schema from '@erc725/erc725.js/schemas/LSP3UniversalProfileMetadata.json'
 import lsp4Schema from '@erc725/erc725.js/schemas/LSP4DigitalAsset.json'
 import lsp9Schema from '@erc725/erc725.js/schemas/LSP9Vault.json'
-import { lsp7TokenDivisible, lsp7TokenNonDivisible } from '../helpers/constants'
+
+import useWeb3 from '@/compositions/useWeb3'
+import useErc725 from '@/compositions/useErc725'
+import { eip165ABI } from '@/abis/eip165ABI'
+import { erc20ABI } from '@/abis/erc20ABI'
+import { store, setState } from '@/stores/index'
+import { lsp7TokenDivisible, lsp7TokenNonDivisible } from '@/helpers/constants'
 
 const getSupportedStandardObject = (schemas: ERC725JSONSchema[]) => {
   try {

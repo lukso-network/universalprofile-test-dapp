@@ -277,7 +277,7 @@ onMounted(() => {
   <div class="field">
     <div class="select is-fullwidth">
       <select v-model="selected" @change="handleChange">
-        <option value="">- ? -</option>
+        <option value="">Empty</option>
         <optgroup
           v-for="(items, label) of data"
           :key="label"
