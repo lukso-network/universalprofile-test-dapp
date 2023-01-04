@@ -99,7 +99,7 @@ test('can send transaction from preset', async () => {
 
   await userEvent.selectOptions(
     screen.getByTestId('preset'),
-    '🏦 Mint 100 ERC20/ERC777/LSP7'
+    '🏦 Mint ERC20/ERC777/LSP7'
   )
   await userEvent.type(
     screen.getByTestId('transaction-to'),
