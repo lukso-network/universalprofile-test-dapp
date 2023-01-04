@@ -26,7 +26,7 @@ const methods: MethodSelect[] = [
     label: '💰 Default',
   },
   {
-    label: '💰 Transfer 1 LSP7/LSP8',
+    label: '💰 Transfer LSP7/LSP8',
     call: 'transfer',
     inputs: [
       { type: 'address', name: 'from' },
@@ -38,7 +38,7 @@ const methods: MethodSelect[] = [
     hasSpecs: [LSPType.LSP7DigitalAsset, LSPType.LSP8IdentifiableDigitalAsset],
   },
   {
-    label: '💰 Transfer 1 ERC20/ERC777',
+    label: '💰 Transfer ERC20/ERC777',
     call: 'transfer',
     inputs: [
       { type: 'address', name: 'to', value: sampleUP },
@@ -47,7 +47,7 @@ const methods: MethodSelect[] = [
     hasSpecs: [LSPType.ERC20, LSPType.ERC777],
   },
   {
-    label: '💰 TransferFrom 1 ERC721',
+    label: '💰 TransferFrom ERC721',
     call: 'transferFrom',
     inputs: [
       { type: 'address', name: 'from' },
@@ -57,7 +57,7 @@ const methods: MethodSelect[] = [
     hasSpecs: [LSPType.ERC721],
   },
   {
-    label: '💰 Send 100 ERC777',
+    label: '💰 Send ERC777',
     call: 'send',
     hasSpecs: [LSPType.ERC777],
     inputs: [
@@ -67,7 +67,7 @@ const methods: MethodSelect[] = [
     ],
   },
   {
-    label: '🏦 Mint 1 LSP7/LSP8',
+    label: '🏦 Mint LSP7/LSP8',
     call: 'mint',
     inputs: [
       { type: 'address', name: 'to' },
@@ -78,7 +78,7 @@ const methods: MethodSelect[] = [
     hasSpecs: [LSPType.LSP7DigitalAsset, LSPType.LSP8IdentifiableDigitalAsset],
   },
   {
-    label: '🏦 Mint 100 ERC20/ERC777/LSP7',
+    label: '🏦 Mint ERC20/ERC777/LSP7',
     call: 'mint',
     hasSpecs: [LSPType.ERC777, LSPType.ERC20, LSPType.LSP7DigitalAsset],
     inputs: [
