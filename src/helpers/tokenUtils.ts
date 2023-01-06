@@ -167,12 +167,23 @@ export const detectLSP = async (
     const { getInstance } = useErc725()
 
     const erc725 = await getInstance(contractAddress)
-    const [{ value: name }, { value: symbol }] = await erc725.fetchData([
+    let [{ value: name }, { value: symbol }] = await erc725.fetchData([
       'LSP4TokenName',
       'LSP4TokenSymbol',
     ])
-    if (typeof name !== 'string' || typeof symbol !== 'string') {
-      throw new Error('Unable to get name and/or symbol')
+    if (typeof name !== 'string') {
+      try {
+        name = (await contract.methods.name().call()) as string
+      } catch (err) {
+        name = '<undef>'
+      }
+    }
+    if (typeof symbol !== 'string') {
+      try {
+        symbol = (await contract.methods.symbol().call()) as string
+      } catch (err) {
+        symbol = '<undef>'
+      }
     }
     let shortType: string = lspType
     switch (shortType) {
