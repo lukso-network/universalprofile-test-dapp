@@ -49,4 +49,4 @@ export const PRIVATE_KEY =
 export const DEFAULT_NETWORK_CONFIG = NETWORKS[DEFAULT_NETWORK]
 
 export const SIGNATURE_LOOKUP_URL =
-  'https://www.4byte.directory/api/v1/signatures/'
+  'https://dawn-band-b9c5.andreas3255.workers.dev/'

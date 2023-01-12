@@ -78,6 +78,9 @@ function validate(value: any): { value: any; error?: string } {
       if (/^0x([0-9a-f][0-9a-f])*/i.test(value)) {
         return { value }
       }
+      if (!value) {
+        return { value: '0x' }
+      }
       return { value, error: 'Invalid bytes value' }
     case 'uint256':
     case 'uint128':
