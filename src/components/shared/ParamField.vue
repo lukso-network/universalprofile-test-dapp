@@ -167,6 +167,37 @@ function validate(value: any): { value: any; error?: string } {
     case 'string':
       return { value }
     case 'bytes32':
+    case 'bytes31':
+    case 'bytes30':
+    case 'bytes29':
+    case 'bytes28':
+    case 'bytes27':
+    case 'bytes26':
+    case 'bytes25':
+    case 'bytes24':
+    case 'bytes23':
+    case 'bytes22':
+    case 'bytes21':
+    case 'bytes20':
+    case 'bytes19':
+    case 'bytes18':
+    case 'bytes17':
+    case 'bytes16':
+    case 'bytes15':
+    case 'bytes14':
+    case 'bytes13':
+    case 'bytes12':
+    case 'bytes11':
+    case 'bytes10':
+    case 'bytes9':
+    case 'bytes8':
+    case 'bytes7':
+    case 'bytes6':
+    case 'bytes5':
+    case 'bytes4':
+    case 'bytes3':
+    case 'bytes2':
+    case 'bytes1':
       if (methodInfo.value.isKey) {
         try {
           ERC725.encodeKeyName(value)
@@ -274,8 +305,11 @@ const shouldWei = (index: number) => {
 
 const shouldBytes32 = (index: number) => {
   const item = data.items[index]
-  if (methodInfo.value.type === 'bytes32') {
-    if (/^[0-9]+$/.test(item.value) || methodInfo.value.isKey) {
+  if (/^bytes32/.test(methodInfo.value.type)) {
+    if (
+      /^[0-9]+$/.test(item.value) ||
+      (methodInfo.value.isKey && !/^0x/.test(item.value))
+    ) {
       return true
     }
   }
@@ -284,7 +318,7 @@ const shouldBytes32 = (index: number) => {
 
 const makeBytes32 = (index: number) => {
   const item = data.items[index]
-  if (methodInfo.value.type === 'bytes32') {
+  if (/^bytes32/.test(methodInfo.value.type)) {
     if (methodInfo.value.isKey) {
       const items = (item.value || '').split(',')
       try {
