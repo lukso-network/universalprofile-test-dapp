@@ -1,7 +1,7 @@
 import { LSPType } from '@/helpers/tokenUtils'
 import { SIGNATURE_LOOKUP_URL } from '@/helpers/config'
 import Web3 from 'web3'
-import { Unit } from 'web3-utils'
+import { Unit, numberToHex } from 'web3-utils'
 
 export type MethodType = {
   label?: string
@@ -20,7 +20,7 @@ export type MethodSelect = {
   hasSpecs?: LSPType[]
 }
 
-const SIGNATURE_CACHE = 'signature-cache'
+const SIGNATURE_CACHE = 'signature-cache2'
 
 type BytesSignatureResponse = {
   count: number
@@ -103,18 +103,32 @@ export const decodeData = async (
           const args = eth.abi.decodeParameters(params, data.substring(8))
           const encodeArgs = Array(params.length)
             .fill(null)
-            .map((_val, index) => args[`${index}`] ?? '0x')
+            .map((_val, index) => {
+              if (params[index] === 'bool') {
+                const val = args[`${index}`]
+                if (val != 1 && val != 0) {
+                  // Due to javascript truthyness any non-empty or non-zero value is encoded as true without a problem.
+                  // The output packet won't match but there is really no reason to even try.
+                  throw new Error('Invalid boolean value')
+                }
+              }
+              return args[`${index}`] ?? '0x'
+            })
           const newData = eth.abi
             .encodeParameters(params, encodeArgs)
             .substring(2)
           if (data.substring(8) === newData) {
+            const call = result.text_signature.replace(/\(.*$/, '')
             const item = {
               label: `Decoded ${result.text_signature.replace(/\(.*$/, '')}`,
-              call: result.text_signature.replace(/\(.*$/, ''),
+              call,
               inputs: params.map((type, index) => ({
                 type,
                 name: `arg${index + 1}`,
                 value: args[index],
+                isKey:
+                  /^bytes32/.test(type) &&
+                  call in { setData: true, getData: true },
               })),
             }
             await signatureCache.put(url, new Response(JSON.stringify(item)))

@@ -33,7 +33,7 @@ const { eth } = getWeb3()
 
 const IS_ARRAY_TYPE_REGEXP = /\[\]$/
 const SUPPORTED_TYPES_REGEXP =
-  /^(bytes(32)?|u?int(8|16|32|64|128|256)|string|bool|address)(\[\])?$/
+  /^(bytes(3[0-2]|2[0-9]|1[0-9]|[1-9])?|u?int(8|16|32|64|128|256)|string|bool|address)(\[\])?$/
 const FUNCTION_REGEXP = /^([a-z_]*)\(([^)]*)\)$/i
 
 function convertModel(model?: MethodType[]) {
