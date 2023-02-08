@@ -10,6 +10,7 @@ import useWalletConnect, {
 import { UP_CONNECTED_ADDRESS } from '@/helpers/config'
 import { sliceAddress } from '@/utils/sliceAddress'
 
+
 const { setupWeb3, accounts, requestAccounts } = useWeb3()
 const { resetProvider, setupProvider, enableProvider, getProvider } =
   useWalletConnect()
@@ -20,6 +21,12 @@ const browserExtensionConnected = localStorage.getItem(UP_CONNECTED_ADDRESS)
 const hasExtension = !!window.ethereum
 
 const connectWalletConnect = async () => {
+  close(dropdown.value)
+  await setupProvider()
+  await enableProvider()
+}
+
+const connectWalletConnectV2 = async () => {
   close(dropdown.value)
   await setupProvider()
   await enableProvider()
@@ -182,7 +189,15 @@ onUnmounted(() => {
           @click="connectWalletConnect"
         >
           <div class="logo wallet-connect" />
-          Wallet Connect {{ walletConnectVersion }}
+          Wallet Connect V1
+        </button>
+        <button
+          class="dropdown-item has-text-weight-bold button is-text"
+          data-testid="connect-wc-v2"
+          @click="connectWalletConnectV2"
+        >
+          <div class="logo wallet-connect" />
+          Wallet Connect V2
         </button>
       </div>
     </div>
