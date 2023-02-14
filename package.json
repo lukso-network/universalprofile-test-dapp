@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@erc725/erc725.js": "0.16.0",
-    "@lukso/lsp-factory.js": "file:../tools-lsp-factory",
+    "@lukso/lsp-factory.js": "^2.4.0",
     "@lukso/lsp-smart-contracts": "^0.7.0",
     "@walletconnect/client": "1.8.0",
     "@walletconnect/encoding": "^1.0.1",
@@ -40,6 +40,9 @@
     "wagmi": "^0.11.4",
     "web3": "1.8.1",
     "web3-eth-contract": "^1.8.1"
+  },
+  "resolutions": {
+    "@lukso/lsp-factory.js/ethers": "^5.7.0"
   },
   "devDependencies": {
     "@depay/web3-mock": "^13.22.14",
