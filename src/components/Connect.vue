@@ -35,7 +35,8 @@ const connectWalletConnect = async () => {
 
 const connectWalletConnectV2 = async () => {
   close(dropdown.value)
-  await openWalletConnectV2Modal()
+  await setupWCV2Provider()
+  await enableWCV2Provider()
 }
 
 const connectExtension = async () => {
@@ -65,7 +66,7 @@ const connectExtension = async () => {
 const disconnect = async () => {
   if (getState('channel') == 'walletConnect') {
     await resetProvider()
-  } else if (getState('channel') == 'walletConnect2') {
+  } else if (getState('channel') == 'walletConnectV2') {
     await resetWCV2Provider()
   } else {
     localStorage.removeItem(UP_CONNECTED_ADDRESS)
@@ -113,10 +114,14 @@ const removeEventListeners = () => {
 
 onMounted(async () => {
   await setupProvider()
+  await setupWCV2Provider()
 
   const wcProvider = getProvider()
+  const wcv2Provider = getWCV2Provider()
   if (wcProvider && wcProvider.wc.connected) {
     await enableProvider()
+  } else if (wcv2Provider && wcv2Provider.connected) {
+    await enableWCV2Provider()
   } else if (browserExtensionConnected) {
     await connectExtension()
   }
