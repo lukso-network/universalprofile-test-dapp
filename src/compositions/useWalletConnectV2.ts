@@ -61,8 +61,6 @@ const setupWCV2Provider = async (): Promise<void> => {
     setConnected(address, 'walletConnectV2')
   })
 
-  await provider.connect()
-
   provider.on('connect', (error: any) => {
     if (error) {
       throw error
@@ -93,10 +91,10 @@ const resetWCV2Provider = async (): Promise<void> => {
 }
 
 const enableWCV2Provider = async (): Promise<void> => {
-  await provider.enable()
+  await provider.connect()
 }
 
-const getWCV2Provider = (): WalletConnectProvider => {
+const getWCV2Provider = (): EthereumProvider => {
   return provider
 }
 
