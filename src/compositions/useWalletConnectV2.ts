@@ -6,6 +6,9 @@ import { DEFAULT_NETWORK_CONFIG } from '@/helpers/config'
 
 let provider: EthereumProvider
 
+/**
+ * Prepares a WalletConnect V2 provider (EthereumProvider) that manages the WebSocket connection.
+ */
 const setupWCV2Provider = async (): Promise<void> => {
   const { setupWeb3 } = useWeb3()
 
@@ -86,18 +89,38 @@ const setupWCV2Provider = async (): Promise<void> => {
   setupWeb3(provider as unknown as Provider)
 }
 
+/**
+ * Disconnects from all sessions. 
+ */
 const resetWCV2Provider = async (): Promise<void> => {
-  await provider.disconnect()
+  if (provider) {
+    await provider.disconnect()
+  } else {
+    console.warn("Provider is not set up. Please, call `setupWCV2Provider` first.")
+  }
 }
 
+/**
+ * Starting a pairing attempt by opening a modal with a QR code.
+ */
 const enableWCV2Provider = async (): Promise<void> => {
-  await provider.connect()
+  if (provider) {
+    await provider.connect()
+  } else {
+    console.warn("Provider is not set up. Please, call `setupWCV2Provider` first.")
+  }
 }
 
+/**
+ * @returns an instance managing WalletConnect V2 connection. 
+ */
 const getWCV2Provider = (): EthereumProvider => {
   return provider
 }
 
+/**
+ * @returns a set of functions to manage WalletConnect V2 connection.
+ */
 export default function useWalletConnectV2(): {
   resetWCV2Provider: () => Promise<void>
   setupWCV2Provider: () => Promise<void>
