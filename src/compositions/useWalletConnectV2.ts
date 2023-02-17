@@ -1,4 +1,4 @@
-import { EthereumProvider } from '@walletconnect/ethereum-provider'
+import EthereumProvider from '@walletconnect/ethereum-provider'
 import { setState, useState, getState } from '@/stores'
 import useWeb3 from '@/compositions/useWeb3'
 import { provider as Provider } from 'web3-core'
