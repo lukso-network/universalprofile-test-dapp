@@ -15,8 +15,12 @@ const { setupWeb3, accounts, requestAccounts } = useWeb3()
 const { resetProvider, setupProvider, enableProvider, getProvider } =
   useWalletConnect()
 
-const { resetWCV2Provider, setuWCV2Provider, enableWCV2Provider, getWCV2Provider } =
-  useWalletConnectV2()
+const {
+  resetWCV2Provider,
+  setupWCV2Provider,
+  enableWCV2Provider,
+  getWCV2Provider,
+} = useWalletConnectV2()
 const { setDisconnected, setConnected } = useState()
 const { close, toggle } = useDropdown()
 const dropdown = ref()
