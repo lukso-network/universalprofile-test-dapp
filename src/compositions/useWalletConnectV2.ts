@@ -9,7 +9,7 @@ let provider: EthereumProvider
 const setupWCV2Provider = async (): Promise<void> => {
   const { setupWeb3 } = useWeb3()
 
-  const provider = await EthereumProvider.init({
+  provider = await EthereumProvider.init({
     projectId: '969ebd167fcb13001839a2d41a7f7170',
     chains: [DEFAULT_NETWORK_CONFIG.chainId],
     methods: [
