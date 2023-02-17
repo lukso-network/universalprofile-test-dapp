@@ -1,24 +1,13 @@
-import SignClient from '@walletconnect/sign-client'
 import { EthereumProvider } from '@walletconnect/ethereum-provider'
 import { setState, useState, getState } from '@/stores'
 import useWeb3 from '@/compositions/useWeb3'
 import { provider as Provider } from 'web3-core'
 import { DEFAULT_NETWORK_CONFIG } from '@/helpers/config'
 
-async function openWalletConnectV2Modal() {
-  // const web3Modal = new Web3Modal({
-  //   projectId: '969ebd167fcb13001839a2d41a7f7170',
-  //   walletConnectVersion: 2,
-  // })
-  // const signClient = await SignClient.init({
-  //   projectId: '969ebd167fcb13001839a2d41a7f7170',
-  //   metadata: {
-  //       name: "UP Test DApp",
-  //       description: "UP Test DApp",
-  //       url: "https://up-test-dapp.lukso.tech/",
-  //       icons: ["https://up-test-dapp.lukso.tech/lukso.png"],
-  //     },
-  // })
+let provider: EthereumProvider
+
+const setupWCV2Provider = async (): Promise<void> => {
+  const { setupWeb3 } = useWeb3()
 
   const provider = await EthereumProvider.init({
     projectId: '969ebd167fcb13001839a2d41a7f7170',
@@ -47,7 +36,7 @@ async function openWalletConnectV2Modal() {
     }
 
     setState('isConnected', true)
-    // setupWeb3(provider as unknown as Provider)
+    setupWeb3(provider as unknown as Provider)
   })
 
   provider.on('connect', (error: any) => {
@@ -69,76 +58,60 @@ async function openWalletConnectV2Modal() {
     const { setConnected } = useState()
     const [address] = accounts
 
-    setConnected(address, 'walletConnect')
+    setConnected(address, 'walletConnectV2')
   })
-
-  //setupWeb3(provider as unknown as Provider)
 
   await provider.connect()
 
-  console.log(provider.accounts)
+  provider.on('connect', (error: any) => {
+    if (error) {
+      throw error
+    }
 
-  // signClient.on("session_event", (event) => {
-  //   // Handle session events, such as "chainChanged", "accountsChanged", etc.
-  //   console.log("WalletConnectV2 session_event: " + JSON.stringify(event))
-  // });
+    setState('isConnected', true)
+    setupWeb3(provider as unknown as Provider)
+  })
 
-  // signClient.on("session_update", ({ topic, params }) => {
-  //   const { namespaces } = params;
-  //   const _session = signClient.session.get(topic);
-  //   // Overwrite the `namespaces` of the existing session with the incoming one.
-  //   const updatedSession = { ..._session, namespaces };
-  //   // Integrate the updated session state into your dapp state.
-  //   // onSessionUpdate(updatedSession);
-  //   console.log("WalletConnectV2 session_update")
-  // });
+  provider.on('accountsChanged', async (accounts: string[]) => {
+    console.log('Account changed', accounts)
 
-  // signClient.on("session_delete", () => {
-  //   // Session was deleted -> reset the dapp state, clean up from user session, etc.
-  //   console.log("WalletConnectV2 session_delete")
-  // });
+    if (accounts.length === 0 && getState('isConnected')) {
+      await resetWCV2Provider()
+    }
 
-  // if (signClient) {
-  //   const namespaces = {
-  //     eip155: {
-  //       // array of JSON-RPC methods expected to be used during the session
-  //       methods: [
-  //         'eth_sendTransaction',
-  //         'eth_sign',
-  //         'personal_sign',
-  //         'eth_getBalance',
-  //         'eth_getAccounts',
-  //         'eth_requestAccounts',
-  //         'up_import',
-  //         'up_addTransactionRelayer',
-  //       ],
-  //       //  array of CAIP-2-compliant chainId's. This parameter MAY be omitted if a single-chain scope is already declared in the index of the object.
-  //       chains: ['eip155:2828'],
-  //       //  array of JSON-RPC message/events expected to be emitted during the session
-  //       events: ['accountsChanged'],
-  //     },
-  //   }
-  //   const { uri, approval } = await signClient.connect({
-  //     requiredNamespaces: namespaces,
-  //   })
+    const { setConnected } = useState()
+    const [address] = accounts
 
-  //   try {
-  //       if (uri) {
-  //       await web3Modal.openModal({
-  //           uri,
-  //           standaloneChains: namespaces.eip155.chains,
-  //       })
-  //       const session = await approval();
-  //       //onSessionConnect(session);
-  //       console.log("onSessionConnect")
-  //       console.log(session)
-  //       console.log(JSON.stringify(session))
-  //       web3Modal.closeModal()
-  //       }
-  //   } catch (e) {
-  //       console.log(e)
-  //       web3Modal.closeModal()
-  //   }
+    setConnected(address, 'walletConnectV2')
+  })
+
+  setupWeb3(provider as unknown as Provider)
 }
 
-export { openWalletConnectV2Modal }
+const resetWCV2Provider = async (): Promise<void> => {
+  await provider.disconnect()
+}
+
+const enableWCV2Provider = async (): Promise<void> => {
+  await provider.enable()
+}
+
+const getWCV2Provider = (): WalletConnectProvider => {
+  return provider
+}
+
+export default function useWalletConnectV2(): {
+  resetWCV2Provider: () => Promise<void>
+  setupWCV2Provider: () => Promise<void>
+  enableWCV2Provider: () => Promise<void>
+  getWCV2Provider: () => EthereumProvider
+  // sendCustomWCRequest: (request: object) => Promise<any>
+} {
+  return {
+    resetWCV2Provider,
+    setupWCV2Provider,
+    enableWCV2Provider,
+    getWCV2Provider,
+    // sendCustomWCRequest,
+  }
+}

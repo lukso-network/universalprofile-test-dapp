@@ -9,11 +9,14 @@ import useWalletConnect, {
 } from '@/compositions/useWalletConnect'
 import { UP_CONNECTED_ADDRESS } from '@/helpers/config'
 import { sliceAddress } from '@/utils/sliceAddress'
-import { openWalletConnectV2Modal } from '@/compositions/useWalletConnectV2'
+import useWalletConnectV2 from '@/compositions/useWalletConnectV2'
 
 const { setupWeb3, accounts, requestAccounts } = useWeb3()
 const { resetProvider, setupProvider, enableProvider, getProvider } =
   useWalletConnect()
+
+const { resetWCV2Provider, setuWCV2Provider, enableWCV2Provider, getWCV2Provider } =
+  useWalletConnectV2()
 const { setDisconnected, setConnected } = useState()
 const { close, toggle } = useDropdown()
 const dropdown = ref()
@@ -58,6 +61,8 @@ const connectExtension = async () => {
 const disconnect = async () => {
   if (getState('channel') == 'walletConnect') {
     await resetProvider()
+  } else if (getState('channel') == 'walletConnect2') {
+    await resetWCV2Provider()
   } else {
     localStorage.removeItem(UP_CONNECTED_ADDRESS)
   }

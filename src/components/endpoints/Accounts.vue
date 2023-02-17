@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
-import useWalletConnect, {
-  WALLET_CONNECT_VERSION as walletConnectVersion,
-} from '@/compositions/useWalletConnect'
-import { openWalletConnectV2Modal } from '@/compositions/useWalletConnectV2'
+import useWalletConnect from '@/compositions/useWalletConnect'
+import useWalletConnectV2 from '@/compositions/useWalletConnectV2'
 import { getState, useState } from '@/stores'
 import useWeb3 from '@/compositions/useWeb3'
 import { UP_CONNECTED_ADDRESS } from '@/helpers/config'
@@ -17,6 +15,8 @@ const { notification, clearNotification, hasNotification, setNotification } =
 const { setDisconnected, setConnected, recalcTokens } = useState()
 const { setupWeb3, requestAccounts } = useWeb3()
 const { resetProvider, enableProvider, setupProvider } = useWalletConnect()
+const { resetWCV2Provider, enableWCV2Provider, setupWCV2Provider } =
+  useWalletConnectV2()
 const hasExtension = !!window.ethereum
 
 const hexChainId = computed(() => {
@@ -51,10 +51,10 @@ const connectWalletConnect = async () => {
 
 const connectWalletConnectV2 = async () => {
   clearNotification()
-  
-  await openWalletConnectV2Modal()
 
   try {
+    await setupWCV2Provider()
+    await enableWCV2Provider()
     setConnected(getState('address'), 'walletConnectV2')
     setNotification(`Connected to address: ${getState('address')}`, 'info')
   } catch (error) {
@@ -67,8 +67,8 @@ const disconnect = async () => {
 
   if (getState('channel') == 'walletConnect') {
     await resetProvider()
-  } else if (getState('channel') == 'walletConnect2') {
-    // TODO: reset the data?
+  } else if (getState('channel') == 'walletConnectV2') {
+    await resetWCV2Provider()
   } else {
     localStorage.removeItem(UP_CONNECTED_ADDRESS)
   }
