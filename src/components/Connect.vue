@@ -121,7 +121,7 @@ onMounted(async () => {
   if (wcProvider && wcProvider.wc.connected) {
     await enableProvider()
   } else if (wcv2Provider && wcv2Provider.connected) {
-    await enableWCV2Provider()
+    // await enableWCV2Provider()
   } else if (browserExtensionConnected) {
     await connectExtension()
   }

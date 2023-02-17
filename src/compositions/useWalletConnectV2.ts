@@ -90,13 +90,15 @@ const setupWCV2Provider = async (): Promise<void> => {
 }
 
 /**
- * Disconnects from all sessions. 
+ * Disconnects from all sessions.
  */
 const resetWCV2Provider = async (): Promise<void> => {
   if (provider) {
     await provider.disconnect()
   } else {
-    console.warn("Provider is not set up. Please, call `setupWCV2Provider` first.")
+    console.warn(
+      'Provider is not set up. Please, call `setupWCV2Provider` first.'
+    )
   }
 }
 
@@ -107,12 +109,14 @@ const enableWCV2Provider = async (): Promise<void> => {
   if (provider) {
     await provider.connect()
   } else {
-    console.warn("Provider is not set up. Please, call `setupWCV2Provider` first.")
+    console.warn(
+      'Provider is not set up. Please, call `setupWCV2Provider` first.'
+    )
   }
 }
 
 /**
- * @returns an instance managing WalletConnect V2 connection. 
+ * @returns an instance managing WalletConnect V2 connection.
  */
 const getWCV2Provider = (): EthereumProvider => {
   return provider
