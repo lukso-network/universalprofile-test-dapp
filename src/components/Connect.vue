@@ -9,7 +9,7 @@ import useWalletConnect, {
 } from '@/compositions/useWalletConnect'
 import { UP_CONNECTED_ADDRESS } from '@/helpers/config'
 import { sliceAddress } from '@/utils/sliceAddress'
-
+import { openWalletConnectV2Modal } from '@/compositions/useWalletConnectV2'
 
 const { setupWeb3, accounts, requestAccounts } = useWeb3()
 const { resetProvider, setupProvider, enableProvider, getProvider } =
@@ -28,8 +28,7 @@ const connectWalletConnect = async () => {
 
 const connectWalletConnectV2 = async () => {
   close(dropdown.value)
-  await setupProvider()
-  await enableProvider()
+  await openWalletConnectV2Modal()
 }
 
 const connectExtension = async () => {
