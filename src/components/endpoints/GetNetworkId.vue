@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
+import { sendRequest } from '@/helpers/customRequest'
 import { ref } from 'vue'
 
 const { notification, clearNotification, hasNotification, setNotification } =
@@ -12,7 +13,7 @@ const getNetworkId = async () => {
   clearNotification()
 
   try {
-    networkId.value = await window.ethereum.request({ method: 'eth_getId' })
+    networkId.value = await sendRequest({ method: 'eth_getId' })
     setNotification(networkId.value, 'info')
   } catch (error) {
     setNotification((error as unknown as Error).message, 'danger')
