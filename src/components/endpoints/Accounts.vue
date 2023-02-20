@@ -15,7 +15,7 @@ const { notification, clearNotification, hasNotification, setNotification } =
 const { setDisconnected, setConnected, recalcTokens } = useState()
 const { setupWeb3, requestAccounts } = useWeb3()
 const { resetProvider, enableProvider, setupProvider } = useWalletConnect()
-const { resetWCV2Provider, enableWCV2Provider, setupWCV2Provider } =
+const { resetWCV2Provider, setupWCV2Provider } =
   useWalletConnectV2()
 const hasExtension = !!window.ethereum
 
@@ -54,7 +54,6 @@ const connectWalletConnectV2 = async () => {
 
   try {
     await setupWCV2Provider()
-    await enableWCV2Provider()
     setConnected(getState('address'), 'walletConnectV2')
     setNotification(`Connected to address: ${getState('address')}`, 'info')
   } catch (error) {

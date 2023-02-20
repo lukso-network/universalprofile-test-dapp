@@ -42,20 +42,11 @@ const setupWCV2Provider = async (): Promise<void> => {
     setupWeb3(provider as unknown as Provider)
   })
 
-  provider.on('connect', (error: any) => {
-    if (error) {
-      throw error
-    }
-
-    setState('isConnected', true)
-    // setupWeb3(provider as unknown as Provider)
-  })
-
   provider.on('accountsChanged', async (accounts: string[]) => {
     console.log('Account changed', accounts)
 
     if (accounts.length === 0 && getState('isConnected')) {
-      // await resetProvider()
+      await resetWCV2Provider()
     }
 
     const { setConnected } = useState()
@@ -86,6 +77,13 @@ const setupWCV2Provider = async (): Promise<void> => {
     setConnected(address, 'walletConnectV2')
   })
 
+
+  const { setConnected } = useState()
+  const [address] = provider.accounts
+  if (address) {
+    setConnected(address, 'walletConnectV2')
+  }
+
   setupWeb3(provider as unknown as Provider)
 }
 
@@ -103,11 +101,24 @@ const resetWCV2Provider = async (): Promise<void> => {
 }
 
 /**
- * Starting a pairing attempt by opening a modal with a QR code.
+ * Starting a new pairing attempt by opening a modal with a QR code.
+ */
+const openWCV2Modal = async (): Promise<void> => {
+  if (provider) {
+    await provider.enable()
+  } else {
+    console.warn(
+      'Provider is not set up. Please, call `setupWCV2Provider` first.'
+    )
+  }
+}
+
+/**
+ * Starting a connection attempt of previously established sessions.
  */
 const enableWCV2Provider = async (): Promise<void> => {
   if (provider) {
-    await provider.connect()
+    
   } else {
     console.warn(
       'Provider is not set up. Please, call `setupWCV2Provider` first.'
@@ -123,20 +134,34 @@ const getWCV2Provider = (): EthereumProvider => {
 }
 
 /**
+ * Custom RPC requests cannot be handled by `window.ethereum.request(request)` and thus must be forwarded to
+ * `provider.request` for a custom processing.
+ */
+const sendCustomWCV2Request = async (request: { method: string, params?: [any] }): Promise<any> => {
+  if (provider && provider.connected) {
+    await provider.request(request)
+  } else {
+    console.warn(
+      'Provider is not set up or not connected.'
+    )
+  }
+}
+
+/**
  * @returns a set of functions to manage WalletConnect V2 connection.
  */
 export default function useWalletConnectV2(): {
   resetWCV2Provider: () => Promise<void>
   setupWCV2Provider: () => Promise<void>
-  enableWCV2Provider: () => Promise<void>
+  openWCV2Modal: () => Promise<void>
   getWCV2Provider: () => EthereumProvider
-  // sendCustomWCRequest: (request: object) => Promise<any>
+  sendCustomWCV2Request: (request: { method: string, params?: [any] }) => Promise<any>
 } {
   return {
     resetWCV2Provider,
     setupWCV2Provider,
-    enableWCV2Provider,
+    openWCV2Modal,
     getWCV2Provider,
-    // sendCustomWCRequest,
+    sendCustomWCV2Request,
   }
 }

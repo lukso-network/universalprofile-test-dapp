@@ -18,7 +18,7 @@ const { resetProvider, setupProvider, enableProvider, getProvider } =
 const {
   resetWCV2Provider,
   setupWCV2Provider,
-  enableWCV2Provider,
+  openWCV2Modal,
   getWCV2Provider,
 } = useWalletConnectV2()
 const { setDisconnected, setConnected } = useState()
@@ -36,7 +36,7 @@ const connectWalletConnect = async () => {
 const connectWalletConnectV2 = async () => {
   close(dropdown.value)
   await setupWCV2Provider()
-  await enableWCV2Provider()
+  await openWCV2Modal()
 }
 
 const connectExtension = async () => {
@@ -121,7 +121,7 @@ onMounted(async () => {
   if (wcProvider && wcProvider.wc.connected) {
     await enableProvider()
   } else if (wcv2Provider && wcv2Provider.connected) {
-    // await enableWCV2Provider()
+    // All set up already
   } else if (browserExtensionConnected) {
     await connectExtension()
   }
