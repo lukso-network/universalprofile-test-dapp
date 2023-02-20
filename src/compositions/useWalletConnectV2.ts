@@ -123,13 +123,14 @@ const getWCV2Provider = (): EthereumProvider => {
  * Custom RPC requests cannot be handled by `window.ethereum.request(request)` and thus must be forwarded to
  * `provider.request` for a custom processing.
  */
-const sendCustomWCV2Request = async (request: { method: string, params?: [any] }): Promise<any> => {
+const sendCustomWCV2Request = async (request: {
+  method: string
+  params?: [any]
+}): Promise<any> => {
   if (provider && provider.connected) {
     await provider.request(request)
   } else {
-    console.warn(
-      'Provider is not set up or not connected.'
-    )
+    console.warn('Provider is not set up or not connected.')
   }
 }
 
@@ -141,7 +142,10 @@ export default function useWalletConnectV2(): {
   setupWCV2Provider: () => Promise<void>
   openWCV2Modal: () => Promise<void>
   getWCV2Provider: () => EthereumProvider
-  sendCustomWCV2Request: (request: { method: string, params?: [any] }) => Promise<any>
+  sendCustomWCV2Request: (request: {
+    method: string
+    params?: [any]
+  }) => Promise<any>
 } {
   return {
     resetWCV2Provider,
