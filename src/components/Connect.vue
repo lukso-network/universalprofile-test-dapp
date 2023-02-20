@@ -4,9 +4,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { EthereumProviderError } from 'eth-rpc-errors'
 import useDropdown from '@/compositions/useDropdown'
 import useWeb3 from '@/compositions/useWeb3'
-import useWalletConnect, {
-  WALLET_CONNECT_VERSION as walletConnectVersion,
-} from '@/compositions/useWalletConnect'
+import useWalletConnect from '@/compositions/useWalletConnect'
 import { UP_CONNECTED_ADDRESS } from '@/helpers/config'
 import { sliceAddress } from '@/utils/sliceAddress'
 import useWalletConnectV2 from '@/compositions/useWalletConnectV2'
