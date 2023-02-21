@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
 import useWalletConnect from '@/compositions/useWalletConnect'
 import useWalletConnectV2 from '@/compositions/useWalletConnectV2'
@@ -23,7 +24,7 @@ const hexChainId = computed(() => {
 
 const connectExtension = async () => {
   clearNotification()
-  setupWeb3(window.ethereum as any)
+  setupWeb3(window.ethereum)
 
   try {
     const [address] = await requestAccounts()
