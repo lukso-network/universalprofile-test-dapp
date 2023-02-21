@@ -12,7 +12,7 @@ const sendRequest = async (request: any): Promise<any> => {
   } else if (wcv2Provider && wcv2Provider.connected) {
     await sendCustomWCV2Request(request)
   } else {
-    await window.ethereum.request(request)
+    await (window.ethereum as any)?.request(request)
   }
 }
 
