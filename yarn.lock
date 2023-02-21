@@ -14344,12 +14344,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uint8arrays@npm:3.1.0, uint8arrays@npm:^3.0.0":
-  version: 3.1.0
-  resolution: "uint8arrays@npm:3.1.0"
+"uint8arrays@npm:^3.1.1":
+  version: 3.1.1
+  resolution: "uint8arrays@npm:3.1.1"
   dependencies:
     multiformats: ^9.4.2
-  checksum: 77fe0c8644417a849f5cfc0e5a5308c65e3b779a56f816dd27b8f60f7fac1ac7626f57c9abacec77d147beb5da8401b86438b1591d93cae7f7511a3211cc01b3
+  checksum: b93b6c3f0a526b116799f3a3409bd4b5d5553eb3e73e485998ece7974742254fbc0d2f7988dd21ac86c4b974552f45d9ae9cf9cba9647e529f8eb1fdd2ed84d0
   languageName: node
   linkType: hard
 
