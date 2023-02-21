@@ -24,7 +24,7 @@ const hexChainId = computed(() => {
 
 const connectExtension = async () => {
   clearNotification()
-  setupWeb3(window.ethereum)
+  setupWeb3(window.ethereum as any)
 
   try {
     const [address] = await requestAccounts()
