@@ -36,7 +36,7 @@ const connectWalletConnectV2 = async () => {
 const connectExtension = async () => {
   try {
     close(dropdown.value)
-    setupWeb3((window.ethereum as any))
+    setupWeb3(window.ethereum as any)
     let address = await accounts()
 
     if (!address) {
@@ -93,17 +93,37 @@ const handleDisconnect = () => {
 }
 
 const addEventListeners = () => {
-  (window.ethereum as any)?.on('accountsChanged', handleAccountsChanged)
-  (window.ethereum as any)?.on('chainChanged', handleChainChanged)
-  (window.ethereum as any)?.on('connect', handleConnect)
-  (window.ethereum as any)?.on('disconnect', handleDisconnect)
+  ;(window.ethereum as any)
+    ?.on(
+      'accountsChanged',
+      handleAccountsChanged
+    )(window.ethereum as any)
+    ?.on(
+      'chainChanged',
+      handleChainChanged
+    )(window.ethereum as any)
+    ?.on(
+      'connect',
+      handleConnect
+    )(window.ethereum as any)
+    ?.on('disconnect', handleDisconnect)
 }
 
 const removeEventListeners = () => {
-  (window.ethereum as any)?.removeListener('accountsChanged', handleAccountsChanged)
-  (window.ethereum as any)?.removeListener('chainChanged', handleChainChanged)
-  (window.ethereum as any)?.removeListener('connect', handleConnect)
-  (window.ethereum as any)?.removeListener('disconnect', handleDisconnect)
+  ;(window.ethereum as any)
+    ?.removeListener(
+      'accountsChanged',
+      handleAccountsChanged
+    )(window.ethereum as any)
+    ?.removeListener(
+      'chainChanged',
+      handleChainChanged
+    )(window.ethereum as any)
+    ?.removeListener(
+      'connect',
+      handleConnect
+    )(window.ethereum as any)
+    ?.removeListener('disconnect', handleDisconnect)
 }
 
 onMounted(async () => {
