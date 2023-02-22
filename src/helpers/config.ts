@@ -52,3 +52,4 @@ export const SIGNATURE_LOOKUP_URL =
   'https://dawn-band-b9c5.andreas3255.workers.dev/'
 
 export const WALLET_CONNECT_PROJECT_ID = '60d33cf1d49c401142281758795f53d9' // We should put this in .env
+;('https://4bytesdictionary.universalprofile.cloud/')
