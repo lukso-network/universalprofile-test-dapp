@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Notifications from '@/components/Notification.vue'
+import { provider as Provider } from 'web3-core'
 import useNotifications from '@/compositions/useNotifications'
 import useWalletConnect from '@/compositions/useWalletConnect'
 import useWalletConnectV2 from '@/compositions/useWalletConnectV2'
@@ -15,7 +16,8 @@ const { notification, clearNotification, hasNotification, setNotification } =
 const { setDisconnected, setConnected, recalcTokens } = useState()
 const { setupWeb3, requestAccounts } = useWeb3()
 const { resetProvider, enableProvider, setupProvider } = useWalletConnect()
-const { resetWCV2Provider, setupWCV2Provider } = useWalletConnectV2()
+const { resetWCV2Provider, setupWCV2Provider, openWCV2Modal } =
+  useWalletConnectV2()
 const hasExtension = !!window.ethereum
 
 const hexChainId = computed(() => {
@@ -24,7 +26,17 @@ const hexChainId = computed(() => {
 
 const connectExtension = async () => {
   clearNotification()
-  setupWeb3(window.ethereum as any)
+
+  if (!window.ethereum) {
+    setNotification(
+      'window.ethereum is undefined, is the extension enabled?',
+      'warning'
+    )
+    return
+  }
+
+  // The Ethereum object is used as a provider
+  setupWeb3(window.ethereum as any as Provider)
 
   try {
     const [address] = await requestAccounts()
@@ -53,6 +65,7 @@ const connectWalletConnectV2 = async () => {
 
   try {
     await setupWCV2Provider()
+    await openWCV2Modal()
     setConnected(getState('address'), 'walletConnectV2')
     setNotification(`Connected to address: ${getState('address')}`, 'info')
   } catch (error) {

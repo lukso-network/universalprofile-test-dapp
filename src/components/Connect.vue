@@ -93,37 +93,17 @@ const handleDisconnect = () => {
 }
 
 const addEventListeners = () => {
-  ;(window.ethereum as any)
-    ?.on(
-      'accountsChanged',
-      handleAccountsChanged
-    )(window.ethereum as any)
-    ?.on(
-      'chainChanged',
-      handleChainChanged
-    )(window.ethereum as any)
-    ?.on(
-      'connect',
-      handleConnect
-    )(window.ethereum as any)
-    ?.on('disconnect', handleDisconnect)
+  window.ethereum?.on?.('accountsChanged', handleAccountsChanged)
+  window.ethereum?.on?.('chainChanged', handleChainChanged)
+  window.ethereum?.on?.('connect', handleConnect)
+  window.ethereum?.on?.('disconnect', handleDisconnect)
 }
 
 const removeEventListeners = () => {
-  ;(window.ethereum as any)
-    ?.removeListener(
-      'accountsChanged',
-      handleAccountsChanged
-    )(window.ethereum as any)
-    ?.removeListener(
-      'chainChanged',
-      handleChainChanged
-    )(window.ethereum as any)
-    ?.removeListener(
-      'connect',
-      handleConnect
-    )(window.ethereum as any)
-    ?.removeListener('disconnect', handleDisconnect)
+  window.ethereum?.removeListener?.('accountsChanged', handleAccountsChanged)
+  window.ethereum?.removeListener?.('chainChanged', handleChainChanged)
+  window.ethereum?.removeListener?.('connect', handleConnect)
+  window.ethereum?.removeListener?.('disconnect', handleDisconnect)
 }
 
 onMounted(async () => {

@@ -73,6 +73,8 @@ test('can connect to browser extension when authorized', async () => {
     },
   })
 
+  window.ethereum = {} as any
+
   render(Accounts)
 
   await fireEvent.click(screen.getByTestId('connect-extension'))
