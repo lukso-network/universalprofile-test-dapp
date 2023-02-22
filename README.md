@@ -55,3 +55,7 @@ yarn upgrade-interactive
 
 > NOTE: Current all jest related npms are still on version 28. Please do not upgrade to 29 as it's a very
 > large piece of work
+
+## Wallet Connect V2
+
+This project supports Wallet Connect V2, a [project ID should be set](https://docs.walletconnect.com/2.0/javascript/sign/installation) in `constants.ts` file.
