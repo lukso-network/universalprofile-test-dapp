@@ -73,6 +73,8 @@ test('can connect to browser extension when authorized', async () => {
     },
   })
 
+  window.ethereum = {} as any
+
   render(Accounts)
 
   await fireEvent.click(screen.getByTestId('connect-extension'))
@@ -83,7 +85,7 @@ test('can connect to browser extension when authorized', async () => {
 })
 
 test('can disconnect from browser extension', async () => {
-  window.ethereum = {}
+  window.ethereum = {} as any
   const { setConnected } = useState()
   setConnected('0x517216362D594516c6f96Ee34b2c502d65B847E4', 'browserExtension')
 

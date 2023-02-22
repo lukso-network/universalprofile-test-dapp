@@ -1,3 +1,5 @@
+import { Ethereum } from '@wagmi/connectors'
+
 export {}
 declare global {
   interface Window {
@@ -6,7 +8,7 @@ declare global {
     erc725Account?: Contract
     keyManager?: Contract
     ERC725?: ERC725
-    ethereum: any
+    ethereum?: Ethereum
   }
 }
 

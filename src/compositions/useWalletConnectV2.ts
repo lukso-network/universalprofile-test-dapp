@@ -2,7 +2,10 @@ import EthereumProvider from '@walletconnect/ethereum-provider'
 import { setState, useState, getState } from '@/stores'
 import useWeb3 from '@/compositions/useWeb3'
 import { provider as Provider } from 'web3-core'
-import { DEFAULT_NETWORK_CONFIG } from '@/helpers/config'
+import {
+  DEFAULT_NETWORK_CONFIG,
+  WALLET_CONNECT_PROJECT_ID,
+} from '@/helpers/config'
 
 let provider: EthereumProvider
 
@@ -13,7 +16,7 @@ const setupWCV2Provider = async (): Promise<void> => {
   const { setupWeb3 } = useWeb3()
 
   provider = await EthereumProvider.init({
-    projectId: '969ebd167fcb13001839a2d41a7f7170',
+    projectId: WALLET_CONNECT_PROJECT_ID,
     chains: [DEFAULT_NETWORK_CONFIG.chainId],
     methods: [
       'eth_sendTransaction',
