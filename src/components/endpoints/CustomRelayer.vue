@@ -2,7 +2,9 @@
 import { ref } from 'vue'
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
-import { sendRequest } from '@/helpers/customRequest'
+import useWalletConnect from '@/compositions/useWalletConnect'
+
+const { getProvider, sendCustomWCRequest } = useWalletConnect()
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
@@ -47,7 +49,12 @@ const addCustomRelayer = async () => {
         },
       ],
     }
-    await sendRequest(request)
+    const wcProvider = getProvider()
+    if (wcProvider && wcProvider.wc.connected) {
+      await sendCustomWCRequest(request)
+    } else {
+      await window.ethereum.request(request)
+    }
     setNotification('The relayer was added')
   } catch (error) {
     setNotification((error as unknown as Error).message, 'danger')

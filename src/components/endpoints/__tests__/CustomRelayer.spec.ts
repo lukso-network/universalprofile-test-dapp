@@ -9,9 +9,9 @@ const data = {
 
 window.ethereum = {
   request: jest.fn(),
-} as any
+}
 
-const windowSpy = jest.spyOn(window.ethereum as any, 'request')
+const windowSpy = jest.spyOn(window.ethereum, 'request')
 
 afterEach(() => {
   windowSpy.mockRestore()
