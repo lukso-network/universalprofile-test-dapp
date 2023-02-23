@@ -13,7 +13,7 @@ export interface Notification {
 
 export type NotificationType = 'primary' | 'danger' | 'info' | 'warning'
 
-export type Channel = 'browserExtension' | 'walletConnect' | 'walletConnectV2'
+export type Channel = 'browserExtension' | 'walletConnect'
 
 export enum ContractStandard {
   LSP8 = 'LSP8',

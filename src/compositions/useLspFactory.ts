@@ -23,7 +23,7 @@ const getFactory = (): LSPFactory => {
 }
 
 const setupLSPFactory = (): void => {
-  lspFactory = new LSPFactory(window.ethereum as any, {
+  lspFactory = new LSPFactory(window.ethereum, {
     chainId: DEFAULT_NETWORK_CONFIG.chainId,
   })
 }

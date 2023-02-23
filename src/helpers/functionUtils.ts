@@ -1,7 +1,7 @@
 import { LSPType } from '@/helpers/tokenUtils'
 import { SIGNATURE_LOOKUP_URL } from '@/helpers/config'
 import Web3 from 'web3'
-import { Unit } from 'web3-utils'
+import { Unit, numberToHex } from 'web3-utils'
 
 export type MethodType = {
   label?: string
