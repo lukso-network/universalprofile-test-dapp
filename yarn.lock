@@ -513,7 +513,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@erc725/erc725.js@npm:0.17.1":
+"@erc725/erc725.js@npm:^0.17.1":
   version: 0.17.1
   resolution: "@erc725/erc725.js@npm:0.17.1"
   dependencies:
@@ -1988,7 +1988,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lukso/lsp-smart-contracts@npm:0.8.1":
+"@lukso/lsp-smart-contracts@npm:^0.8.1":
   version: 0.8.1
   resolution: "@lukso/lsp-smart-contracts@npm:0.8.1"
   dependencies:
@@ -13058,9 +13058,9 @@ __metadata:
   resolution: "universalprofile-test-dapp@workspace:."
   dependencies:
     "@depay/web3-mock": ^13.22.14
-    "@erc725/erc725.js": 0.17.1
+    "@erc725/erc725.js": ^0.17.1
     "@lukso/lsp-factory.js": 2.4.0
-    "@lukso/lsp-smart-contracts": 0.8.1
+    "@lukso/lsp-smart-contracts": ^0.8.1
     "@testing-library/jest-dom": 5.16.5
     "@testing-library/user-event": 14.4.3
     "@testing-library/vue": 6.6.1
