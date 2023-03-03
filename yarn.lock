@@ -513,15 +513,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@erc725/erc725.js@npm:0.16.0":
-  version: 0.16.0
-  resolution: "@erc725/erc725.js@npm:0.16.0"
+"@erc725/erc725.js@npm:^0.17.1":
+  version: 0.17.1
+  resolution: "@erc725/erc725.js@npm:0.17.1"
   dependencies:
-    ethereumjs-util: ^7.1.4
-    web3-eth-abi: ^1.7.3
+    ethereumjs-util: ^7.1.5
+    web3-eth-abi: ^1.8.2
     web3-providers-http: ^1.8.0
-    web3-utils: ^1.7.3
-  checksum: 81a027060ef28b659b8cc1c9d42bdda3aa8b44193f52b4326882fd3424d83bcb0664b69d2f7716d1b31476da4ccd27f93af004b90aa4dec02f43076cbb13acb2
+    web3-utils: ^1.8.2
+  checksum: 392032366186b12dfd84d201aca8898286abda1409d1a161858150a43a44a843b74a28d90f7d479edb4183bc1f173a54a20025bf16b14a5cd2652bf3afcdd0ed
   languageName: node
   linkType: hard
 
@@ -534,6 +534,17 @@ __metadata:
     "@types/chai": ^4.3.1
     solidity-bytes-utils: 0.8.0
   checksum: bf04bf1d1c0051f51141833366614d4a167ff1a25da4e2789563de8b91a95c526bb794f162b7e831949c3f9b5cea821e3afc9754efd62ac26843824402702124
+  languageName: node
+  linkType: hard
+
+"@erc725/smart-contracts@npm:^4.1.1":
+  version: 4.1.1
+  resolution: "@erc725/smart-contracts@npm:4.1.1"
+  dependencies:
+    "@openzeppelin/contracts": ^4.7.3
+    "@openzeppelin/contracts-upgradeable": ^4.7.3
+    solidity-bytes-utils: 0.8.0
+  checksum: 8d66e686f0e9c0ae610fdf499ab3a3b4613ff2351f710626115952ff635bc4fc56b7676d5c411ec79e91a87352642c9a8341a80c7b3a01a4d0f76fd262877546
   languageName: node
   linkType: hard
 
@@ -1977,6 +1988,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@lukso/lsp-smart-contracts@npm:^0.8.1":
+  version: 0.8.1
+  resolution: "@lukso/lsp-smart-contracts@npm:0.8.1"
+  dependencies:
+    "@erc725/smart-contracts": ^4.1.1
+    "@openzeppelin/contracts": ^4.8.0
+    "@openzeppelin/contracts-upgradeable": ^4.8.0
+    solidity-bytes-utils: 0.8.0
+  checksum: 5612235db03b1c0718c8137b9ea57c9d6e67ee2a4c37da07cf78a8f86459bfe322755d7e849a4cf770ab58353e68361cfec02511d807dd85a2a4af1a5147e802
+  languageName: node
+  linkType: hard
+
 "@metamask/eth-sig-util@npm:4.0.1":
   version: 4.0.1
   resolution: "@metamask/eth-sig-util@npm:4.0.1"
@@ -2072,10 +2095,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@openzeppelin/contracts-upgradeable@npm:^4.8.0":
+  version: 4.8.2
+  resolution: "@openzeppelin/contracts-upgradeable@npm:4.8.2"
+  checksum: b1ad40e5d0c4d3bcfea7c74b772fb2c830562f2863ea8f816a603113146e0614dc806b32d9b1649f8c88ceb93dbf8b394abf8dbeb9022fc09e546858c4fe71e9
+  languageName: node
+  linkType: hard
+
 "@openzeppelin/contracts@npm:^4.7.3":
   version: 4.8.0
   resolution: "@openzeppelin/contracts@npm:4.8.0"
   checksum: dfab51a7f91735cfb1e94dd5074736b0dac0207e4ebf26eb46b32defd3b67adce5a36b248daa7b841c21be74863c1e37cf92ed194a9c36d3f8c5326d1a24242a
+  languageName: node
+  linkType: hard
+
+"@openzeppelin/contracts@npm:^4.8.0":
+  version: 4.8.2
+  resolution: "@openzeppelin/contracts@npm:4.8.2"
+  checksum: 1d362f0b9c880549cb82544e23fb70270fbbbe24a69e10bd5aa07649fd82347686173998ae484defafdc473d04004d519f839e3cd3d3e7733d0895b950622243
   languageName: node
   linkType: hard
 
@@ -13021,9 +13058,9 @@ __metadata:
   resolution: "universalprofile-test-dapp@workspace:."
   dependencies:
     "@depay/web3-mock": ^13.22.14
-    "@erc725/erc725.js": 0.16.0
+    "@erc725/erc725.js": ^0.17.1
     "@lukso/lsp-factory.js": 2.4.0
-    "@lukso/lsp-smart-contracts": 0.7.0
+    "@lukso/lsp-smart-contracts": ^0.8.1
     "@testing-library/jest-dom": 5.16.5
     "@testing-library/user-event": 14.4.3
     "@testing-library/vue": 6.6.1
@@ -13595,6 +13632,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"web3-eth-abi@npm:^1.8.2":
+  version: 1.8.2
+  resolution: "web3-eth-abi@npm:1.8.2"
+  dependencies:
+    "@ethersproject/abi": ^5.6.3
+    web3-utils: 1.8.2
+  checksum: d593b42c5a63afaba88b947245594769df6aa1a2b2cba5a43fddb8e77791fc38da3238673d713d2ddfc3fc4aac91f7ec529bbc3ad8ea4e02995919a0c89cbb88
+  languageName: node
+  linkType: hard
+
 "web3-eth-accounts@npm:1.7.4":
   version: 1.7.4
   resolution: "web3-eth-accounts@npm:1.7.4"
@@ -13982,6 +14029,21 @@ __metadata:
     randombytes: ^2.1.0
     utf8: 3.0.0
   checksum: 08bb2df9cd19672f034bb82a27b857e0571b836a620f83de2214377457c6e52446e8dedcf916f8f10a13c86b5a02674dd4f45c60c45698b388368601cce9cf5e
+  languageName: node
+  linkType: hard
+
+"web3-utils@npm:1.8.2, web3-utils@npm:^1.8.2":
+  version: 1.8.2
+  resolution: "web3-utils@npm:1.8.2"
+  dependencies:
+    bn.js: ^5.2.1
+    ethereum-bloom-filters: ^1.0.6
+    ethereumjs-util: ^7.1.0
+    ethjs-unit: 0.1.6
+    number-to-bn: 1.7.0
+    randombytes: ^2.1.0
+    utf8: 3.0.0
+  checksum: a6cda086d7bde4939fc55be8f1dc5040b4cacd9205ac2ac07f37d14305214679e030af7814a3e97f6fabf2901e3452cd0dc8ce7c1cdd8bce4d0d4bae72c50ad9
   languageName: node
   linkType: hard
 

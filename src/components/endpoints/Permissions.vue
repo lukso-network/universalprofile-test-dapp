@@ -3,18 +3,18 @@ import { getState } from '@/stores'
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
 import {
-  ERC725YKeys,
+  ERC725YDataKeys,
   ALL_PERMISSIONS,
   PERMISSIONS,
   // @ts-ignore
-} from '@lukso/lsp-smart-contracts/constants.js'
+} from '@lukso/lsp-smart-contracts'
+import { Permissions } from '@erc725/erc725.js/build/main/src/types/Method'
 
 import { computed, ref } from 'vue'
 import useErc725 from '@/compositions/useErc725'
 import { sliceAddress } from '@/utils/sliceAddress'
 import { hexToBytes } from '@/utils/hexToBytes'
 import Web3Utils, { hexToNumber, numberToHex, padLeft } from 'web3-utils'
-import type { Permissions } from '@erc725/erc725.js/build/main/src/types/Method'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
@@ -23,7 +23,7 @@ const grantPermissionAddress = ref('0xaf3bf2ffb025098b79caddfbdd113b3681817744')
 const permissions: Permissions = {
   CHANGEOWNER: false,
   CHANGEPERMISSIONS: false,
-  ADDPERMISSIONS: false,
+  ADDCONTROLLER: false,
   SETDATA: false,
   CALL: false,
   STATICCALL: false,
@@ -54,7 +54,7 @@ const setPermissions = async () => {
   const erc725AccountAddress = getState('address')
 
   const key =
-    ERC725YKeys['LSP6']['AddressPermissions:Permissions'] +
+    ERC725YDataKeys['LSP6']['AddressPermissions:Permissions'] +
     grantPermissionAddress.value.slice(2)
   const value = encodePermissions(selectedPermissions.value)
 
