@@ -23,8 +23,8 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/iframe',
-    name: "EIP1559",
-    component: IFrame
+    name: 'EIP1559',
+    component: IFrame,
   },
   {
     path: '/profiles',
