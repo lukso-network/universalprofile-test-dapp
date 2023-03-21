@@ -12,7 +12,7 @@ const setupWeb3 = (provider: Provider): void => {
 }
 
 const getWeb3 = (): Web3 => {
-  return web3
+  return web3 || {}
 }
 
 const getChainId = async (): Promise<number> => {
