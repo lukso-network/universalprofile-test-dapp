@@ -3,6 +3,11 @@ import vue from '@vitejs/plugin-vue'
 import path from 'path'
 
 console.log(process.cwd())
+
+const resolveModule = name => {
+  return path.resolve(__dirname, 'node_modules', name)
+}
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [vue()],
@@ -10,11 +15,11 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, 'src'),
       process: 'process/browser',
-      util: 'util/',
-      http: 'stream-http',
-      https: 'https-browserify',
-      stream: 'stream-browserify',
-      buffer: 'buffer/',
+      util: resolveModule('util/'),
+      http: resolveModule('stream-http'),
+      https: resolveModule('https-browserify'),
+      stream: resolveModule('stream-browserify'),
+      buffer: resolveModule('buffer/'),
     },
   },
   build: {
