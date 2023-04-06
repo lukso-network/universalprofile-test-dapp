@@ -16,12 +16,13 @@ const hide = () => {
   emits('hide')
 }
 
-const renderMessage = () => {
+const renderMessage = ({ class: className }: { class: any }) => {
   const text = new DOMParser().parseFromString(
     props.notification.message as string,
     'text/html'
   ).body.innerHTML
   return h('div', {
+    class: className,
     innerHTML: text,
     'data-testid': 'message',
   })
