@@ -4,6 +4,7 @@ import Profile from '@/views/Profile.vue'
 import ProfileUpload from '@/views/profile/Upload.vue'
 import Detail from '@/views/profile/Detail.vue'
 import ProfileDeploy from '@/views/profile/Deploy.vue'
+import IFrame from '@/views/IFrame.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -19,6 +20,11 @@ const routes: Array<RouteRecordRaw> = [
     // which is lazy-loaded when the route is visited.
     component: () =>
       import(/* webpackChunkName: "about" */ '@/views/Profile.vue'),
+  },
+  {
+    path: '/iframe',
+    name: 'EIP1559',
+    component: IFrame,
   },
   {
     path: '/profiles',
