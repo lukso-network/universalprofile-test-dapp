@@ -7,13 +7,14 @@ type Emits = {
 }
 
 type Props = {
-  disabled?: boolean
+  disabled?: boolean,
+  newMetadata?: Lsp4Metadata
 }
 
 const props = defineProps<Props>()
 const emits = defineEmits<Emits>()
 
-const metadata = ref<Lsp4Metadata>({
+const metadata = ref<Lsp4Metadata>(props.newMetadata || {
   description: 'My super description',
   links: [
     {
