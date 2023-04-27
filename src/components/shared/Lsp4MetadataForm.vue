@@ -8,20 +8,23 @@ type Emits = {
 
 type Props = {
   disabled?: boolean
+  newMetadata?: Lsp4Metadata
 }
 
 const props = defineProps<Props>()
 const emits = defineEmits<Emits>()
 
-const metadata = ref<Lsp4Metadata>({
-  description: 'My super description',
-  links: [
-    {
-      title: 'LUKSO Docs',
-      url: 'https://docs.lukso.tech',
-    },
-  ],
-})
+const metadata = ref<Lsp4Metadata>(
+  props.newMetadata || {
+    description: 'My super description',
+    links: [
+      {
+        title: 'LUKSO Docs',
+        url: 'https://docs.lukso.tech',
+      },
+    ],
+  }
+)
 
 const handleTokenIcon = (event: Event) => {
   const target = event.target as HTMLInputElement
