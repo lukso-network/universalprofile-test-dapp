@@ -58,6 +58,21 @@ const methods: MethodSelect[] = [
     hasSpecs: [LSPType.ERC721],
   },
   {
+    label: '💰 Authorize Operator LSP7/LSP8',
+    call: 'authorizeOperator',
+    inputs: [
+      { type: 'address', name: 'operator', value: sampleUP },
+      { type: 'uint256', name: 'amount', value: '1' },
+    ],
+    hasSpecs: [LSPType.LSP7DigitalAsset, LSPType.LSP8IdentifiableDigitalAsset],
+  },
+  {
+    label: '💰 Transfer Ownership LSP7/LSP8',
+    call: 'transferOwnership',
+    inputs: [{ type: 'address', name: 'newOwner' }],
+    hasSpecs: [LSPType.UP],
+  },
+  {
     label: '💰 Send ERC777',
     call: 'send',
     hasSpecs: [LSPType.ERC777],
