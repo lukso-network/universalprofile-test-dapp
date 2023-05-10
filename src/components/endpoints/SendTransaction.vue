@@ -67,9 +67,36 @@ const methods: MethodSelect[] = [
     hasSpecs: [LSPType.LSP7DigitalAsset, LSPType.LSP8IdentifiableDigitalAsset],
   },
   {
-    label: '💰 Transfer Ownership LSP7/LSP8',
+    label: '💰 Revoke Operator LSP7',
+    call: 'revokeOperator',
+    inputs: [{ type: 'address', name: 'operator', value: sampleUP }],
+    hasSpecs: [LSPType.LSP7DigitalAsset],
+  },
+  {
+    label: '💰 Revoke Operator LSP8',
+    call: 'revokeOperator',
+    inputs: [
+      { type: 'address', name: 'operator', value: sampleUP },
+      { type: 'bytes32', name: 'tokenId', value: '1' },
+    ],
+    hasSpecs: [LSPType.LSP8IdentifiableDigitalAsset],
+  },
+  {
+    label: '💰 Transfer Ownership UP',
     call: 'transferOwnership',
     inputs: [{ type: 'address', name: 'newOwner' }],
+    hasSpecs: [LSPType.UP],
+  },
+  {
+    label: '💰 Accept Ownership UP',
+    call: 'acceptOwnership',
+    inputs: [],
+    hasSpecs: [LSPType.UP],
+  },
+  {
+    label: '💰 Renounce Ownership UP',
+    call: 'renounceOwnership',
+    inputs: [],
     hasSpecs: [LSPType.UP],
   },
   {
