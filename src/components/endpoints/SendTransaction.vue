@@ -39,32 +39,13 @@ const methods: MethodSelect[] = [
     hasSpecs: [LSPType.LSP7DigitalAsset, LSPType.LSP8IdentifiableDigitalAsset],
   },
   {
-    label: '💰 Transfer ERC20/ERC777',
-    call: 'transfer',
-    inputs: [
-      { type: 'address', name: 'to', value: sampleUP },
-      { type: 'uint256', name: 'amount', isWei: 'ether', value: '1' },
-    ],
-    hasSpecs: [LSPType.ERC20, LSPType.ERC777],
-  },
-  {
-    label: '💰 TransferFrom ERC721',
-    call: 'transferFrom',
-    inputs: [
-      { type: 'address', name: 'from' },
-      { type: 'address', name: 'to' },
-      { type: 'uint256', name: 'amount', isWei: 'ether', value: '1' },
-    ],
-    hasSpecs: [LSPType.ERC721],
-  },
-  {
-    label: '💰 Authorize Operator LSP7/LSP8',
+    label: '💰 Authorize Operator LSP7',
     call: 'authorizeOperator',
     inputs: [
       { type: 'address', name: 'operator', value: sampleUP },
       { type: 'uint256', name: 'amount', value: '1' },
     ],
-    hasSpecs: [LSPType.LSP7DigitalAsset, LSPType.LSP8IdentifiableDigitalAsset],
+    hasSpecs: [LSPType.LSP7DigitalAsset],
   },
   {
     label: '💰 Revoke Operator LSP7',
@@ -73,11 +54,43 @@ const methods: MethodSelect[] = [
     hasSpecs: [LSPType.LSP7DigitalAsset],
   },
   {
+    label: '🏦 Mint LSP7',
+    call: 'mint',
+    inputs: [
+      { type: 'address', name: 'to' },
+      { type: 'uint256', name: 'amount', value: '1' },
+      { type: 'bool', name: 'force', value: false },
+      { type: 'bytes', name: 'data', value: '0x' },
+    ],
+    hasSpecs: [LSPType.LSP7DigitalAsset],
+  },
+  {
+    label: '💰 Authorize Operator LSP8',
+    call: 'authorizeOperator',
+    inputs: [
+      { type: 'address', name: 'operator', value: sampleUP },
+      { type: 'bytes32', name: 'tokenId', value: '1' },
+    ],
+    hasSpecs: [LSPType.LSP8IdentifiableDigitalAsset],
+  },
+  {
     label: '💰 Revoke Operator LSP8',
     call: 'revokeOperator',
     inputs: [
       { type: 'address', name: 'operator', value: sampleUP },
       { type: 'bytes32', name: 'tokenId', value: '1' },
+    ],
+    hasSpecs: [LSPType.LSP8IdentifiableDigitalAsset],
+  },
+
+  {
+    label: '🏦 Mint LSP8',
+    call: 'mint',
+    inputs: [
+      { type: 'address', name: 'to' },
+      { type: 'bytes32', name: 'tokenId', value: '1' },
+      { type: 'bool', name: 'force', value: false },
+      { type: 'bytes', name: 'data', value: '0x' },
     ],
     hasSpecs: [LSPType.LSP8IdentifiableDigitalAsset],
   },
@@ -100,6 +113,15 @@ const methods: MethodSelect[] = [
     hasSpecs: [LSPType.UP],
   },
   {
+    label: '💰 Transfer ERC20/ERC777',
+    call: 'transfer',
+    inputs: [
+      { type: 'address', name: 'to', value: sampleUP },
+      { type: 'uint256', name: 'amount', isWei: 'ether', value: '1' },
+    ],
+    hasSpecs: [LSPType.ERC20, LSPType.ERC777],
+  },
+  {
     label: '💰 Send ERC777',
     call: 'send',
     hasSpecs: [LSPType.ERC777],
@@ -110,15 +132,58 @@ const methods: MethodSelect[] = [
     ],
   },
   {
-    label: '🏦 Mint LSP7/LSP8',
-    call: 'mint',
+    label: '💰Operator Send ERC777',
+    call: 'operatorSend',
+    hasSpecs: [LSPType.ERC777],
     inputs: [
+      { type: 'address', name: 'sender' },
+      { type: 'address', name: 'recipient' },
+      { type: 'uint256', name: 'amount', isWei: 'ether', value: '1' },
+      { type: 'bytes', name: 'data', value: '0x' },
+      { type: 'bytes', name: 'operatorData', value: '0x' },
+    ],
+  },
+  {
+    label: '💰Operator Burn ERC777',
+    call: 'operatorBurn',
+    hasSpecs: [LSPType.ERC777],
+    inputs: [
+      { type: 'address', name: 'account' },
+      { type: 'uint256', name: 'amount', isWei: 'ether', value: '1' },
+      { type: 'bytes', name: 'data', value: '0x' },
+      { type: 'bytes', name: 'operatorData', value: '0x' },
+    ],
+  },
+  {
+    label: '💰 TransferFrom ERC721',
+    call: 'transferFrom',
+    inputs: [
+      { type: 'address', name: 'from' },
       { type: 'address', name: 'to' },
-      { type: 'bytes32', name: 'tokenId', value: '1' },
-      { type: 'bool', name: 'force', value: false },
+      { type: 'uint256', name: 'amount', isWei: 'ether', value: '1' },
+    ],
+    hasSpecs: [LSPType.ERC721],
+  },
+  {
+    label: '💰 Approve ERC721',
+    call: 'approve',
+    inputs: [
+      { type: 'address', name: 'approved' },
+      { type: 'uint256', name: 'tokenId', value: '1' },
+    ],
+    hasSpecs: [LSPType.ERC721],
+  },
+  {
+    label: '💰 SafeTransferFrom ERC1155',
+    call: 'safeTransferFrom',
+    inputs: [
+      { type: 'address', name: 'from' },
+      { type: 'address', name: 'to' },
+      { type: 'uint256', name: 'id' },
+      { type: 'uint256', name: 'amount', isWei: 'ether', value: '1' },
       { type: 'bytes', name: 'data', value: '0x' },
     ],
-    hasSpecs: [LSPType.LSP7DigitalAsset, LSPType.LSP8IdentifiableDigitalAsset],
+    hasSpecs: [LSPType.Unknown],
   },
   {
     label: '🏦 Mint ERC20/ERC777/LSP7',
