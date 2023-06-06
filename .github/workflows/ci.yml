@@ -49,4 +49,5 @@ jobs:
         run: yarn test:unit
 
       - name: 🛠 Build
+        if: github.event.action != 'closed'
         run: yarn build
