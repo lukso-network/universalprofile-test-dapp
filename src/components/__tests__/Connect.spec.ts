@@ -1,6 +1,6 @@
 import Connect from '../Connect.vue'
 import { render, fireEvent, waitFor, screen } from '@testing-library/vue'
-import { useState, setState } from '@/stores'
+import { useState } from '@/stores'
 
 const mockCall = jest.fn()
 const mockSetupProvider = jest.fn()
@@ -114,8 +114,6 @@ test('can connect to browser extension when authorized', async () => {
 })
 
 test('can connect to browser extension when not authorized', async () => {
-  setState('isConnected', false)
-  window.ethereum = {}
   mockAccounts.mockResolvedValue(undefined)
   mockRequestAccounts.mockReturnValue([
     '0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298',

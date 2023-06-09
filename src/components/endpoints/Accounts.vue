@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
-import useWalletConnect, {
-  WALLET_CONNECT_VERSION as walletConnectVersion,
-} from '@/compositions/useWalletConnect'
+import useWalletConnect from '@/compositions/useWalletConnect'
+import useWalletConnectV2 from '@/compositions/useWalletConnectV2'
 import { getState, useState } from '@/stores'
 import useWeb3 from '@/compositions/useWeb3'
 import { UP_CONNECTED_ADDRESS } from '@/helpers/config'
 import { createBlockScoutLink } from '@/utils/createLinks'
 import Web3Utils from 'web3-utils'
 import { computed, watch, ref } from 'vue'
+import { provider as Provider } from 'web3-core'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
@@ -22,6 +22,8 @@ watch(
   () => !!window.ethereum,
   value => (hasExtension.value = value)
 )
+const { resetWCV2Provider, setupWCV2Provider, openWCV2Modal } =
+  useWalletConnectV2()
 
 const hexChainId = computed(() => {
   return Web3Utils.numberToHex(getState('chainId'))
@@ -29,7 +31,17 @@ const hexChainId = computed(() => {
 
 const connectExtension = async () => {
   clearNotification()
-  await setupWeb3(window.ethereum)
+
+  if (!window.ethereum) {
+    setNotification(
+      'window.ethereum is undefined, is the extension enabled?',
+      'warning'
+    )
+    return
+  }
+
+  // The Ethereum object is used as a provider
+  setupWeb3(window.ethereum as unknown as Provider)
 
   try {
     const [address] = await requestAccounts()
@@ -40,7 +52,7 @@ const connectExtension = async () => {
   }
 }
 
-const connectWalletconnect = async () => {
+const connectWalletConnect = async () => {
   clearNotification()
 
   try {
@@ -53,11 +65,26 @@ const connectWalletconnect = async () => {
   }
 }
 
+const connectWalletConnectV2 = async () => {
+  clearNotification()
+
+  try {
+    await setupWCV2Provider()
+    await openWCV2Modal()
+    setConnected(getState('address'), 'walletConnectV2')
+    setNotification(`Connected to address: ${getState('address')}`, 'info')
+  } catch (error) {
+    setNotification((error as unknown as Error).message, 'danger')
+  }
+}
+
 const disconnect = async () => {
   clearNotification()
 
   if (getState('channel') == 'walletConnect') {
     await resetProvider()
+  } else if (getState('channel') == 'walletConnectV2') {
+    await resetWCV2Provider()
   } else {
     localStorage.removeItem(UP_CONNECTED_ADDRESS)
   }
@@ -101,13 +128,31 @@ const handleRefresh = (e: Event) => {
           class="button is-primary is-rounded mb-1"
           :disabled="getState('isConnected')"
           data-testid="connect-wc"
-          @click="connectWalletconnect"
+          @click="connectWalletConnect"
         >
-          Wallet Connect {{ walletConnectVersion }}
+          Wallet Connect V1
         </button>
         <span
           v-if="
             getState('channel') === 'walletConnect' && getState('isConnected')
+          "
+          class="icon ml-3 mt-4 has-text-primary"
+        >
+          <i class="fas fa-check"></i>
+        </span>
+      </div>
+      <div class="field">
+        <button
+          class="button is-primary is-rounded mb-1"
+          :disabled="getState('address') ? true : undefined"
+          data-testid="connect-wc-v2"
+          @click="connectWalletConnectV2"
+        >
+          Wallet Connect V2
+        </button>
+        <span
+          v-if="
+            getState('channel') === 'walletConnectV2' && getState('isConnected')
           "
           class="icon ml-3 mt-4 has-text-primary"
         >

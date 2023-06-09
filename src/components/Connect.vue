@@ -1,18 +1,21 @@
 <script setup lang="ts">
 import { getState, useState } from '@/stores'
 import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { provider as Provider } from 'web3-core'
 import { EthereumProviderError } from 'eth-rpc-errors'
 import useDropdown from '@/compositions/useDropdown'
 import useWeb3 from '@/compositions/useWeb3'
-import useWalletConnect, {
-  WALLET_CONNECT_VERSION as walletConnectVersion,
-} from '@/compositions/useWalletConnect'
+import useWalletConnect from '@/compositions/useWalletConnect'
 import { UP_CONNECTED_ADDRESS } from '@/helpers/config'
 import { sliceAddress } from '@/utils/sliceAddress'
+import useWalletConnectV2 from '@/compositions/useWalletConnectV2'
 
 const { setupWeb3, accounts, requestAccounts } = useWeb3()
 const { resetProvider, setupProvider, enableProvider, getProvider } =
   useWalletConnect()
+
+const { resetWCV2Provider, setupWCV2Provider, openWCV2Modal, getWCV2Provider } =
+  useWalletConnectV2()
 const { setDisconnected, setConnected } = useState()
 const { close, toggle } = useDropdown()
 const dropdown = ref()
@@ -30,10 +33,16 @@ const connectWalletConnect = async () => {
   await enableProvider()
 }
 
+const connectWalletConnectV2 = async () => {
+  close(dropdown.value)
+  await setupWCV2Provider()
+  await openWCV2Modal()
+}
+
 const connectExtension = async () => {
   try {
     close(dropdown.value)
-    await setupWeb3(window.ethereum)
+    await setupWeb3(window.ethereum as unknown as Provider)
 
     let address = await accounts()
 
@@ -58,6 +67,8 @@ const connectExtension = async () => {
 const disconnect = async () => {
   if (getState('channel') == 'walletConnect') {
     await resetProvider()
+  } else if (getState('channel') == 'walletConnectV2') {
+    await resetWCV2Provider()
   } else {
     localStorage.removeItem(UP_CONNECTED_ADDRESS)
   }
@@ -104,10 +115,14 @@ const removeEventListeners = () => {
 
 onMounted(async () => {
   await setupProvider()
+  await setupWCV2Provider()
 
   const wcProvider = getProvider()
+  const wcv2Provider = getWCV2Provider()
   if (wcProvider && wcProvider.wc.connected) {
     await enableProvider()
+  } else if (wcv2Provider && wcv2Provider.connected) {
+    // All set up already
   } else if (browserExtensionConnected) {
     await connectExtension()
   }
@@ -189,7 +204,15 @@ onUnmounted(() => {
           @click="connectWalletConnect"
         >
           <div class="logo wallet-connect" />
-          Wallet Connect {{ walletConnectVersion }}
+          Wallet Connect V1
+        </button>
+        <button
+          class="dropdown-item has-text-weight-bold button is-text"
+          data-testid="connect-wc-v2"
+          @click="connectWalletConnectV2"
+        >
+          <div class="logo wallet-connect" />
+          Wallet Connect V2
         </button>
       </div>
     </div>
