@@ -4,9 +4,7 @@ import { ref } from 'vue'
 import Notifications from '@/components/Notification.vue'
 
 import useNotifications from '@/compositions/useNotifications'
-import useWalletConnect from '@/compositions/useWalletConnect'
-
-const { getProvider, sendCustomWCRequest } = useWalletConnect()
+import { sendRequest } from '@/helpers/customRequest'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
@@ -22,13 +20,7 @@ const onImportProfile = async () => {
       method: 'up_import',
       params: [universalProfileAddress.value],
     }
-    let newControllerAddress: string
-    const wcProvider = getProvider()
-    if (wcProvider && wcProvider.wc.connected) {
-      newControllerAddress = await sendCustomWCRequest(request)
-    } else {
-      newControllerAddress = await window.ethereum.request(request)
-    }
+    let newControllerAddress: string = await sendRequest(request)
     if (newControllerAddress) {
       controllerAddress.value = newControllerAddress
     }

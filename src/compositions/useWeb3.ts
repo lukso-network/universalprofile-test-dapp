@@ -20,11 +20,11 @@ const getChainId = async (): Promise<number> => {
 }
 
 const contract = (
-  jsonInterface: AbiItem,
+  jsonInterface: AbiItem[],
   address?: string,
   options?: ContractOptions
-) => {
-  return new web3.eth.Contract(jsonInterface, address, options)
+): Contract => {
+  return new Contract(jsonInterface, address, options)
 }
 
 const getBalance = async (address: string) => {
@@ -70,7 +70,7 @@ export default function useWeb3(): {
   getWeb3: () => Web3
   getChainId: () => Promise<number>
   contract: (
-    jsonInterface: AbiItem,
+    jsonInterface: AbiItem[],
     address?: string,
     options?: ContractOptions
   ) => Contract
