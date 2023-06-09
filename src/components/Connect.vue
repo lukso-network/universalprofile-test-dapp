@@ -7,7 +7,7 @@ import useWeb3 from '@/compositions/useWeb3'
 import useWalletConnect, {
   WALLET_CONNECT_VERSION as walletConnectVersion,
 } from '@/compositions/useWalletConnect'
-import { UP_CONNECTED_ADDRESS } from '@/helpers/config'
+import { UP_CONNECTED_ADDRESS, setNetworkConfig } from '@/helpers/config'
 import { sliceAddress } from '@/utils/sliceAddress'
 
 const { setupWeb3, accounts, requestAccounts } = useWeb3()
@@ -29,6 +29,7 @@ const connectExtension = async () => {
   try {
     close(dropdown.value)
     setupWeb3(window.ethereum)
+    setNetworkConfig(window.ethereum.chainId)
     let address = await accounts()
 
     if (!address) {

@@ -1,4 +1,4 @@
-export type NetworkType = 'l16'
+export type NetworkType = 'l16' | 'testnet'
 
 export type NetworkInfo = {
   name: string
