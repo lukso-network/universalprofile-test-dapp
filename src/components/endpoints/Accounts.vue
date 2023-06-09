@@ -144,7 +144,7 @@ const handleRefresh = (e: Event) => {
       <div class="field">
         <button
           class="button is-primary is-rounded mb-1"
-          :disabled="getState('address') ? true : undefined"
+          :disabled="getState('isConnected')"
           data-testid="connect-wc-v2"
           @click="connectWalletConnectV2"
         >

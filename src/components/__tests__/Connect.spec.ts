@@ -114,6 +114,7 @@ test('can connect to browser extension when authorized', async () => {
 })
 
 test('can connect to browser extension when not authorized', async () => {
+  window.ethereum = {} as typeof window.ethereum
   mockAccounts.mockResolvedValue(undefined)
   mockRequestAccounts.mockReturnValue([
     '0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298',

@@ -209,6 +209,7 @@ onUnmounted(() => {
         <button
           class="dropdown-item has-text-weight-bold button is-text"
           data-testid="connect-wc-v2"
+          :disabled="getState('isConnected')"
           @click="connectWalletConnectV2"
         >
           <div class="logo wallet-connect" />
