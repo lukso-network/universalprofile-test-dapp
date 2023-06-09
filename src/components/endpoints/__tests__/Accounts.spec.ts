@@ -1,5 +1,5 @@
 import Accounts from '../Accounts.vue'
-import { render, fireEvent, screen } from '@testing-library/vue'
+import { render, fireEvent, screen, waitFor } from '@testing-library/vue'
 import { useState } from '@/stores'
 
 const mockCall = jest.fn()
@@ -78,7 +78,9 @@ test('can connect to browser extension when authorized', async () => {
   await fireEvent.click(screen.getByTestId('connect-extension'))
 
   expect(mockRequestAccounts).toBeCalledTimes(1)
-  expect(screen.getByTestId('info')).toHaveTextContent('Connected to address')
+  await waitFor(() => {
+    expect(screen.getByTestId('info')).toHaveTextContent('Connected to address')
+  })
   // expect(screen.getByTestId('chain')).toHaveTextContent('22 (0x16)')
 })
 
@@ -89,12 +91,16 @@ test('can disconnect from browser extension', async () => {
 
   render(Accounts)
 
-  expect(screen.getByTestId('connect-extension')).toBeDisabled()
-  expect(screen.getByTestId('disconnect')).not.toBeDisabled()
+  await waitFor(() => {
+    expect(screen.getByTestId('connect-extension')).toBeDisabled()
+    expect(screen.getByTestId('disconnect')).not.toBeDisabled()
+  })
 
   await fireEvent.click(screen.getByTestId('disconnect'))
 
-  expect(screen.getByTestId('connect-extension')).not.toBeDisabled()
-  expect(screen.getByTestId('disconnect')).toBeDisabled()
-  expect(screen.getByTestId('notification')).toHaveTextContent('Disconnected')
+  await waitFor(() => {
+    expect(screen.getByTestId('connect-extension')).not.toBeDisabled()
+    expect(screen.getByTestId('disconnect')).toBeDisabled()
+    expect(screen.getByTestId('notification')).toHaveTextContent('Disconnected')
+  })
 })

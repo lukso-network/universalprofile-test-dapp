@@ -9,14 +9,19 @@ import useWeb3 from '@/compositions/useWeb3'
 import { UP_CONNECTED_ADDRESS } from '@/helpers/config'
 import { createBlockScoutLink } from '@/utils/createLinks'
 import Web3Utils from 'web3-utils'
-import { computed } from 'vue'
+import { computed, watch, ref } from 'vue'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
 const { setDisconnected, setConnected, recalcTokens } = useState()
 const { setupWeb3, requestAccounts } = useWeb3()
 const { resetProvider, enableProvider, setupProvider } = useWalletConnect()
-const hasExtension = !!window.ethereum
+const hasExtension = ref<boolean>(!!window.ethereum)
+
+watch(
+  () => !!window.ethereum,
+  value => (hasExtension.value = value)
+)
 
 const hexChainId = computed(() => {
   return Web3Utils.numberToHex(getState('chainId'))
@@ -24,7 +29,7 @@ const hexChainId = computed(() => {
 
 const connectExtension = async () => {
   clearNotification()
-  setupWeb3(window.ethereum)
+  await setupWeb3(window.ethereum)
 
   try {
     const [address] = await requestAccounts()
@@ -60,7 +65,7 @@ const disconnect = async () => {
   setNotification(`Disconnected ${getState('channel')} channel`, 'info')
 
   setDisconnected()
-  setupWeb3(null)
+  await setupWeb3(null)
 }
 const handleRefresh = (e: Event) => {
   e.stopPropagation()
@@ -75,7 +80,7 @@ const handleRefresh = (e: Event) => {
       <div class="field">
         <button
           class="button is-primary is-rounded mb-1"
-          :disabled="getState('address') || !hasExtension ? true : undefined"
+          :disabled="!hasExtension || getState('isConnected')"
           data-testid="connect-extension"
           @click="connectExtension"
         >
@@ -94,7 +99,7 @@ const handleRefresh = (e: Event) => {
       <div class="field">
         <button
           class="button is-primary is-rounded mb-1"
-          :disabled="getState('address') ? true : undefined"
+          :disabled="getState('isConnected')"
           data-testid="connect-wc"
           @click="connectWalletconnect"
         >
@@ -112,7 +117,7 @@ const handleRefresh = (e: Event) => {
       <div class="field">
         <button
           class="button is-primary is-rounded"
-          :disabled="getState('isConnected') ? undefined : true"
+          :disabled="!getState('isConnected')"
           data-testid="disconnect"
           @click="disconnect"
         >

@@ -86,7 +86,7 @@ export function setNetworkConfig(inChainId: number): void {
   if (network) {
     DEFAULT_NETWORK_CONFIG = NETWORKS[network[0] as NetworkType]
   } else {
-    alert('Unknown network defaulting to l16')
+    console.warn('Unknown network defaulting to l16')
     DEFAULT_NETWORK_CONFIG = NETWORKS['l16']
   }
 }

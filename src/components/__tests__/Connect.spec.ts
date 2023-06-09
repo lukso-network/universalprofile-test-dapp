@@ -1,6 +1,6 @@
 import Connect from '../Connect.vue'
 import { render, fireEvent, waitFor, screen } from '@testing-library/vue'
-import { useState } from '@/stores'
+import { useState, setState } from '@/stores'
 
 const mockCall = jest.fn()
 const mockSetupProvider = jest.fn()
@@ -100,13 +100,22 @@ test('can connect to browser extension when authorized', async () => {
 
   // expect(mockSetupWeb3).toBeCalledTimes(1)
   // expect(mockAccounts).toBeCalledTimes(2)
-  expect(await screen.findByTestId('address')).toHaveTextContent('0xD8B0b8...')
+  await waitFor(() => {
+    expect(screen.getByTestId('address')).toHaveTextContent(
+      /.*0xD8B0b8\.\.\..*/,
+      {
+        normalizeWhitespace: true,
+      }
+    )
+  })
   await waitFor(() => {
     expect(screen.getByTestId('balance')).toHaveTextContent('2 LYX')
   })
 })
 
 test('can connect to browser extension when not authorized', async () => {
+  setState('isConnected', false)
+  window.ethereum = {}
   mockAccounts.mockResolvedValue(undefined)
   mockRequestAccounts.mockReturnValue([
     '0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298',
@@ -120,11 +129,20 @@ test('can connect to browser extension when not authorized', async () => {
 
   render(Connect)
 
-  await fireEvent.click(screen.getByTestId('connect-extension'))
+  await waitFor(
+    () => {
+      expect(screen.getByTestId('connect-extension')).toBeEnabled()
+    },
+    { timeout: 1000 }
+  )
 
-  expect(await screen.findByTestId('address')).toHaveTextContent('0x7367C9...')
+  await fireEvent.click(screen.getByTestId('connect-extension'))
   await waitFor(() => {
+    expect(screen.getByTestId('address')).toHaveTextContent(
+      /.*0x7367C9\.\.\..*/,
+      { normalizeWhitespace: true }
+    )
     expect(mockRequestAccounts).toBeCalled()
     expect(screen.getByTestId('balance')).toHaveTextContent('3 LYX')
   })
-})
+}, 5000)

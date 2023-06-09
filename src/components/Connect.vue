@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { getState, useState } from '@/stores'
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { EthereumProviderError } from 'eth-rpc-errors'
 import useDropdown from '@/compositions/useDropdown'
 import useWeb3 from '@/compositions/useWeb3'
 import useWalletConnect, {
   WALLET_CONNECT_VERSION as walletConnectVersion,
 } from '@/compositions/useWalletConnect'
-import { UP_CONNECTED_ADDRESS, setNetworkConfig } from '@/helpers/config'
+import { UP_CONNECTED_ADDRESS } from '@/helpers/config'
 import { sliceAddress } from '@/utils/sliceAddress'
 
 const { setupWeb3, accounts, requestAccounts } = useWeb3()
@@ -17,7 +17,12 @@ const { setDisconnected, setConnected } = useState()
 const { close, toggle } = useDropdown()
 const dropdown = ref()
 const browserExtensionConnected = localStorage.getItem(UP_CONNECTED_ADDRESS)
-const hasExtension = !!window.ethereum
+const hasExtension = ref<boolean>(!!window.ethereum)
+
+watch(
+  () => !!window.ethereum,
+  value => (hasExtension.value = value)
+)
 
 const connectWalletConnect = async () => {
   close(dropdown.value)
@@ -28,8 +33,8 @@ const connectWalletConnect = async () => {
 const connectExtension = async () => {
   try {
     close(dropdown.value)
-    setupWeb3(window.ethereum)
-    setNetworkConfig(window.ethereum.chainId)
+    await setupWeb3(window.ethereum)
+
     let address = await accounts()
 
     if (!address) {
@@ -58,7 +63,7 @@ const disconnect = async () => {
   }
 
   setDisconnected()
-  setupWeb3(null)
+  await setupWeb3(null)
 }
 
 const handleAccountsChanged = (accounts: string[]) => {
@@ -171,15 +176,16 @@ onUnmounted(() => {
         <button
           class="dropdown-item has-text-weight-bold button is-text"
           data-testid="connect-extension"
-          :disabled="hasExtension ? undefined : true"
+          :disabled="!hasExtension || getState('isConnected')"
           @click="connectExtension"
         >
           <div class="logo browser-extension" />
-          Browser Extension
+          Browser Extensiond
         </button>
         <button
           class="dropdown-item has-text-weight-bold button is-text"
           data-testid="connect-wc"
+          :disabled="getState('isConnected')"
           @click="connectWalletConnect"
         >
           <div class="logo wallet-connect" />

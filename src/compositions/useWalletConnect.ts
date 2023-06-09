@@ -40,7 +40,7 @@ const setupProvider = async (): Promise<void> => {
     setConnected(address, 'walletConnect')
   })
 
-  setupWeb3(provider as unknown as Provider)
+  await setupWeb3(provider as unknown as Provider)
 }
 
 const resetProvider = async (): Promise<void> => {

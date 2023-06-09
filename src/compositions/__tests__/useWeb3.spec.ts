@@ -10,9 +10,9 @@ jest.mock('web3', () => {
   }))
 })
 
-test('can check for validity of address', () => {
+test('can check for validity of address', async () => {
   const { isAddress, setupWeb3 } = useWeb3()
-  setupWeb3('lukso')
+  await setupWeb3('lukso')
   isAddress('123')
   expect(mockIsAddress).toBeCalledWith('123')
 })
