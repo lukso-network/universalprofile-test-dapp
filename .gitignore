@@ -24,6 +24,7 @@ tmp
 *.njsproj
 *.sln
 *.sw?
+.env.*
 
 # Yarn
 .pnp.*

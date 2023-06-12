@@ -3,11 +3,22 @@ name: Build and deploy to GH Pages
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
 
+concurrency: deployment-${{ github.ref }}
+
+env:
+  CF_PROJECT_NAME: 'universalprofile-test-dapp'
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Extract branch name
+        shell: bash
+        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
+        id: extract_branch
+
       - name: 🛎️ Checkout
         uses: actions/checkout@v3
 
@@ -38,9 +49,18 @@ jobs:
       - name: 🎯 Test
         run: yarn test:unit
 
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4
+      - name: 'Deploy production'
+        if: ${{ github.event.number == '' }}
+        uses: cloudflare/wrangler-action@2.0.0
         with:
-          branch: gh-pages # The branch the action should deploy to.
-          folder: dist # The folder the action should deploy.
-          clean-exclude: pr-preview/
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          command: pages deploy --project-name "${CF_PROJECT_NAME}" .vercel/output/static
+
+      - name: Deploy devnet (PR builds)
+        if: ${{ github.event.number != '' }}
+        uses: cloudflare/wrangler-action@2.0.0
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          command: pages deploy --project-name "${CF_PROJECT_NAME}" .vercel/output/static --branch "${{ steps.extract_branch.outputs.branch }}"
