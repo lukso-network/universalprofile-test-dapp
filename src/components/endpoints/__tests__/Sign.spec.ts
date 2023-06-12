@@ -106,7 +106,7 @@ test('can sign with ethereum', async () => {
     screen.getByTestId('siwe.expirationDate'),
     '2022-09-02'
   )
-  await fireEvent.update(screen.getByTestId('siwe.nonce'), '1')
+  await fireEvent.update(screen.getByTestId('siwe.nonce'), 'ABCDEFAB1')
   await fireEvent.update(screen.getByTestId('siwe.domain'), 'example.com')
   await fireEvent.update(
     screen.getByTestId('siwe.address'),
@@ -116,7 +116,7 @@ test('can sign with ethereum', async () => {
     screen.getByTestId('siwe.uri'),
     'http://example.com/login'
   )
-  await fireEvent.update(screen.getByTestId('siwe.version'), '2')
+  await fireEvent.update(screen.getByTestId('siwe.version'), '1')
   await fireEvent.update(screen.getByTestId('siwe.chainId'), '2829')
   await fireEvent.update(screen.getByTestId('siwe.expirationTime'), '11:00')
   await fireEvent.update(screen.getByTestId('siwe.notBeforeDate'), '2022-09-01')
@@ -143,9 +143,9 @@ test('can sign with ethereum', async () => {
 By logging in, you confirm the terms and conditions
 
 URI: http://example.com/login
-Version: 2
+Version: 1
 Chain ID: 2829
-Nonce: 1
+Nonce: ABCDEFAB1
 Issued At: 2022-09-01T09:00:00.000Z
 Expiration Time: 2022-09-02T11:00:00.000Z
 Not Before: 2022-09-01T10:00:00.000Z
