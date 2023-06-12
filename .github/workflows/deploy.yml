@@ -15,8 +15,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Extract branch name
+        if: ${{ github.event.number != '' }}
         shell: bash
-        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
+        run: |
+          if [[ -n "${{ github.event.number }}" ]]
+          then
+            echo "branch=--branch=${GITHUB_HEAD_REF}" >> $GITHUB_OUTPUT
+            echo "url=https://${GITHUB_HEAD_REF}.${{ env.CF_PROJECT_NAME }}.pages.dev" >> $GITHUB_OUTPUT
+          else
+            echo "url=${PUBLIC_URL}" >> $GITHUB_OUTPUT
+          fi
         id: extract_branch
 
       - name: 🛎️ Checkout
@@ -49,40 +57,19 @@ jobs:
       - name: 🎯 Test
         run: yarn test:unit
 
-      - name: 'Deploy production'
-        if: ${{ github.event.number == '' }}
+      - name: Deploy
         uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          command: pages deploy --project-name "${CF_PROJECT_NAME}" dist
+          command: pages deploy --project-name "${CF_PROJECT_NAME}" dist ${{ steps.extract_branch.outputs.branch }} | tee /dev/tty | sed -n 's#.*Take a peek over at \(.*\)$#specific_url=\1' >> $GITHUB_OUTPUT
+        id: deploy
 
-      - name: Deploy devnet (PR builds)
-        if: ${{ github.event.number != '' }}
-        uses: cloudflare/wrangler-action@2.0.0
+      - name: Create commit comment
+        uses: peter-evans/commit-comment@v2
         with:
-          apiToken: ${{ secrets.CF_API_TOKEN }}
-          accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          command: pages deploy --project-name "${CF_PROJECT_NAME}" dist --branch "${{ steps.extract_branch.outputs.branch }}"
-
-      - name: Post success status for PR build
-        if: ${{ github.event.number != '' }}
-        uses: Sibz/github-status-action@v1
-        with:
-          authToken: ${{ secrets.GITHUB_TOKEN }}
-          context: 'cloudflare-pr-deploy'
-          description: 'Passed'
-          target_url: 'https://${{ steps.extract_branch.outputs.branch }}.${{ env.CF_PROJECT_NAME }}.pages.dev'
-          state: 'success'
           sha: ${{github.event.pull_request.head.sha || github.sha}}
-
-      - name: Post success status for normal deployment
-        if: ${{ github.event.number == '' }}
-        uses: Sibz/github-status-action@v1
-        with:
-          authToken: ${{ secrets.GITHUB_TOKEN }}
-          context: 'cloudflare-production-deploy'
-          description: 'Passed'
-          target_url: ${{ env.PUBLIC_URL }}
-          state: 'success'
-          sha: ${{github.event.pull_request.head.sha || github.sha}}
+          body: |
+            - Deployed with **Cloudflare Pages** :cloud: :rocket: :ok:
+            - **URL**: [${{ steps.extract_branch.outputs.url }}](${{ steps.extract_branch.outputs.url }})
+            - **Specific**: [${{ steps.deploy.outputs.specific_url }}](${{ steps.deploy.outputs.specific_url }})
