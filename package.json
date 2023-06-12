@@ -35,10 +35,10 @@
     "ethers": "^5.7.2",
     "filesize": "10.0.7",
     "https-browserify": "1.0.0",
-    "siwe": "1.1.6",
+    "siwe": "^2.0.3",
     "vue": "^3.2.47",
     "vue-router": "4.1.6",
-    "wagmi": "^0.11.4",
+    "wagmi": "^1.0.0",
     "web3": "1.9.0",
     "web3-eth-contract": "^1.9.0"
   },
