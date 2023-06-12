@@ -5,14 +5,11 @@ import { provider as Provider } from 'web3-core'
 import { EthereumProviderError } from 'eth-rpc-errors'
 import useDropdown from '@/compositions/useDropdown'
 import useWeb3 from '@/compositions/useWeb3'
-import useWalletConnect from '@/compositions/useWalletConnect'
 import { UP_CONNECTED_ADDRESS } from '@/helpers/config'
 import { sliceAddress } from '@/utils/sliceAddress'
 import useWalletConnectV2 from '@/compositions/useWalletConnectV2'
 
 const { setupWeb3, accounts, requestAccounts } = useWeb3()
-const { resetProvider, setupProvider, enableProvider, getProvider } =
-  useWalletConnect()
 
 const { resetWCV2Provider, setupWCV2Provider, openWCV2Modal, getWCV2Provider } =
   useWalletConnectV2()
@@ -26,12 +23,6 @@ watch(
   () => !!window.ethereum,
   value => (hasExtension.value = value)
 )
-
-const connectWalletConnect = async () => {
-  close(dropdown.value)
-  await setupProvider()
-  await enableProvider()
-}
 
 const connectWalletConnectV2 = async () => {
   close(dropdown.value)
@@ -65,9 +56,7 @@ const connectExtension = async () => {
 }
 
 const disconnect = async () => {
-  if (getState('channel') == 'walletConnect') {
-    await resetProvider()
-  } else if (getState('channel') == 'walletConnectV2') {
+  if (getState('channel') == 'walletConnectV2') {
     await resetWCV2Provider()
   } else {
     localStorage.removeItem(UP_CONNECTED_ADDRESS)
@@ -114,14 +103,10 @@ const removeEventListeners = () => {
 }
 
 onMounted(async () => {
-  await setupProvider()
   await setupWCV2Provider()
 
-  const wcProvider = getProvider()
   const wcv2Provider = getWCV2Provider()
-  if (wcProvider && wcProvider.wc.connected) {
-    await enableProvider()
-  } else if (wcv2Provider && wcv2Provider.connected) {
+  if (wcv2Provider && wcv2Provider.connected) {
     // All set up already
   } else if (browserExtensionConnected) {
     await connectExtension()
@@ -196,15 +181,6 @@ onUnmounted(() => {
         >
           <div class="logo browser-extension" />
           Browser Extensiond
-        </button>
-        <button
-          class="dropdown-item has-text-weight-bold button is-text"
-          data-testid="connect-wc"
-          :disabled="getState('isConnected')"
-          @click="connectWalletConnect"
-        >
-          <div class="logo wallet-connect" />
-          Wallet Connect V1
         </button>
         <button
           class="dropdown-item has-text-weight-bold button is-text"

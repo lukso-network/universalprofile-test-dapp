@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
-import useWalletConnect from '@/compositions/useWalletConnect'
 import useWalletConnectV2 from '@/compositions/useWalletConnectV2'
 import { getState, useState } from '@/stores'
 import useWeb3 from '@/compositions/useWeb3'
@@ -15,7 +14,6 @@ const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
 const { setDisconnected, setConnected, recalcTokens } = useState()
 const { setupWeb3, requestAccounts } = useWeb3()
-const { resetProvider, enableProvider, setupProvider } = useWalletConnect()
 const hasExtension = ref<boolean>(!!window.ethereum)
 
 watch(
@@ -52,19 +50,6 @@ const connectExtension = async () => {
   }
 }
 
-const connectWalletConnect = async () => {
-  clearNotification()
-
-  try {
-    await setupProvider()
-    await enableProvider()
-    setConnected(getState('address'), 'walletConnect')
-    setNotification(`Connected to address: ${getState('address')}`, 'info')
-  } catch (error) {
-    setNotification((error as unknown as Error).message, 'danger')
-  }
-}
-
 const connectWalletConnectV2 = async () => {
   clearNotification()
 
@@ -81,9 +66,7 @@ const connectWalletConnectV2 = async () => {
 const disconnect = async () => {
   clearNotification()
 
-  if (getState('channel') == 'walletConnect') {
-    await resetProvider()
-  } else if (getState('channel') == 'walletConnectV2') {
+  if (getState('channel') == 'walletConnectV2') {
     await resetWCV2Provider()
   } else {
     localStorage.removeItem(UP_CONNECTED_ADDRESS)
@@ -119,24 +102,6 @@ const handleRefresh = (e: Event) => {
             getState('isConnected')
           "
           class="icon ml-3 mt-1 has-text-primary"
-        >
-          <i class="fas fa-check"></i>
-        </span>
-      </div>
-      <div class="field">
-        <button
-          class="button is-primary is-rounded mb-1"
-          :disabled="getState('isConnected')"
-          data-testid="connect-wc"
-          @click="connectWalletConnect"
-        >
-          Wallet Connect V1
-        </button>
-        <span
-          v-if="
-            getState('channel') === 'walletConnect' && getState('isConnected')
-          "
-          class="icon ml-3 mt-4 has-text-primary"
         >
           <i class="fas fa-check"></i>
         </span>
