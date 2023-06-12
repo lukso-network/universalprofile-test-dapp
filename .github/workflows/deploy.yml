@@ -9,6 +9,7 @@ concurrency: deployment-${{ github.ref }}
 
 env:
   CF_PROJECT_NAME: 'universalprofile-test-dapp'
+  PUBLIC_URL: 'https://https://up-test-dapp.lukso.tech'
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -55,6 +56,7 @@ jobs:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
           command: pages deploy --project-name "${CF_PROJECT_NAME}" dist
+
       - name: Deploy devnet (PR builds)
         if: ${{ github.event.number != '' }}
         uses: cloudflare/wrangler-action@2.0.0
@@ -62,3 +64,25 @@ jobs:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
           command: pages deploy --project-name "${CF_PROJECT_NAME}" dist --branch "${{ steps.extract_branch.outputs.branch }}"
+
+      - name: Post success status for PR build
+        if: ${{ github.event.number != '' }}
+        uses: Sibz/github-status-action@v1
+        with:
+          authToken: ${{ secrets.GITHUB_TOKEN }}
+          context: 'cloudflare-pr-deploy'
+          description: 'Passed'
+          target_url: 'https://${{ steps.extract_branch.outputs.branch }}.${{ env.CF_PROJECT_NAME }}.pages.dev'
+          state: 'success'
+          sha: ${{github.event.pull_request.head.sha || github.sha}}
+
+      - name: Post success status for normal deployment
+        if: ${{ github.event.number == '' }}
+        uses: Sibz/github-status-action@v1
+        with:
+          authToken: ${{ secrets.GITHUB_TOKEN }}
+          context: 'cloudflare-production-deploy'
+          description: 'Passed'
+          target_url: ${{ env.PUBLIC_URL }}
+          state: 'success'
+          sha: ${{github.event.pull_request.head.sha || github.sha}}
