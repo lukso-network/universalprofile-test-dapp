@@ -54,12 +54,11 @@ jobs:
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          command: pages deploy --project-name "${CF_PROJECT_NAME}" .vercel/output/static
-
+          command: pages deploy --project-name "${CF_PROJECT_NAME}" dist
       - name: Deploy devnet (PR builds)
         if: ${{ github.event.number != '' }}
         uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          command: pages deploy --project-name "${CF_PROJECT_NAME}" .vercel/output/static --branch "${{ steps.extract_branch.outputs.branch }}"
+          command: pages deploy --project-name "${CF_PROJECT_NAME}" dist --branch "${{ steps.extract_branch.outputs.branch }}"
