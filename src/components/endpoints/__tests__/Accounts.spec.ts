@@ -4,17 +4,20 @@ import { useState } from '@/stores'
 
 const mockCall = jest.fn()
 const mockSetupProvider = jest.fn()
-const mockEnableProvider = jest.fn()
+const mockOpenWCV2Modal = jest.fn()
 const mockResetProvider = jest.fn()
 const mockGetProvider = jest.fn()
+const mockSendCustomWCV2Request = jest.fn()
 
-jest.mock('@/compositions/useWalletConnect', () => ({
+jest.mock('@/compositions/useWalletConnectV2', () => ({
   __esModule: true,
   default: () => ({
-    resetProvider: () => mockResetProvider(),
-    setupProvider: () => mockSetupProvider(),
-    enableProvider: () => mockEnableProvider(),
-    getProvider: () => mockGetProvider(),
+    resetWCV2Provider: () => mockResetProvider(),
+    setupWCV2Provider: () => mockSetupProvider(),
+    openWCV2Modal: () => mockOpenWCV2Modal(),
+    getWCV2Provider: () => mockGetProvider(),
+    sendCustomWCV2Request: (request: { method: string; params?: [any] }) =>
+      mockSendCustomWCV2Request(request),
   }),
 }))
 
@@ -54,10 +57,10 @@ test.skip('can connect to wallet connect', async () => {
 
   render(Accounts)
 
-  await fireEvent.click(screen.getByTestId('connect-wc'))
+  await fireEvent.click(screen.getByTestId('connect-wc-v2'))
 
   expect(mockSetupProvider).toBeCalledTimes(1)
-  expect(mockEnableProvider).toBeCalledTimes(1)
+  expect(mockOpenWCV2Modal).toBeCalledTimes(1)
   expect(await screen.findByTestId('notification')).toHaveTextContent(
     'Connected to address'
   )
