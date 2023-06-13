@@ -34,7 +34,7 @@ const setupWCV2Provider = async (): Promise<void> => {
       url: 'https://up-test-dapp.lukso.tech/',
       icons: ['https://up-test-dapp.lukso.tech/lukso.png'],
     },
-    showQrModal: false,
+    showQrModal: true,
   })
 
   provider.on('disconnect', (error: any) => {
@@ -108,7 +108,7 @@ const resetWCV2Provider = async (): Promise<void> => {
  */
 const openWCV2Modal = async (): Promise<void> => {
   if (provider) {
-    await provider.enable()
+    await provider.connect()
   } else {
     console.warn(
       'Provider is not set up. Please, call `setupWCV2Provider` first.'
