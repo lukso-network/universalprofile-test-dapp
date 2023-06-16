@@ -20,11 +20,11 @@ jobs:
         run: |
           if [[ -n "${{ github.event.number }}" ]]
           then
-            GITHUB_HEAD_REF="fix/something-really-really-long-and$&$--__broken"
             BRANCH="${GITHUB_HEAD_REF//[^a-zA-Z0-9]/-}"
             BRANCH="${BRANCH//--/-}"
             BRANCH="${BRANCH:0:28}"
-            if [[ "$BRANCH" =~ '-$' ]]; then
+            if [[ "${BRANCH}zxz" =~ -zxz ]]
+            then
               BRANCH="${BRANCH::-1}"
             fi
             echo "branch=--branch=${BRANCH}" >> $GITHUB_OUTPUT
