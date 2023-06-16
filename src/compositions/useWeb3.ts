@@ -34,7 +34,7 @@ const contract = (
   address?: string,
   options?: ContractOptions
 ): Contract => {
-  return new Contract(jsonInterface, address, options)
+  return new web3.eth.Contract(jsonInterface, address, options)
 }
 
 const getBalance = async (address: string) => {

@@ -40,7 +40,7 @@
     "vue-router": "4.1.6",
     "wagmi": "^1.0.0",
     "web3": "1.9.0",
-    "web3-eth-contract": "^1.9.0"
+    "web3-eth-contract": "1.9.0"
   },
   "devDependencies": {
     "@depay/web3-mock": "^13.26.0",
