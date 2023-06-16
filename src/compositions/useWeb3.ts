@@ -1,6 +1,6 @@
 import Web3 from 'web3'
 import { provider as Provider } from 'web3-core'
-import { AbiItem } from 'web3-utils'
+import { AbiItem, isAddress } from 'web3-utils'
 import { Contract, ContractOptions } from 'web3-eth-contract'
 import { TransactionConfig, TransactionReceipt } from 'web3-core'
 import { DEFAULT_NETWORK_CONFIG, setNetworkConfig } from '@/helpers/config'
@@ -69,10 +69,6 @@ const sign = async (message: string, address: string): Promise<string> => {
 
 const recover = async (message: string, signature: string): Promise<string> => {
   return web3.eth.accounts.recover(message, signature)
-}
-
-const isAddress = (address: string): boolean => {
-  return web3.utils.isAddress(address)
 }
 
 export default function useWeb3(): {
