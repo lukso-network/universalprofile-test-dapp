@@ -20,8 +20,15 @@ jobs:
         run: |
           if [[ -n "${{ github.event.number }}" ]]
           then
-            echo "branch=--branch=${GITHUB_HEAD_REF}" >> $GITHUB_OUTPUT
-            echo "url=https://${GITHUB_HEAD_REF}.${{ env.CF_PROJECT_NAME }}.pages.dev" >> $GITHUB_OUTPUT
+            GITHUB_HEAD_REF="fix/something-really-really-long-and$&$--__broken"
+            BRANCH="${GITHUB_HEAD_REF//[^a-zA-Z0-9]/-}"
+            BRANCH="${BRANCH//--/-}"
+            BRANCH="${BRANCH:0:28}"
+            if [[ "$BRANCH" =~ '-$' ]]; then
+              BRANCH="${BRANCH::-1}"
+            fi
+            echo "branch=--branch=${BRANCH}" >> $GITHUB_OUTPUT
+            echo "url=https://${BRANCH}.${{ env.CF_PROJECT_NAME }}.pages.dev" >> $GITHUB_OUTPUT
           else
             echo "url=${PUBLIC_URL}" >> $GITHUB_OUTPUT
           fi
