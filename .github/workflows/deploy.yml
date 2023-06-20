@@ -9,7 +9,7 @@ concurrency: deployment-${{ github.ref }}
 
 env:
   CF_PROJECT_NAME: 'universalprofile-test-dapp'
-  PUBLIC_URL: 'https://https://up-test-dapp.lukso.tech'
+  PUBLIC_URL: 'https://up-test-dapp.lukso.tech'
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -23,7 +23,11 @@ jobs:
             BRANCH="${GITHUB_HEAD_REF//[^a-zA-Z0-9]/-}"
             BRANCH="${BRANCH//--/-}"
             BRANCH="${BRANCH:0:28}"
-            if [[ "${BRANCH}zxz" =~ -zxz ]]
+            # Use dummy "zxaxz" to allow regex to match "end of string"
+            # the normal -$ does not seem to work due to the github.com
+            # yaml parser expeding a variable name after.
+            # The string zxaxz is very unlikely to be part of a branch name.
+            if [[ "${BRANCH}zxaxz" =~ -zxaxz ]]
             then
               BRANCH="${BRANCH::-1}"
             fi
