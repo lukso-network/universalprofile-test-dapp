@@ -31,8 +31,8 @@ const setupWCV2Provider = async (): Promise<void> => {
     metadata: {
       name: 'UP Test DApp',
       description: 'UP Test DApp',
-      url: 'https://up-test-dapp.lukso.tech/',
-      icons: ['https://up-test-dapp.lukso.tech/lukso.png'],
+      url: document.location.origin,
+      icons: [document.location.origin + '/lukso.png'],
     },
     showQrModal: true,
   })
