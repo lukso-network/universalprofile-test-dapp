@@ -48,7 +48,7 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-test.skip('can connect to wallet connect', async () => {
+test('can connect to wallet connect V2', async () => {
   mockGetProvider.mockReturnValue({
     wc: {
       connected: false,
