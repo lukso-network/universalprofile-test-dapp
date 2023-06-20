@@ -9,7 +9,7 @@ concurrency: deployment-${{ github.ref }}
 
 env:
   CF_PROJECT_NAME: 'universalprofile-test-dapp'
-  PUBLIC_URL: 'https://https://up-test-dapp.lukso.tech'
+  PUBLIC_URL: 'https://up-test-dapp.lukso.tech'
 jobs:
   deploy:
     runs-on: ubuntu-latest
