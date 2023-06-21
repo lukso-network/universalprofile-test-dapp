@@ -1,6 +1,6 @@
 import { DEFAULT_GAS_PRICE } from '@/helpers/config'
 import Sign from '../Sign.vue'
-import { render, fireEvent, screen } from '@testing-library/vue'
+import { render, fireEvent, screen, waitFor } from '@testing-library/vue'
 import { setState } from '@/stores'
 import { Contract } from 'web3-eth-contract'
 import userEvent from '@testing-library/user-event'
@@ -106,17 +106,17 @@ test('can sign with ethereum', async () => {
     screen.getByTestId('siwe.expirationDate'),
     '2022-09-02'
   )
-  await fireEvent.update(screen.getByTestId('siwe.nonce'), '1')
+  await fireEvent.update(screen.getByTestId('siwe.nonce'), 'ABCDEFAB1')
   await fireEvent.update(screen.getByTestId('siwe.domain'), 'example.com')
   await fireEvent.update(
     screen.getByTestId('siwe.address'),
-    '0x117216362D594516c6f96Ee34b2c502d65B847E4'
+    '0x117216362d594516C6f96ee34B2C502D65b847E4'
   )
   await fireEvent.update(
     screen.getByTestId('siwe.uri'),
     'http://example.com/login'
   )
-  await fireEvent.update(screen.getByTestId('siwe.version'), '2')
+  await fireEvent.update(screen.getByTestId('siwe.version'), '1')
   await fireEvent.update(screen.getByTestId('siwe.chainId'), '2829')
   await fireEvent.update(screen.getByTestId('siwe.expirationTime'), '11:00')
   await fireEvent.update(screen.getByTestId('siwe.notBeforeDate'), '2022-09-01')
@@ -131,19 +131,21 @@ test('can sign with ethereum', async () => {
 
   await fireEvent.click(screen.getByTestId('sign'))
 
-  expect(screen.getByTestId('notification')).toHaveTextContent(
-    'Message signed successfully'
-  )
+  await waitFor(() => {
+    expect(screen.getByTestId('notification')).toHaveTextContent(
+      'Message signed successfully'
+    )
+  })
   expect(mockSign).toBeCalledWith(
     `example.com wants you to sign in with your Ethereum account:
-0x117216362D594516c6f96Ee34b2c502d65B847E4
+0x117216362d594516C6f96ee34B2C502D65b847E4
 
 By logging in, you confirm the terms and conditions
 
 URI: http://example.com/login
-Version: 2
+Version: 1
 Chain ID: 2829
-Nonce: 1
+Nonce: ABCDEFAB1
 Issued At: 2022-09-01T09:00:00.000Z
 Expiration Time: 2022-09-02T11:00:00.000Z
 Not Before: 2022-09-01T10:00:00.000Z

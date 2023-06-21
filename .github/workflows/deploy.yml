@@ -1,13 +1,43 @@
-name: Build and deploy to GH Pages
+name: Build and deploy to Cloudflare Pages
 
 on:
   push:
     branches: [main]
+  pull_request:
 
+concurrency: deployment-${{ github.ref }}
+
+env:
+  CF_PROJECT_NAME: 'universalprofile-test-dapp'
+  PUBLIC_URL: 'https://up-test-dapp.lukso.tech'
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Extract branch name
+        if: ${{ github.event.number != '' }}
+        shell: bash
+        run: |
+          if [[ -n "${{ github.event.number }}" ]]
+          then
+            BRANCH="${GITHUB_HEAD_REF//[^a-zA-Z0-9]/-}"
+            BRANCH="${BRANCH//--/-}"
+            BRANCH="${BRANCH:0:28}"
+            # Use dummy "zxaxz" to allow regex to match "end of string"
+            # the normal -$ does not seem to work due to the github.com
+            # yaml parser expeding a variable name after.
+            # The string zxaxz is very unlikely to be part of a branch name.
+            if [[ "${BRANCH}zxaxz" =~ -zxaxz ]]
+            then
+              BRANCH="${BRANCH::-1}"
+            fi
+            echo "branch=--branch=${BRANCH}" >> $GITHUB_OUTPUT
+            echo "url=https://${BRANCH}.${{ env.CF_PROJECT_NAME }}.pages.dev" >> $GITHUB_OUTPUT
+          else
+            echo "url=${PUBLIC_URL}" >> $GITHUB_OUTPUT
+          fi
+        id: extract_branch
+
       - name: 🛎️ Checkout
         uses: actions/checkout@v3
 
@@ -38,9 +68,21 @@ jobs:
       - name: 🎯 Test
         run: yarn test:unit
 
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4
+      - name: Deploy
+        uses: cloudflare/wrangler-action@2.0.0
         with:
-          branch: gh-pages # The branch the action should deploy to.
-          folder: dist # The folder the action should deploy.
-          clean-exclude: pr-preview/
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          command: pages deploy --project-name "${CF_PROJECT_NAME}" dist ${{ steps.extract_branch.outputs.branch }} | tee output.log
+          postCommands: |
+            sed < output.log -n 's#.*Take a peek over at \(.*\)$#specific_url=\1#p' >> $GITHUB_OUTPUT
+        id: deploy
+
+      - name: Create commit comment
+        uses: mshick/add-pr-comment@v2
+        if: ${{ github.event.number != '' }}
+        with:
+          message: |
+            ### Deployed with **Cloudflare Pages** :cloud: :rocket: :ok:
+            - **URL**: [${{ steps.extract_branch.outputs.url }}](${{ steps.extract_branch.outputs.url }})
+            - **Specific**: [${{ steps.deploy.outputs.specific_url }}](${{ steps.deploy.outputs.specific_url }})

@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite --mode development",
     "build": "vue-tsc --noEmit && vite build",
+    "build:cloudflare": "yarn lint:js && yarn lint:css && yarn lint:format && yarn lint:types && yarn test:unit && yarn build",
     "preview": "vite preview",
     "test:unit": "jest",
     "lint": "npm-run-all --aggregate-output --continue-on-error --parallel 'lint:*!(fix)'",
@@ -20,18 +21,26 @@
     "@erc725/erc725.js": "^0.17.2",
     "@lukso/lsp-factory.js": "2.5.1",
     "@lukso/lsp-smart-contracts": "^0.8.2",
-    "@walletconnect/client": "1.8.0",
+    "@walletconnect/encoding": "^1.0.2",
+    "@walletconnect/ethereum-provider": "^2.4.4",
     "@walletconnect/qrcode-modal": "1.8.0",
+    "@walletconnect/sign-client": "2.2.1",
+    "@walletconnect/types": "2.2.1",
+    "@walletconnect/utils": "2.2.1",
     "@walletconnect/web3-provider": "1.8.0",
+    "@web3modal/ethereum": "^2.1.1",
+    "@web3modal/standalone": "^2.1.1",
     "bulma": "0.9.4",
     "eth-rpc-errors": "4.0.3",
+    "ethers": "^5.7.2",
     "filesize": "10.0.7",
     "https-browserify": "1.0.0",
     "siwe": "1.1.6",
     "vue": "^3.2.47",
     "vue-router": "4.1.6",
+    "wagmi": "^1.0.0",
     "web3": "1.9.0",
-    "web3-eth-contract": "^1.9.0"
+    "web3-eth-contract": "1.9.0"
   },
   "devDependencies": {
     "@depay/web3-mock": "^13.26.0",
@@ -50,17 +59,18 @@
     "husky": "^8.0.3",
     "jest": "28.1.3",
     "jest-environment-jsdom": "28.1.3",
-    "lint-staged": "^13.2.1",
+    "lint-staged": "^13.2.2",
+    "lokijs": "^1.5.12",
     "npm-run-all": "4.1.5",
     "postcss-html": "^1.5.0",
-    "prettier": "2.8.7",
+    "prettier": "2.8.8",
     "sass": "1.61.0",
     "stream-browserify": "3.0.0",
     "stream-http": "3.2.0",
-    "stylelint": "15.4.0",
+    "stylelint": "15.7.0",
     "stylelint-config-prettier": "9.0.5",
     "stylelint-config-recommended-vue": "1.4.0",
-    "stylelint-config-standard-scss": "7.0.1",
+    "stylelint-config-standard-scss": "9.0.0",
     "ts-jest": "28.0.8",
     "typescript": "^5.0.4",
     "util": "0.12.5",
@@ -83,5 +93,8 @@
   "engines": {
     "node": "18.12.1"
   },
-  "packageManager": "yarn@3.3.0"
+  "packageManager": "yarn@3.3.0",
+  "resolutions": {
+    "wagmi": "~1.2.0"
+  }
 }

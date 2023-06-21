@@ -1,14 +1,24 @@
 import Web3 from 'web3'
 import { provider as Provider } from 'web3-core'
-import { AbiItem } from 'web3-utils'
+import { AbiItem, isAddress as baseIsAddress } from 'web3-utils'
 import { Contract, ContractOptions } from 'web3-eth-contract'
 import { TransactionConfig, TransactionReceipt } from 'web3-core'
+import { DEFAULT_NETWORK_CONFIG, setNetworkConfig } from '@/helpers/config'
 
 let web3: Web3
 
-const setupWeb3 = (provider: Provider): void => {
+const setupWeb3 = async (provider: Provider): Promise<void> => {
   web3 = new Web3(provider)
   window.web3 = web3
+  web3.eth
+    ?.getChainId()
+    .then(chainId => {
+      setNetworkConfig(chainId)
+    })
+    .catch(() => {
+      // Ignore error
+      setNetworkConfig(DEFAULT_NETWORK_CONFIG.chainId)
+    })
 }
 
 const getWeb3 = (): Web3 => {
@@ -20,10 +30,10 @@ const getChainId = async (): Promise<number> => {
 }
 
 const contract = (
-  jsonInterface: AbiItem,
+  jsonInterface: AbiItem[],
   address?: string,
   options?: ContractOptions
-) => {
+): Contract => {
   return new web3.eth.Contract(jsonInterface, address, options)
 }
 
@@ -62,15 +72,15 @@ const recover = async (message: string, signature: string): Promise<string> => {
 }
 
 const isAddress = (address: string): boolean => {
-  return web3.utils.isAddress(address)
+  return baseIsAddress(address)
 }
 
 export default function useWeb3(): {
-  setupWeb3: (provider: Provider) => void
+  setupWeb3: (provider: Provider) => Promise<void>
   getWeb3: () => Web3
   getChainId: () => Promise<number>
   contract: (
-    jsonInterface: AbiItem,
+    jsonInterface: AbiItem[],
     address?: string,
     options?: ContractOptions
   ) => Contract
