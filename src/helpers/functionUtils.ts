@@ -1,7 +1,7 @@
 import { LSPType } from '@/helpers/tokenUtils'
 import { SIGNATURE_LOOKUP_URL } from '@/helpers/config'
 import Web3 from 'web3'
-import { Unit } from 'web3-utils'
+import { Unit, isAddress } from 'web3-utils'
 
 export type MethodType = {
   label?: string
@@ -95,7 +95,7 @@ export const decodeData = async (
     })
 
     if (methods && methods.results.length > 0) {
-      for (const result of methods.results) {
+      for (const result of methods.results.reverse()) {
         try {
           const params: string[] = result.text_signature
             .replace(/^[^(]*\(|\)[^)]*$/g, '')
@@ -110,6 +110,14 @@ export const decodeData = async (
                   // Due to javascript truthyness any non-empty or non-zero value is encoded as true without a problem.
                   // The output packet won't match but there is really no reason to even try.
                   throw new Error('Invalid boolean value')
+                }
+              }
+              if (params[index] === 'address') {
+                const val = args[`${index}`]
+                if (!isAddress(val)) {
+                  // Due to javascript truthyness any non-empty or non-zero value is encoded as true without a problem.
+                  // The output packet won't match but there is really no reason to even try.
+                  throw new Error('Invalid address value')
                 }
               }
               return args[`${index}`] ?? '0x'

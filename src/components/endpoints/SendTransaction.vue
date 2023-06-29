@@ -165,13 +165,13 @@ const methods: MethodSelect[] = [
     hasSpecs: [LSPType.ERC721],
   },
   {
-    label: '💰 Approve ERC721',
+    label: '💰 Approve ERC721 / ERC20',
     call: 'approve',
     inputs: [
       { type: 'address', name: 'approved' },
       { type: 'uint256', name: 'tokenId', value: '1' },
     ],
-    hasSpecs: [LSPType.ERC721],
+    hasSpecs: [LSPType.ERC721, LSPType.ERC20],
   },
   {
     label: '💰 SafeTransferFrom ERC1155',
