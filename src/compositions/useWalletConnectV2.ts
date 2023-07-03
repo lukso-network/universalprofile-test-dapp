@@ -141,7 +141,7 @@ const sendCustomWCV2Request = async (request: {
   params?: [any]
 }): Promise<any> => {
   if (provider && provider.connected) {
-    await provider.request(request)
+    return await provider.request(request)
   } else {
     console.warn('Provider is not set up or not connected.')
   }
