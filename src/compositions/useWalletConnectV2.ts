@@ -14,19 +14,24 @@ let provider: EthereumProvider
  */
 const setupWCV2Provider = async (): Promise<void> => {
   const { setupWeb3 } = useWeb3()
-
   provider = await EthereumProvider.init({
     projectId: WALLET_CONNECT_PROJECT_ID,
     chains: [DEFAULT_NETWORK_CONFIG.chainId],
     methods: [
+      'eth_getAccounts',
+      'eth_getBalance',
+      'eth_getId',
+      'eth_personalSign',
+      'eth_requestAccounts',
       'eth_sendTransaction',
       'eth_sign',
+      'eth_signTransaction',
+      'eth_signTypedData',
       'personal_sign',
-      'eth_getBalance',
-      'eth_getAccounts',
-      'eth_requestAccounts',
-      'up_import',
       'up_addTransactionRelayer',
+      'up_import',
+      'wallet_addEthereumChain',
+      'wallet_switchEthereumChain',
     ],
     metadata: {
       name: 'UP Test DApp',
