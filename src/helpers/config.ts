@@ -92,6 +92,6 @@ export function setNetworkConfig(inChainId: number): void {
 }
 
 export const SIGNATURE_LOOKUP_URL =
-  'https://dawn-band-b9c5.andreas3255.workers.dev/'
+  'https://4bytesdictionary.universalprofile.cloud'
 
 export const WALLET_CONNECT_PROJECT_ID = '4f90c247328c3e3fed9d514f92b2fdce' // We should put this in .env
