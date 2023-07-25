@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
+import { DEFAULT_NETWORK, NETWORKS } from '@/helpers/config'
 import { sendRequest } from '@/helpers/customRequest'
 import { ref } from 'vue'
 
@@ -20,24 +21,7 @@ const { notification, clearNotification, hasNotification, setNotification } =
 
 const networkId = ref('')
 const err = ref('')
-const activeNetwork = ref<NetworkInfo>({
-  name: 'L16 Testnet',
-  http: {
-    url: 'https://rpc.l16.lukso.network',
-  },
-  ws: {
-    url: 'wss://ws.rpc.l16.lukso.network',
-  },
-  relayer: {
-    url: 'https://service-relayer.staging.lukso.dev/api',
-  },
-  explorer: {
-    url: 'https://explorer.execution.l16.lukso.network/tx/{transactionId}/internal-transactions',
-  },
-  isCustom: false,
-  id: 'l16',
-  chainId: '0xb0c',
-})
+const activeNetwork = ref<NetworkInfo>(NETWORKS[DEFAULT_NETWORK])
 
 const networks = [
   {
@@ -101,6 +85,7 @@ const getNetworkId = async () => {
 
   try {
     networkId.value = await sendRequest({ method: 'eth_getId' })
+
     setNotification(networkId.value, 'info')
   } catch (error) {
     setNotification((error as unknown as Error).message, 'danger')
