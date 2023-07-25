@@ -12,6 +12,7 @@ const sendRequest = async (request: any): Promise<any> => {
       return await sendCustomWCV2Request(request)
     }
   }
+  return await (window.ethereum as any)?.request(request)
 }
 
 export { sendRequest }

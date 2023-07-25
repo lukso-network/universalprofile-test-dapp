@@ -75,9 +75,9 @@ const handleAccountsChanged = (accounts: string[]) => {
   }
 }
 
-const handleChainChanged = (chainId: string) => {
+const handleChainChanged = async (chainId: string) => {
   console.log('Chain changed', chainId)
-
+  await disconnect()
   window.location.reload()
 }
 

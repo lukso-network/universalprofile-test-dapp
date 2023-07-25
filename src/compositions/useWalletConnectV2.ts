@@ -14,25 +14,35 @@ let provider: EthereumProvider
  */
 const setupWCV2Provider = async (): Promise<void> => {
   const { setupWeb3 } = useWeb3()
-
   provider = await EthereumProvider.init({
     projectId: WALLET_CONNECT_PROJECT_ID,
     chains: [DEFAULT_NETWORK_CONFIG.chainId],
     methods: [
+      'eth_getAccounts',
+      'eth_getBalance',
+      'eth_getId',
+      'eth_personalSign',
+      'eth_requestAccounts',
       'eth_sendTransaction',
       'eth_sign',
+      'eth_signTransaction',
+      'eth_signTypedData',
       'personal_sign',
-      'eth_getBalance',
-      'eth_getAccounts',
-      'eth_requestAccounts',
-      'up_import',
       'up_addTransactionRelayer',
+      'up_import',
+      'wallet_addEthereumChain',
+      'wallet_switchEthereumChain',
     ],
     metadata: {
       name: 'UP Test DApp',
       description: 'UP Test DApp',
       url: document.location.origin,
       icons: [document.location.origin + '/lukso.png'],
+    },
+    rpcMap: {
+      42: 'https://rpc.mainnet.lukso.network',
+      2828: 'https://rpc.l16.lukso.network',
+      4201: 'https://rpc.testnet.lukso.network',
     },
     showQrModal: true,
   })
@@ -42,8 +52,8 @@ const setupWCV2Provider = async (): Promise<void> => {
       throw error
     }
 
-    setState('isConnected', true)
     setupWeb3(provider as unknown as Provider)
+    setState('isConnected', true)
   })
 
   provider.on('accountsChanged', async (accounts: string[]) => {
@@ -64,8 +74,8 @@ const setupWCV2Provider = async (): Promise<void> => {
       throw error
     }
 
-    setState('isConnected', true)
     setupWeb3(provider as unknown as Provider)
+    setState('isConnected', true)
   })
 
   provider.on('accountsChanged', async (accounts: string[]) => {
@@ -81,13 +91,13 @@ const setupWCV2Provider = async (): Promise<void> => {
     setConnected(address, 'walletConnectV2')
   })
 
+  setupWeb3(provider as unknown as Provider)
+
   const { setConnected } = useState()
   const [address] = provider.accounts
   if (address) {
     setConnected(address, 'walletConnectV2')
   }
-
-  setupWeb3(provider as unknown as Provider)
 }
 
 /**
@@ -132,7 +142,7 @@ const sendCustomWCV2Request = async (request: {
   params?: [any]
 }): Promise<any> => {
   if (provider && provider.connected) {
-    await provider.request(request)
+    return await provider.request(request)
   } else {
     console.warn('Provider is not set up or not connected.')
   }
