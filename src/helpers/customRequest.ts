@@ -4,7 +4,6 @@ import { isDesktop } from '@/utils/isDesktop'
 const { getWCV2Provider, sendCustomWCV2Request } = useWalletConnectV2()
 
 const sendRequest = async (request: any): Promise<any> => {
-  debugger
   if (isDesktop()) {
     return await (window.ethereum as any)?.request(request)
   } else {
