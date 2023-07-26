@@ -12,7 +12,7 @@ describe('can produce LSP Factory', () => {
   })
 
   it('should be called with window.ethereum', async () => {
-    expect(LSPFactory).toBeCalledWith({}, { chainId: 2828 })
+    expect(LSPFactory).toBeCalledWith({}, { chainId: 4201 })
   })
 
   it('should return null for empty chain id', async () => {
