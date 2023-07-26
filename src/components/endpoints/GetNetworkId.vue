@@ -19,9 +19,24 @@ export type NetworkInfo = {
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
 
+const defaultNetwork: NetworkInfo = {
+  name: NETWORKS[DEFAULT_NETWORK].name,
+  http: NETWORKS[DEFAULT_NETWORK].rpc,
+  ws: {
+    url: 'wss://ws-rpc.testnet.lukso.network',
+  },
+  relayer: {
+    url: 'https://relayer.testnet.lukso.network/api',
+  },
+  explorer: NETWORKS[DEFAULT_NETWORK].blockscout,
+  isCustom: false,
+  id: 'testnet',
+  chainId: '0x1069',
+}
+
 const networkId = ref('')
 const err = ref('')
-const activeNetwork = ref<NetworkInfo>(NETWORKS[DEFAULT_NETWORK])
+const activeNetwork = ref<NetworkInfo>(defaultNetwork)
 
 const networks = [
   {
