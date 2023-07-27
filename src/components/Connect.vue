@@ -21,7 +21,6 @@ const { resetWCV2Provider, setupWCV2Provider, openWCV2Modal, getWCV2Provider } =
 const { setDisconnected, setConnected } = useState()
 const { close, toggle } = useDropdown()
 const dropdown = ref()
-const browserExtensionConnected = localStorage.getItem(UP_CONNECTED_ADDRESS)
 const hasExtension = ref<boolean>(!!window.ethereum)
 
 watch(
@@ -108,12 +107,16 @@ const removeEventListeners = () => {
 }
 
 onMounted(async () => {
-  await setupWCV2Provider()
+  const channel = localStorage.getItem(MEANS_OF_CONNECTION)
+  const isWalletConnectUsed = channel === WALLET_CONNECT
 
-  const wcv2Provider = getWCV2Provider()
-  if (wcv2Provider && wcv2Provider.connected) {
-    // All set up already
-  } else if (browserExtensionConnected) {
+  if (!channel) {
+    return
+  }
+
+  if (isWalletConnectUsed) {
+    await setupWCV2Provider()
+  } else {
     await connectExtension()
   }
 
