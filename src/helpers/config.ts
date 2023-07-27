@@ -6,8 +6,8 @@ export const UP_CONNECTED_ADDRESS = 'up:connected-address'
  * - WalletConnect (for mobile, extension or desktop app);
  * - or injected `window.ethereum` object for extension only.
  *
- * Note: wallet connect can be used for extension, mobile and desktop application as well.
- * Thus, we do not check what DApp is connected to but rather what was used to connect
+ * Note: wallet connect can be used for extension, mobile and desktop applications as well.
+ * Thus, we do not check what DApp is connected to but rather what tool was used to connect
  * so that we can recreate the connection correctly.
  */
 export const MEANS_OF_CONNECTION = 'means-of-connection'
