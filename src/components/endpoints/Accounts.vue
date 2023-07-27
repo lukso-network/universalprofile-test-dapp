@@ -4,7 +4,7 @@ import useNotifications from '@/compositions/useNotifications'
 import useWalletConnectV2 from '@/compositions/useWalletConnectV2'
 import { getState, useState } from '@/stores'
 import useWeb3 from '@/compositions/useWeb3'
-import { UP_CONNECTED_ADDRESS } from '@/helpers/config'
+import { UP_CONNECTED_ADDRESS, WALLET_CONNECT, WINDOW_ETHEREUM } from '@/helpers/config'
 import { createBlockScoutLink } from '@/utils/createLinks'
 import Web3Utils from 'web3-utils'
 import { computed, watch, ref } from 'vue'
@@ -43,7 +43,7 @@ const connectExtension = async () => {
 
   try {
     const [address] = await requestAccounts()
-    setConnected(address, 'browserExtension')
+    setConnected(address, WINDOW_ETHEREUM)
     localStorage.setItem(UP_CONNECTED_ADDRESS, address)
   } catch (error) {
     setNotification((error as unknown as Error).message, 'danger')
@@ -56,7 +56,7 @@ const connectWalletConnectV2 = async () => {
   try {
     await setupWCV2Provider()
     await openWCV2Modal()
-    setConnected(getState('address'), 'walletConnectV2')
+    setConnected(getState('address'), WALLET_CONNECT)
     setNotification(`Connected to address: ${getState('address')}`, 'info')
   } catch (error) {
     setNotification((error as unknown as Error).message, 'danger')
@@ -66,7 +66,7 @@ const connectWalletConnectV2 = async () => {
 const disconnect = async () => {
   clearNotification()
 
-  if (getState('channel') == 'walletConnectV2') {
+  if (getState('channel') == WALLET_CONNECT) {
     await resetWCV2Provider()
   } else {
     localStorage.removeItem(UP_CONNECTED_ADDRESS)
@@ -98,8 +98,7 @@ const handleRefresh = (e: Event) => {
         </button>
         <span
           v-if="
-            getState('channel') === 'browserExtension' &&
-            getState('isConnected')
+            getState('channel') === WINDOW_ETHEREUM && getState('isConnected')
           "
           class="icon ml-3 mt-1 has-text-primary"
         >
@@ -117,7 +116,7 @@ const handleRefresh = (e: Event) => {
         </button>
         <span
           v-if="
-            getState('channel') === 'walletConnectV2' && getState('isConnected')
+            getState('channel') === WALLET_CONNECT && getState('isConnected')
           "
           class="icon ml-3 mt-4 has-text-primary"
         >

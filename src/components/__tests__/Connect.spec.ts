@@ -1,6 +1,7 @@
 import Connect from '../Connect.vue'
 import { render, fireEvent, waitFor, screen } from '@testing-library/vue'
 import { useState } from '@/stores'
+import { WALLET_CONNECT } from '@/helpers/config'
 
 const mockCall = jest.fn()
 const mockSetupProvider = jest.fn()
@@ -75,7 +76,7 @@ test('can disconnect from wallet connect V2', async () => {
   })
   mockGetBalance.mockReturnValue('2')
   const { setConnected } = useState()
-  setConnected('0x8e54b33F8d42E59c0B4Cf02e6457CF8bb6a71094', 'walletConnectV2')
+  setConnected('0x8e54b33F8d42E59c0B4Cf02e6457CF8bb6a71094', WALLET_CONNECT)
 
   render(Connect)
 

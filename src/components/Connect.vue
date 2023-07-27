@@ -5,10 +5,14 @@ import { provider as Provider } from 'web3-core'
 import { EthereumProviderError } from 'eth-rpc-errors'
 import useDropdown from '@/compositions/useDropdown'
 import useWeb3 from '@/compositions/useWeb3'
-import { UP_CONNECTED_ADDRESS } from '@/helpers/config'
+import {
+  MEANS_OF_CONNECTION,
+  UP_CONNECTED_ADDRESS,
+  WALLET_CONNECT,
+  WINDOW_ETHEREUM,
+} from '@/helpers/config'
 import { sliceAddress } from '@/utils/sliceAddress'
 import useWalletConnectV2 from '@/compositions/useWalletConnectV2'
-import { isDesktop } from '@/utils/isDesktop'
 
 const { setupWeb3, accounts, requestAccounts } = useWeb3()
 
@@ -42,7 +46,7 @@ const connectExtension = async () => {
       ;[address] = await requestAccounts()
     }
 
-    setConnected(address, 'browserExtension')
+    setConnected(address, WINDOW_ETHEREUM)
     localStorage.setItem(UP_CONNECTED_ADDRESS, address)
     close(dropdown.value)
   } catch (error) {
@@ -50,14 +54,14 @@ const connectExtension = async () => {
 
     if (epError.code === 4100) {
       const address = (await requestAccounts())[0]
-      setConnected(address, 'browserExtension')
+      setConnected(address, WINDOW_ETHEREUM)
       localStorage.setItem(UP_CONNECTED_ADDRESS, address)
     }
   }
 }
 
 const disconnect = async () => {
-  if (getState('channel') == 'walletConnectV2') {
+  if (getState('channel') == WALLET_CONNECT) {
     await resetWCV2Provider()
   } else {
     localStorage.removeItem(UP_CONNECTED_ADDRESS)
@@ -138,7 +142,7 @@ onUnmounted(() => {
       >
         <div
           :class="`logo ${
-            getState('channel') === 'browserExtension'
+            getState('channel') === WINDOW_ETHEREUM
               ? 'browser-extension'
               : 'wallet-connect'
           }`"

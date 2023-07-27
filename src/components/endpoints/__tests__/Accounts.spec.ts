@@ -1,6 +1,7 @@
 import Accounts from '../Accounts.vue'
 import { render, fireEvent, screen, waitFor } from '@testing-library/vue'
 import { useState } from '@/stores'
+import { WINDOW_ETHEREUM } from '@/helpers/config'
 
 const mockCall = jest.fn()
 const mockSetupProvider = jest.fn()
@@ -92,7 +93,7 @@ test('can connect to browser extension when authorized', async () => {
 test('can disconnect from browser extension', async () => {
   window.ethereum = {} as any
   const { setConnected } = useState()
-  setConnected('0x517216362D594516c6f96Ee34b2c502d65B847E4', 'browserExtension')
+  setConnected('0x517216362D594516c6f96Ee34b2c502d65B847E4', WINDOW_ETHEREUM)
 
   render(Accounts)
 
