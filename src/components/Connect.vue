@@ -104,13 +104,11 @@ const removeEventListeners = () => {
 }
 
 onMounted(async () => {
-  if (!isDesktop()) {
-    await setupWCV2Provider()
+  await setupWCV2Provider()
 
-    const wcv2Provider = getWCV2Provider()
-    if (wcv2Provider && wcv2Provider.connected) {
-      // All set up already
-    }
+  const wcv2Provider = getWCV2Provider()
+  if (wcv2Provider && wcv2Provider.connected) {
+    // All set up already
   } else if (browserExtensionConnected) {
     await connectExtension()
   }
