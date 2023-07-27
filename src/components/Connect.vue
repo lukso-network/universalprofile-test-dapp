@@ -8,6 +8,7 @@ import useWeb3 from '@/compositions/useWeb3'
 import { UP_CONNECTED_ADDRESS } from '@/helpers/config'
 import { sliceAddress } from '@/utils/sliceAddress'
 import useWalletConnectV2 from '@/compositions/useWalletConnectV2'
+import { isDesktop } from '@/utils/isDesktop'
 
 const { setupWeb3, accounts, requestAccounts } = useWeb3()
 
@@ -103,11 +104,13 @@ const removeEventListeners = () => {
 }
 
 onMounted(async () => {
-  await setupWCV2Provider()
+  if (!isDesktop()) {
+    await setupWCV2Provider()
 
-  const wcv2Provider = getWCV2Provider()
-  if (wcv2Provider && wcv2Provider.connected) {
-    // All set up already
+    const wcv2Provider = getWCV2Provider()
+    if (wcv2Provider && wcv2Provider.connected) {
+      // All set up already
+    }
   } else if (browserExtensionConnected) {
     await connectExtension()
   }
