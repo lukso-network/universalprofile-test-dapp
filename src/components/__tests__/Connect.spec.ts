@@ -64,11 +64,11 @@ test('can connect to wallet connect V2', async () => {
 
   render(Connect)
 
-  expect(mockSetupProvider).toBeCalledTimes(1)
+  expect(mockSetupProvider).toBeCalledTimes(0)
 
   await fireEvent.click(screen.getByTestId('connect-wc-v2'))
 
-  expect(mockSetupProvider).toBeCalledTimes(2)
+  expect(mockSetupProvider).toBeCalledTimes(1)
   expect(mockOpenWCV2Modal).toBeCalledTimes(1)
 })
 
@@ -80,7 +80,7 @@ test('can disconnect from wallet connect V2', async () => {
   })
   mockGetBalance.mockReturnValue('2')
   const { setConnected } = useState()
-  setConnected('0x8e54b33F8d42E59c0B4Cf02e6457CF8bb6a71094', WALLET_CONNECT)
+  await setConnected('0x8e54b33F8d42E59c0B4Cf02e6457CF8bb6a71094', WALLET_CONNECT)
 
   render(Connect)
 

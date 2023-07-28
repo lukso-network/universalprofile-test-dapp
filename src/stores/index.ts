@@ -5,7 +5,6 @@ import {
   DEFAULT_GAS,
   DEFAULT_GAS_PRICE,
   MEANS_OF_CONNECTION,
-  WALLET_CONNECT,
 } from '@/helpers/config'
 import UniversalProfile from '@lukso/lsp-smart-contracts/artifacts/UniversalProfile.json'
 import KeyManager from '@lukso/lsp-smart-contracts/artifacts/LSP6KeyManager.json'
