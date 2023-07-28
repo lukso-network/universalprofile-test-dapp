@@ -80,7 +80,10 @@ test('can disconnect from wallet connect V2', async () => {
   })
   mockGetBalance.mockReturnValue('2')
   const { setConnected } = useState()
-  await setConnected('0x8e54b33F8d42E59c0B4Cf02e6457CF8bb6a71094', WALLET_CONNECT)
+  await setConnected(
+    '0x8e54b33F8d42E59c0B4Cf02e6457CF8bb6a71094',
+    WALLET_CONNECT
+  )
 
   render(Connect)
 
