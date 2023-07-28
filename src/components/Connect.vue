@@ -13,6 +13,7 @@ import {
 } from '@/helpers/config'
 import { sliceAddress } from '@/utils/sliceAddress'
 import useWalletConnectV2 from '@/compositions/useWalletConnectV2'
+import { isDesktop } from '@/utils/isDesktop'
 
 const { setupWeb3, accounts, requestAccounts } = useWeb3()
 

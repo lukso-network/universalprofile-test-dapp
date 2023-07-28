@@ -22,6 +22,10 @@ jest.mock('@/compositions/useWalletConnectV2', () => ({
   }),
 }))
 
+jest.mock('@/utils/isDesktop', () => ({
+  isDesktop: jest.fn().mockReturnValue(true),
+}))
+
 const mockSetupWeb3 = jest.fn()
 const mockAccounts = jest.fn()
 const mockGetBalance = jest.fn()
