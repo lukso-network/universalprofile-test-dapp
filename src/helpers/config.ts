@@ -1,6 +1,18 @@
 import { NetworkInfo, NetworkType } from '@/interfaces/network'
 
 export const UP_CONNECTED_ADDRESS = 'up:connected-address'
+/**
+ * Tells what was used to establish currently available connection, if any:
+ * - WalletConnect (for mobile, extension or desktop app);
+ * - or injected `window.ethereum` object for extension only.
+ *
+ * Note: wallet connect can be used for extension, mobile and desktop applications as well.
+ * Thus, we do not check what DApp is connected to but rather what tool was used to connect
+ * so that we can recreate the connection correctly.
+ */
+export const MEANS_OF_CONNECTION = 'means-of-connection'
+export const WALLET_CONNECT = 'wallet-connect-v2'
+export const WINDOW_ETHEREUM = 'window-ethereum'
 
 export const DEFAULT_GAS = 5_000_000
 export const DEFAULT_GAS_PRICE = '10000000000'

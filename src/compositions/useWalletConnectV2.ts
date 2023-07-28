@@ -4,6 +4,7 @@ import useWeb3 from '@/compositions/useWeb3'
 import { provider as Provider } from 'web3-core'
 import {
   DEFAULT_NETWORK_CONFIG,
+  WALLET_CONNECT,
   WALLET_CONNECT_PROJECT_ID,
 } from '@/helpers/config'
 
@@ -66,7 +67,7 @@ const setupWCV2Provider = async (): Promise<void> => {
     const { setConnected } = useState()
     const [address] = accounts
 
-    setConnected(address, 'walletConnectV2')
+    setConnected(address, WALLET_CONNECT)
   })
 
   provider.on('connect', (error: any) => {
@@ -88,7 +89,7 @@ const setupWCV2Provider = async (): Promise<void> => {
     const { setConnected } = useState()
     const [address] = accounts
 
-    setConnected(address, 'walletConnectV2')
+    setConnected(address, WALLET_CONNECT)
   })
 
   setupWeb3(provider as unknown as Provider)
@@ -96,7 +97,7 @@ const setupWCV2Provider = async (): Promise<void> => {
   const { setConnected } = useState()
   const [address] = provider.accounts
   if (address) {
-    setConnected(address, 'walletConnectV2')
+    setConnected(address, WALLET_CONNECT)
   }
 }
 
