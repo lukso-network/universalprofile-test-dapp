@@ -4,7 +4,11 @@ import useNotifications from '@/compositions/useNotifications'
 import useWalletConnectV2 from '@/compositions/useWalletConnectV2'
 import { getState, useState } from '@/stores'
 import useWeb3 from '@/compositions/useWeb3'
-import { UP_CONNECTED_ADDRESS, WALLET_CONNECT, WINDOW_ETHEREUM } from '@/helpers/config'
+import {
+  UP_CONNECTED_ADDRESS,
+  WALLET_CONNECT,
+  WINDOW_ETHEREUM,
+} from '@/helpers/config'
 import { createBlockScoutLink } from '@/utils/createLinks'
 import Web3Utils from 'web3-utils'
 import { computed, watch, ref } from 'vue'
