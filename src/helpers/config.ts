@@ -20,6 +20,7 @@ export const DEFAULT_GAS_PRICE = '10000000000'
 export const MAGICVALUE = '0x1626ba7e'
 
 export const DEFAULT_NETWORK: NetworkType = 'testnet'
+export const SELECTED_NETWORK_KEY = 'selected-network'
 
 export const NETWORKS: { [K in NetworkType]: NetworkInfo } = {
   l16: {
@@ -95,12 +96,16 @@ export function setNetworkConfig(inChainId: number): void {
   const network = Object.entries(NETWORKS).find(
     ([, { chainId }]) => chainId === inChainId
   )
+  let networkKey
   if (network) {
+    networkKey = network[1].name
     DEFAULT_NETWORK_CONFIG = NETWORKS[network[0] as NetworkType]
   } else {
-    console.warn('Unknown network defaulting to l16')
-    DEFAULT_NETWORK_CONFIG = NETWORKS['l16']
+    console.warn('Unknown network defaulting to testnet')
+    DEFAULT_NETWORK_CONFIG = NETWORKS.testnet
+    networkKey = 'testnet'
   }
+  localStorage.setItem(SELECTED_NETWORK_KEY, networkKey)
 }
 
 export const SIGNATURE_LOOKUP_URL =
