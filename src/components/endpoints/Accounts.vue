@@ -5,6 +5,7 @@ import useWalletConnectV2 from '@/compositions/useWalletConnectV2'
 import { getState, useState } from '@/stores'
 import useWeb3 from '@/compositions/useWeb3'
 import {
+  getSelectedNetworkConfig,
   UP_CONNECTED_ADDRESS,
   WALLET_CONNECT,
   WINDOW_ETHEREUM,
@@ -19,6 +20,7 @@ const { notification, clearNotification, hasNotification, setNotification } =
 const { setDisconnected, setConnected, recalcTokens } = useState()
 const { setupWeb3, requestAccounts } = useWeb3()
 const hasExtension = ref<boolean>(!!window.ethereum)
+const selectedNetworkConfig = getSelectedNetworkConfig()
 
 watch(
   () => !!window.ethereum,
@@ -91,6 +93,9 @@ const handleRefresh = (e: Event) => {
   <div class="tile is-4 is-parent">
     <div class="tile is-child box">
       <p class="is-size-5 has-text-weight-bold mb-1">Connect</p>
+      <div style="padding-top: 8px; padding-bottom: 8px">
+        DApp uses <b>{{ selectedNetworkConfig.name }}</b> network.
+      </div>
       <div class="field">
         <button
           class="button is-primary is-rounded mb-1"

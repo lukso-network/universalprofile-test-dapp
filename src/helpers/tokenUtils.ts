@@ -10,9 +10,9 @@ import useErc725 from '@/compositions/useErc725'
 import { eip165ABI } from '@/abis/eip165ABI'
 import { erc20ABI } from '@/abis/erc20ABI'
 import { store, setState } from '@/stores/index'
-import { DEFAULT_NETWORK, NETWORKS } from '@/helpers/config'
+import { getSelectedNetworkConfig } from '@/helpers/config'
 
-const { lsp7TokenDivisible, lsp7TokenNonDivisible } = NETWORKS[DEFAULT_NETWORK]
+const { lsp7TokenDivisible, lsp7TokenNonDivisible } = getSelectedNetworkConfig()
 
 const getSupportedStandardObject = (schemas: ERC725JSONSchema[]) => {
   try {

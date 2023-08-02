@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import { getAndPrepareAllIpfsItems } from '@/helpers/localstorage'
 import { filesize } from 'filesize'
-import { DEFAULT_NETWORK, NETWORKS } from '@/helpers/config'
+import { getSelectedNetworkConfig } from '@/helpers/config'
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
 import { useLspFactory } from '@/compositions/useLspFactory'
@@ -25,7 +25,7 @@ const name = ref('')
 const description = ref('')
 const links = ref<ProfileLinks[]>([])
 const tags = ref<string[]>([])
-const uploadTarget = ref(NETWORKS[DEFAULT_NETWORK].ipfs.url)
+const uploadTarget = ref(getSelectedNetworkConfig().ipfs.url)
 const uploadResult = ref()
 const uploadedProfiles = ref(getAndPrepareAllIpfsItems())
 

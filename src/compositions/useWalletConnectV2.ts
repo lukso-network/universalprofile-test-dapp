@@ -3,7 +3,8 @@ import { setState, useState, getState } from '@/stores'
 import useWeb3 from '@/compositions/useWeb3'
 import { provider as Provider } from 'web3-core'
 import {
-  DEFAULT_NETWORK_CONFIG,
+  getSelectedNetworkConfig,
+  NETWORKS,
   WALLET_CONNECT,
   WALLET_CONNECT_PROJECT_ID,
 } from '@/helpers/config'
@@ -17,7 +18,7 @@ const setupWCV2Provider = async (): Promise<void> => {
   const { setupWeb3 } = useWeb3()
   provider = await EthereumProvider.init({
     projectId: WALLET_CONNECT_PROJECT_ID,
-    chains: [DEFAULT_NETWORK_CONFIG.chainId],
+    chains: Object.entries(NETWORKS).map(net => net[1].chainId),
     methods: [
       'eth_getAccounts',
       'eth_getBalance',
@@ -52,7 +53,6 @@ const setupWCV2Provider = async (): Promise<void> => {
     if (error) {
       throw error
     }
-
     setupWeb3(provider as unknown as Provider)
     setState('isConnected', true)
   })
@@ -74,7 +74,6 @@ const setupWCV2Provider = async (): Promise<void> => {
     if (error) {
       throw error
     }
-
     setupWeb3(provider as unknown as Provider)
     setState('isConnected', true)
   })
@@ -106,7 +105,11 @@ const setupWCV2Provider = async (): Promise<void> => {
  */
 const resetWCV2Provider = async (): Promise<void> => {
   if (provider) {
-    await provider.disconnect()
+    try {
+      await provider.disconnect()
+    } catch (error) {
+      console.warn(`WalletConnect V2 disconnection error: ${error}`)
+    }
   } else {
     console.warn(
       'Provider is not set up. Please, call `setupWCV2Provider` first.'
@@ -119,7 +122,11 @@ const resetWCV2Provider = async (): Promise<void> => {
  */
 const openWCV2Modal = async (): Promise<void> => {
   if (provider) {
-    await provider.connect()
+    try {
+      await provider.connect()
+    } catch (error) {
+      console.warn(`WalletConnect V2 connection error: ${error}`)
+    }
   } else {
     console.warn(
       'Provider is not set up. Please, call `setupWCV2Provider` first.'

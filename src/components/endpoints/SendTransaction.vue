@@ -10,14 +10,14 @@ import useWeb3 from '@/compositions/useWeb3'
 import {
   DEFAULT_GAS,
   DEFAULT_GAS_PRICE,
-  DEFAULT_NETWORK,
+  getSelectedNetworkConfig,
 } from '@/helpers/config'
 import ContractFunction from '@/components/shared/ContractFunction.vue'
 import { MethodSelect, MethodType } from '@/helpers/functionUtils'
 import { NETWORKS } from '@/helpers/config'
 import { LSPType } from '@/helpers/tokenUtils'
 
-const { sampleUP } = NETWORKS[DEFAULT_NETWORK]
+const { sampleUP } = getSelectedNetworkConfig()
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
 const { sendTransaction, getBalance } = useWeb3()

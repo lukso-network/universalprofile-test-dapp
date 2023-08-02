@@ -11,13 +11,12 @@ import {
   WALLET_CONNECT,
   WINDOW_ETHEREUM,
 } from '@/helpers/config'
-import { sliceAddress } from '@/utils/sliceAddress'
 import useWalletConnectV2 from '@/compositions/useWalletConnectV2'
-import { isDesktop } from '@/utils/isDesktop'
+import { sliceAddress } from '@/utils/sliceAddress'
 
 const { setupWeb3, accounts, requestAccounts } = useWeb3()
 
-const { resetWCV2Provider, setupWCV2Provider, openWCV2Modal, getWCV2Provider } =
+const { resetWCV2Provider, setupWCV2Provider, openWCV2Modal } =
   useWalletConnectV2()
 const { setDisconnected, setConnected } = useState()
 const { close, toggle } = useDropdown()

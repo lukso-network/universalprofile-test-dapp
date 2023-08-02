@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
-import { DEFAULT_NETWORK, NETWORKS } from '@/helpers/config'
+import { getSelectedNetworkConfig, setNetworkConfig } from '@/helpers/config'
 import { sendRequest } from '@/helpers/customRequest'
 import { ref } from 'vue'
+import { hexToNumber, numberToHex } from 'web3-utils'
 
 export type NetworkInfo = {
   id: string
@@ -19,19 +20,20 @@ export type NetworkInfo = {
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
 
+const defaultNetworkConfig = getSelectedNetworkConfig()
 const defaultNetwork: NetworkInfo = {
-  name: NETWORKS[DEFAULT_NETWORK].name,
-  http: NETWORKS[DEFAULT_NETWORK].rpc,
+  name: defaultNetworkConfig.name,
+  http: defaultNetworkConfig.rpc,
   ws: {
     url: 'wss://ws-rpc.testnet.lukso.network',
   },
   relayer: {
     url: 'https://relayer.testnet.lukso.network/api',
   },
-  explorer: NETWORKS[DEFAULT_NETWORK].blockscout,
+  explorer: defaultNetworkConfig.blockscout,
   isCustom: false,
-  id: 'testnet',
-  chainId: '0x1069',
+  id: defaultNetworkConfig.name,
+  chainId: numberToHex(defaultNetworkConfig.chainId),
 }
 
 const networkId = ref('')
@@ -123,6 +125,20 @@ const changeNetwork = async () => {
   }
 }
 
+const changeDappNetwork = async () => {
+  try {
+    let currentChainId = getSelectedNetworkConfig().chainId
+    if (numberToHex(currentChainId) !== activeNetwork.value.chainId) {
+      setNetworkConfig(hexToNumber(activeNetwork.value.chainId) as number)
+      currentChainId = getSelectedNetworkConfig().chainId
+    }
+    location.reload()
+  } catch (error) {
+    console.error(error)
+    setNotification((error as unknown as Error).message, 'danger')
+  }
+}
+
 const addNetwork = async () => {
   try {
     await sendRequest({
@@ -182,6 +198,18 @@ const addNetwork = async () => {
         >
           Add Network
         </button>
+      </div>
+      <div>
+        <button
+          class="button is-primary is-rounded mt-4"
+          data-testid="changeDappNetworkButton"
+          @click="changeDappNetwork"
+        >
+          Switch Network in DApp to {{ activeNetwork.name }}
+        </button>
+        <div style="padding-top: 8px">
+          DApp uses <b>{{ defaultNetworkConfig.name }}</b> network.
+        </div>
       </div>
       <p class="red">
         {{ err }}
