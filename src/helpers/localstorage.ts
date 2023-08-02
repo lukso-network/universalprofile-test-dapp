@@ -1,4 +1,4 @@
-import { DEFAULT_NETWORK_CONFIG } from './config'
+import { getSelectedNetworkConfig } from './config'
 
 const IPFS_PREFIX = 'ipfs://'
 
@@ -9,11 +9,11 @@ export function getAndPrepareAllIpfsItems(): {
   const values: { url: string; profile: string; timestamp: number }[] = []
   const keys = Object.keys(localStorage)
   let i = keys.length
-
+  const selectedNetwork = getSelectedNetworkConfig()
   while (i--) {
     if (keys[i].startsWith(IPFS_PREFIX)) {
       values.push({
-        url: keys[i].replace(IPFS_PREFIX, DEFAULT_NETWORK_CONFIG.ipfs.url),
+        url: keys[i].replace(IPFS_PREFIX, selectedNetwork.ipfs.url),
         profile: JSON.parse(localStorage.getItem(keys[i]) as string),
         timestamp: Date.now(),
       })

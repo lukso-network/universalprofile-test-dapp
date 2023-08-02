@@ -3,7 +3,7 @@ import { provider as Provider } from 'web3-core'
 import { AbiItem, isAddress as baseIsAddress } from 'web3-utils'
 import { Contract, ContractOptions } from 'web3-eth-contract'
 import { TransactionConfig, TransactionReceipt } from 'web3-core'
-import { DEFAULT_NETWORK_CONFIG, setNetworkConfig } from '@/helpers/config'
+import { resetNetworkConfig, setNetworkConfig } from '@/helpers/config'
 
 let web3: Web3
 
@@ -17,7 +17,7 @@ const setupWeb3 = async (provider: Provider): Promise<void> => {
     })
     .catch(() => {
       // Ignore error
-      setNetworkConfig(DEFAULT_NETWORK_CONFIG.chainId)
+      resetNetworkConfig()
     })
 }
 

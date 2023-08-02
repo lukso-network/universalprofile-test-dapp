@@ -8,7 +8,7 @@ import {
 } from '@lukso/lsp-factory.js'
 
 import { UploadOptions } from '@lukso/lsp-factory.js/build/main/src/lib/interfaces/profile-upload-options'
-import { DEFAULT_NETWORK_CONFIG } from '@/helpers/config'
+import { getSelectedNetworkConfig } from '@/helpers/config'
 import {
   DeployedLSP7DigitalAsset,
   DeployedLSP8IdentifiableDigitalAsset,
@@ -24,7 +24,7 @@ const getFactory = (): LSPFactory => {
 
 const setupLSPFactory = (): void => {
   lspFactory = new LSPFactory(window.ethereum as any, {
-    chainId: DEFAULT_NETWORK_CONFIG.chainId,
+    chainId: getSelectedNetworkConfig().chainId,
   })
 }
 

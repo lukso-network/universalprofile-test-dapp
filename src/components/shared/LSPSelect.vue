@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { getState } from '@/stores'
 import { LSPType, TokenInfo } from '@/helpers/tokenUtils'
-import { DEFAULT_NETWORK, NETWORKS } from '@/helpers/config'
+import { getSelectedNetworkConfig } from '@/helpers/config'
 import { ref, computed, onMounted, watch } from 'vue'
 
 type Props = {
@@ -27,7 +27,7 @@ const {
   erc777TokenWithEip165,
   erc777TokenWithoutEip165,
   erc721TokenWithEip165,
-} = NETWORKS[DEFAULT_NETWORK]
+} = getSelectedNetworkConfig()
 const emits = defineEmits<Emits>()
 const props = defineProps<Props>()
 const selected = ref<string | undefined>(props.address)
