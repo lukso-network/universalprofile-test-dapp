@@ -12,6 +12,7 @@ import {
   WINDOW_ETHEREUM,
 } from '@/helpers/config'
 import useWalletConnectV2 from '@/compositions/useWalletConnectV2'
+import { sliceAddress } from '@/utils/sliceAddress'
 
 const { setupWeb3, accounts, requestAccounts } = useWeb3()
 
