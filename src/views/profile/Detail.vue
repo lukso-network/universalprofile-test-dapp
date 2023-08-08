@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { DEFAULT_NETWORK_CONFIG } from '@/helpers/config'
+import { getSelectedNetworkConfig } from '@/helpers/config'
 import { onMounted, ref, watch } from 'vue'
 import useErc725 from '@/compositions/useErc725'
 import { useRoute, RouteLocationNormalizedLoaded, useRouter } from 'vue-router'
@@ -53,7 +53,7 @@ const getProfileDataFromIPFS = async (ipfsHash: string) => {
     return false
   }
   try {
-    const result = await fetch(DEFAULT_NETWORK_CONFIG.ipfs.url + ipfsHash)
+    const result = await fetch(getSelectedNetworkConfig().ipfs.url + ipfsHash)
     dataSource.value = 'IPFS'
     profileData.value = await result.json()
   } catch (err: unknown) {

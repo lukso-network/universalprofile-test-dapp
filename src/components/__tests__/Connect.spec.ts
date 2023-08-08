@@ -1,6 +1,7 @@
 import Connect from '../Connect.vue'
 import { render, fireEvent, waitFor, screen } from '@testing-library/vue'
 import { useState } from '@/stores'
+import { WALLET_CONNECT } from '@/helpers/config'
 
 const mockCall = jest.fn()
 const mockSetupProvider = jest.fn()
@@ -19,6 +20,10 @@ jest.mock('@/compositions/useWalletConnectV2', () => ({
     sendCustomWCV2Request: (request: { method: string; params?: [any] }) =>
       mockSendCustomWCV2Request(request),
   }),
+}))
+
+jest.mock('@/utils/isDesktop', () => ({
+  isDesktop: jest.fn().mockReturnValue(true),
 }))
 
 const mockSetupWeb3 = jest.fn()
@@ -59,11 +64,11 @@ test('can connect to wallet connect V2', async () => {
 
   render(Connect)
 
-  expect(mockSetupProvider).toBeCalledTimes(1)
+  expect(mockSetupProvider).toBeCalledTimes(0)
 
   await fireEvent.click(screen.getByTestId('connect-wc-v2'))
 
-  expect(mockSetupProvider).toBeCalledTimes(2)
+  expect(mockSetupProvider).toBeCalledTimes(1)
   expect(mockOpenWCV2Modal).toBeCalledTimes(1)
 })
 
@@ -75,7 +80,10 @@ test('can disconnect from wallet connect V2', async () => {
   })
   mockGetBalance.mockReturnValue('2')
   const { setConnected } = useState()
-  setConnected('0x8e54b33F8d42E59c0B4Cf02e6457CF8bb6a71094', 'walletConnectV2')
+  await setConnected(
+    '0x8e54b33F8d42E59c0B4Cf02e6457CF8bb6a71094',
+    WALLET_CONNECT
+  )
 
   render(Connect)
 

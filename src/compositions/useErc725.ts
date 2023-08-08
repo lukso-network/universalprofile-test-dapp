@@ -6,13 +6,14 @@ import lsp9Schema from '@erc725/erc725.js/schemas/LSP9Vault.json'
 import { Permissions } from '@erc725/erc725.js/build/main/src/types/Method'
 import { FetchDataOutput } from '@erc725/erc725.js/build/main/src/types/decodeData'
 import Web3 from 'web3'
-import { DEFAULT_NETWORK_CONFIG } from '@/helpers/config'
+import { getSelectedNetworkConfig } from '@/helpers/config'
 
 window.ERC725 = ERC725
 
-const provider = new Web3.providers.HttpProvider(DEFAULT_NETWORK_CONFIG.rpc.url)
+const defaultNetworkConfig = getSelectedNetworkConfig()
+const provider = new Web3.providers.HttpProvider(defaultNetworkConfig.rpc.url)
 const config = {
-  ipfsGateway: DEFAULT_NETWORK_CONFIG.ipfs.url,
+  ipfsGateway: defaultNetworkConfig.ipfs.url,
 }
 
 const getInstance = (address: string) => {

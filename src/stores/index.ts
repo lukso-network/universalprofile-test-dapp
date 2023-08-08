@@ -1,7 +1,11 @@
 import { reactive } from 'vue'
 import { Store, Channel } from '@/types'
 import useWeb3 from '@/compositions/useWeb3'
-import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
+import {
+  DEFAULT_GAS,
+  DEFAULT_GAS_PRICE,
+  MEANS_OF_CONNECTION,
+} from '@/helpers/config'
 import UniversalProfile from '@lukso/lsp-smart-contracts/artifacts/UniversalProfile.json'
 import KeyManager from '@lukso/lsp-smart-contracts/artifacts/LSP6KeyManager.json'
 import { recalcTokens } from '@/helpers/tokenUtils'
@@ -45,6 +49,8 @@ export function useState(): {
       setState('channel', channel)
       setState('chainId', await getChainId())
 
+      localStorage.setItem(MEANS_OF_CONNECTION, channel)
+
       window.erc725Account = contract(UniversalProfile.abi as any, address, {
         gasPrice: DEFAULT_GAS_PRICE,
         gas: DEFAULT_GAS,
@@ -78,6 +84,7 @@ export function useState(): {
       setState('assets', [])
       setState('lsp7', [])
       setState('lsp8', [])
+      localStorage.removeItem(MEANS_OF_CONNECTION)
 
       window.erc725Account = undefined
     },
