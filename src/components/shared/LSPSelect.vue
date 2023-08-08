@@ -30,6 +30,7 @@ const {
 } = getSelectedNetworkConfig()
 const emits = defineEmits<Emits>()
 const props = defineProps<Props>()
+// eslint-disable-next-line vue/no-setup-props-destructure
 const selected = ref<string | undefined>(props.address)
 
 const data = computed<{ [key: string]: TokenInfo[] }>(() => {
