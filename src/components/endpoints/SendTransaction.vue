@@ -14,7 +14,6 @@ import {
 } from '@/helpers/config'
 import ContractFunction from '@/components/shared/ContractFunction.vue'
 import { MethodSelect, MethodType } from '@/helpers/functionUtils'
-import { NETWORKS } from '@/helpers/config'
 import { LSPType } from '@/helpers/tokenUtils'
 
 const { sampleUP } = getSelectedNetworkConfig()
