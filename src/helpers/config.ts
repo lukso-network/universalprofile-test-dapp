@@ -53,7 +53,7 @@ export const NETWORKS: { [K in NetworkType]: NetworkInfo } = {
       url: 'https://2eff.lukso.dev/ipfs/',
     },
     blockscout: {
-      url: 'https://explorer.testnet.lukso.network',
+      url: 'https://explorer.execution.testnet.lukso.network',
     },
     chainId: 4201,
 

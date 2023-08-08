@@ -15,6 +15,7 @@ import { useLspFactory } from '@/compositions/useLspFactory'
 import ERC725 from '@erc725/erc725.js'
 import { BN } from 'bn.js'
 import { addTokenToLocalStore, recalcTokens } from '@/helpers/tokenUtils'
+import { useERC20 } from '@/compositions/useErc20'
 
 type Token = {
   type: ContractStandard
@@ -68,6 +69,7 @@ const create = async () => {
   try {
     const { deployLSP7DigitalAsset, deployLSP8IdentifiableDigitalAsset } =
       useLspFactory()
+    const { deployERC20Token } = useERC20()
 
     let deployedAsset
     switch (token.value.type) {
@@ -129,6 +131,15 @@ const create = async () => {
             deployedAsset.LSP8IdentifiableDigitalAsset.address)
         )
         break
+      case ContractStandard.ERC20:
+        deployedAsset = await deployERC20Token({
+          from: erc725AccountAddress,
+          tokenName: token.value.name,
+          tokenSymbol: token.value.symbol,
+        })
+        tokenAddress.value = deployedAsset.ERC20Token.address
+        addTokenToLocalStore(deployedAsset.ERC20Token.address)
+        break
       default:
         console.log('Standard not supported')
     }
@@ -158,6 +169,10 @@ const create = async () => {
             display: ContractStandard.LSP8,
             value: ContractStandard.LSP8,
           },
+          {
+            display: ContractStandard.ERC20,
+            value: ContractStandard.ERC20,
+          },
         ]"
         @option-selected="handleStandardSelected"
       />
@@ -173,7 +188,13 @@ const create = async () => {
           <input v-model="token.symbol" class="input" type="text" />
         </div>
       </div>
-      <Lsp4MetadataForm @new-metadata="handleNewLsp4Metadata" />
+      <Lsp4MetadataForm
+        v-if="
+          token.type === ContractStandard.LSP7 ||
+          token.type === ContractStandard.LSP8
+        "
+        @new-metadata="handleNewLsp4Metadata"
+      />
 
       <div v-if="token.type === ContractStandard.LSP7" class="field">
         <label class="checkbox">
