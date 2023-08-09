@@ -9,7 +9,7 @@ jest.mock('@/compositions/useLspFactory', () => ({
   }),
 }))
 
-jest.mock('@/compositions/useERC20', () => ({
+jest.mock('@/compositions/useErc20', () => ({
   useERC20: () => ({
     deployERC20Token: () => jest.fn(),
   }),

@@ -38,7 +38,7 @@ async function deployERC20Token({
       })
       .send({ from })
       .on('receipt', function (receipt: any) {
-        console.log('+++ erc20 receipt', receipt)
+        console.log('erc20 receipt', receipt)
         resolve({
           ERC20Token: {
             address: receipt.contractAddress,
@@ -47,7 +47,7 @@ async function deployERC20Token({
         })
       })
       .once('sending', (payload: any) => {
-        console.log('+++ erc20 sending', JSON.stringify(payload, null, 2))
+        console.log('erc20 sending', JSON.stringify(payload, null, 2))
       })
       .catch(reject)
   })
