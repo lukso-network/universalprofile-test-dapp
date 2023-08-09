@@ -170,7 +170,7 @@ const create = async () => {
             value: ContractStandard.LSP8,
           },
           {
-            display: ContractStandard.ERC20,
+            display: 'ERC20+ERC165',
             value: ContractStandard.ERC20,
           },
         ]"

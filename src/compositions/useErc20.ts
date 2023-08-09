@@ -1,7 +1,6 @@
 import { DeployedContract } from '@lukso/lsp-factory.js'
-import erc20 from '@openzeppelin/contracts/build/contracts/ERC20.json'
-import erc165 from '@openzeppelin/contracts/build/contracts/ERC165.json'
 
+import erc20AndErc165 from '../abis/CustomERC20AndERC165/CustomERC20AndERC165.json'
 import useWeb3 from './useWeb3'
 import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
 
@@ -21,19 +20,15 @@ async function deployERC20Token({
   tokenSymbol,
 }: ERC20DeploymentOptions): Promise<DeployedERC20Token> {
   const { contract } = useWeb3()
-  const erc20contract = contract(
-    erc165.abi.concat(erc20.abi as any) as any,
-    from,
-    {
-      gas: DEFAULT_GAS,
-      gasPrice: DEFAULT_GAS_PRICE,
-    }
-  )
+  const erc20contract = contract(erc20AndErc165.abi as any, from, {
+    gas: DEFAULT_GAS,
+    gasPrice: DEFAULT_GAS_PRICE,
+  })
 
   return new Promise((resolve, reject) => {
     erc20contract
       .deploy({
-        data: erc20.bytecode,
+        data: erc20AndErc165.bytecode,
         arguments: [tokenName, tokenSymbol],
       })
       .send({ from })
