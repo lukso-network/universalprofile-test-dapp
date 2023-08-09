@@ -20,7 +20,7 @@
   "dependencies": {
     "@erc725/erc725.js": "^0.18.0",
     "@lukso/lsp-factory.js": "2.5.1",
-    "@lukso/lsp-smart-contracts": "^0.11.0-rc.0",
+    "@lukso/lsp-smart-contracts": "^0.11.0-rc.1",
     "@walletconnect/ethereum-provider": "2.9.2",
     "@walletconnect/sign-client": "2.9.2",
     "@walletconnect/types": "2.9.2",

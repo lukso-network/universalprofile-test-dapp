@@ -1713,15 +1713,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lukso/lsp-smart-contracts@npm:^0.11.0-rc.0":
-  version: 0.11.0-rc.0
-  resolution: "@lukso/lsp-smart-contracts@npm:0.11.0-rc.0"
+"@lukso/lsp-smart-contracts@npm:^0.11.0-rc.1":
+  version: 0.11.0-rc.1
+  resolution: "@lukso/lsp-smart-contracts@npm:0.11.0-rc.1"
   dependencies:
     "@erc725/smart-contracts": ^5.1.0
     "@openzeppelin/contracts": ^4.9.2
     "@openzeppelin/contracts-upgradeable": ^4.9.2
     solidity-bytes-utils: 0.8.0
-  checksum: e2e85468b994edaa24eb4d4ad5861519a91f7e048878aabbc7ef85a5c968977d47c24762f698a732efa22653ce7c289011ad1f69fd33cca837229ea2bbc6b574
+  checksum: 3acf90d2d356d992337e84b8a96765a0591b30855ac76f71f3d0ce838d3e99736d0b4b31882689e853652101deb080d27111b3a79abaa51394e567000059b893
   languageName: node
   linkType: hard
 
@@ -13961,7 +13961,7 @@ __metadata:
     "@depay/web3-mock": ^14.15.0
     "@erc725/erc725.js": ^0.18.0
     "@lukso/lsp-factory.js": 2.5.1
-    "@lukso/lsp-smart-contracts": ^0.11.0-rc.0
+    "@lukso/lsp-smart-contracts": ^0.11.0-rc.1
     "@testing-library/jest-dom": 5.17.0
     "@testing-library/user-event": 14.4.3
     "@testing-library/vue": 7.0.0
