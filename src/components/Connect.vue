@@ -188,7 +188,7 @@ onUnmounted(() => {
           @click="connectExtension"
         >
           <div class="logo browser-extension" />
-          Browser Extensiond
+          Browser Extension
         </button>
         <button
           class="dropdown-item has-text-weight-bold button is-text"

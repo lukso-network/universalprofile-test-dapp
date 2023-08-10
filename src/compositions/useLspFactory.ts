@@ -18,10 +18,6 @@ import {
 
 let lspFactory: LSPFactory
 
-const getFactory = (): LSPFactory => {
-  return lspFactory
-}
-
 const setupLSPFactory = (): void => {
   lspFactory = new LSPFactory(window.ethereum as any, {
     chainId: getSelectedNetworkConfig().chainId,
@@ -71,7 +67,6 @@ export function useLspFactory(): {
     profileData: ProfileDataBeforeUpload,
     uploadOptions?: UploadOptions
   ) => Promise<ProfileDataForEncoding>
-  getFactory: () => LSPFactory
   deployLSP7DigitalAsset: (
     digitalAssetDeploymentOptions: LSP7DigitalAssetDeploymentOptions
   ) => Promise<DeployedLSP7DigitalAsset>
@@ -88,7 +83,6 @@ export function useLspFactory(): {
   return {
     deployUniversalProfile,
     uploadUniversalProfileMetaData,
-    getFactory,
     deployLSP7DigitalAsset,
     deployLSP8IdentifiableDigitalAsset,
   }

@@ -3,7 +3,6 @@ import { setState, useState, getState } from '@/stores'
 import useWeb3 from '@/compositions/useWeb3'
 import { provider as Provider } from 'web3-core'
 import {
-  getSelectedNetworkConfig,
   NETWORKS,
   WALLET_CONNECT,
   WALLET_CONNECT_PROJECT_ID,
