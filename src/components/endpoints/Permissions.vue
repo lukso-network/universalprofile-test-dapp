@@ -22,7 +22,7 @@ const { encodePermissions, decodePermissions } = useErc725()
 const grantPermissionAddress = ref('0xaf3bf2ffb025098b79caddfbdd113b3681817744')
 const permissions: Permissions = {
   CHANGEOWNER: false,
-  CHANGEPERMISSIONS: false,
+  EDITPERMISSIONS: false,
   ADDCONTROLLER: false,
   SETDATA: false,
   CALL: false,
