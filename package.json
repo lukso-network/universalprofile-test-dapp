@@ -21,6 +21,7 @@
     "@erc725/erc725.js": "^0.17.2",
     "@lukso/lsp-factory.js": "2.5.1",
     "@lukso/lsp-smart-contracts": "^0.8.2",
+    "@lukso/web3-onboard-config": "file:/Users/andrewogaga/Documents/softwares/lukso/lukso-web3-onboard-config",
     "@walletconnect/encoding": "^1.0.2",
     "@walletconnect/ethereum-provider": "^2.4.4",
     "@walletconnect/qrcode-modal": "1.8.0",
@@ -28,6 +29,8 @@
     "@walletconnect/types": "2.2.1",
     "@walletconnect/utils": "2.2.1",
     "@walletconnect/web3-provider": "1.8.0",
+    "@web3-onboard/core": "^2.21.0",
+    "@web3-onboard/injected-wallets": "^2.10.4",
     "@web3modal/ethereum": "^2.1.1",
     "@web3modal/standalone": "^2.1.1",
     "bulma": "0.9.4",
@@ -95,6 +98,7 @@
   },
   "packageManager": "yarn@3.3.0",
   "resolutions": {
-    "wagmi": "~1.2.0"
+    "wagmi": "~1.2.0",
+    "@lukso/web3-onboard-config": "portal:/Users/andrewogaga/Documents/softwares/lukso/lukso-web3-onboard-config"
   }
 }
