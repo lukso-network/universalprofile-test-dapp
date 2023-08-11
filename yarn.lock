@@ -1713,6 +1713,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@lukso/lsp-factory.js@patch:@lukso/lsp-factory.js@npm%3A2.5.1#./.yarn/patches/@lukso-lsp-factory.js-npm-2.5.1-8ecf6d6ce0.patch::locator=universalprofile-test-dapp%40workspace%3A.":
+  version: 2.5.1
+  resolution: "@lukso/lsp-factory.js@patch:@lukso/lsp-factory.js@npm%3A2.5.1#./.yarn/patches/@lukso-lsp-factory.js-npm-2.5.1-8ecf6d6ce0.patch::version=2.5.1&hash=ec5433&locator=universalprofile-test-dapp%40workspace%3A."
+  dependencies:
+    "@erc725/erc725.js": ^0.17.2
+    "@ethersproject/abi": ^5.7.0
+    "@ethersproject/experimental": ^5.7.0
+    "@lukso/lsp-smart-contracts": ^0.8.2
+    axios: ^0.23.0
+    browser-image-compression: ^2.0.0
+    ethers: ^5.7.0
+    ipfs-http-client: 52.0.3
+    ipfs-utils: 8.1.6
+    rxjs: ^7.8.0
+  checksum: aa5d0ea04c7fc5b0539f2e08ff1f35d3d2993b280a9be780c57f616dfc3d696ed47200cf46fee6521924b5dc38b2819d9279723ac41e7c01324aed57acfb39f4
+  languageName: node
+  linkType: hard
+
 "@lukso/lsp-smart-contracts@npm:^0.11.0-rc.1":
   version: 0.11.0-rc.1
   resolution: "@lukso/lsp-smart-contracts@npm:0.11.0-rc.1"
