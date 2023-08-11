@@ -1715,7 +1715,7 @@ __metadata:
 
 "@lukso/lsp-factory.js@patch:@lukso/lsp-factory.js@npm%3A2.5.1#./.yarn/patches/@lukso-lsp-factory.js-npm-2.5.1-8ecf6d6ce0.patch::locator=universalprofile-test-dapp%40workspace%3A.":
   version: 2.5.1
-  resolution: "@lukso/lsp-factory.js@patch:@lukso/lsp-factory.js@npm%3A2.5.1#./.yarn/patches/@lukso-lsp-factory.js-npm-2.5.1-8ecf6d6ce0.patch::version=2.5.1&hash=ec5433&locator=universalprofile-test-dapp%40workspace%3A."
+  resolution: "@lukso/lsp-factory.js@patch:@lukso/lsp-factory.js@npm%3A2.5.1#./.yarn/patches/@lukso-lsp-factory.js-npm-2.5.1-8ecf6d6ce0.patch::version=2.5.1&hash=257cb9&locator=universalprofile-test-dapp%40workspace%3A."
   dependencies:
     "@erc725/erc725.js": ^0.17.2
     "@ethersproject/abi": ^5.7.0
@@ -1727,19 +1727,19 @@ __metadata:
     ipfs-http-client: 52.0.3
     ipfs-utils: 8.1.6
     rxjs: ^7.8.0
-  checksum: aa5d0ea04c7fc5b0539f2e08ff1f35d3d2993b280a9be780c57f616dfc3d696ed47200cf46fee6521924b5dc38b2819d9279723ac41e7c01324aed57acfb39f4
+  checksum: e8dbc5c0c313d3c7b72ba9165d512fd055dc8a2e1ce4cfcad5d2223e3f79916a024aeb9938cdeaf3531d6c2f650486947a7db7ea34eb388bbb8a042bdfa2498c
   languageName: node
   linkType: hard
 
-"@lukso/lsp-smart-contracts@npm:^0.11.0-rc.1":
-  version: 0.11.0-rc.1
-  resolution: "@lukso/lsp-smart-contracts@npm:0.11.0-rc.1"
+"@lukso/lsp-smart-contracts@npm:^0.10.3":
+  version: 0.10.3
+  resolution: "@lukso/lsp-smart-contracts@npm:0.10.3"
   dependencies:
     "@erc725/smart-contracts": ^5.1.0
     "@openzeppelin/contracts": ^4.9.2
     "@openzeppelin/contracts-upgradeable": ^4.9.2
     solidity-bytes-utils: 0.8.0
-  checksum: 3acf90d2d356d992337e84b8a96765a0591b30855ac76f71f3d0ce838d3e99736d0b4b31882689e853652101deb080d27111b3a79abaa51394e567000059b893
+  checksum: d3ca0b776c79260d49fc9314131d8a5a871df26b84cf49e72e5765e80c84fb0410260669c7d5b0f84260219cb8782f8a5850c2c133db1dec89a47b8ef41af39a
   languageName: node
   linkType: hard
 
@@ -1963,28 +1963,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openzeppelin/contracts-upgradeable@npm:^4.7.3, @openzeppelin/contracts-upgradeable@npm:^4.8.0":
-  version: 4.9.1
-  resolution: "@openzeppelin/contracts-upgradeable@npm:4.9.1"
-  checksum: 4dff468b7de51701da8f46ca16e44831109e2602e80c96d68e3fba8ea1ae4ac498e60d38829e0d2d8494bb8cfc274adc7adc2dab566b929319dfe76a5c3af017
-  languageName: node
-  linkType: hard
-
-"@openzeppelin/contracts-upgradeable@npm:^4.9.2":
+"@openzeppelin/contracts-upgradeable@npm:^4.7.3, @openzeppelin/contracts-upgradeable@npm:^4.8.0, @openzeppelin/contracts-upgradeable@npm:^4.9.2":
   version: 4.9.3
   resolution: "@openzeppelin/contracts-upgradeable@npm:4.9.3"
   checksum: bda0240b1d44c913ec5a4e109c622f216c2bbd7b468d210822f75782a5f7fe0609d08bf03b78b253333625e99e507cf2f75212f1de3b274bd9fc64ae967aeec3
   languageName: node
   linkType: hard
 
-"@openzeppelin/contracts@npm:^4.7.3, @openzeppelin/contracts@npm:^4.8.0":
-  version: 4.9.1
-  resolution: "@openzeppelin/contracts@npm:4.9.1"
-  checksum: 9bb3cc6aecd6c56d5ece10d9820d43e6e9c460395b75cc4af9b4e776f1a9e56c9906bc03538b0707e617dc31f1abdfffcbeedfecc8884358d864198ed73f59c1
-  languageName: node
-  linkType: hard
-
-"@openzeppelin/contracts@npm:^4.9.2":
+"@openzeppelin/contracts@npm:^4.7.3, @openzeppelin/contracts@npm:^4.8.0, @openzeppelin/contracts@npm:^4.9.2":
   version: 4.9.3
   resolution: "@openzeppelin/contracts@npm:4.9.3"
   checksum: 4932063e733b35fa7669b9fe2053f69b062366c5c208b0c6cfa1ac451712100c78acff98120c3a4b88d94154c802be05d160d71f37e7d74cadbe150964458838
@@ -13979,7 +13965,7 @@ __metadata:
     "@depay/web3-mock": ^14.15.0
     "@erc725/erc725.js": ^0.18.0
     "@lukso/lsp-factory.js": 2.5.1
-    "@lukso/lsp-smart-contracts": ^0.11.0-rc.1
+    "@lukso/lsp-smart-contracts": ^0.10.3
     "@testing-library/jest-dom": 5.17.0
     "@testing-library/user-event": 14.4.3
     "@testing-library/vue": 7.0.0
