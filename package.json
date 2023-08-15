@@ -94,6 +94,7 @@
   "resolutions": {
     "wagmi": "~1.2.0",
     "@lukso/lsp-smart-contracts": "^0.10.3",
+    "@erc725/erc725.js": "^0.18.0",
     "@lukso/lsp-factory.js@2.5.1": "patch:@lukso/lsp-factory.js@npm%3A2.5.1#./.yarn/patches/@lukso-lsp-factory.js-npm-2.5.1-8ecf6d6ce0.patch"
   }
 }
