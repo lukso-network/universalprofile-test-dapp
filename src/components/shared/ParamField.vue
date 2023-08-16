@@ -225,8 +225,10 @@ function convert(modelValue: any): ElementType[] {
   return values.map<ElementType>(value => validate(value))
 }
 
+// eslint-disable-next-line vue/no-setup-props-destructure
 const data = reactive<{
   items: ElementType[]
+  // eslint-disable-next-line vue/no-setup-props-destructure
 }>({ items: convert(props.modelValue) })
 
 watch(

@@ -46,6 +46,7 @@ const setupWCV2Provider = async (): Promise<void> => {
       4201: 'https://rpc.testnet.lukso.network',
     },
     showQrModal: true,
+    optionalChains: [0],
   })
 
   provider.on('disconnect', (error: any) => {

@@ -21,8 +21,10 @@ const setupWeb3 = async (provider: Provider): Promise<void> => {
     })
 }
 
+const dummy = new Web3()
+
 const getWeb3 = (): Web3 => {
-  return web3 || {}
+  return web3 || dummy
 }
 
 const getChainId = async (): Promise<number> => {

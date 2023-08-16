@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { Lsp4Metadata } from '@/types'
 
 type Emits = {
@@ -14,15 +14,23 @@ type Props = {
 const props = defineProps<Props>()
 const emits = defineEmits<Emits>()
 
-const metadata = ref<Lsp4Metadata>(
-  props.newMetadata || {
-    description: 'My super description',
-    links: [
-      {
-        title: 'LUKSO Docs',
-        url: 'https://docs.lukso.tech',
-      },
-    ],
+const defaultValue = {
+  description: 'My super description',
+  links: [
+    {
+      title: 'LUKSO Docs',
+      url: 'https://docs.lukso.tech',
+    },
+  ],
+}
+
+// eslint-disable-next-line vue/no-setup-props-destructure
+const metadata = ref<Lsp4Metadata>(props.newMetadata || defaultValue)
+
+watch(
+  () => props.newMetadata,
+  newMetadata => {
+    metadata.value = newMetadata || defaultValue
   }
 )
 

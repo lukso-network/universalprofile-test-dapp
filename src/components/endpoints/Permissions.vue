@@ -22,7 +22,7 @@ const { encodePermissions, decodePermissions } = useErc725()
 const grantPermissionAddress = ref('0xaf3bf2ffb025098b79caddfbdd113b3681817744')
 const permissions: Permissions = {
   CHANGEOWNER: false,
-  CHANGEPERMISSIONS: false,
+  EDITPERMISSIONS: false,
   ADDCONTROLLER: false,
   SETDATA: false,
   CALL: false,
@@ -61,10 +61,8 @@ const setPermissions = async () => {
   try {
     isPending.value = true
     window.erc725Account &&
-      (await window.erc725Account.methods['setData(bytes32[],bytes[])'](
-        [key],
-        [value]
-      )
+      (await window.erc725Account.methods
+        .setDataBatch([key], [value])
         .send({
           from: erc725AccountAddress,
         })
