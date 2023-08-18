@@ -141,6 +141,7 @@ function handleCall(e: Event) {
     reactiveData.items = newArgs
       .split(',')
       .map((item: string) => item.trim().split(/\s+/))
+      .filter(([type]) => type)
       .map(([type, name], index) => {
         const old = reactiveData.items[index] || {}
         name = name || `input_${index + 1}`
