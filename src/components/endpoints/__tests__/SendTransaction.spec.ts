@@ -101,6 +101,7 @@ test('can send transaction from preset', async () => {
     screen.getByTestId('preset'),
     '🏦 Mint ERC20/ERC777/LSP7'
   )
+  await userEvent.clear(screen.getByTestId('transaction-to'))
   await userEvent.type(
     screen.getByTestId('transaction-to'),
     '0xB29c50a9F3D90FA3aDF394f2960BD6D8e0Ff5E9D'
