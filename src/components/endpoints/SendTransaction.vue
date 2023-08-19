@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { toWei } from 'web3-utils'
+import { toWei, numberToHex } from 'web3-utils'
 import { ref, watch, reactive, computed } from 'vue'
 import { TransactionConfig } from 'web3-core'
 
@@ -16,7 +16,7 @@ import ContractFunction from '@/components/shared/ContractFunction.vue'
 import { MethodSelect, MethodType } from '@/helpers/functionUtils'
 import { LSPType } from '@/helpers/tokenUtils'
 
-const { sampleUP } = getSelectedNetworkConfig()
+const { sampleUP, errorContract } = getSelectedNetworkConfig()
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
 const { sendTransaction, getBalance } = useWeb3()
@@ -218,6 +218,38 @@ const methods: MethodSelect[] = [
     ],
   },
   {
+    label: '⛔️ Call revertWithCustomError',
+    call: 'revertWithCustomError',
+    inputs: [],
+    hasSpecs: [LSPType.ERROR_TEST],
+    to: errorContract,
+    amount: '0',
+  },
+  {
+    label: '⛔️ Call revertWithErrorString',
+    call: 'revertWithErrorString',
+    inputs: [],
+    hasSpecs: [LSPType.ERROR_TEST],
+    to: errorContract,
+    amount: '0',
+  },
+  {
+    label: '⛔️ Call revertWithPanicError',
+    call: 'revertWithPanicError',
+    inputs: [],
+    hasSpecs: [LSPType.ERROR_TEST],
+    to: errorContract,
+    amount: '0',
+  },
+  {
+    label: '⛔️ Call revertWithNoErrorData',
+    call: 'revertWithNoErrorData',
+    inputs: [],
+    hasSpecs: [LSPType.ERROR_TEST],
+    to: errorContract,
+    amount: '0',
+  },
+  {
     label: '🦾 Sample call data',
     call: 'init',
     inputs: [
@@ -256,11 +288,12 @@ watch(
 )
 
 function makeValue(param: MethodType) {
-  const { value, isWei } = param
+  const { value: _value, isWei } = param
   if (isWei) {
+    const value = typeof _value !== 'string' ? numberToHex(_value) : _value
     return toWei(value, isWei)
   }
-  return value
+  return _value
 }
 
 const send = async () => {
@@ -305,7 +338,7 @@ const params = reactive<{ items: MethodType[] }>({
 
 const selectMethod = (e: Event) => {
   const value = parseInt((e.target as HTMLInputElement).value, 10)
-  const item: MethodSelect =
+  const { to, amount, ...item } =
     value >= methods.length
       ? items.items[value - methods.length]
       : methods[value]
@@ -326,6 +359,12 @@ const selectMethod = (e: Event) => {
   })
   method.item.call = item.call
   hasData.value = item.call != null
+  if (to != undefined) {
+    params.items[1].value = to
+  }
+  if (amount != undefined) {
+    params.items[2].value = amount
+  }
 }
 
 const handleData = (e?: string) => {
@@ -354,11 +393,8 @@ const handleAdd = (e: Event) => {
   e.stopPropagation()
   const name = window.prompt('Menu title')
   if (name) {
-    items.items.push(
-      JSON.parse(
-        JSON.stringify({ ...method.item, label: name, inputs: params.items })
-      )
-    )
+    const item = JSON.parse(JSON.stringify({ ...method.item, label: name }))
+    items.items.push(item)
     saveItems()
   }
 }
