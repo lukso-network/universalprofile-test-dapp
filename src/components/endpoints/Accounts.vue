@@ -35,7 +35,6 @@ const {
   setupWeb3Onboard,
   connectWallet,
   disconnect: disconnectWeb3Onboard,
-  setChainId,
 } = useWeb3Onboard()
 
 const hexChainId = computed(() => {
