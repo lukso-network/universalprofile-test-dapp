@@ -2,11 +2,11 @@ import { createIpfsLink, createBlockScoutLink } from '@/utils/createLinks'
 
 test('createBlockScoutLink(): returns correct blockscout link', () => {
   const link = createBlockScoutLink('ABC', true)
-  expect(link).toBe(`https://explorer.execution.l16.lukso.network/tx/ABC`)
+  expect(link).toBe('https://explorer.execution.testnet.lukso.network/tx/ABC')
 
   const linkAddress = createBlockScoutLink('ABC')
   expect(linkAddress).toBe(
-    `https://explorer.execution.l16.lukso.network/address/ABC`
+    `https://explorer.execution.testnet.lukso.network/address/ABC`
   )
 })
 

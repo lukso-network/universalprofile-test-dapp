@@ -5,18 +5,22 @@ import { provider as Provider } from 'web3-core'
 import { EthereumProviderError } from 'eth-rpc-errors'
 import useDropdown from '@/compositions/useDropdown'
 import useWeb3 from '@/compositions/useWeb3'
-import { UP_CONNECTED_ADDRESS } from '@/helpers/config'
-import { sliceAddress } from '@/utils/sliceAddress'
+import {
+  MEANS_OF_CONNECTION,
+  UP_CONNECTED_ADDRESS,
+  WALLET_CONNECT,
+  WINDOW_ETHEREUM,
+} from '@/helpers/config'
 import useWalletConnectV2 from '@/compositions/useWalletConnectV2'
+import { sliceAddress } from '@/utils/sliceAddress'
 
 const { setupWeb3, accounts, requestAccounts } = useWeb3()
 
-const { resetWCV2Provider, setupWCV2Provider, openWCV2Modal, getWCV2Provider } =
+const { resetWCV2Provider, setupWCV2Provider, openWCV2Modal } =
   useWalletConnectV2()
 const { setDisconnected, setConnected } = useState()
 const { close, toggle } = useDropdown()
 const dropdown = ref()
-const browserExtensionConnected = localStorage.getItem(UP_CONNECTED_ADDRESS)
 const hasExtension = ref<boolean>(!!window.ethereum)
 
 watch(
@@ -41,7 +45,7 @@ const connectExtension = async () => {
       ;[address] = await requestAccounts()
     }
 
-    setConnected(address, 'browserExtension')
+    setConnected(address, WINDOW_ETHEREUM)
     localStorage.setItem(UP_CONNECTED_ADDRESS, address)
     close(dropdown.value)
   } catch (error) {
@@ -49,14 +53,14 @@ const connectExtension = async () => {
 
     if (epError.code === 4100) {
       const address = (await requestAccounts())[0]
-      setConnected(address, 'browserExtension')
+      setConnected(address, WINDOW_ETHEREUM)
       localStorage.setItem(UP_CONNECTED_ADDRESS, address)
     }
   }
 }
 
 const disconnect = async () => {
-  if (getState('channel') == 'walletConnectV2') {
+  if (getState('channel') == WALLET_CONNECT) {
     await resetWCV2Provider()
   } else {
     localStorage.removeItem(UP_CONNECTED_ADDRESS)
@@ -74,9 +78,9 @@ const handleAccountsChanged = (accounts: string[]) => {
   }
 }
 
-const handleChainChanged = (chainId: string) => {
+const handleChainChanged = async (chainId: string) => {
   console.log('Chain changed', chainId)
-
+  await disconnect()
   window.location.reload()
 }
 
@@ -103,12 +107,16 @@ const removeEventListeners = () => {
 }
 
 onMounted(async () => {
-  await setupWCV2Provider()
+  const channel = localStorage.getItem(MEANS_OF_CONNECTION)
+  const isWalletConnectUsed = channel === WALLET_CONNECT
 
-  const wcv2Provider = getWCV2Provider()
-  if (wcv2Provider && wcv2Provider.connected) {
-    // All set up already
-  } else if (browserExtensionConnected) {
+  if (!channel) {
+    return
+  }
+
+  if (isWalletConnectUsed) {
+    await setupWCV2Provider()
+  } else {
     await connectExtension()
   }
 
@@ -137,7 +145,7 @@ onUnmounted(() => {
       >
         <div
           :class="`logo ${
-            getState('channel') === 'browserExtension'
+            getState('channel') === WINDOW_ETHEREUM
               ? 'browser-extension'
               : 'wallet-connect'
           }`"
@@ -180,7 +188,7 @@ onUnmounted(() => {
           @click="connectExtension"
         >
           <div class="logo browser-extension" />
-          Browser Extensiond
+          Browser Extension
         </button>
         <button
           class="dropdown-item has-text-weight-bold button is-text"

@@ -3,7 +3,8 @@ import { setState, useState, getState } from '@/stores'
 import useWeb3 from '@/compositions/useWeb3'
 import { provider as Provider } from 'web3-core'
 import {
-  DEFAULT_NETWORK_CONFIG,
+  NETWORKS,
+  WALLET_CONNECT,
   WALLET_CONNECT_PROJECT_ID,
 } from '@/helpers/config'
 
@@ -14,19 +15,24 @@ let provider: EthereumProvider
  */
 const setupWCV2Provider = async (): Promise<void> => {
   const { setupWeb3 } = useWeb3()
-
   provider = await EthereumProvider.init({
     projectId: WALLET_CONNECT_PROJECT_ID,
-    chains: [DEFAULT_NETWORK_CONFIG.chainId],
+    chains: Object.entries(NETWORKS).map(net => net[1].chainId),
     methods: [
+      'eth_getAccounts',
+      'eth_getBalance',
+      'eth_getId',
+      'eth_personalSign',
+      'eth_requestAccounts',
       'eth_sendTransaction',
       'eth_sign',
+      'eth_signTransaction',
+      'eth_signTypedData',
       'personal_sign',
-      'eth_getBalance',
-      'eth_getAccounts',
-      'eth_requestAccounts',
-      'up_import',
       'up_addTransactionRelayer',
+      'up_import',
+      'wallet_addEthereumChain',
+      'wallet_switchEthereumChain',
     ],
     metadata: {
       name: 'UP Test DApp',
@@ -34,16 +40,21 @@ const setupWCV2Provider = async (): Promise<void> => {
       url: document.location.origin,
       icons: [document.location.origin + '/lukso.png'],
     },
+    rpcMap: {
+      42: 'https://rpc.mainnet.lukso.network',
+      2828: 'https://rpc.l16.lukso.network',
+      4201: 'https://rpc.testnet.lukso.network',
+    },
     showQrModal: true,
+    optionalChains: [0],
   })
 
   provider.on('disconnect', (error: any) => {
     if (error) {
       throw error
     }
-
-    setState('isConnected', true)
     setupWeb3(provider as unknown as Provider)
+    setState('isConnected', true)
   })
 
   provider.on('accountsChanged', async (accounts: string[]) => {
@@ -56,16 +67,15 @@ const setupWCV2Provider = async (): Promise<void> => {
     const { setConnected } = useState()
     const [address] = accounts
 
-    setConnected(address, 'walletConnectV2')
+    setConnected(address, WALLET_CONNECT)
   })
 
   provider.on('connect', (error: any) => {
     if (error) {
       throw error
     }
-
-    setState('isConnected', true)
     setupWeb3(provider as unknown as Provider)
+    setState('isConnected', true)
   })
 
   provider.on('accountsChanged', async (accounts: string[]) => {
@@ -78,16 +88,16 @@ const setupWCV2Provider = async (): Promise<void> => {
     const { setConnected } = useState()
     const [address] = accounts
 
-    setConnected(address, 'walletConnectV2')
+    setConnected(address, WALLET_CONNECT)
   })
+
+  setupWeb3(provider as unknown as Provider)
 
   const { setConnected } = useState()
   const [address] = provider.accounts
   if (address) {
-    setConnected(address, 'walletConnectV2')
+    setConnected(address, WALLET_CONNECT)
   }
-
-  setupWeb3(provider as unknown as Provider)
 }
 
 /**
@@ -95,7 +105,11 @@ const setupWCV2Provider = async (): Promise<void> => {
  */
 const resetWCV2Provider = async (): Promise<void> => {
   if (provider) {
-    await provider.disconnect()
+    try {
+      await provider.disconnect()
+    } catch (error) {
+      console.warn(`WalletConnect V2 disconnection error: ${error}`)
+    }
   } else {
     console.warn(
       'Provider is not set up. Please, call `setupWCV2Provider` first.'
@@ -108,7 +122,11 @@ const resetWCV2Provider = async (): Promise<void> => {
  */
 const openWCV2Modal = async (): Promise<void> => {
   if (provider) {
-    await provider.connect()
+    try {
+      await provider.connect()
+    } catch (error) {
+      console.warn(`WalletConnect V2 connection error: ${error}`)
+    }
   } else {
     console.warn(
       'Provider is not set up. Please, call `setupWCV2Provider` first.'
@@ -132,7 +150,7 @@ const sendCustomWCV2Request = async (request: {
   params?: [any]
 }): Promise<any> => {
   if (provider && provider.connected) {
-    await provider.request(request)
+    return await provider.request(request)
   } else {
     console.warn('Provider is not set up or not connected.')
   }

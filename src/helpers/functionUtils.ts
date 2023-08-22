@@ -33,7 +33,7 @@ type BytesSignatureResponse = {
       text_signature: string
       hex_signature: string
       bytes_signature: string
-    }
+    },
   ]
 }
 

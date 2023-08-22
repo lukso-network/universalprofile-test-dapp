@@ -29,7 +29,6 @@ const props = defineProps<Props>()
 const emits = defineEmits<Emits>()
 
 const { getWeb3 } = useWeb3()
-const { eth } = getWeb3()
 
 const IS_ARRAY_TYPE_REGEXP = /\[\]$/
 const SUPPORTED_TYPES_REGEXP =
@@ -52,15 +51,23 @@ function convertModel(model?: MethodType[]) {
   return model
 }
 
-const data = reactive<{ call?: string; items: ElementType[] }>({
+// eslint-disable-next-line vue/no-setup-props-destructure
+const reactiveData = reactive<{ call?: string; items: ElementType[] }>({
   call: props.call,
+  // eslint-disable-next-line vue/no-setup-props-destructure
   items: convertModel(props.modelValue),
 })
 
 watch(
   () => props.modelValue,
   model => {
-    data.items = convertModel(model)
+    reactiveData.items = convertModel(model)
+  }
+)
+watch(
+  () => props.call,
+  call => {
+    reactiveData.call = call
   }
 )
 
@@ -76,24 +83,24 @@ function makeValue(value: string, isWei?: Unit) {
 }
 
 function handleValue(param: number, value: any) {
-  const item = data.items[param]
+  const item = reactiveData.items[param]
   item.value = value
-  emits('update:modelValue', data.items)
+  emits('update:modelValue', reactiveData.items)
 }
 
 function handleError(param: number, error?: boolean) {
-  const item = data.items[param]
+  const item = reactiveData.items[param]
   if (item.error !== error) {
     item.error = error
     emits(
       'update:error',
-      data.items.some(({ error }) => error)
+      reactiveData.items.some(({ error }) => error)
     )
   }
 }
 
 function handleUnit(param: number, isWei?: Unit) {
-  const item = data.items[param]
+  const item = reactiveData.items[param]
   if (isWei) {
     item.isWei = isWei
   } else {
@@ -102,7 +109,7 @@ function handleUnit(param: number, isWei?: Unit) {
 }
 
 function handleIsKey(param: number, isKey?: boolean) {
-  const item = data.items[param]
+  const item = reactiveData.items[param]
   if (isKey != null) {
     item.isKey = isKey
   } else {
@@ -110,11 +117,11 @@ function handleIsKey(param: number, isKey?: boolean) {
   }
 }
 
-const call = computed<string>(() => {
-  if (!data.call) {
+const computedCall = computed<string>(() => {
+  if (!reactiveData.call) {
     return ''
   }
-  return `${data.call}(${data.items
+  return `${reactiveData.call}(${reactiveData.items
     ?.map(({ name, type }) => `${type} ${name}`)
     .join(', ')})`
 })
@@ -131,11 +138,11 @@ function handleCall(e: Event) {
     return
   }
   try {
-    data.items = newArgs
+    reactiveData.items = newArgs
       .split(',')
       .map((item: string) => item.trim().split(/\s+/))
       .map(([type, name], index) => {
-        const old = data.items[index] || {}
+        const old = reactiveData.items[index] || {}
         name = name || `input_${index + 1}`
         if (!SUPPORTED_TYPES_REGEXP.test(type)) {
           throw new Error('syntax error')
@@ -147,7 +154,7 @@ function handleCall(e: Event) {
           value: /\[\]$/.test(type) ? [] : '',
         } as ElementType
       })
-    data.call = newCall
+    reactiveData.call = newCall
   } catch (err) {
     // Ignore
     console.error(err)
@@ -165,16 +172,17 @@ const makeBytes32 = (value: string, type: string) => {
 
 const output = computed<{ error: undefined | string; value: string }>(() => {
   try {
-    if (!data.call) {
+    if (!reactiveData.call) {
       return { value: '0x', error: undefined }
     }
-    const callSig = `${data.call}(${data.items
+    const { eth } = getWeb3()
+    const callSig = `${reactiveData.call}(${reactiveData.items
       .map(({ type }) => type)
       .join(',')})`
     const output = `${eth.abi.encodeFunctionSignature(callSig)}${eth.abi
       .encodeParameters(
-        data.items.map(({ type }) => type),
-        data.items.map(({ value, type, isWei }) => {
+        reactiveData.items.map(({ type }) => type),
+        reactiveData.items.map(({ value, type, isWei }) => {
           const makeItem = (value: any) =>
             /^bytes/.test(type)
               ? makeBytes32(value, type) ?? '0x'
@@ -203,19 +211,15 @@ watch(
 )
 
 watch(
-  () => props.call,
-  call => (data.call = call)
-)
-
-watch(
   () => props.data,
   async value => {
     const { value: _value } = output.value
     if (value && value !== _value) {
       try {
+        const { eth } = getWeb3()
         const method = await decodeData(eth, value)
-        data.call = method.call
-        data.items = method.inputs || []
+        reactiveData.call = method.call
+        reactiveData.items = method.inputs || []
       } catch (err) {
         // Ignore
       }
@@ -227,7 +231,7 @@ onMounted(() => {
   if (value) {
     emits('update:data', value)
   }
-  emits('update:modelValue', data.items)
+  emits('update:modelValue', reactiveData.items)
 })
 </script>
 
@@ -235,14 +239,14 @@ onMounted(() => {
   <div :class="{ box: !props.onlyParams, 'mb-5': true }">
     <div v-if="!props.onlyParams">
       <label class="label">{{
-        !props.custom ? `Function ${call}` : 'Function'
+        !props.custom ? `Function ${computedCall}` : 'Function'
       }}</label>
       <div v-if="props.custom" class="field">
-        <input class="input" :value="call" @input="handleCall" />
+        <input class="input" :value="computedCall" @input="handleCall" />
       </div>
     </div>
     <div
-      v-for="(item, index) of data.items"
+      v-for="(item, index) of reactiveData.items"
       :key="index"
       :class="{ field: true, box: true, 'is-error': item.error }"
     >

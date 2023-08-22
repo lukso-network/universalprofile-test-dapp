@@ -13,7 +13,7 @@ export interface Notification {
 
 export type NotificationType = 'primary' | 'danger' | 'info' | 'warning'
 
-export type Channel = 'browserExtension' | 'walletConnectV2' | 'web3Onboard'
+export type Channel = WINDOW_ETHEREUM | WALLET_CONNECT | WEB3_ONBOARD
 
 export enum ContractStandard {
   LSP8 = 'LSP8',

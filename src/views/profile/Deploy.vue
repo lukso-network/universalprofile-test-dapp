@@ -4,7 +4,7 @@ import Notifications from '@/components/Notification.vue'
 import ProfileListIpfs from '@/components/profile/profile-list-ipfs/ProfileListIpfs.vue'
 import { ref } from 'vue'
 import useNotifications from '@/compositions/useNotifications'
-import { NETWORKS } from '@/helpers/config'
+import { getSelectedNetworkConfig } from '@/helpers/config'
 import { useLspFactory } from '@/compositions/useLspFactory'
 import ProfileModal from '@/components/modals/ProfileModal.vue'
 import { createBlockScoutLink } from '@/utils/createLinks'
@@ -26,7 +26,7 @@ const profileDeploymentEvents = ref<DeploymentEvent[]>([])
 const isLoading = ref(false)
 const { deployUniversalProfile } = useLspFactory()
 const uploadedProfiles = ref(getAndPrepareAllIpfsItems())
-const uploadTarget = ref(NETWORKS.l16.ipfs.url)
+const uploadTarget = ref(getSelectedNetworkConfig().ipfs.url)
 
 const deploy = async (controllerKey: string) => {
   isLoading.value = true

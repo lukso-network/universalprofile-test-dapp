@@ -8,7 +8,7 @@ import {
 } from '@lukso/lsp-factory.js'
 
 import { UploadOptions } from '@lukso/lsp-factory.js/build/main/src/lib/interfaces/profile-upload-options'
-import { DEFAULT_NETWORK_CONFIG } from '@/helpers/config'
+import { getSelectedNetworkConfig } from '@/helpers/config'
 import {
   DeployedLSP7DigitalAsset,
   DeployedLSP8IdentifiableDigitalAsset,
@@ -18,13 +18,9 @@ import {
 
 let lspFactory: LSPFactory
 
-const getFactory = (): LSPFactory => {
-  return lspFactory
-}
-
 const setupLSPFactory = (): void => {
   lspFactory = new LSPFactory(window.ethereum as any, {
-    chainId: DEFAULT_NETWORK_CONFIG.chainId,
+    chainId: getSelectedNetworkConfig().chainId,
   })
 }
 
@@ -71,7 +67,6 @@ export function useLspFactory(): {
     profileData: ProfileDataBeforeUpload,
     uploadOptions?: UploadOptions
   ) => Promise<ProfileDataForEncoding>
-  getFactory: () => LSPFactory
   deployLSP7DigitalAsset: (
     digitalAssetDeploymentOptions: LSP7DigitalAssetDeploymentOptions
   ) => Promise<DeployedLSP7DigitalAsset>
@@ -88,7 +83,6 @@ export function useLspFactory(): {
   return {
     deployUniversalProfile,
     uploadUniversalProfileMetaData,
-    getFactory,
     deployLSP7DigitalAsset,
     deployLSP8IdentifiableDigitalAsset,
   }

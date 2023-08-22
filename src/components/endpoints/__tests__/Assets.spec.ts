@@ -9,6 +9,12 @@ jest.mock('@/compositions/useLspFactory', () => ({
   }),
 }))
 
+jest.mock('@/compositions/useErc20', () => ({
+  useERC20: () => ({
+    deployERC20Token: () => jest.fn(),
+  }),
+}))
+
 test('can create token', async () => {
   setState('isConnected', true)
   mockDeployLSP7DigitalAsset.mockReturnValue({
