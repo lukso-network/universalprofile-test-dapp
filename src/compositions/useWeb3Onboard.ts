@@ -18,14 +18,14 @@ const chains = [
   {
     id: 1,
     token: 'LYX',
-    label: 'LUKSO Testnet',
-    rpcUrl: 'https://rpc.testnet.lukso.network/',
+    label: 'LUKSO Mainnet',
+    rpcUrl: 'https://rpc.mainnet.lukso.network/',
   },
   {
     id: 2,
-    token: 'LYX',
-    label: 'LUKSO L16',
-    rpcUrl: 'https://rpc.l16.lukso.network',
+    token: 'LYXt',
+    label: 'LUKSO Testnet',
+    rpcUrl: 'https://rpc.testnet.lukso.network',
   },
 ]
 
