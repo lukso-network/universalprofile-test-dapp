@@ -1,7 +1,7 @@
 import Accounts from '../Accounts.vue'
 import { render, fireEvent, screen, waitFor } from '@testing-library/vue'
 import { useState } from '@/stores'
-import { WINDOW_ETHEREUM } from '@/helpers/config'
+import { NETWORKS, WINDOW_ETHEREUM } from '@/helpers/config'
 
 const mockCall = jest.fn()
 const mockSetupProvider = jest.fn()
@@ -19,6 +19,15 @@ jest.mock('@/compositions/useWalletConnectV2', () => ({
     getWCV2Provider: () => mockGetProvider(),
     sendCustomWCV2Request: (request: { method: string; params?: [any] }) =>
       mockSendCustomWCV2Request(request),
+  }),
+}))
+
+jest.mock('@/compositions/useWeb3Onboard', () => ({
+  __esModule: true,
+  default: () => ({
+    setupWeb3Onboard: () => jest.fn(),
+    connectWallet: () => jest.fn(),
+    disconnect: () => jest.fn(),
   }),
 }))
 
