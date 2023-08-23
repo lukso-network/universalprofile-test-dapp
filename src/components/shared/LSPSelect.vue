@@ -27,6 +27,7 @@ const {
   erc777TokenWithEip165,
   erc777TokenWithoutEip165,
   erc721TokenWithEip165,
+  errorContract,
 } = getSelectedNetworkConfig()
 const emits = defineEmits<Emits>()
 const props = defineProps<Props>()
@@ -36,7 +37,6 @@ const selected = ref<string | undefined>(props.address)
 const data = computed<{ [key: string]: TokenInfo[] }>(() => {
   const data: { [key: string]: TokenInfo[] } = {}
   let items: TokenInfo[]
-
   if (
     props.showUp ||
     props.showAccounts ||
@@ -141,6 +141,18 @@ const data = computed<{ [key: string]: TokenInfo[] }>(() => {
       )}...`,
     })
   }
+  if (
+    props.showAny ||
+    props.showTypes?.includes(LSPType.ERROR_TEST) ||
+    props.showTypes == null
+  ) {
+    items = data[LSPType.ERROR_TEST] = []
+    items.push({
+      type: LSPType.ERROR_TEST,
+      address: errorContract,
+      label: `ErrorTesting Contract...`,
+    })
+  }
 
   let children
   if (
@@ -196,26 +208,43 @@ const handleChange = (e: Event) => {
 }
 
 const selectFirst = () => {
-  const first: undefined | TokenInfo = Object.entries(data.value).reduce(
-    (first: undefined | TokenInfo, [, items]) => {
+  if (props.address) {
+    const corresponding: undefined | TokenInfo = Object.entries(
+      data.value
+    ).reduce((first: undefined | TokenInfo, [, items]) => {
       if (first) {
         return first
       }
-      const found = items.find(({ address }) => address != null)
+      const found = items.find(({ address }) => address === props.address)
       return found
-    },
-    undefined
-  )
-  if (first) {
-    selected.value = first.address
-    const e = { target: { value: first.address } }
-    handleChange(e as any)
-  } else {
-    const first = Object.entries(data.value)[0]?.[1]?.[0]
-    if (first) {
-      selected.value = first.type
-      const e = { target: { value: first.type } }
+    }, undefined)
+    if (corresponding && selected.value !== corresponding.type) {
+      selected.value = corresponding.address
+      const e = { target: { value: corresponding.address } }
       handleChange(e as any)
+    }
+  } else {
+    const first: undefined | TokenInfo = Object.entries(data.value).reduce(
+      (first: undefined | TokenInfo, [, items]) => {
+        if (first) {
+          return first
+        }
+        const found = items.find(({ address }) => address != null)
+        return found
+      },
+      undefined
+    )
+    if (first) {
+      selected.value = first.address
+      const e = { target: { value: first.address } }
+      handleChange(e as any)
+    } else {
+      const first = Object.entries(data.value)[0]?.[1]?.[0]
+      if (first) {
+        selected.value = first.type
+        const e = { target: { value: first.type } }
+        handleChange(e as any)
+      }
     }
   }
 }
@@ -227,9 +256,6 @@ function triggerSelectFirst() {
   }
   timeout = setTimeout(() => {
     timeout = undefined
-    if (selected.value) {
-      return
-    }
     selectFirst()
   }, 2)
 }
@@ -237,14 +263,7 @@ function triggerSelectFirst() {
 watch(
   () => data.value,
   () => {
-    if (selected.value) {
-      const item = findItem(selected.value)
-      if (item) {
-        selected.value = item.address
-      }
-    } else {
-      triggerSelectFirst()
-    }
+    triggerSelectFirst()
   }
 )
 
@@ -253,12 +272,12 @@ watch(
     return getState('lsp7')
       .concat(getState('lsp8'))
       .concat([getState('address')])
+      .concat([props.address])
   },
   () => {
     setTimeout(() => {
-      if (!selected.value) {
-        triggerSelectFirst()
-      }
+      timeout = undefined
+      triggerSelectFirst()
     }, 100)
   }
 )

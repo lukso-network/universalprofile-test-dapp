@@ -9,6 +9,7 @@ export type NetworkInfo = {
   chainId: number
   sampleEoA: string
   sampleUP: string
+  errorContract: string
   sampleSC: string
   // ERC20
   erc20TokenWithEip165: string

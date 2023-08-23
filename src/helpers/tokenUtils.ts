@@ -42,6 +42,7 @@ export enum LSPType {
   ERC777 = 'ERC777',
   ERC721 = 'ERC721',
   Unknown = 'Unknown',
+  ERROR_TEST = 'ERROR_TEST',
 }
 
 interface LspTypeOption {
@@ -71,6 +72,10 @@ export const lspTypeOptions: Record<
     lsp2Schema: getSupportedStandardObject(lsp9Schema as ERC725JSONSchema[]),
   },
   [LSPType.EoA]: {
+    interfaceId: '',
+    lsp2Schema: null,
+  },
+  [LSPType.ERROR_TEST]: {
     interfaceId: '',
     lsp2Schema: null,
   },
