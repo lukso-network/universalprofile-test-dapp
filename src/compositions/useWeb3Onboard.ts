@@ -9,6 +9,7 @@ const lukso = luksoModule()
 
 const injected = injectedModule({
   custom: [lukso],
+  sort: () => {},
   displayUnavailable: ['Universal Profiles'],
 })
 
