@@ -159,7 +159,7 @@ const toggleShow = () => {
 <template>
   <div class="tile is-4 is-parent">
     <div class="tile is-child box">
-      <p class="is-size-5 has-text-weight-bold mb-4">Sign</p>
+      <p class="is-size-5 has-text-weight-bold mb-4">Personal Sign</p>
       <div class="field">
         <label class="label">Message</label>
         <div class="control">
@@ -175,11 +175,6 @@ const toggleShow = () => {
             class="textarea"
             rows="3"
           />
-          <!-- <input
-            v-model="password"
-            class="textarea"
-            rows="1"
-          /> -->
           <div class="field has-addons">
             <div class="control is-expanded">
               <input
@@ -381,9 +376,12 @@ const toggleShow = () => {
         </button>
       </div>
       <div class="field">
-        Test <code>eth_sign</code> RPC call [<a
-          href="https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_sign"
-          >documentation</a
+        Test <code>personal_sign</code> RPC call [<a
+          href="https://docs.constellationnetwork.io/stargazer/apireference/ethereumrpcapi/personal_sign/"
+          >documentation ex. 1</a
+        >,
+        <a href="https://docs.metamask.io/wallet/reference/personal_sign/"
+          >documentation ex. 2</a
         >].
       </div>
       <div class="field">
