@@ -2,7 +2,7 @@ import { getSelectedNetworkConfig } from '@/helpers/config'
 import { MethodSelect } from '@/helpers/functionUtils'
 import { LSPType } from '@/helpers/tokenUtils'
 
-const { sampleUP } = getSelectedNetworkConfig()
+const { sampleUP, errorContract } = getSelectedNetworkConfig()
 
 export const methodSelectors: MethodSelect[] = [
   {
@@ -195,6 +195,38 @@ export const methodSelectors: MethodSelect[] = [
       },
       { type: 'bytes[]', name: 'values', isPairs: true },
     ],
+  },
+  {
+    label: '⛔️ Call revertWithCustomError',
+    call: 'revertWithCustomError',
+    inputs: [],
+    hasSpecs: [LSPType.ERROR_TEST],
+    to: errorContract,
+    amount: '0',
+  },
+  {
+    label: '⛔️ Call revertWithErrorString',
+    call: 'revertWithErrorString',
+    inputs: [],
+    hasSpecs: [LSPType.ERROR_TEST],
+    to: errorContract,
+    amount: '0',
+  },
+  {
+    label: '⛔️ Call revertWithPanicError',
+    call: 'revertWithPanicError',
+    inputs: [],
+    hasSpecs: [LSPType.ERROR_TEST],
+    to: errorContract,
+    amount: '0',
+  },
+  {
+    label: '⛔️ Call revertWithNoErrorData',
+    call: 'revertWithNoErrorData',
+    inputs: [],
+    hasSpecs: [LSPType.ERROR_TEST],
+    to: errorContract,
+    amount: '0',
   },
   {
     label: '🦾 Sample call data',

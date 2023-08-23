@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { toWei } from 'web3-utils'
+import { toWei, numberToHex } from 'web3-utils'
 import { ref, watch, reactive, computed } from 'vue'
 import { TransactionConfig } from 'web3-core'
 
@@ -28,11 +28,12 @@ watch(
 )
 
 function makeValue(param: MethodType) {
-  const { value, isWei } = param
+  const { value: _value, isWei } = param
   if (isWei) {
+    const value = typeof _value !== 'string' ? numberToHex(_value) : _value
     return toWei(value, isWei)
   }
-  return value
+  return _value
 }
 
 const send = async () => {
@@ -71,13 +72,13 @@ const params = reactive<{ items: MethodType[] }>({
   items: [
     { type: 'address', name: 'from', value: getState('address') },
     { type: 'address', name: 'to' },
-    { type: 'uint256', isWei: 'ether', name: 'amount', value: '0.1' },
+    { type: 'uint256', isWei: 'ether', name: 'amount', value: '0' },
   ],
 })
 
 const selectMethod = (e: Event) => {
   const value = parseInt((e.target as HTMLInputElement).value, 10)
-  const item: MethodSelect =
+  const { to, amount, ...item } =
     value >= methods.length
       ? items.items[value - methods.length]
       : methods[value]
@@ -98,6 +99,12 @@ const selectMethod = (e: Event) => {
   })
   method.item.call = item.call
   hasData.value = item.call != null
+  if (to != undefined) {
+    params.items[1].value = to
+  }
+  if (amount != undefined) {
+    params.items[2].value = amount
+  }
 }
 
 const handleData = (e?: string) => {
@@ -126,11 +133,8 @@ const handleAdd = (e: Event) => {
   e.stopPropagation()
   const name = window.prompt('Menu title')
   if (name) {
-    items.items.push(
-      JSON.parse(
-        JSON.stringify({ ...method.item, label: name, inputs: params.items })
-      )
-    )
+    const item = JSON.parse(JSON.stringify({ ...method.item, label: name }))
+    items.items.push(item)
     saveItems()
   }
 }
