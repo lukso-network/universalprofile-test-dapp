@@ -85,31 +85,13 @@ const signTransaction = async (
   transaction: TransactionConfig,
   address: string
 ): Promise<string> => {
-  // Even though it says that RLPEncodedTransaction object is returned
+  // Even though `signTransaction` says that RLPEncodedTransaction object is returned
   // we might get just a string that is an encoded transaction. Thus, the "typeof" check.
   const response = await web3.eth.signTransaction(transaction, address)
   if (typeof response === 'string') {
     return response
   }
   return response.raw
-}
-
-const arbitraryRpc = async (
-  method: string,
-  params?: any[]
-): Promise<string> => {
-  // ;(web3.eth.currentProvider as HttpProvider).send(
-  //   {
-  //     jsonrpc: '2.0',
-  //     method: method,
-  //     params: params,
-  //     id: Date.now(),
-  //   },
-  //   (error, result) => {
-  //     console.log('arbitrary RPC sent')
-  //   }
-  // )
-  throw new Error('aribtraryRpc function not implemented')
 }
 
 const recover = async (message: string, signature: string): Promise<string> => {
@@ -151,7 +133,6 @@ export default function useWeb3(): {
     transaction: TransactionConfig,
     address: string
   ) => Promise<string>
-  arbitraryRpc: (rpc: string, payload: any, address: string) => Promise<any>
   recover: (message: string, signature: string) => Promise<string>
   recoverRawTransaction: (encodedTransaction: string) => Promise<string>
   isAddress: (address: string) => boolean
@@ -168,7 +149,6 @@ export default function useWeb3(): {
     sign,
     personalSign,
     signTransaction,
-    arbitraryRpc,
     recover,
     recoverRawTransaction,
     isAddress,
