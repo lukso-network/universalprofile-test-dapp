@@ -112,11 +112,11 @@ test('can send transaction from preset', async () => {
   expect(screen.getByTestId('notification')).toHaveTextContent(
     'The transaction was successful'
   )
-  expect(mockSendTransaction).toBeCalledWith({
+  expect(mockSendTransaction).toHaveBeenLastCalledWith({
     data: '0x40c10f19000000000000000000000000517216362d594516c6f96ee34b2c502d65b847e40000000000000000000000000000000000000000000000056bc75e2d63100000',
     from: '0x517216362D594516c6f96Ee34b2c502d65B847E4',
     to: '0xB29c50a9F3D90FA3aDF394f2960BD6D8e0Ff5E9D',
-    value: '100000000000000000',
+    value: '0',
     gas: 5000000,
     gasPrice: '10000000000',
   })
