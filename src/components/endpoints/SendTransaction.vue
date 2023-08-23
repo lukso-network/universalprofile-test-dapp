@@ -332,7 +332,7 @@ const params = reactive<{ items: MethodType[] }>({
   items: [
     { type: 'address', name: 'from', value: getState('address') },
     { type: 'address', name: 'to' },
-    { type: 'uint256', isWei: 'ether', name: 'amount', value: '0.1' },
+    { type: 'uint256', isWei: 'ether', name: 'amount', value: '0' },
   ],
 })
 
