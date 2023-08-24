@@ -1,9 +1,5 @@
 import Web3 from 'web3'
-import {
-  provider as Provider,
-  HttpProvider,
-  RLPEncodedTransaction,
-} from 'web3-core'
+import { provider as Provider } from 'web3-core'
 import { AbiItem, isAddress as baseIsAddress } from 'web3-utils'
 import { Contract, ContractOptions } from 'web3-eth-contract'
 import { TransactionConfig, TransactionReceipt } from 'web3-core'
