@@ -23,7 +23,7 @@ const grantPermissionAddress = ref('0xaf3bf2ffb025098b79caddfbdd113b3681817744')
 const permissions: Permissions = {
   CHANGEOWNER: false,
   ADDCONTROLLER: false,
-  CHANGEPERMISSIONS: false,
+  EDITPERMISSIONS: false,
   ADDEXTENSIONS: false,
   CHANGEEXTENSIONS: false,
   ADDUNIVERSALRECEIVERDELEGATE: false,
