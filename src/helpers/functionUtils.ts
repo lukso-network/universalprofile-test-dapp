@@ -18,6 +18,8 @@ export type MethodSelect = {
   call?: string
   inputs?: MethodType[]
   hasSpecs?: LSPType[]
+  to?: string
+  amount?: string
 }
 
 const SIGNATURE_CACHE = 'signature-cache2'
