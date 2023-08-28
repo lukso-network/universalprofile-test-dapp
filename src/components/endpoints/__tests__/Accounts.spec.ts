@@ -22,6 +22,15 @@ jest.mock('@/compositions/useWalletConnectV2', () => ({
   }),
 }))
 
+jest.mock('@/compositions/useWeb3Onboard', () => ({
+  __esModule: true,
+  default: () => ({
+    setupWeb3Onboard: () => jest.fn(),
+    connectWallet: () => jest.fn(),
+    disconnect: () => jest.fn(),
+  }),
+}))
+
 const mockAccounts = jest.fn()
 const mockGetBalance = jest.fn()
 const mockRequestAccounts = jest.fn()

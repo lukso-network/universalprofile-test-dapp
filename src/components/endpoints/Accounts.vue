@@ -4,11 +4,13 @@ import useNotifications from '@/compositions/useNotifications'
 import useWalletConnectV2 from '@/compositions/useWalletConnectV2'
 import { getState, useState } from '@/stores'
 import useWeb3 from '@/compositions/useWeb3'
+import useWeb3Onboard from '@/compositions/useWeb3Onboard'
 import {
   getSelectedNetworkConfig,
   UP_CONNECTED_ADDRESS,
   WALLET_CONNECT,
   WINDOW_ETHEREUM,
+  WEB3_ONBOARD,
 } from '@/helpers/config'
 import { createBlockScoutLink } from '@/utils/createLinks'
 import Web3Utils from 'web3-utils'
@@ -28,6 +30,12 @@ watch(
 )
 const { resetWCV2Provider, setupWCV2Provider, openWCV2Modal } =
   useWalletConnectV2()
+
+const {
+  setupWeb3Onboard,
+  connectWallet,
+  disconnect: disconnectWeb3Onboard,
+} = useWeb3Onboard()
 
 const hexChainId = computed(() => {
   return Web3Utils.numberToHex(getState('chainId'))
@@ -69,6 +77,19 @@ const connectWalletConnectV2 = async () => {
   }
 }
 
+const connectWeb3Onboard = async () => {
+  clearNotification()
+  setupWeb3Onboard()
+  try {
+    const [primaryWallet] = await connectWallet()
+    const connectedAddress = primaryWallet.accounts[0].address
+    setConnected(connectedAddress, WEB3_ONBOARD)
+    setNotification(`Connected to address: ${connectedAddress}`, 'info')
+  } catch (error) {
+    setNotification((error as unknown as Error).message, 'danger')
+  }
+}
+
 const disconnect = async () => {
   clearNotification()
 
@@ -79,7 +100,7 @@ const disconnect = async () => {
   }
 
   setNotification(`Disconnected ${getState('channel')} channel`, 'info')
-
+  disconnectWeb3Onboard()
   setDisconnected()
   await setupWeb3(null)
 }
@@ -131,6 +152,15 @@ const handleRefresh = (e: Event) => {
         >
           <i class="fas fa-check"></i>
         </span>
+      </div>
+      <div class="field">
+        <button
+          class="button is-primary is-rounded mb-1"
+          data-testid="connect-w3onboard"
+          @click="connectWeb3Onboard"
+        >
+          Web3-Onboard
+        </button>
       </div>
       <div class="field">
         <button
