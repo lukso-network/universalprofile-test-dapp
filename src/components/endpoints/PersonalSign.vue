@@ -54,7 +54,8 @@ const onSign = async () => {
     console.info(signMessage.value)
     signResponse.value = await personalSign(
       signMessage.value,
-      erc725AccountAddress
+      erc725AccountAddress,
+      password.value
     )
     recovery.value = undefined
     magicValue.value = undefined
@@ -183,6 +184,7 @@ const toggleShow = () => {
                 type="text"
                 class="input"
                 placeholder="Optional password"
+                data-testid="password"
               />
               <input
                 v-else
@@ -190,10 +192,15 @@ const toggleShow = () => {
                 type="password"
                 class="input"
                 placeholder="Optional password"
+                data-testid="password"
               />
             </div>
             <div class="control">
-              <button class="button" @click="toggleShow">
+              <button
+                class="button"
+                data-testid="toggle-password-visibility"
+                @click="toggleShow"
+              >
                 <div
                   :class="`password-visibility ${showPassword ? 'on' : 'off'}`"
                 />
