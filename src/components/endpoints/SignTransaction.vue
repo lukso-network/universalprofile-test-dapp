@@ -6,7 +6,6 @@ import useWeb3 from '@/compositions/useWeb3'
 import { MAGICVALUE } from '@/helpers/config'
 import { toWei } from 'web3-utils'
 import { TransactionConfig } from 'web3-core'
-
 import Notifications from '@/components/Notification.vue'
 import ContractFunction from '@/components/shared/ContractFunction.vue'
 import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
@@ -62,7 +61,15 @@ const makeTransaction = (): TransactionConfig => {
   if (hasData.value) {
     transaction = { ...transaction, data: data.value }
   }
+
   return transaction
+}
+
+const hashTransaction = (transaction: TransactionConfig): string => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { from, gas, ...rest } = transaction
+  const modifiedTx = { ...rest, gasLimit: gas }
+  return keccak256(serializeTransaction(modifiedTx as UnsignedTransaction))
 }
 
 const onSign = async () => {
@@ -74,15 +81,10 @@ const onSign = async () => {
     isPending.value = true
     signResponse.value = await signTransaction(
       transaction,
-      transaction.from as string
+      transaction.from
     )
 
-    delete transaction['from']
-    transaction['gasLimit'] = transaction.gas
-    delete transaction['gas']
-    transactionHashedForSignature.value = keccak256(
-      serializeTransaction(transaction as UnsignedTransaction)
-    )
+    transactionHashedForSignature.value = hashTransaction(transaction)
     recovery.value = undefined
     magicValue.value = undefined
 
@@ -115,10 +117,10 @@ const onPermissionsValidation = async () => {
         stripHexPrefix(signerAddress)
     )
     .call()
-  console.log('permissions ' + permissionsResponse)
+    
   const decodedPermissions: Permissions =
     ERC725.decodePermissions(permissionsResponse)
-  console.log('decodedPermissions ' + JSON.stringify(decodedPermissions))
+
   if (!decodedPermissions.SIGN) {
     throw new Error(
       `Signer doesn't have SIGN permission. Transaction will fail.`
@@ -390,7 +392,7 @@ const hasRemove = computed<boolean>(() => {
         <button
           class="button is-primary is-rounded mb-3"
           :disabled="recovery ? undefined : true"
-          data-testid="permissionValidation"
+          data-testid="validate-permission"
           @click="onPermissionsValidation"
         >
           Validate permissions
