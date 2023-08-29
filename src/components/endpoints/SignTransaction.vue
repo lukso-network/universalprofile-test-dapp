@@ -79,10 +79,7 @@ const onSign = async () => {
 
   try {
     isPending.value = true
-    signResponse.value = await signTransaction(
-      transaction,
-      transaction.from
-    )
+    signResponse.value = await signTransaction(transaction, transaction.from)
 
     transactionHashedForSignature.value = hashTransaction(transaction)
     recovery.value = undefined
@@ -117,7 +114,7 @@ const onPermissionsValidation = async () => {
         stripHexPrefix(signerAddress)
     )
     .call()
-    
+
   const decodedPermissions: Permissions =
     ERC725.decodePermissions(permissionsResponse)
 

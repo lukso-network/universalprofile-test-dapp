@@ -13,7 +13,7 @@ const mockHashMessage = jest.fn()
 jest.mock('@/compositions/useWeb3', () => ({
   __esModule: true,
   default: () => ({
-    personalSign: (message: string, address: string, password?: string) => 
+    personalSign: (message: string, address: string, password?: string) =>
       mockPersonalSign(message, address, password),
     recover: (message: string, signature: string) =>
       mockRecover(message, signature),
@@ -47,11 +47,8 @@ test('can sign message', async () => {
   setState('address', '0x517216362D594516c6f96Ee34b2c502d65B847E4')
   render(PersonalSign)
 
-  await userEvent.type(
-    screen.getByTestId('password'),
-    'that-password'
-  )
-  
+  await userEvent.type(screen.getByTestId('password'), 'that-password')
+
   await fireEvent.click(screen.getByTestId('sign'))
 
   expect(screen.getByTestId('notification')).toHaveTextContent(
@@ -133,10 +130,7 @@ test('can sign with ethereum', async () => {
     screen.getByTestId('siwe.resource-2'),
     'http://some-resource2.com'
   )
-  await userEvent.type(
-    screen.getByTestId('password'),
-    'that-password'
-  )
+  await userEvent.type(screen.getByTestId('password'), 'that-password')
 
   jest.useFakeTimers().setSystemTime(new Date('2022-09-01 09:00'))
 

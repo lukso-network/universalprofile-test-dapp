@@ -16,8 +16,8 @@ jest.mock('ethers/lib/utils', () => ({
   keccak256: (value: any) => mockKeccak256(value),
   joinSignature: (value: any) => mockJoinSignature(value),
   RLP: {
-    decode: (value: any) => mockRlpDecode(value)
-  }
+    decode: (value: any) => mockRlpDecode(value),
+  },
 }))
 
 jest.mock('@/compositions/useWeb3', () => {
@@ -37,8 +37,8 @@ jest.mock('@/compositions/useWeb3', () => {
           }),
           getData: (value: any) => ({
             call: () => mockGetDataCall(value),
-          })
-        }
+          }),
+        },
       }),
       getWeb3: () => ({
         eth: {
@@ -47,7 +47,7 @@ jest.mock('@/compositions/useWeb3', () => {
           },
         },
       }),
-    })
+    }),
   }
 })
 
@@ -74,7 +74,8 @@ test('can sign transaction', async () => {
   expect(screen.getByTestId('notification')).toHaveTextContent(
     'The transaction was signed'
   )
-  expect(mockSignTransaction).toBeCalledWith({  
+  expect(mockSignTransaction).toBeCalledWith(
+    {
       from: '0x517216362D594516c6f96Ee34b2c502d65B847E4',
       gas: 5000000,
       gasPrice: '10000000000',
@@ -150,7 +151,7 @@ test('can verify signature', async () => {
   mockSignTransaction.mockReturnValue('0x123')
   mockValidSignatureCall.mockReturnValue('0x1626ba7e')
   mockJoinSignature.mockReturnValue('dummy-signature')
-  mockRlpDecode.mockReturnValue(['0x00',2,3])
+  mockRlpDecode.mockReturnValue(['0x00', 2, 3])
   mockKeccak256.mockReturnValue('transaction-hashed-for-signing')
   setState('address', '0x517216362D594516c6f96Ee34b2c502d65B847E4')
   render(SignTransaction)
@@ -162,7 +163,10 @@ test('can verify signature', async () => {
     'Signature validated successfully'
   )
   expect(mockValidSignatureCall).toBeCalledTimes(1)
-  expect(mockValidSignatureCall).toBeCalledWith('transaction-hashed-for-signing', 'dummy-signature')
+  expect(mockValidSignatureCall).toBeCalledWith(
+    'transaction-hashed-for-signing',
+    'dummy-signature'
+  )
   expect(mockValidSignatureCall).toReturnWith('0x1626ba7e')
   expect(screen.getByTestId('magic-value')).toHaveTextContent('0x1626ba7e')
 })
