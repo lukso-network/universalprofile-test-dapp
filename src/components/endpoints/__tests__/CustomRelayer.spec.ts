@@ -7,11 +7,11 @@ const data = {
   chainIds: [2828],
 }
 
-window.ethereum = {
+window.lukso = {
   request: jest.fn(),
 } as any
 
-const windowSpy = jest.spyOn(window.ethereum as any, 'request')
+const windowSpy = jest.spyOn(window.lukso as any, 'request')
 
 afterEach(() => {
   windowSpy.mockRestore()

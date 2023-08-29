@@ -11,7 +11,7 @@ jest.mock('@/compositions/useWeb3', () => {
   const data = actual.default()
   const web3mock = require('@depay/web3-mock')
   web3mock.mock('ethereum')
-  data.setupWeb3(window.ethereum)
+  data.setupWeb3(window.lukso)
   const output = {
     __esModule: true,
     ...actual,

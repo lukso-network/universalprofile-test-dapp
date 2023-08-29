@@ -9,22 +9,29 @@ import {
   MEANS_OF_CONNECTION,
   UP_CONNECTED_ADDRESS,
   WALLET_CONNECT,
-  WINDOW_ETHEREUM,
+  WEB3_ONBOARD,
+  WINDOW_LUKSO,
 } from '@/helpers/config'
 import useWalletConnectV2 from '@/compositions/useWalletConnectV2'
 import { sliceAddress } from '@/utils/sliceAddress'
+import useWeb3Onboard from '@/compositions/useWeb3Onboard'
 
 const { setupWeb3, accounts, requestAccounts } = useWeb3()
 
 const { resetWCV2Provider, setupWCV2Provider, openWCV2Modal } =
   useWalletConnectV2()
+const {
+  setupWeb3Onboard,
+  connectWallet,
+  disconnect: disconnectWeb3Onboard,
+} = useWeb3Onboard()
 const { setDisconnected, setConnected } = useState()
 const { close, toggle } = useDropdown()
 const dropdown = ref()
-const hasExtension = ref<boolean>(!!window.ethereum)
+const hasExtension = ref<boolean>(!!window.lukso)
 
 watch(
-  () => !!window.ethereum,
+  () => !!window.lukso,
   value => (hasExtension.value = value)
 )
 
@@ -37,7 +44,7 @@ const connectWalletConnectV2 = async () => {
 const connectExtension = async () => {
   try {
     close(dropdown.value)
-    await setupWeb3(window.ethereum as unknown as Provider)
+    await setupWeb3(window.lukso as unknown as Provider)
 
     let address = await accounts()
 
@@ -45,7 +52,7 @@ const connectExtension = async () => {
       ;[address] = await requestAccounts()
     }
 
-    setConnected(address, WINDOW_ETHEREUM)
+    setConnected(address, WINDOW_LUKSO)
     localStorage.setItem(UP_CONNECTED_ADDRESS, address)
     close(dropdown.value)
   } catch (error) {
@@ -53,8 +60,24 @@ const connectExtension = async () => {
 
     if (epError.code === 4100) {
       const address = (await requestAccounts())[0]
-      setConnected(address, WINDOW_ETHEREUM)
+      setConnected(address, WINDOW_LUKSO)
       localStorage.setItem(UP_CONNECTED_ADDRESS, address)
+    }
+  }
+}
+
+const connectWeb3Onboard = async () => {
+  setupWeb3Onboard()
+  try {
+    const [primaryWallet] = await connectWallet()
+    const connectedAddress = primaryWallet.accounts[0].address
+    setConnected(connectedAddress, WEB3_ONBOARD)
+  } catch (error) {
+    const epError = error as EthereumProviderError<Error>
+
+    if (epError.code === 4100) {
+      const address = (await requestAccounts())[0]
+      setConnected(address, WEB3_ONBOARD)
     }
   }
 }
@@ -62,6 +85,8 @@ const connectExtension = async () => {
 const disconnect = async () => {
   if (getState('channel') == WALLET_CONNECT) {
     await resetWCV2Provider()
+  } else if (getState('channel') == WEB3_ONBOARD) {
+    await disconnectWeb3Onboard()
   } else {
     localStorage.removeItem(UP_CONNECTED_ADDRESS)
   }
@@ -93,22 +118,23 @@ const handleDisconnect = () => {
 }
 
 const addEventListeners = () => {
-  window.ethereum?.on?.('accountsChanged', handleAccountsChanged)
-  window.ethereum?.on?.('chainChanged', handleChainChanged)
-  window.ethereum?.on?.('connect', handleConnect)
-  window.ethereum?.on?.('disconnect', handleDisconnect)
+  window.lukso?.on?.('accountsChanged', handleAccountsChanged)
+  window.lukso?.on?.('chainChanged', handleChainChanged)
+  window.lukso?.on?.('connect', handleConnect)
+  window.lukso?.on?.('disconnect', handleDisconnect)
 }
 
 const removeEventListeners = () => {
-  window.ethereum?.removeListener?.('accountsChanged', handleAccountsChanged)
-  window.ethereum?.removeListener?.('chainChanged', handleChainChanged)
-  window.ethereum?.removeListener?.('connect', handleConnect)
-  window.ethereum?.removeListener?.('disconnect', handleDisconnect)
+  window.lukso?.removeListener?.('accountsChanged', handleAccountsChanged)
+  window.lukso?.removeListener?.('chainChanged', handleChainChanged)
+  window.lukso?.removeListener?.('connect', handleConnect)
+  window.lukso?.removeListener?.('disconnect', handleDisconnect)
 }
 
 onMounted(async () => {
   const channel = localStorage.getItem(MEANS_OF_CONNECTION)
   const isWalletConnectUsed = channel === WALLET_CONNECT
+  const isWeb3OnboardUsed = channel === WEB3_ONBOARD
 
   if (!channel) {
     return
@@ -116,6 +142,8 @@ onMounted(async () => {
 
   if (isWalletConnectUsed) {
     await setupWCV2Provider()
+  } else if (isWeb3OnboardUsed) {
+    await connectWeb3Onboard()
   } else {
     await connectExtension()
   }
@@ -145,7 +173,7 @@ onUnmounted(() => {
       >
         <div
           :class="`logo ${
-            getState('channel') === WINDOW_ETHEREUM
+            getState('channel') === WINDOW_LUKSO
               ? 'browser-extension'
               : 'wallet-connect'
           }`"

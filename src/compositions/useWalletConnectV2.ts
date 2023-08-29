@@ -142,7 +142,7 @@ const getWCV2Provider = (): EthereumProvider => {
 }
 
 /**
- * Custom RPC requests cannot be handled by `window.ethereum.request(request)` and thus must be forwarded to
+ * Custom RPC requests cannot be handled by `window.lukso.request(request)` and thus must be forwarded to
  * `provider.request` for a custom processing.
  */
 const sendCustomWCV2Request = async (request: {

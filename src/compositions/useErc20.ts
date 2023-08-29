@@ -53,7 +53,7 @@ export function useERC20(): {
     erc20DeploymentOptions: ERC20DeploymentOptions
   ) => Promise<DeployedERC20Token>
 } {
-  const hasExtension = !!window.ethereum
+  const hasExtension = !!window.lukso
   if (!hasExtension) {
     throw new Error('Extension not installed')
   }

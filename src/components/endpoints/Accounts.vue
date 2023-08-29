@@ -9,7 +9,7 @@ import {
   getSelectedNetworkConfig,
   UP_CONNECTED_ADDRESS,
   WALLET_CONNECT,
-  WINDOW_ETHEREUM,
+  WINDOW_LUKSO,
   WEB3_ONBOARD,
 } from '@/helpers/config'
 import { createBlockScoutLink } from '@/utils/createLinks'
@@ -21,11 +21,11 @@ const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
 const { setDisconnected, setConnected, recalcTokens } = useState()
 const { setupWeb3, requestAccounts } = useWeb3()
-const hasExtension = ref<boolean>(!!window.ethereum)
+const hasExtension = ref<boolean>(!!window.lukso)
 const selectedNetworkConfig = getSelectedNetworkConfig()
 
 watch(
-  () => !!window.ethereum,
+  () => !!window.lukso,
   value => (hasExtension.value = value)
 )
 const { resetWCV2Provider, setupWCV2Provider, openWCV2Modal } =
@@ -44,20 +44,20 @@ const hexChainId = computed(() => {
 const connectExtension = async () => {
   clearNotification()
 
-  if (!window.ethereum) {
+  if (!window.lukso) {
     setNotification(
-      'window.ethereum is undefined, is the extension enabled?',
+      'window.lukso is undefined, is the extension enabled?',
       'warning'
     )
     return
   }
 
-  // The Ethereum object is used as a provider
-  setupWeb3(window.ethereum as unknown as Provider)
+  // The lukso is used as a provider
+  setupWeb3(window.lukso as unknown as Provider)
 
   try {
     const [address] = await requestAccounts()
-    setConnected(address, WINDOW_ETHEREUM)
+    setConnected(address, WINDOW_LUKSO)
     localStorage.setItem(UP_CONNECTED_ADDRESS, address)
   } catch (error) {
     setNotification((error as unknown as Error).message, 'danger')
@@ -127,9 +127,7 @@ const handleRefresh = (e: Event) => {
           Browser Extension
         </button>
         <span
-          v-if="
-            getState('channel') === WINDOW_ETHEREUM && getState('isConnected')
-          "
+          v-if="getState('channel') === WINDOW_LUKSO && getState('isConnected')"
           class="icon ml-3 mt-1 has-text-primary"
         >
           <i class="fas fa-check"></i>

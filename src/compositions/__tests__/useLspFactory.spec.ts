@@ -7,16 +7,16 @@ jest.mock('@lukso/lsp-factory.js', () => ({
 
 describe('can produce LSP Factory', () => {
   beforeAll(async () => {
-    window.ethereum = {} as any
+    window.lukso = {} as any
     useLspFactory()
   })
 
-  it('should be called with window.ethereum', async () => {
+  it('should be called with window.lukso', async () => {
     expect(LSPFactory).toBeCalledWith({}, { chainId: 4201 })
   })
 
   it('should return null for empty chain id', async () => {
-    window.ethereum = undefined
+    window.lukso = undefined
     expect(useLspFactory).toThrow('Extension not installed')
   })
 })

@@ -15,7 +15,7 @@ import Transfer from '@/components/endpoints/Transfer.vue'
 import Mint from '@/components/endpoints/Mint.vue'
 
 const hasExtension = computed(() => {
-  return window.ethereum
+  return window.lukso
 })
 </script>
 

@@ -19,7 +19,7 @@ import {
 let lspFactory: LSPFactory
 
 const setupLSPFactory = (): void => {
-  lspFactory = new LSPFactory(window.ethereum as any, {
+  lspFactory = new LSPFactory(window.lukso as any, {
     chainId: getSelectedNetworkConfig().chainId,
   })
 }
@@ -74,7 +74,7 @@ export function useLspFactory(): {
     digitalAssetDeploymentOptions: DigitalAssetDeploymentOptions
   ) => Promise<DeployedLSP8IdentifiableDigitalAsset>
 } {
-  const hasExtension = !!window.ethereum
+  const hasExtension = !!window.lukso
   if (!hasExtension) {
     throw new Error('Extension not installed')
   }

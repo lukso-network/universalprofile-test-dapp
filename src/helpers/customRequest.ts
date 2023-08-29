@@ -12,7 +12,7 @@ const sendRequest = async (request: any): Promise<any> => {
       return await sendCustomWCV2Request(request)
     }
   } else {
-    return await (window.ethereum as any)?.request(request)
+    return await (window.lukso as any)?.request(request)
   }
 }
 
