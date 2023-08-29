@@ -21,11 +21,13 @@ const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
 const { setDisconnected, setConnected, recalcTokens } = useState()
 const { setupWeb3, requestAccounts } = useWeb3()
-const hasExtension = ref<boolean>(!!window.lukso)
+const { getWeb3OnboardProvider } = useWeb3Onboard()
+const provider = getWeb3OnboardProvider()
+const hasExtension = ref<boolean>(!!provider)
 const selectedNetworkConfig = getSelectedNetworkConfig()
 
 watch(
-  () => !!window.lukso,
+  () => !!provider,
   value => (hasExtension.value = value)
 )
 const { resetWCV2Provider, setupWCV2Provider, openWCV2Modal } =
@@ -44,16 +46,16 @@ const hexChainId = computed(() => {
 const connectExtension = async () => {
   clearNotification()
 
-  if (!window.lukso) {
+  if (!provider) {
     setNotification(
-      'window.lukso is undefined, is the extension enabled?',
+      'provider is undefined, is the extension enabled?',
       'warning'
     )
     return
   }
 
   // The lukso is used as a provider
-  setupWeb3(window.lukso as unknown as Provider)
+  setupWeb3(provider as unknown as Provider)
 
   try {
     const [address] = await requestAccounts()

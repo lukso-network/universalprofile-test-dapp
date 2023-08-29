@@ -4,6 +4,7 @@ import luksoModule from '@lukso/web3-onboard-config'
 import { ConnectModalOptions, WalletState } from '@web3-onboard/core/dist/types'
 import useWeb3 from './useWeb3'
 import EthereumProvider from '@walletconnect/ethereum-provider/dist/types/EthereumProvider'
+import { ref } from 'vue'
 
 const lukso = luksoModule()
 
@@ -72,6 +73,7 @@ const connect: ConnectModalOptions = {
 }
 
 let onboard: OnboardAPI
+const provider = ref<EthereumProvider>()
 
 const setupWeb3Onboard = () => {
   onboard = Onboard({
@@ -86,8 +88,13 @@ const { setupWeb3 } = useWeb3()
 
 const connectWallet = async (): Promise<WalletState[]> => {
   const wallets = await onboard.connectWallet()
+  provider.value = wallets[0].provider as EthereumProvider
   await setupWeb3(wallets[0].provider as EthereumProvider)
   return wallets
+}
+
+const getWeb3OnboardProvider = (): EthereumProvider => {
+  return provider.value as EthereumProvider
 }
 
 const disconnect = async (): Promise<void> => {
@@ -105,5 +112,6 @@ export default function useWeb3Onboard() {
     disconnect,
     setChainId,
     setupWeb3Onboard,
+    getWeb3OnboardProvider,
   }
 }

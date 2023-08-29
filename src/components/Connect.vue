@@ -21,6 +21,7 @@ const { setupWeb3, accounts, requestAccounts } = useWeb3()
 const { resetWCV2Provider, setupWCV2Provider, openWCV2Modal } =
   useWalletConnectV2()
 const {
+  getWeb3OnboardProvider,
   setupWeb3Onboard,
   connectWallet,
   disconnect: disconnectWeb3Onboard,
@@ -28,10 +29,11 @@ const {
 const { setDisconnected, setConnected } = useState()
 const { close, toggle } = useDropdown()
 const dropdown = ref()
-const hasExtension = ref<boolean>(!!window.lukso)
+const provider = getWeb3OnboardProvider()
+const hasExtension = ref<boolean>(!!provider)
 
 watch(
-  () => !!window.lukso,
+  () => !!provider,
   value => (hasExtension.value = value)
 )
 
@@ -44,7 +46,7 @@ const connectWalletConnectV2 = async () => {
 const connectExtension = async () => {
   try {
     close(dropdown.value)
-    await setupWeb3(window.lukso as unknown as Provider)
+    await setupWeb3(provider as unknown as Provider)
 
     let address = await accounts()
 
@@ -118,17 +120,17 @@ const handleDisconnect = () => {
 }
 
 const addEventListeners = () => {
-  window.lukso?.on?.('accountsChanged', handleAccountsChanged)
-  window.lukso?.on?.('chainChanged', handleChainChanged)
-  window.lukso?.on?.('connect', handleConnect)
-  window.lukso?.on?.('disconnect', handleDisconnect)
+  provider?.on?.('accountsChanged', handleAccountsChanged)
+  provider?.on?.('chainChanged', handleChainChanged)
+  provider?.on?.('connect', handleConnect)
+  provider?.on?.('disconnect', handleDisconnect)
 }
 
 const removeEventListeners = () => {
-  window.lukso?.removeListener?.('accountsChanged', handleAccountsChanged)
-  window.lukso?.removeListener?.('chainChanged', handleChainChanged)
-  window.lukso?.removeListener?.('connect', handleConnect)
-  window.lukso?.removeListener?.('disconnect', handleDisconnect)
+  provider?.removeListener?.('accountsChanged', handleAccountsChanged)
+  provider?.removeListener?.('chainChanged', handleChainChanged)
+  provider?.removeListener?.('connect', handleConnect)
+  provider?.removeListener?.('disconnect', handleDisconnect)
 }
 
 onMounted(async () => {
