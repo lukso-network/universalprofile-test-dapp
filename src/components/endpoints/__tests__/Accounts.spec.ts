@@ -10,6 +10,8 @@ const mockResetProvider = jest.fn()
 const mockGetProvider = jest.fn()
 const mockSendCustomWCV2Request = jest.fn()
 
+window.lukso = {} as any
+
 jest.mock('@/compositions/useWalletConnectV2', () => ({
   __esModule: true,
   default: () => ({
@@ -25,9 +27,11 @@ jest.mock('@/compositions/useWalletConnectV2', () => ({
 jest.mock('@/compositions/useWeb3Onboard', () => ({
   __esModule: true,
   default: () => ({
-    setupWeb3Onboard: () => jest.fn(),
     connectWallet: () => jest.fn(),
     disconnect: () => jest.fn(),
+    setChainId: () => jest.fn(),
+    setupWeb3Onboard: () => jest.fn(),
+    getWeb3OnboardProvider: () => window.lukso,
   }),
 }))
 
@@ -85,8 +89,6 @@ test('can connect to browser extension when authorized', async () => {
       connected: false,
     },
   })
-
-  window.lukso = {} as any
 
   render(Accounts)
 

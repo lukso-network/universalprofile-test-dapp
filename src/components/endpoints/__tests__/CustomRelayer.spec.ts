@@ -11,6 +11,17 @@ window.lukso = {
   request: jest.fn(),
 } as any
 
+jest.mock('@/compositions/useWeb3Onboard', () => ({
+  __esModule: true,
+  default: () => ({
+    connectWallet: () => jest.fn(),
+    disconnect: () => jest.fn(),
+    setChainId: () => jest.fn(),
+    setupWeb3Onboard: () => jest.fn(),
+    getWeb3OnboardProvider: () => window.lukso,
+  }),
+}))
+
 const windowSpy = jest.spyOn(window.lukso as any, 'request')
 
 afterEach(() => {

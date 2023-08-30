@@ -5,6 +5,17 @@ jest.mock('@lukso/lsp-factory.js', () => ({
   LSPFactory: jest.fn(),
 }))
 
+jest.mock('@/compositions/useWeb3Onboard', () => ({
+  __esModule: true,
+  default: () => ({
+    connectWallet: () => jest.fn(),
+    disconnect: () => jest.fn(),
+    setChainId: () => jest.fn(),
+    setupWeb3Onboard: () => jest.fn(),
+    getWeb3OnboardProvider: () => window.lukso,
+  }),
+}))
+
 describe('can produce LSP Factory', () => {
   beforeAll(async () => {
     window.lukso = {} as any

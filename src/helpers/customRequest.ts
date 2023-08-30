@@ -5,7 +5,6 @@ import { MEANS_OF_CONNECTION, WALLET_CONNECT } from '@/helpers/config'
 const { getWCV2Provider, sendCustomWCV2Request } = useWalletConnectV2()
 
 const { getWeb3OnboardProvider } = useWeb3Onboard()
-const provider = getWeb3OnboardProvider()
 
 const sendRequest = async (request: any): Promise<any> => {
   const channel = localStorage.getItem(MEANS_OF_CONNECTION)
@@ -16,6 +15,7 @@ const sendRequest = async (request: any): Promise<any> => {
       return await sendCustomWCV2Request(request)
     }
   } else {
+    const provider = getWeb3OnboardProvider()
     return await (provider as any)?.request(request)
   }
 }
