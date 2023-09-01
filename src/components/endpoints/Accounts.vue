@@ -1,111 +1,47 @@
 <script setup lang="ts">
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
-import useWalletConnectV2 from '@/compositions/useWalletConnectV2'
 import { getState, useState } from '@/stores'
-import useWeb3 from '@/compositions/useWeb3'
-import useWeb3Onboard from '@/compositions/useWeb3Onboard'
+
 import {
   getSelectedNetworkConfig,
-  UP_CONNECTED_ADDRESS,
   WALLET_CONNECT,
   WINDOW_LUKSO,
   WEB3_ONBOARD,
 } from '@/helpers/config'
 import { createBlockScoutLink } from '@/utils/createLinks'
 import Web3Utils from 'web3-utils'
-import { computed, watch, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { provider as Provider } from 'web3-core'
+import useWeb3Connection from '@/compositions/useWeb3Connection'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
-const { setDisconnected, setConnected, recalcTokens } = useState()
-const { setupWeb3, requestAccounts } = useWeb3()
-const { getWeb3OnboardProvider } = useWeb3Onboard()
-const provider = getWeb3OnboardProvider()
-const hasExtension = ref<boolean>(!!provider)
+const { recalcTokens } = useState()
+const provider = ref<Provider>()
+const { setupProvider, disconnect } = useWeb3Connection()
 const selectedNetworkConfig = getSelectedNetworkConfig()
-
-watch(
-  () => !!provider,
-  value => (hasExtension.value = value)
-)
-const { resetWCV2Provider, setupWCV2Provider, openWCV2Modal } =
-  useWalletConnectV2()
-
-const {
-  setupWeb3Onboard,
-  connectWallet,
-  disconnect: disconnectWeb3Onboard,
-} = useWeb3Onboard()
 
 const hexChainId = computed(() => {
   return Web3Utils.numberToHex(getState('chainId'))
 })
 
-const connectExtension = async () => {
+const disconnectWallet = async () => {
   clearNotification()
-
-  if (!provider) {
-    setNotification(
-      'provider is undefined, is the extension enabled?',
-      'warning'
-    )
-    return
-  }
-
-  // The lukso is used as a provider
-  setupWeb3(provider as unknown as Provider)
-
-  try {
-    const [address] = await requestAccounts()
-    setConnected(address, WINDOW_LUKSO)
-    localStorage.setItem(UP_CONNECTED_ADDRESS, address)
-  } catch (error) {
-    setNotification((error as unknown as Error).message, 'danger')
-  }
+  await disconnect()
+  setNotification(`Disconnected ${getState('channel')} channel`, 'info')
 }
 
-const connectWalletConnectV2 = async () => {
+const connectExtension = async (meansOfConnection: string) => {
   clearNotification()
-
   try {
-    await setupWCV2Provider()
-    await openWCV2Modal()
-    setConnected(getState('address'), WALLET_CONNECT)
+    provider.value = await setupProvider(meansOfConnection)
     setNotification(`Connected to address: ${getState('address')}`, 'info')
   } catch (error) {
     setNotification((error as unknown as Error).message, 'danger')
   }
 }
 
-const connectWeb3Onboard = async () => {
-  clearNotification()
-  setupWeb3Onboard()
-  try {
-    const [primaryWallet] = await connectWallet()
-    const connectedAddress = primaryWallet.accounts[0].address
-    setConnected(connectedAddress, WEB3_ONBOARD)
-    setNotification(`Connected to address: ${connectedAddress}`, 'info')
-  } catch (error) {
-    setNotification((error as unknown as Error).message, 'danger')
-  }
-}
-
-const disconnect = async () => {
-  clearNotification()
-
-  if (getState('channel') == WALLET_CONNECT) {
-    await resetWCV2Provider()
-  } else {
-    localStorage.removeItem(UP_CONNECTED_ADDRESS)
-  }
-
-  setNotification(`Disconnected ${getState('channel')} channel`, 'info')
-  disconnectWeb3Onboard()
-  setDisconnected()
-  await setupWeb3(null)
-}
 const handleRefresh = (e: Event) => {
   e.stopPropagation()
   recalcTokens()
@@ -122,9 +58,9 @@ const handleRefresh = (e: Event) => {
       <div class="field">
         <button
           class="button is-primary is-rounded mb-1"
-          :disabled="!hasExtension || getState('isConnected')"
+          :disabled="getState('isConnected')"
           data-testid="connect-extension"
-          @click="connectExtension"
+          @click="connectExtension(WINDOW_LUKSO)"
         >
           Browser Extension
         </button>
@@ -140,7 +76,7 @@ const handleRefresh = (e: Event) => {
           class="button is-primary is-rounded mb-1"
           :disabled="getState('isConnected')"
           data-testid="connect-wc-v2"
-          @click="connectWalletConnectV2"
+          @click="connectExtension(WALLET_CONNECT)"
         >
           Wallet Connect V2
         </button>
@@ -157,7 +93,8 @@ const handleRefresh = (e: Event) => {
         <button
           class="button is-primary is-rounded mb-1"
           data-testid="connect-w3onboard"
-          @click="connectWeb3Onboard"
+          :disabled="getState('isConnected')"
+          @click="connectExtension(WEB3_ONBOARD)"
         >
           Web3-Onboard
         </button>
@@ -167,7 +104,7 @@ const handleRefresh = (e: Event) => {
           class="button is-primary is-rounded"
           :disabled="!getState('isConnected')"
           data-testid="disconnect"
-          @click="disconnect"
+          @click="disconnectWallet"
         >
           Disconnect
         </button>

@@ -13,13 +13,8 @@ import ImportProfile from '@/components/endpoints/ImportProfile.vue'
 import GetNetworkId from '@/components/endpoints/GetNetworkId.vue'
 import Transfer from '@/components/endpoints/Transfer.vue'
 import Mint from '@/components/endpoints/Mint.vue'
-import useWeb3Onboard from '@/compositions/useWeb3Onboard'
 
-const { getWeb3OnboardProvider } = useWeb3Onboard()
-
-const hasExtension = computed(() => {
-  return getWeb3OnboardProvider()
-})
+const hasExtension = computed(() => !!window.lukso)
 </script>
 
 <template>

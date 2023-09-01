@@ -7,26 +7,14 @@ const data = {
   chainIds: [2828],
 }
 
-window.lukso = {
-  request: jest.fn(),
-} as any
+const mockSendRequest = jest.fn()
 
-jest.mock('@/compositions/useWeb3Onboard', () => ({
+jest.mock('@/compositions/useWeb3Connection', () => ({
   __esModule: true,
   default: () => ({
-    connectWallet: () => jest.fn(),
-    disconnect: () => jest.fn(),
-    setChainId: () => jest.fn(),
-    setupWeb3Onboard: () => jest.fn(),
-    getWeb3OnboardProvider: () => window.lukso,
+    sendRequest: (arg: any) => mockSendRequest(arg),
   }),
 }))
-
-const windowSpy = jest.spyOn(window.lukso as any, 'request')
-
-afterEach(() => {
-  windowSpy.mockRestore()
-})
 
 test('can add relayer', async () => {
   render(CustomRelayer)
@@ -37,7 +25,7 @@ test('can add relayer', async () => {
 
   expect(screen.getByTestId('chain-id-list')).toHaveTextContent(/2828/)
 
-  expect(windowSpy).toHaveBeenCalledWith({
+  expect(mockSendRequest).toHaveBeenCalledWith({
     method: 'up_addTransactionRelayer',
     params: [data],
   })

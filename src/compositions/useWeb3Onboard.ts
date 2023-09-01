@@ -1,10 +1,7 @@
 import Onboard, { OnboardAPI } from '@web3-onboard/core'
 import injectedModule from '@web3-onboard/injected-wallets'
 import luksoModule from '@lukso/web3-onboard-config'
-import { ConnectModalOptions, WalletState } from '@web3-onboard/core/dist/types'
-import useWeb3 from './useWeb3'
-import EthereumProvider from '@walletconnect/ethereum-provider/dist/types/EthereumProvider'
-import { ref } from 'vue'
+import { ConnectModalOptions } from '@web3-onboard/core/dist/types'
 
 const lukso = luksoModule()
 
@@ -73,28 +70,16 @@ const connect: ConnectModalOptions = {
 }
 
 let onboard: OnboardAPI
-const provider = ref<EthereumProvider>()
 
-const setupWeb3Onboard = () => {
+const setupWeb3Onboard = async () => {
   onboard = Onboard({
     wallets,
     chains,
     appMetadata,
     connect,
   })
-}
-
-const { setupWeb3 } = useWeb3()
-
-const connectWallet = async (): Promise<WalletState[]> => {
-  const wallets = await onboard.connectWallet()
-  provider.value = wallets[0].provider as EthereumProvider
-  await setupWeb3(wallets[0].provider as EthereumProvider)
-  return wallets
-}
-
-const getWeb3OnboardProvider = (): EthereumProvider => {
-  return provider.value as EthereumProvider
+  const connectedWallets = await onboard.connectWallet()
+  return connectedWallets[0]
 }
 
 const disconnect = async (): Promise<void> => {
@@ -108,10 +93,8 @@ const setChainId = async (chainHex: string): Promise<void> => {
 
 export default function useWeb3Onboard() {
   return {
-    connectWallet,
     disconnect,
     setChainId,
     setupWeb3Onboard,
-    getWeb3OnboardProvider,
   }
 }

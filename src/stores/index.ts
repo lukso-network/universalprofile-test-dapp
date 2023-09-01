@@ -1,6 +1,5 @@
 import { reactive } from 'vue'
 import { Store, Channel } from '@/types'
-import useWeb3 from '@/compositions/useWeb3'
 import {
   DEFAULT_GAS,
   DEFAULT_GAS_PRICE,
@@ -9,6 +8,7 @@ import {
 import UniversalProfile from '@lukso/lsp-smart-contracts/artifacts/UniversalProfile.json'
 import KeyManager from '@lukso/lsp-smart-contracts/artifacts/LSP6KeyManager.json'
 import { recalcTokens } from '@/helpers/tokenUtils'
+import useWeb3Connection from '@/compositions/useWeb3Connection'
 
 export const store = reactive<Store>({
   isConnected: false,
@@ -42,7 +42,7 @@ export function useState(): {
 } {
   return {
     setConnected: async (address: string, channel: Channel) => {
-      const { getChainId, getBalance, contract } = useWeb3()
+      const { getChainId, getBalance, contract } = useWeb3Connection()
 
       setState('address', address)
       setState('isConnected', true)

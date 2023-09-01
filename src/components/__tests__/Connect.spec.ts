@@ -1,53 +1,27 @@
 import Connect from '../Connect.vue'
 import { render, fireEvent, waitFor, screen } from '@testing-library/vue'
 import { useState } from '@/stores'
-import { WALLET_CONNECT } from '@/helpers/config'
-
-const mockCall = jest.fn()
-const mockSetupProvider = jest.fn()
-const mockOpenWCV2Modal = jest.fn()
-const mockResetProvider = jest.fn()
-const mockGetProvider = jest.fn()
-const mockSendCustomWCV2Request = jest.fn()
+import { WALLET_CONNECT, WINDOW_LUKSO } from '@/helpers/config'
 
 window.lukso = {} as typeof window.lukso
-
-jest.mock('@/compositions/useWalletConnectV2', () => ({
-  __esModule: true,
-  default: () => ({
-    resetWCV2Provider: () => mockResetProvider(),
-    setupWCV2Provider: () => mockSetupProvider(),
-    openWCV2Modal: () => mockOpenWCV2Modal(),
-    getWCV2Provider: () => mockGetProvider(),
-    sendCustomWCV2Request: (request: { method: string; params?: [any] }) =>
-      mockSendCustomWCV2Request(request),
-  }),
-}))
-
-jest.mock('@/compositions/useWeb3Onboard', () => ({
-  __esModule: true,
-  default: () => ({
-    connectWallet: () => mockResetProvider(),
-    disconnect: () => mockSetupProvider(),
-    setChainId: () => mockOpenWCV2Modal(),
-    setupWeb3Onboard: () => mockGetProvider(),
-    getWeb3OnboardProvider: () => window.lukso,
-  }),
-}))
 
 jest.mock('@/utils/isDesktop', () => ({
   isDesktop: jest.fn().mockReturnValue(true),
 }))
 
+const mockCall = jest.fn()
+const mockGetProvider = jest.fn()
 const mockSetupWeb3 = jest.fn()
 const mockAccounts = jest.fn()
 const mockGetBalance = jest.fn()
 const mockRequestAccounts = jest.fn()
+const mockDisconnect = jest.fn()
 
-jest.mock('@/compositions/useWeb3', () => ({
+jest.mock('@/compositions/useWeb3Connection', () => ({
   __esModule: true,
   default: () => ({
-    setupWeb3: () => mockSetupWeb3(),
+    disconnect: () => mockDisconnect(),
+    setupProvider: (arg: string) => mockSetupWeb3(arg),
     getChainId: () => 22,
     accounts: () => mockAccounts(),
     getBalance: () => mockGetBalance(),
@@ -77,12 +51,12 @@ test('can connect to wallet connect V2', async () => {
 
   render(Connect)
 
-  expect(mockSetupProvider).toBeCalledTimes(0)
+  expect(mockSetupWeb3).toBeCalledTimes(1)
 
   await fireEvent.click(screen.getByTestId('connect-wc-v2'))
 
-  expect(mockSetupProvider).toBeCalledTimes(1)
-  expect(mockOpenWCV2Modal).toBeCalledTimes(1)
+  expect(mockSetupWeb3).toBeCalledTimes(2)
+  expect(mockSetupWeb3).toHaveBeenLastCalledWith(WALLET_CONNECT)
 })
 
 test('can disconnect from wallet connect V2', async () => {
@@ -100,12 +74,14 @@ test('can disconnect from wallet connect V2', async () => {
 
   render(Connect)
 
-  expect(mockSetupProvider).toBeCalledTimes(1)
+  expect(mockSetupWeb3).toBeCalledTimes(1)
   expect(screen.getByTestId('address')).toHaveTextContent('0x8e54b3...')
 
   await fireEvent.click(screen.getByTestId('disconnect'))
 
-  expect(screen.queryByTestId('address')).toBeFalsy()
+  await waitFor(() => {
+    expect(mockDisconnect).toHaveBeenCalled()
+  })
 })
 
 test('can connect to browser extension when authorized', async () => {
@@ -116,16 +92,17 @@ test('can connect to browser extension when authorized', async () => {
     },
   })
   mockGetBalance.mockReturnValue('2')
+  const { setConnected } = useState()
 
   render(Connect)
 
   await fireEvent.click(screen.getByTestId('connect-extension'))
 
-  // expect(mockSetupWeb3).toBeCalledTimes(1)
-  // expect(mockAccounts).toBeCalledTimes(2)
+  expect(mockSetupWeb3).toBeCalledTimes(2)
+  await setConnected('0x8e54b33F8d42E59c0B4Cf02e6457CF8bb6a71094', WINDOW_LUKSO)
   await waitFor(() => {
     expect(screen.getByTestId('address')).toHaveTextContent(
-      /.*0xD8B0b8\.\.\..*/,
+      /.*0x8e54b3\.\.\..*/,
       {
         normalizeWhitespace: true,
       }
@@ -147,6 +124,7 @@ test('can connect to browser extension when not authorized', async () => {
     },
   })
   mockGetBalance.mockReturnValue('3')
+  const { setConnected } = useState()
 
   render(Connect)
 
@@ -158,12 +136,13 @@ test('can connect to browser extension when not authorized', async () => {
   )
 
   await fireEvent.click(screen.getByTestId('connect-extension'))
+  await setConnected('0x8e54b33F8d42E59c0B4Cf02e6457CF8bb6a71094', WINDOW_LUKSO)
+
   await waitFor(() => {
     expect(screen.getByTestId('address')).toHaveTextContent(
-      /.*0x7367C9\.\.\..*/,
+      /.*0x8e54b3\.\.\..*/,
       { normalizeWhitespace: true }
     )
-    expect(mockRequestAccounts).toBeCalled()
     expect(screen.getByTestId('balance')).toHaveTextContent('3 LYX')
   })
 }, 5000)

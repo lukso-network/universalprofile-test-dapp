@@ -1,4 +1,9 @@
-import useWeb3 from '@/compositions/useWeb3'
+import useWeb3Connection from '@/compositions/useWeb3Connection'
+
+jest.mock('@/compositions/useWeb3Onboard', () => ({
+  __esModule: true,
+  default: () => ({}),
+}))
 
 const mockIsAddress = jest.fn()
 
@@ -8,7 +13,7 @@ jest.mock('web3-utils', () => {
 })
 
 test('can check for validity of address', async () => {
-  const { isAddress } = useWeb3()
+  const { isAddress } = useWeb3Connection()
   isAddress('123')
   expect(mockIsAddress).toBeCalledWith('123')
 })

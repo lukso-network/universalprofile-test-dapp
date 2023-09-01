@@ -3,14 +3,14 @@ import { getState } from '@/stores'
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
 import { ref, watchEffect } from 'vue'
-import useWeb3 from '@/compositions/useWeb3'
 import { MAGICVALUE } from '@/helpers/config'
 import { generateNonce, SiweMessage } from 'siwe'
 import { getDate, getTime } from '@/utils/dateTime'
+import useWeb3Connection from '@/compositions/useWeb3Connection'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
-const { sign, recover, getWeb3 } = useWeb3()
+const { sign, recover, getWeb3 } = useWeb3Connection()
 
 const isPending = ref(false)
 const message = ref('sign message')
