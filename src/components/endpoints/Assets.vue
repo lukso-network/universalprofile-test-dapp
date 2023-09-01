@@ -10,12 +10,12 @@ import { Lsp4Metadata } from '@/types'
 import { ContractStandard } from '@/enums'
 import CustomSelect from '@/components/shared/CustomSelect.vue'
 import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
-import useWeb3 from '@/compositions/useWeb3'
 import { useLspFactory } from '@/compositions/useLspFactory'
 import ERC725 from '@erc725/erc725.js'
 import { BN } from 'bn.js'
 import { addTokenToLocalStore, recalcTokens } from '@/helpers/tokenUtils'
 import { useERC20 } from '@/compositions/useErc20'
+import useWeb3Connection from '@/compositions/useWeb3Connection'
 
 type Token = {
   type: ContractStandard
@@ -26,7 +26,7 @@ type Token = {
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
-const { contract } = useWeb3()
+const { contract } = useWeb3Connection()
 
 const isTokenCreated = ref(false)
 const isTokenPending = ref(false)

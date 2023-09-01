@@ -10,7 +10,7 @@ const mockRecover = jest.fn()
 const mockValidSignatureCall = jest.fn()
 const mockHashMessage = jest.fn()
 
-jest.mock('@/compositions/useWeb3', () => ({
+jest.mock('@/compositions/useWeb3Connection', () => ({
   __esModule: true,
   default: () => ({
     sign: (message: string, address: string) => mockSign(message, address),

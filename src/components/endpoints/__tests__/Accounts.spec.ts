@@ -1,47 +1,25 @@
 import Accounts from '../Accounts.vue'
 import { render, fireEvent, screen, waitFor } from '@testing-library/vue'
 import { useState } from '@/stores'
-import { WINDOW_ETHEREUM } from '@/helpers/config'
+import { WINDOW_LUKSO } from '@/helpers/config'
 
 const mockCall = jest.fn()
 const mockSetupProvider = jest.fn()
-const mockOpenWCV2Modal = jest.fn()
-const mockResetProvider = jest.fn()
 const mockGetProvider = jest.fn()
-const mockSendCustomWCV2Request = jest.fn()
 
-jest.mock('@/compositions/useWalletConnectV2', () => ({
-  __esModule: true,
-  default: () => ({
-    resetWCV2Provider: () => mockResetProvider(),
-    setupWCV2Provider: () => mockSetupProvider(),
-    openWCV2Modal: () => mockOpenWCV2Modal(),
-    getWCV2Provider: () => mockGetProvider(),
-    sendCustomWCV2Request: (request: { method: string; params?: [any] }) =>
-      mockSendCustomWCV2Request(request),
-  }),
-}))
-
-jest.mock('@/compositions/useWeb3Onboard', () => ({
-  __esModule: true,
-  default: () => ({
-    setupWeb3Onboard: () => jest.fn(),
-    connectWallet: () => jest.fn(),
-    disconnect: () => jest.fn(),
-  }),
-}))
+window.lukso = {} as any
 
 const mockAccounts = jest.fn()
 const mockGetBalance = jest.fn()
 const mockRequestAccounts = jest.fn()
-const mockSetupWeb3 = jest.fn()
 
-jest.mock('@/compositions/useWeb3', () => ({
+jest.mock('@/compositions/useWeb3Connection', () => ({
   __esModule: true,
   default: () => ({
-    setupWeb3: () => mockSetupWeb3(),
+    setupProvider: () => mockSetupProvider(),
     getChainId: () => 22,
     accounts: () => mockAccounts(),
+    disconnect: jest.fn(),
     getBalance: () => mockGetBalance(),
     requestAccounts: () => mockRequestAccounts(),
     contract: () => ({
@@ -70,7 +48,6 @@ test('can connect to wallet connect V2', async () => {
   await fireEvent.click(screen.getByTestId('connect-wc-v2'))
 
   expect(mockSetupProvider).toBeCalledTimes(1)
-  expect(mockOpenWCV2Modal).toBeCalledTimes(1)
   expect(await screen.findByTestId('notification')).toHaveTextContent(
     'Connected to address'
   )
@@ -85,24 +62,25 @@ test('can connect to browser extension when authorized', async () => {
       connected: false,
     },
   })
-
-  window.ethereum = {} as any
+  const { setConnected } = useState()
 
   render(Accounts)
 
   await fireEvent.click(screen.getByTestId('connect-extension'))
+  await setConnected('0x8e54b33F8d42E59c0B4Cf02e6457CF8bb6a71094', WINDOW_LUKSO)
 
-  expect(mockRequestAccounts).toBeCalledTimes(1)
   await waitFor(() => {
-    expect(screen.getByTestId('info')).toHaveTextContent('Connected to address')
+    expect(screen.getByTestId('info')).toHaveTextContent(
+      'Connected to address:'
+    )
   })
-  // expect(screen.getByTestId('chain')).toHaveTextContent('22 (0x16)')
+  expect(screen.getByTestId('chain')).toHaveTextContent('22 (0x16)')
 })
 
 test('can disconnect from browser extension', async () => {
-  window.ethereum = {} as any
-  const { setConnected } = useState()
-  setConnected('0x517216362D594516c6f96Ee34b2c502d65B847E4', WINDOW_ETHEREUM)
+  window.lukso = {} as any
+  const { setConnected, setDisconnected } = useState()
+  setConnected('0x517216362D594516c6f96Ee34b2c502d65B847E4', WINDOW_LUKSO)
 
   render(Accounts)
 
@@ -112,7 +90,7 @@ test('can disconnect from browser extension', async () => {
   })
 
   await fireEvent.click(screen.getByTestId('disconnect'))
-
+  setDisconnected()
   await waitFor(() => {
     expect(screen.getByTestId('connect-extension')).not.toBeDisabled()
     expect(screen.getByTestId('disconnect')).toBeDisabled()

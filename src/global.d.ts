@@ -9,5 +9,6 @@ declare global {
     keyManager?: Contract
     ERC725?: ERC725
     ethereum?: Ethereum
+    lukso?: Ethereum
   }
 }

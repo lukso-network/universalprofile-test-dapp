@@ -6,7 +6,6 @@ import { TransactionConfig } from 'web3-core'
 import { getState, setState } from '@/stores'
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
-import useWeb3 from '@/compositions/useWeb3'
 import {
   DEFAULT_GAS,
   DEFAULT_GAS_PRICE,
@@ -15,11 +14,12 @@ import {
 import ContractFunction from '@/components/shared/ContractFunction.vue'
 import { MethodSelect, MethodType } from '@/helpers/functionUtils'
 import { LSPType } from '@/helpers/tokenUtils'
+import useWeb3Connection from '@/compositions/useWeb3Connection'
 
 const { sampleUP, errorContract } = getSelectedNetworkConfig()
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
-const { sendTransaction, getBalance } = useWeb3()
+const { sendTransaction, getBalance } = useWeb3Connection()
 
 const data = ref<string>('')
 const hasData = ref(false)
@@ -308,7 +308,6 @@ const send = async () => {
     gas: DEFAULT_GAS,
     gasPrice: DEFAULT_GAS_PRICE,
   } as TransactionConfig
-
   if (hasData.value) {
     transaction = { ...transaction, data: data.value }
   }

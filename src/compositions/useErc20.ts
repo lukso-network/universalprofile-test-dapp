@@ -1,8 +1,8 @@
 import { DeployedContract } from '@lukso/lsp-factory.js'
 
 import erc20AndErc165 from '../abis/CustomERC20AndERC165/CustomERC20AndERC165.json'
-import useWeb3 from './useWeb3'
 import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
+import useWeb3Connection from './useWeb3Connection'
 
 interface ERC20DeploymentOptions {
   from: string
@@ -14,12 +14,13 @@ interface DeployedERC20Token {
   ERC20Token: DeployedContract
 }
 
+const { getProvider, contract } = useWeb3Connection()
+
 async function deployERC20Token({
   from,
   tokenName,
   tokenSymbol,
 }: ERC20DeploymentOptions): Promise<DeployedERC20Token> {
-  const { contract } = useWeb3()
   const erc20contract = contract(erc20AndErc165.abi as any, from, {
     gas: DEFAULT_GAS,
     gasPrice: DEFAULT_GAS_PRICE,
@@ -53,9 +54,9 @@ export function useERC20(): {
     erc20DeploymentOptions: ERC20DeploymentOptions
   ) => Promise<DeployedERC20Token>
 } {
-  const hasExtension = !!window.ethereum
+  const hasExtension = !!getProvider()
   if (!hasExtension) {
-    throw new Error('Extension not installed')
+    throw new Error('Extension not connected')
   }
 
   return {

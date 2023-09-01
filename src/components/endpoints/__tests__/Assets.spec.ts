@@ -15,6 +15,19 @@ jest.mock('@/compositions/useErc20', () => ({
   }),
 }))
 
+jest.mock('@/compositions/useWeb3Connection', () => ({
+  __esModule: true,
+  default: () => ({
+    contract: () => ({
+      methods: {
+        owner: () => ({
+          call: () => jest.fn(),
+        }),
+      },
+    }),
+  }),
+}))
+
 test('can create token', async () => {
   setState('isConnected', true)
   mockDeployLSP7DigitalAsset.mockReturnValue({

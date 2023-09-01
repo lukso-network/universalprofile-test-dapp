@@ -4,13 +4,12 @@ import { INTERFACE_IDS } from '@lukso/lsp-smart-contracts'
 import lsp3Schema from '@erc725/erc725.js/schemas/LSP3UniversalProfileMetadata.json'
 import lsp4Schema from '@erc725/erc725.js/schemas/LSP4DigitalAsset.json'
 import lsp9Schema from '@erc725/erc725.js/schemas/LSP9Vault.json'
-
-import useWeb3 from '@/compositions/useWeb3'
 import useErc725 from '@/compositions/useErc725'
 import { eip165ABI } from '@/abis/eip165ABI'
 import { erc20ABI } from '@/abis/erc20ABI'
 import { store, setState } from '@/stores/index'
 import { getSelectedNetworkConfig } from '@/helpers/config'
+import useWeb3Connection from '@/compositions/useWeb3Connection'
 
 const { lsp7TokenDivisible, lsp7TokenNonDivisible } = getSelectedNetworkConfig()
 
@@ -128,7 +127,7 @@ export const detectLSP = async (
     return undefined
   }
 
-  const { contract: Contract } = useWeb3()
+  const { contract: Contract } = useWeb3Connection()
   // EIP-165 detection
   const contract = Contract(eip165ABI.concat(erc20ABI) as any, contractAddress)
 

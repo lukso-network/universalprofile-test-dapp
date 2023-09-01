@@ -1,7 +1,7 @@
 import Mint from '../Mint.vue'
 import { render, fireEvent, screen } from '@testing-library/vue'
 
-jest.mock('@/compositions/useWeb3', () => ({
+jest.mock('@/compositions/useWeb3Connection', () => ({
   __esModule: true,
   default: () => ({
     contract: () => ({

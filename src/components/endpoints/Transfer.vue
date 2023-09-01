@@ -3,7 +3,6 @@ import { getState } from '@/stores'
 import { ref } from 'vue'
 import { Contract } from 'web3-eth-contract'
 import useNotifications from '@/compositions/useNotifications'
-import useWeb3 from '@/compositions/useWeb3'
 import LSP7Mintable from '@lukso/lsp-smart-contracts/artifacts/LSP7Mintable.json'
 import LSP8Mintable from '@lukso/lsp-smart-contracts/artifacts/LSP8Mintable.json'
 import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
@@ -13,10 +12,11 @@ import { ContractStandard } from '@/enums'
 import LSPSelect from '@/components/shared/LSPSelect.vue'
 import { padLeft } from 'web3-utils'
 import { LSPType, TokenInfo } from '@/helpers/tokenUtils'
+import useWeb3Connection from '@/compositions/useWeb3Connection'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
-const { contract } = useWeb3()
+const { contract } = useWeb3Connection()
 
 const tokenType = ref<ContractStandard>(ContractStandard.LSP7)
 const tokenId = ref<string>('')

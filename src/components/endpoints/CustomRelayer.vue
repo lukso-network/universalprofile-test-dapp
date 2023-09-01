@@ -2,10 +2,12 @@
 import { ref } from 'vue'
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
-import { sendRequest } from '@/helpers/customRequest'
+import useWeb3Connection from '@/compositions/useWeb3Connection'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
+
+const web3 = useWeb3Connection()
 
 const name = ref('My Relayer')
 const apiUrl = ref('https://service-relayer.staging.lukso.dev/api')
@@ -47,7 +49,7 @@ const addCustomRelayer = async () => {
         },
       ],
     }
-    await sendRequest(request)
+    await web3.sendRequest(request)
     setNotification('The relayer was added')
   } catch (error) {
     setNotification((error as unknown as Error).message, 'danger')

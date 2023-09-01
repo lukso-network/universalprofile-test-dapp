@@ -5,6 +5,19 @@ import { Contract } from 'web3-eth-contract'
 
 const mockSend = jest.fn()
 
+jest.mock('@/compositions/useWeb3Connection', () => ({
+  __esModule: true,
+  default: () => ({
+    contract: () => ({
+      methods: {
+        owner: () => ({
+          call: () => jest.fn(),
+        }),
+      },
+    }),
+  }),
+}))
+
 window.erc725Account = {
   methods: {
     setDataBatch: (key: any[], value: any[]) => ({
