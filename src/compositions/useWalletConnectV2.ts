@@ -1,20 +1,12 @@
 import EthereumProvider from '@walletconnect/ethereum-provider'
-import { setState, useState, getState } from '@/stores'
-import useWeb3 from '@/compositions/useWeb3'
-import { provider as Provider } from 'web3-core'
-import {
-  NETWORKS,
-  WALLET_CONNECT,
-  WALLET_CONNECT_PROJECT_ID,
-} from '@/helpers/config'
+import { NETWORKS, WALLET_CONNECT_PROJECT_ID } from '@/helpers/config'
 
 let provider: EthereumProvider
 
 /**
  * Prepares a WalletConnect V2 provider (EthereumProvider) that manages the WebSocket connection.
  */
-const setupWCV2Provider = async (): Promise<void> => {
-  const { setupWeb3 } = useWeb3()
+const setupWCV2Provider = async () => {
   provider = await EthereumProvider.init({
     projectId: WALLET_CONNECT_PROJECT_ID,
     chains: Object.entries(NETWORKS).map(net => net[1].chainId),
@@ -48,56 +40,8 @@ const setupWCV2Provider = async (): Promise<void> => {
     showQrModal: true,
     optionalChains: [0],
   })
-
-  provider.on('disconnect', (error: any) => {
-    if (error) {
-      throw error
-    }
-    setupWeb3(provider as unknown as Provider)
-    setState('isConnected', true)
-  })
-
-  provider.on('accountsChanged', async (accounts: string[]) => {
-    console.log('Account changed', accounts)
-
-    if (accounts.length === 0 && getState('isConnected')) {
-      await resetWCV2Provider()
-    }
-
-    const { setConnected } = useState()
-    const [address] = accounts
-
-    setConnected(address, WALLET_CONNECT)
-  })
-
-  provider.on('connect', (error: any) => {
-    if (error) {
-      throw error
-    }
-    setupWeb3(provider as unknown as Provider)
-    setState('isConnected', true)
-  })
-
-  provider.on('accountsChanged', async (accounts: string[]) => {
-    console.log('Account changed', accounts)
-
-    if (accounts.length === 0 && getState('isConnected')) {
-      await resetWCV2Provider()
-    }
-
-    const { setConnected } = useState()
-    const [address] = accounts
-
-    setConnected(address, WALLET_CONNECT)
-  })
-
-  setupWeb3(provider as unknown as Provider)
-
-  const { setConnected } = useState()
-  const [address] = provider.accounts
-  if (address) {
-    setConnected(address, WALLET_CONNECT)
-  }
+  await provider.connect()
+  return provider
 }
 
 /**
@@ -142,38 +86,18 @@ const getWCV2Provider = (): EthereumProvider => {
 }
 
 /**
- * Custom RPC requests cannot be handled by `window.ethereum.request(request)` and thus must be forwarded to
- * `provider.request` for a custom processing.
- */
-const sendCustomWCV2Request = async (request: {
-  method: string
-  params?: [any]
-}): Promise<any> => {
-  if (provider && provider.connected) {
-    return await provider.request(request)
-  } else {
-    console.warn('Provider is not set up or not connected.')
-  }
-}
-
-/**
  * @returns a set of functions to manage WalletConnect V2 connection.
  */
 export default function useWalletConnectV2(): {
   resetWCV2Provider: () => Promise<void>
-  setupWCV2Provider: () => Promise<void>
+  setupWCV2Provider: () => Promise<EthereumProvider>
   openWCV2Modal: () => Promise<void>
   getWCV2Provider: () => EthereumProvider
-  sendCustomWCV2Request: (request: {
-    method: string
-    params?: [any]
-  }) => Promise<any>
 } {
   return {
     resetWCV2Provider,
     setupWCV2Provider,
     openWCV2Modal,
     getWCV2Provider,
-    sendCustomWCV2Request,
   }
 }

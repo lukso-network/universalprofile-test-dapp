@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
+import useWeb3Connection from '@/compositions/useWeb3Connection'
 import { getSelectedNetworkConfig, setNetworkConfig } from '@/helpers/config'
-import { sendRequest } from '@/helpers/customRequest'
 import { ref } from 'vue'
 import { hexToNumber, numberToHex } from 'web3-utils'
 
@@ -19,6 +19,7 @@ export type NetworkInfo = {
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
+const web3 = useWeb3Connection()
 
 const defaultNetworkConfig = getSelectedNetworkConfig()
 const defaultNetwork: NetworkInfo = {
@@ -101,7 +102,7 @@ const getNetworkId = async () => {
   clearNotification()
 
   try {
-    networkId.value = await sendRequest({ method: 'eth_getId' })
+    networkId.value = await web3.sendRequest({ method: 'eth_getId' })
 
     setNotification(networkId.value, 'info')
   } catch (error) {
@@ -111,7 +112,7 @@ const getNetworkId = async () => {
 
 const changeNetwork = async () => {
   try {
-    await sendRequest({
+    await web3.sendRequest({
       method: 'wallet_switchEthereumChain',
       params: [
         {
@@ -141,7 +142,7 @@ const changeDappNetwork = async () => {
 
 const addNetwork = async () => {
   try {
-    await sendRequest({
+    await web3.sendRequest({
       method: 'wallet_addEthereumChain',
       params: [
         {

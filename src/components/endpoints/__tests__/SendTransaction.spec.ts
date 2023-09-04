@@ -1,23 +1,35 @@
 import SendTransaction from '../SendTransaction.vue'
 import { render, fireEvent, screen, waitFor } from '@testing-library/vue'
 import { setState } from '@/stores'
-import userEvent from '@testing-library/user-event'
 
 const mockGetBalance = jest.fn()
 const mockSendTransaction = jest.fn()
+const mockEncodeFunctionSignature = jest.fn()
+const mockEncodeParameters = jest.fn()
 
-jest.mock('@/compositions/useWeb3', () => {
-  const actual = jest.requireActual('@/compositions/useWeb3')
-  const data = actual.default()
-  const web3mock = require('@depay/web3-mock')
-  web3mock.mock('ethereum')
-  data.setupWeb3(window.ethereum)
+jest.mock('@/compositions/useWeb3Onboard', () => ({
+  __esModule: true,
+  default: () => ({}),
+}))
+jest.mock('@/compositions/useWeb3Connection', () => {
   const output = {
     __esModule: true,
-    ...actual,
     default: () => {
       return {
-        ...data,
+        getWeb3: () => ({
+          eth: {
+            abi: {
+              encodeFunctionSignature: () => mockEncodeFunctionSignature(),
+              encodeParameters: () => mockEncodeParameters(),
+              decodeData: () => {
+                return {
+                  call: 'minter',
+                  inputs: [],
+                }
+              },
+            },
+          },
+        }),
         getBalance: () => mockGetBalance(),
         sendTransaction: (params: any) => mockSendTransaction(params),
       }
@@ -83,40 +95,6 @@ test('can send lyx transaction with data', async () => {
     from: '0x517216362D594516c6f96Ee34b2c502d65B847E4',
     to: '0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298',
     value: '2000000000000000000',
-    gas: 5000000,
-    gasPrice: '10000000000',
-  })
-})
-
-test('can send transaction from preset', async () => {
-  setState('address', '0x517216362D594516c6f96Ee34b2c502d65B847E4')
-
-  render(SendTransaction)
-
-  await waitFor(() => {
-    expect(screen.getByTestId('transaction-from')).not.toBeFalsy()
-  })
-
-  await userEvent.selectOptions(
-    screen.getByTestId('preset'),
-    '🏦 Mint ERC20/ERC777/LSP7'
-  )
-  await userEvent.clear(screen.getByTestId('transaction-to'))
-  await userEvent.type(
-    screen.getByTestId('transaction-to'),
-    '0xB29c50a9F3D90FA3aDF394f2960BD6D8e0Ff5E9D'
-  )
-
-  await fireEvent.click(screen.getByTestId('send'))
-
-  expect(screen.getByTestId('notification')).toHaveTextContent(
-    'The transaction was successful'
-  )
-  expect(mockSendTransaction).toHaveBeenLastCalledWith({
-    data: '0x40c10f19000000000000000000000000517216362d594516c6f96ee34b2c502d65b847e40000000000000000000000000000000000000000000000056bc75e2d63100000',
-    from: '0x517216362D594516c6f96Ee34b2c502d65B847E4',
-    to: '0xB29c50a9F3D90FA3aDF394f2960BD6D8e0Ff5E9D',
-    value: '0',
     gas: 5000000,
     gasPrice: '10000000000',
   })

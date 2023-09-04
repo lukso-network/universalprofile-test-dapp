@@ -4,12 +4,12 @@ import { onMounted, ref, watch } from 'vue'
 import useErc725 from '@/compositions/useErc725'
 import { useRoute, RouteLocationNormalizedLoaded, useRouter } from 'vue-router'
 import { createIpfsLink } from '@/utils/createLinks'
-import useWeb3 from '@/compositions/useWeb3'
 import Notifications from '@/components/Notification.vue'
 import { LSP3ProfileJSON } from '@lukso/lsp-factory.js'
 import useNotifications from '@/compositions/useNotifications'
+import useWeb3Connection from '@/compositions/useWeb3Connection'
 const route = useRoute()
-const { isAddress } = useWeb3()
+const { isAddress } = useWeb3Connection()
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
 const router = useRouter()

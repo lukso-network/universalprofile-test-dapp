@@ -15,11 +15,15 @@ import {
   DigitalAssetDeploymentOptions,
   LSP7DigitalAssetDeploymentOptions,
 } from '@lukso/lsp-factory.js/build/main/src/lib/interfaces/digital-asset-deployment'
+import useWeb3Connection from './useWeb3Connection'
 
 let lspFactory: LSPFactory
 
+const { getProvider } = useWeb3Connection()
+
 const setupLSPFactory = (): void => {
-  lspFactory = new LSPFactory(window.ethereum as any, {
+  const provider = getProvider()
+  lspFactory = new LSPFactory(provider as any, {
     chainId: getSelectedNetworkConfig().chainId,
   })
 }
@@ -74,7 +78,7 @@ export function useLspFactory(): {
     digitalAssetDeploymentOptions: DigitalAssetDeploymentOptions
   ) => Promise<DeployedLSP8IdentifiableDigitalAsset>
 } {
-  const hasExtension = !!window.ethereum
+  const hasExtension = !!getProvider()
   if (!hasExtension) {
     throw new Error('Extension not installed')
   }

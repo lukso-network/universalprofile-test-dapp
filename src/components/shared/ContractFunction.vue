@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import useWeb3 from '@/compositions/useWeb3'
 import { decodeData, MethodType } from '@/helpers/functionUtils'
 import { reactive, computed, watch, onMounted } from 'vue'
 import { toWei, Unit, padLeft } from 'web3-utils'
 import ParamField from './ParamField.vue'
+import useWeb3Connection from '@/compositions/useWeb3Connection'
 
 interface ElementType extends MethodType {
   error?: boolean
@@ -28,7 +28,7 @@ type Emits = {
 const props = defineProps<Props>()
 const emits = defineEmits<Emits>()
 
-const { getWeb3 } = useWeb3()
+const { getWeb3 } = useWeb3Connection()
 
 const IS_ARRAY_TYPE_REGEXP = /\[\]$/
 const SUPPORTED_TYPES_REGEXP =
@@ -243,7 +243,12 @@ onMounted(() => {
         !props.custom ? `Function ${computedCall}` : 'Function'
       }}</label>
       <div v-if="props.custom" class="field">
-        <input class="input" :value="computedCall" @input="handleCall" />
+        <input
+          class="input"
+          data-testid="function-call"
+          :value="computedCall"
+          @input="handleCall"
+        />
       </div>
     </div>
     <div

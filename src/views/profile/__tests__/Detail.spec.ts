@@ -13,7 +13,7 @@ jest.mock('@/compositions/useErc725', () => ({
     fetchProfile: mockFetchProfile,
   }),
 }))
-jest.mock('@/compositions/useWeb3', () => ({
+jest.mock('@/compositions/useWeb3Connection', () => ({
   __esModule: true,
   default: () => ({
     isAddress: () => mockIsAddress(),

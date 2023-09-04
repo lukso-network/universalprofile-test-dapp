@@ -20,8 +20,8 @@ jest.mock('ethers/lib/utils', () => ({
   },
 }))
 
-jest.mock('@/compositions/useWeb3', () => {
-  const actual = jest.requireActual('@/compositions/useWeb3')
+jest.mock('@/compositions/useWeb3Connection', () => {
+  const actual = jest.requireActual('@/compositions/useWeb3Connection')
   return {
     __esModule: true,
     ...actual,

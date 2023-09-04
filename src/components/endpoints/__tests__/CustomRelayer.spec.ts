@@ -7,15 +7,14 @@ const data = {
   chainIds: [2828],
 }
 
-window.ethereum = {
-  request: jest.fn(),
-} as any
+const mockSendRequest = jest.fn()
 
-const windowSpy = jest.spyOn(window.ethereum as any, 'request')
-
-afterEach(() => {
-  windowSpy.mockRestore()
-})
+jest.mock('@/compositions/useWeb3Connection', () => ({
+  __esModule: true,
+  default: () => ({
+    sendRequest: (arg: any) => mockSendRequest(arg),
+  }),
+}))
 
 test('can add relayer', async () => {
   render(CustomRelayer)
@@ -26,7 +25,7 @@ test('can add relayer', async () => {
 
   expect(screen.getByTestId('chain-id-list')).toHaveTextContent(/2828/)
 
-  expect(windowSpy).toHaveBeenCalledWith({
+  expect(mockSendRequest).toHaveBeenCalledWith({
     method: 'up_addTransactionRelayer',
     params: [data],
   })

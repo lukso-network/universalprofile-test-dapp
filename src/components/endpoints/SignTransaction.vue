@@ -2,7 +2,7 @@
 import { getState } from '@/stores'
 import useNotifications from '@/compositions/useNotifications'
 import { ref, watch, reactive, computed } from 'vue'
-import useWeb3 from '@/compositions/useWeb3'
+import useWeb3Connection from '@/compositions/useWeb3Connection'
 import { MAGICVALUE } from '@/helpers/config'
 import { toWei } from 'web3-utils'
 import { TransactionConfig } from 'web3-core'
@@ -29,7 +29,7 @@ const hasData = ref(false)
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
-const { signTransaction, recoverRawTransaction, contract } = useWeb3()
+const { signTransaction, recoverRawTransaction, contract } = useWeb3Connection()
 
 const isPending = ref(false)
 const transactionHashedForSignature = ref<string>()

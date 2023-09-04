@@ -16,9 +16,7 @@ import GetNetworkId from '@/components/endpoints/GetNetworkId.vue'
 import Transfer from '@/components/endpoints/Transfer.vue'
 import Mint from '@/components/endpoints/Mint.vue'
 
-const hasExtension = computed(() => {
-  return window.ethereum
-})
+const hasExtension = computed(() => !!window.lukso)
 </script>
 
 <template>

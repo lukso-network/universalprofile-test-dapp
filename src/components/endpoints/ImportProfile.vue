@@ -4,10 +4,11 @@ import { ref } from 'vue'
 import Notifications from '@/components/Notification.vue'
 
 import useNotifications from '@/compositions/useNotifications'
-import { sendRequest } from '@/helpers/customRequest'
+import useWeb3Connection from '@/compositions/useWeb3Connection'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
+const web3 = useWeb3Connection()
 
 const universalProfileAddress = ref('')
 const controllerAddress = ref('')
@@ -20,7 +21,7 @@ const onImportProfile = async () => {
       method: 'up_import',
       params: [universalProfileAddress.value],
     }
-    let newControllerAddress: string = await sendRequest(request)
+    let newControllerAddress: string = await web3.sendRequest(request)
     if (newControllerAddress) {
       controllerAddress.value = newControllerAddress
     }
