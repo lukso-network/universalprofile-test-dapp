@@ -11,6 +11,11 @@ const mockKeccak256 = jest.fn()
 const mockRlpDecode = jest.fn()
 const mockJoinSignature = jest.fn()
 
+jest.mock('@/compositions/useWeb3Onboard', () => ({
+  __esModule: true,
+  default: () => ({}),
+}))
+
 jest.mock('ethers/lib/utils', () => ({
   serializeTransaction: (value: any) => mockSerializeTransaction(value),
   keccak256: (value: any) => mockKeccak256(value),
@@ -21,10 +26,8 @@ jest.mock('ethers/lib/utils', () => ({
 }))
 
 jest.mock('@/compositions/useWeb3Connection', () => {
-  const actual = jest.requireActual('@/compositions/useWeb3Connection')
   return {
     __esModule: true,
-    ...actual,
     default: () => ({
       signTransaction: (params: any, address: string) => {
         return mockSignTransaction(params, address)
