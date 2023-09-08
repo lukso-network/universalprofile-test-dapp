@@ -22,6 +22,7 @@ export default defineConfig({
       buffer: resolveModule('buffer/'),
     },
   },
+  esbuild: process.env.NODE_ENV === 'production' ? {} : undefined,
   build: {
     commonjsOptions: {
       transformMixedEsModules: true,
