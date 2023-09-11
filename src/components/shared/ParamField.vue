@@ -203,7 +203,8 @@ function validate(value: any): { value: any; error?: string } {
     case 'bytes1':
       if (methodInfo.value.isKey) {
         try {
-          ERC725.encodeKeyName(value)
+          const items = (value || '').split(',')
+          ERC725.encodeKeyName(items[0], items.slice(1))
         } catch (err) {
           return { value, error: (err as Error).message }
         }
@@ -324,13 +325,20 @@ const shouldBytes32 = (index: number) => {
 const makeBytes32 = (index: number) => {
   const item = data.items[index]
   if (/^bytes32/.test(methodInfo.value.type)) {
-    if (methodInfo.value.isKey) {
+    if (
+      methodInfo.value.isKey &&
+      !/^0x/i.test(item.value) &&
+      /^[a-z0-9]+$/i.test(item.value)
+    ) {
       const items = (item.value || '').split(',')
       try {
         return ERC725.encodeKeyName(items[0], items.slice(1))
       } catch (err) {
         return (err as Error).message
       }
+    }
+    if (/^0x[0-9a-f]*$/i.test(item.value)) {
+      return padLeft(item.value.replace(/^0x/, ''), 64)
     }
     if (/^[0-9]*$/.test(item.value)) {
       return padLeft(item.value, 64)

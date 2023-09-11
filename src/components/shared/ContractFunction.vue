@@ -4,6 +4,7 @@ import { reactive, computed, watch, onMounted } from 'vue'
 import { toWei, Unit, padLeft } from 'web3-utils'
 import ParamField from './ParamField.vue'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
+import ERC725 from '@erc725/erc725.js'
 
 interface ElementType extends MethodType {
   error?: boolean
@@ -163,9 +164,20 @@ function handleCall(e: Event) {
 }
 
 const makeBytes32 = (value: string, type: string) => {
-  if (type === 'bytes32') {
-    if (/^[0-9]*$/.test(value)) {
+  if (/^bytes32/.test(type)) {
+    if (/^[0-9]+$/.test(value)) {
       return padLeft(value, 64)
+    }
+    if (/^0x[0-9a-f]*$/i.test(value)) {
+      return padLeft(value.replace(/^0x/, ''), 64)
+    }
+    if (/^\w*:.*,.*$/.test(value)) {
+      const items = (value || '').split(',')
+      try {
+        return ERC725.encodeKeyName(items[0], items.slice(1))
+      } catch (err) {
+        return '0x'
+      }
     }
   }
   return value
@@ -185,7 +197,7 @@ const output = computed<{ error: undefined | string; value: string }>(() => {
         reactiveData.items.map(({ type }) => type),
         reactiveData.items.map(({ value, type, isWei }) => {
           const makeItem = (value: any) =>
-            /^bytes/.test(type)
+            /^bytes32/.test(type)
               ? makeBytes32(value, type) ?? '0x'
               : makeValue(value, isWei) || ''
           if (/\[\]$/.test(type)) {
