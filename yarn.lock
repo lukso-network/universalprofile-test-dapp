@@ -2198,9 +2198,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lukso/lsp-factory.js@npm:3.1.0":
-  version: 3.1.0
-  resolution: "@lukso/lsp-factory.js@npm:3.1.0"
+"@lukso/lsp-factory.js@npm:3.1.1":
+  version: 3.1.1
+  resolution: "@lukso/lsp-factory.js@npm:3.1.1"
   dependencies:
     "@erc725/erc725.js": ^0.18.0
     "@ethersproject/abi": ^5.7.0
@@ -2212,7 +2212,7 @@ __metadata:
     ipfs-http-client: 52.0.3
     ipfs-utils: 8.1.6
     rxjs: ^7.8.0
-  checksum: f00a594b4dd61360ddd97e370e838442c10d1ed457e759d9114548c3d4f306118762898edf94553ddcb3c87ee6ff47123bbc214ff03facb977bf523b31fd4b36
+  checksum: c39e57118350e45c351b9d1204941de36754422988c0f2ce38ab158fae6c272fbe5adef67d2454a6ef0808385c44c9eec16a5fad60a2f551bab9353a40b0a6f0
   languageName: node
   linkType: hard
 
@@ -14951,7 +14951,7 @@ __metadata:
   dependencies:
     "@depay/web3-mock": ^14.17.0
     "@erc725/erc725.js": ^0.18.0
-    "@lukso/lsp-factory.js": 3.1.0
+    "@lukso/lsp-factory.js": 3.1.1
     "@lukso/lsp-smart-contracts": ^0.11.1
     "@lukso/web3-onboard-config": 1.0.3
     "@testing-library/jest-dom": 5.17.0

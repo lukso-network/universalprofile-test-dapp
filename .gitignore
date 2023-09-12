@@ -34,3 +34,4 @@ tmp
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+/vite.config.ts.timestamp-*

@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@erc725/erc725.js": "^0.18.0",
-    "@lukso/lsp-factory.js": "3.1.0",
+    "@lukso/lsp-factory.js": "3.1.1",
     "@lukso/lsp-smart-contracts": "^0.11.1",
     "@lukso/web3-onboard-config": "1.0.3",
     "@walletconnect/ethereum-provider": "2.10.0",
@@ -97,7 +97,6 @@
   "resolutions": {
     "wagmi": "~1.2.0",
     "@lukso/lsp-smart-contracts": "^0.10.3",
-    "@erc725/erc725.js": "^0.18.0",
-    "@lukso/lsp-factory.js@2.5.1": "patch:@lukso/lsp-factory.js@npm%3A2.5.1#./.yarn/patches/@lukso-lsp-factory.js-npm-2.5.1-8ecf6d6ce0.patch"
+    "@erc725/erc725.js": "^0.18.0"
   }
 }
