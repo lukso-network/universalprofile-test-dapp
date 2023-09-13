@@ -4,7 +4,6 @@ import { ref, onMounted, onUnmounted, watch } from 'vue'
 import useDropdown from '@/compositions/useDropdown'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
 import { WALLET_CONNECT, WEB3_ONBOARD, WINDOW_LUKSO } from '@/helpers/config'
-import EthereumProvider from '@walletconnect/ethereum-provider/dist/types/EthereumProvider'
 import { sliceAddress } from '@/utils/sliceAddress'
 
 const { setupProvider, disconnect } = useWeb3Connection()
@@ -12,7 +11,7 @@ const { setupProvider, disconnect } = useWeb3Connection()
 const { close, toggle } = useDropdown()
 const dropdown = ref()
 const hasExtension = ref(false)
-const provider = ref<EthereumProvider>()
+const provider = ref<any>()
 
 watch(
   () => !!window.lukso,
