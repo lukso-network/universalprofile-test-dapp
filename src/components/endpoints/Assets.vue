@@ -95,6 +95,7 @@ const create = async () => {
           controllerAddress: erc725AccountAddress,
           name: token.value.name,
           symbol: token.value.symbol,
+          creators: [erc725AccountAddress],
           digitalAssetMetadata: {
             LSP4Metadata: {
               ...lsp4Metadata.value,
