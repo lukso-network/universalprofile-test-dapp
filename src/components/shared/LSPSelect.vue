@@ -164,9 +164,15 @@ const data = computed<{ [key: string]: TokenInfo[] }>(() => {
       if (props.showLspType) {
         items.push({ type: LSPType.LSP7DigitalAsset, label: 'Any LSP7' })
       }
+      items.push({
+        type: LSPType.LSP7DigitalAsset,
+        label: 'LUKSO Community Token (LYXC)',
+        address: '0x6395b330F063F96579aA8F7b59f2584fb9b6c3a5',
+      })
       items.push(...children)
     }
   }
+
   if (
     props.showTypes
       ? props.showTypes.includes(LSPType.LSP8IdentifiableDigitalAsset)
