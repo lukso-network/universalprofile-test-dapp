@@ -2,7 +2,7 @@
 import { getState } from '@/stores'
 import { LSPType, TokenInfo } from '@/helpers/tokenUtils'
 import { getSelectedNetworkConfig } from '@/helpers/config'
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 
 type Props = {
   address?: string
