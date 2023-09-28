@@ -22,7 +22,7 @@ const setData = async () => {
     isPending.value = true
     window.erc725Account &&
       (await window.erc725Account.methods
-        .setDataBatch([key.value], [value.value])
+        .setData(key.value, value.value)
         .send({
           from: erc725AccountAddress,
         })

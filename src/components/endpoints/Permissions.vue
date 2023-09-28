@@ -62,7 +62,7 @@ const setPermissions = async () => {
     isPending.value = true
     window.erc725Account &&
       (await window.erc725Account.methods
-        .setDataBatch([key], [value])
+        .setData(key, value)
         .send({
           from: erc725AccountAddress,
         })
