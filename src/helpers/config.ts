@@ -15,8 +15,10 @@ export const WALLET_CONNECT = 'wallet-connect-v2'
 export const WINDOW_LUKSO = 'window-lukso'
 export const WEB3_ONBOARD = 'web3Onboard'
 
-export const DEFAULT_GAS = 5_000_000
+export const DEFAULT_GAS = '50000000000000000'
 export const DEFAULT_GAS_PRICE = '10000000000'
+export const DEFAULT_MAX_PRIORITY_FEE_PER_GAS = '1'
+export const DEFAULT_MAX_FEE_PER_GAS = '1'
 
 export const MAGICVALUE = '0x1626ba7e'
 

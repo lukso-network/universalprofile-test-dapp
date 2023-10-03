@@ -5,7 +5,6 @@ import { Contract } from 'web3-eth-contract'
 import useNotifications from '@/compositions/useNotifications'
 import LSP7Mintable from '@lukso/lsp-smart-contracts/artifacts/LSP7Mintable.json'
 import LSP8Mintable from '@lukso/lsp-smart-contracts/artifacts/LSP8Mintable.json'
-import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
 import Notifications from '@/components/Notification.vue'
 import { toWei } from 'web3-utils'
 import { ERC725 } from '@erc725/erc725.js'
@@ -81,10 +80,7 @@ const mint = async () => {
   try {
     switch (tokenType.value) {
       case ContractStandard.LSP7:
-        myToken.value = contract(LSP7Mintable.abi as any, mintToken.value, {
-          gas: DEFAULT_GAS,
-          gasPrice: DEFAULT_GAS_PRICE,
-        })
+        myToken.value = contract(LSP7Mintable.abi as any, mintToken.value)
 
         await myToken.value.methods
           .mint(
@@ -107,10 +103,7 @@ const mint = async () => {
           return
         }
 
-        myToken.value = contract(LSP8Mintable.abi as any, mintToken.value, {
-          gas: DEFAULT_GAS,
-          gasPrice: DEFAULT_GAS_PRICE,
-        })
+        myToken.value = contract(LSP8Mintable.abi as any, mintToken.value)
 
         await myToken.value.methods
           .mint(mintReceiver.value, tokenId.value, false, '0x')

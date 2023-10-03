@@ -1,10 +1,6 @@
 import { reactive } from 'vue'
 import { Store, Channel } from '@/types'
-import {
-  DEFAULT_GAS,
-  DEFAULT_GAS_PRICE,
-  MEANS_OF_CONNECTION,
-} from '@/helpers/config'
+import { MEANS_OF_CONNECTION } from '@/helpers/config'
 import UniversalProfile from '@lukso/lsp-smart-contracts/artifacts/UniversalProfile.json'
 import KeyManager from '@lukso/lsp-smart-contracts/artifacts/LSP6KeyManager.json'
 import { recalcTokens } from '@/helpers/tokenUtils'
@@ -50,17 +46,11 @@ export function useState(): {
 
       localStorage.setItem(MEANS_OF_CONNECTION, channel)
 
-      window.erc725Account = contract(UniversalProfile.abi as any, address, {
-        gasPrice: DEFAULT_GAS_PRICE,
-        gas: DEFAULT_GAS,
-      })
+      window.erc725Account = contract(UniversalProfile.abi as any, address)
 
       try {
         const upOwner = await window.erc725Account.methods.owner().call()
-        window.keyManager = contract(KeyManager.abi as any, upOwner, {
-          gas: DEFAULT_GAS,
-          gasPrice: DEFAULT_GAS_PRICE,
-        })
+        window.keyManager = contract(KeyManager.abi as any, upOwner)
       } catch (error) {
         console.warn('Not using key manager', error)
       }

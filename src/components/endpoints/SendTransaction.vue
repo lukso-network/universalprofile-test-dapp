@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { toWei, numberToHex } from 'web3-utils'
+import { toWei, toNumber } from 'web3-utils'
 import { ref, watch, reactive, computed } from 'vue'
 import { TransactionConfig } from 'web3-core'
 
@@ -9,6 +9,8 @@ import useNotifications from '@/compositions/useNotifications'
 import {
   DEFAULT_GAS,
   DEFAULT_GAS_PRICE,
+  DEFAULT_MAX_FEE_PER_GAS,
+  DEFAULT_MAX_PRIORITY_FEE_PER_GAS,
   getSelectedNetworkConfig,
 } from '@/helpers/config'
 import ContractFunction from '@/components/shared/ContractFunction.vue'
@@ -19,7 +21,12 @@ import useWeb3Connection from '@/compositions/useWeb3Connection'
 const { sampleUP, errorContract } = getSelectedNetworkConfig()
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
-const { sendTransaction, getBalance } = useWeb3Connection()
+const {
+  sendTransaction,
+  getBalance,
+  estimateGas,
+  defaultMaxPriorityFeePerGas,
+} = useWeb3Connection()
 
 const data = ref<string>('')
 const hasData = ref(false)
@@ -290,29 +297,57 @@ watch(
 function makeValue(param: MethodType) {
   const { value: _value, isWei } = param
   if (isWei) {
-    const value = typeof _value !== 'string' ? numberToHex(_value) : _value
+    const value =
+      typeof _value !== 'string' ? toNumber(_value).toString() : _value
     return toWei(value, isWei)
   }
   return _value
+}
+
+const estimate = async () => {
+  const from = makeValue(params.items[0])
+  let transaction = {
+    from,
+    to: makeValue(params.items[1]),
+    value: makeValue(params.items[2]),
+    maxPriorityFeePerGas: makeValue(params.items[3]),
+    maxFeePerGas: makeValue(params.items[4]),
+    gas: makeValue(params.items[5]),
+    gasPrice: makeValue(params.items[6]),
+  } as TransactionConfig
+  if (hasData.value) {
+    transaction = { ...transaction, data: data.value }
+  }
+
+  try {
+    isPending.value = true
+    const gas = await estimateGas(transaction)
+    setNotification(`Estimated gas ${gas}`)
+    params.items[5].value = gas
+    setState('balance', await getBalance(from))
+  } catch (error) {
+    setNotification((error as unknown as Error).message, 'danger')
+  } finally {
+    isPending.value = false
+  }
 }
 
 const send = async () => {
   clearNotification()
 
   const from = makeValue(params.items[0])
-  console.log('from', from, params.items)
   let transaction = {
     from,
     to: makeValue(params.items[1]),
     value: makeValue(params.items[2]),
-    gas: DEFAULT_GAS,
-    gasPrice: DEFAULT_GAS_PRICE,
+    maxPriorityFeePerGas: makeValue(params.items[3]),
+    maxFeePerGas: makeValue(params.items[4]),
+    gas: makeValue(params.items[5]),
+    gasPrice: makeValue(params.items[6]),
   } as TransactionConfig
   if (hasData.value) {
     transaction = { ...transaction, data: data.value }
   }
-
-  console.log(transaction)
 
   try {
     isPending.value = true
@@ -332,6 +367,25 @@ const params = reactive<{ items: MethodType[] }>({
     { type: 'address', name: 'from', value: getState('address') },
     { type: 'address', name: 'to' },
     { type: 'uint256', isWei: 'ether', name: 'amount', value: '0' },
+    {
+      type: 'uint256',
+      isWei: 'wei',
+      name: 'maxPriorityFeePerGas',
+      value: DEFAULT_MAX_PRIORITY_FEE_PER_GAS,
+    }, // 3
+    {
+      type: 'uint256',
+      isWei: 'wei',
+      name: 'maxFeePerGas',
+      value: DEFAULT_MAX_FEE_PER_GAS,
+    }, // 4
+    { type: 'uint256', isWei: 'wei', name: 'gas', value: DEFAULT_GAS }, // 5
+    {
+      type: 'uint256',
+      isWei: 'wei',
+      name: 'gasPrice',
+      value: DEFAULT_GAS_PRICE,
+    }, // 6
   ],
 })
 
@@ -364,6 +418,9 @@ const selectMethod = (e: Event) => {
   if (amount != undefined) {
     params.items[2].value = amount
   }
+  defaultMaxPriorityFeePerGas().then(value => {
+    params.items[3].value = value
+  })
 }
 
 const handleData = (e?: string) => {
@@ -453,6 +510,7 @@ const hasRemove = computed<boolean>(() => {
         testid-prefix="transaction-"
         :custom="true"
       />
+
       <div class="field">
         <label class="checkbox">
           <input v-model="hasData" data-testid="hasData" type="checkbox" />
@@ -471,6 +529,16 @@ const hasRemove = computed<boolean>(() => {
         @update:data="handleData"
       />
 
+      <div>
+        <label class="label">maxPriorityFeePerGas</label>
+        <input
+          v-model="params.items[3].value"
+          class="input"
+          type="number"
+          placeholder="0"
+          data-testid="maxPriorityFeePerGas"
+        />
+      </div>
       <div v-if="hasData" class="field">
         <label class="label">Data (optional)</label>
         <textarea
@@ -500,6 +568,15 @@ const hasRemove = computed<boolean>(() => {
         </button>
       </div>
       <div class="field">
+        <button
+          :class="`button is-primary is-rounded mt-4 ${
+            isPending ? 'is-loading' : ''
+          }`"
+          data-testid="send"
+          @click="estimate"
+        >
+          Estimate Gas
+        </button>
         <button
           :class="`button is-primary is-rounded mt-4 ${
             isPending ? 'is-loading' : ''

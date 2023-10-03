@@ -9,7 +9,6 @@ import LSP8Mintable from '@lukso/lsp-smart-contracts/artifacts/LSP8Mintable.json
 import { Lsp4Metadata } from '@/types'
 import { ContractStandard } from '@/enums'
 import CustomSelect from '@/components/shared/CustomSelect.vue'
-import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
 import { useLspFactory } from '@/compositions/useLspFactory'
 import ERC725 from '@erc725/erc725.js'
 import { BN } from 'bn.js'
@@ -110,11 +109,7 @@ const create = async () => {
         tokenAddress.value = deployedAsset.LSP8IdentifiableDigitalAsset.address
         const deployedContract = contract(
           LSP8Mintable.abi as any,
-          tokenAddress.value,
-          {
-            gas: DEFAULT_GAS,
-            gasPrice: DEFAULT_GAS_PRICE,
-          }
+          tokenAddress.value
         )
         await deployedContract.methods
           .setData(
