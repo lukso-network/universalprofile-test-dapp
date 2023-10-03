@@ -1,6 +1,12 @@
 import SendTransaction from '../SendTransaction.vue'
 import { render, fireEvent, screen, waitFor } from '@testing-library/vue'
 import { setState } from '@/stores'
+import {
+  DEFAULT_GAS,
+  DEFAULT_GAS_PRICE,
+  DEFAULT_MAX_FEE_PER_GAS,
+  DEFAULT_MAX_PRIORITY_FEE_PER_GAS,
+} from '@/helpers/config'
 
 const mockGetBalance = jest.fn()
 const mockSendTransaction = jest.fn()
@@ -61,8 +67,10 @@ test('can send lyx transaction', async () => {
     from: '0x517216362D594516c6f96Ee34b2c502d65B847E4',
     to: '0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298',
     value: '2000000000000000000',
-    gas: 5000000,
-    gasPrice: '10000000000',
+    gas: DEFAULT_GAS,
+    gasPrice: DEFAULT_GAS_PRICE,
+    maxFeePerGas: DEFAULT_MAX_FEE_PER_GAS,
+    maxPriorityFeePerGas: DEFAULT_MAX_PRIORITY_FEE_PER_GAS,
   })
 })
 
@@ -95,7 +103,9 @@ test('can send lyx transaction with data', async () => {
     from: '0x517216362D594516c6f96Ee34b2c502d65B847E4',
     to: '0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298',
     value: '2000000000000000000',
-    gas: 5000000,
-    gasPrice: '10000000000',
+    gas: DEFAULT_GAS,
+    gasPrice: DEFAULT_GAS_PRICE,
+    maxFeePerGas: DEFAULT_MAX_FEE_PER_GAS,
+    maxPriorityFeePerGas: DEFAULT_MAX_PRIORITY_FEE_PER_GAS,
   })
 })

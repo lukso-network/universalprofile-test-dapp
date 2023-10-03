@@ -1,7 +1,6 @@
 import { DeployedContract } from '@lukso/lsp-factory.js'
 
 import erc20AndErc165 from '../abis/CustomERC20AndERC165/CustomERC20AndERC165.json'
-import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
 import useWeb3Connection from './useWeb3Connection'
 
 interface ERC20DeploymentOptions {
@@ -21,10 +20,7 @@ async function deployERC20Token({
   tokenName,
   tokenSymbol,
 }: ERC20DeploymentOptions): Promise<DeployedERC20Token> {
-  const erc20contract = contract(erc20AndErc165.abi as any, from, {
-    gas: DEFAULT_GAS,
-    gasPrice: DEFAULT_GAS_PRICE,
-  })
+  const erc20contract = contract(erc20AndErc165.abi as any, from)
 
   return new Promise((resolve, reject) => {
     erc20contract
