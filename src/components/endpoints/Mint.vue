@@ -83,7 +83,6 @@ const mint = async () => {
       case ContractStandard.LSP7:
         myToken.value = contract(LSP7Mintable.abi as any, mintToken.value)
 
-        debugger
         const isNonDivisible =
           (await myToken.value.methods.decimals().call()) === '0'
 
