@@ -81,18 +81,19 @@ const mint = async () => {
   try {
     switch (tokenType.value) {
       case ContractStandard.LSP7:
-        myToken.value = contract(LSP7Mintable.abi as any, mintToken.value, {
-          gas: DEFAULT_GAS,
-          gasPrice: DEFAULT_GAS_PRICE,
-        })
+        myToken.value = contract(LSP7Mintable.abi as any, mintToken.value)
+
+        debugger
+        const isNonDivisible =
+          (await myToken.value.methods.decimals().call()) === '0'
+
+        // if token is divisible (decimals = 18) we need to convert to wei
+        const amount = isNonDivisible
+          ? mintAmount.value.toString()
+          : toWei(mintAmount.value.toString())
 
         await myToken.value.methods
-          .mint(
-            mintReceiver.value,
-            toWei(mintAmount.value.toString()),
-            false,
-            '0x'
-          )
+          .mint(mintReceiver.value, amount, false, '0x')
           .send({ from: erc725AccountAddress })
           .on('receipt', function (receipt: any) {
             console.log(receipt)
