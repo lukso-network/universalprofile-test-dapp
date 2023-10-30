@@ -36,6 +36,7 @@ const lsp4Metadata = ref<Lsp4Metadata>({
     },
   ],
 })
+const creators = ref<string[]>([getState('address')])
 
 const metadataJsonUrl =
   '0x6f357c6a6143da573459ba01321df3eb223e96b0015c2914a1907df319804573d538c311697066733a2f2f516d51357071797167637a6d6b736e4e434a734a76333453664469776e4676426d64456f74704254337642464865'
@@ -44,6 +45,14 @@ watchEffect(() => {
   mintReceiver.value = getState('address')
   mintToken.value = getState('tokenAddress')
 })
+
+const handleNewLsp4Metadata = (
+  metadata: Lsp4Metadata,
+  newCreators: string[]
+) => {
+  lsp4Metadata.value = metadata
+  creators.value = newCreators
+}
 
 const handleTokenSelected = (info: TokenInfo) => {
   tokenType.value =
@@ -213,7 +222,7 @@ const mint = async () => {
         </div>
       </div>
       <div v-else>
-        <Lsp4MetadataForm disabled :new-metadata="lsp4Metadata" />
+        <Lsp4MetadataForm @new-metadata="handleNewLsp4Metadata" />
       </div>
       <div class="field">
         <button
