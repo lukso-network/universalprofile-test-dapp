@@ -62,22 +62,7 @@ const uploadUniversalProfileMetaData = async (
   )
 }
 
-export function useLspFactory(): {
-  deployUniversalProfile: (
-    profileDeploymentOptions: ProfileDeploymentOptions,
-    contractDeploymentOptions?: ContractDeploymentOptions | undefined
-  ) => Promise<DeployedUniversalProfileContracts>
-  uploadUniversalProfileMetaData: (
-    profileData: ProfileDataBeforeUpload,
-    uploadOptions?: UploadOptions
-  ) => Promise<ProfileDataForEncoding>
-  deployLSP7DigitalAsset: (
-    digitalAssetDeploymentOptions: LSP7DigitalAssetDeploymentOptions
-  ) => Promise<DeployedLSP7DigitalAsset>
-  deployLSP8IdentifiableDigitalAsset: (
-    digitalAssetDeploymentOptions: DigitalAssetDeploymentOptions
-  ) => Promise<DeployedLSP8IdentifiableDigitalAsset>
-} {
+export function useLspFactory() {
   const hasExtension = !!getProvider()
   if (!hasExtension) {
     throw new Error('Extension not installed')

@@ -2,7 +2,7 @@
 import { getState, setState } from '@/stores'
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
-import { ref } from 'vue'
+import { ref, toRaw } from 'vue'
 import { createBlockScoutLink } from '@/utils/createLinks'
 import Lsp4MetadataForm from '@/components/shared/Lsp4MetadataForm.vue'
 import LSP8Mintable from '@lukso/lsp-smart-contracts/artifacts/LSP8Mintable.json'
@@ -45,11 +45,15 @@ const lsp4Metadata = ref<Lsp4Metadata>({
     },
   ],
 })
-
+const creators = ref<string[]>()
 const tokenAddress = ref<string>()
 
-const handleNewLsp4Metadata = (metadata: Lsp4Metadata) => {
+const handleNewLsp4Metadata = (
+  metadata: Lsp4Metadata,
+  newCreators: string[]
+) => {
   lsp4Metadata.value = metadata
+  creators.value = newCreators
 }
 
 const handleStandardSelected = (standard: string) => {
@@ -72,37 +76,43 @@ const create = async () => {
     const { deployERC20Token } = useERC20()
 
     let deployedAsset
+    let digitalAssetData
     switch (token.value.type) {
       case ContractStandard.LSP7:
-        deployedAsset = await deployLSP7DigitalAsset({
+        digitalAssetData = {
           isNFT: token.value.isNonDivisible,
           controllerAddress: erc725AccountAddress,
           name: token.value.name,
           symbol: token.value.symbol,
-          creators: [erc725AccountAddress],
+          creators: toRaw(creators.value),
           digitalAssetMetadata: {
             LSP4Metadata: {
               ...lsp4Metadata.value,
             },
           },
-        })
+        }
+        console.log(digitalAssetData)
+        deployedAsset = await deployLSP7DigitalAsset(digitalAssetData)
         console.log('Deployed asset', deployedAsset.LSP7DigitalAsset)
         addTokenToLocalStore(
           (tokenAddress.value = deployedAsset.LSP7DigitalAsset.address)
         )
         break
       case ContractStandard.LSP8:
-        deployedAsset = await deployLSP8IdentifiableDigitalAsset({
+        digitalAssetData = {
           controllerAddress: erc725AccountAddress,
           name: token.value.name,
           symbol: token.value.symbol,
-          creators: [erc725AccountAddress],
+          creators: toRaw(creators.value),
           digitalAssetMetadata: {
             LSP4Metadata: {
               ...lsp4Metadata.value,
             },
           },
-        })
+        }
+        console.log(digitalAssetData)
+        deployedAsset =
+          await deployLSP8IdentifiableDigitalAsset(digitalAssetData)
         console.log(
           'Deployed asset',
           deployedAsset.LSP8IdentifiableDigitalAsset
