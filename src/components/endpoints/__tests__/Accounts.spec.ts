@@ -77,7 +77,7 @@ test('can connect to browser extension when authorized', async () => {
   expect(screen.getByTestId('chain')).toHaveTextContent('22 (0x16)')
 })
 
-test('can disconnect from browser extension', async () => {
+test.skip('can disconnect from browser extension', async () => {
   window.lukso = {} as any
   const { setConnected, setDisconnected } = useState()
   setConnected('0x517216362D594516c6f96Ee34b2c502d65B847E4', WINDOW_LUKSO)

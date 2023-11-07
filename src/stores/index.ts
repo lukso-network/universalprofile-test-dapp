@@ -31,11 +31,7 @@ export async function setState(
   ;(store[key] as any) = newState
 }
 
-export function useState(): {
-  setConnected: (address: string, channel: Channel) => Promise<void>
-  setDisconnected: () => void
-  recalcTokens: () => Promise<void>
-} {
+export function useState() {
   return {
     setConnected: async (address: string, channel: Channel) => {
       const { getChainId, getBalance, contract } = useWeb3Connection()

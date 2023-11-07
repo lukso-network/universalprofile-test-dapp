@@ -77,7 +77,9 @@ test('can call data from ipfs', async () => {
     })),
   })
   const screen = render(Detail)
-  expect(mockFetch).toBeCalledWith('https://2eff.lukso.dev/ipfs/123')
+  expect(mockFetch).toBeCalledWith(
+    'https://api.universalprofile.cloud/ipfs/123'
+  )
   expect(screen.getByText('Loading...')).toBeDefined()
   await waitFor(() => {
     expect(screen.getByText('IPFS: 123')).toBeDefined()
@@ -97,7 +99,9 @@ test('can call data from ipfs if url changes', () => {
     },
   })
   render(Detail)
-  expect(mockFetch).toBeCalledWith('https://2eff.lukso.dev/ipfs/1234')
+  expect(mockFetch).toBeCalledWith(
+    'https://api.universalprofile.cloud/ipfs/1234'
+  )
 })
 
 test('cannot call ipfs server if ipfs address/hash is empty', () => {
