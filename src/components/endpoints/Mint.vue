@@ -219,7 +219,8 @@ const mint = async () => {
       </div>
       <div v-if="tokenType === ContractStandard.LSP8" class="field">
         <label class="label"
-          >Token Id ({{ LSP8TokenIdTypes[tokenIdType] }})</label
+          >Token Id ({{ LSP8TokenIdTypes[tokenIdType] }} in
+          {{ LSP8TokenIdTypesData[tokenIdType] }})</label
         >
         <div class="control">
           <input
