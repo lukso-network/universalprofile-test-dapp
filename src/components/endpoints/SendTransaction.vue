@@ -6,11 +6,7 @@ import { TransactionConfig } from 'web3-core'
 import { getState, setState } from '@/stores'
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
-import {
-  DEFAULT_GAS,
-  DEFAULT_GAS_PRICE,
-  getSelectedNetworkConfig,
-} from '@/helpers/config'
+import { getSelectedNetworkConfig } from '@/helpers/config'
 import ContractFunction from '@/components/shared/ContractFunction.vue'
 import { MethodSelect, MethodType } from '@/helpers/functionUtils'
 import { LSPType } from '@/helpers/tokenUtils'
@@ -305,8 +301,6 @@ const send = async () => {
     from,
     to: makeValue(params.items[1]),
     value: makeValue(params.items[2]),
-    gas: DEFAULT_GAS,
-    gasPrice: DEFAULT_GAS_PRICE,
   } as TransactionConfig
   if (hasData.value) {
     transaction = { ...transaction, data: data.value }

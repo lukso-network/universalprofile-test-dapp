@@ -15,9 +15,6 @@ export const WALLET_CONNECT = 'wallet-connect-v2'
 export const WINDOW_LUKSO = 'window-lukso'
 export const WEB3_ONBOARD = 'web3Onboard'
 
-export const DEFAULT_GAS = 5_000_000
-export const DEFAULT_GAS_PRICE = '10000000000'
-
 export const MAGICVALUE = '0x1626ba7e'
 
 const DEFAULT_NETWORK: NetworkType = 'testnet'
@@ -33,7 +30,7 @@ export const NETWORKS: { [K in NetworkType]: NetworkInfo } = {
       url: 'https://erc725cache.l16.lukso.network/graphql',
     },
     ipfs: {
-      url: 'https://2eff.lukso.dev/ipfs/',
+      url: 'https://api.universalprofile.cloud/ipfs/',
     },
     blockscout: {
       url: 'https://explorer.execution.l16.lukso.network',
@@ -65,7 +62,7 @@ export const NETWORKS: { [K in NetworkType]: NetworkInfo } = {
       url: 'https://erc725cache.testnet.lukso.network/graphql',
     },
     ipfs: {
-      url: 'https://2eff.lukso.dev/ipfs/',
+      url: 'https://api.universalprofile.cloud/ipfs/',
     },
     blockscout: {
       url: 'https://explorer.execution.testnet.lukso.network',

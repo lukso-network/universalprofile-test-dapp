@@ -1,21 +1,27 @@
 <script setup lang="ts">
 import { getState } from '@/stores'
-import { ref, watchEffect } from 'vue'
+import { onMounted, ref, watchEffect } from 'vue'
 import { Contract } from 'web3-eth-contract'
 import useNotifications from '@/compositions/useNotifications'
 import LSP7Mintable from '@lukso/lsp-smart-contracts/artifacts/LSP7Mintable.json'
 import LSP8Mintable from '@lukso/lsp-smart-contracts/artifacts/LSP8Mintable.json'
-import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
 import Notifications from '@/components/Notification.vue'
 import { toWei } from 'web3-utils'
-import { ERC725 } from '@erc725/erc725.js'
+import { ERC725, ERC725JSONSchema } from '@erc725/erc725.js'
 import { Lsp4Metadata } from '@/types'
 import Lsp4MetadataForm from '@/components/shared/Lsp4MetadataForm.vue'
-import { ContractStandard } from '@/enums'
+import {
+  ContractStandard,
+  LSP8TokenIdTypes,
+  LSP8TokenIdTypesData,
+} from '@/enums'
 import LSPSelect from '@/components/shared/LSPSelect.vue'
-import { padLeft } from 'web3-utils'
 import { TokenInfo, LSPType } from '@/helpers/tokenUtils'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
+import useErc725 from '@/compositions/useErc725'
+import LSP8IdentifiableDigitalAsset from '@erc725/erc725.js/schemas/LSP8IdentifiableDigitalAsset.json'
+import { isHex } from 'web3-utils'
+import { isAddress } from 'ethers/lib/utils'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
@@ -24,7 +30,7 @@ const { contract } = useWeb3Connection()
 const tokenType = ref<ContractStandard>(ContractStandard.LSP7)
 const myToken = ref<Contract>()
 const mintToken = ref<string>()
-const tokenId = ref<string>(padLeft(1, 64))
+const tokenId = ref<string>()
 const mintReceiver = ref<string>()
 const mintAmount = ref(100)
 const lsp4Metadata = ref<Lsp4Metadata>({
@@ -37,13 +43,27 @@ const lsp4Metadata = ref<Lsp4Metadata>({
   ],
 })
 const creators = ref<string[]>([getState('address')])
+const tokenIdType = ref()
+const tokenIdTypeError = ref<string>()
 
 const metadataJsonUrl =
   '0x6f357c6a6143da573459ba01321df3eb223e96b0015c2914a1907df319804573d538c311697066733a2f2f516d51357071797167637a6d6b736e4e434a734a76333453664469776e4676426d64456f74704254337642464865'
 
-watchEffect(() => {
+onMounted(() => {
   mintReceiver.value = getState('address')
   mintToken.value = getState('tokenAddress')
+})
+
+watchEffect(async () => {
+  if (mintToken.value && tokenType.value === ContractStandard.LSP8) {
+    const { getInstance } = useErc725()
+    const erc725 = getInstance(
+      mintToken.value,
+      LSP8IdentifiableDigitalAsset as ERC725JSONSchema[]
+    )
+    const lsp8DigitalAsset = await erc725.fetchData('LSP8TokenIdType')
+    tokenIdType.value = Number(lsp8DigitalAsset.value)
+  }
 })
 
 const handleNewLsp4Metadata = (
@@ -70,17 +90,38 @@ const handleMintReceiverSelected = (info: TokenInfo) => {
   }
 }
 
-const handleBlurTokenId = (event: Event) => {
+const handleChangeTokenId = (event: Event) => {
   const value = (event?.target as HTMLInputElement)?.value
-  try {
-    const newVal = padLeft(value, 64)
-    if (newVal !== value) {
-      tokenId.value = newVal
-    }
-  } catch (err) {
-    console.error(err)
-    // ignore
+  tokenIdTypeError.value = ''
+
+  switch (tokenIdType.value) {
+    case 0:
+      if (typeof parseInt(value) !== 'number') {
+        return (tokenIdTypeError.value = 'Must be a number')
+      }
+      break
+    case 1:
+      if (value.length > 32) {
+        return (tokenIdTypeError.value =
+          'Must be a string with less than 32 characters')
+      }
+      break
+    case 2:
+    case 3:
+      if (value.length !== 66 || !isHex(value)) {
+        return (tokenIdTypeError.value = 'Must be a 32byte hash')
+      }
+      break
+    case 4:
+      if (!isAddress(value)) {
+        return (tokenIdTypeError.value = 'Must be a valid address')
+      }
+      break
+    default:
+      return
   }
+
+  tokenId.value = value
 }
 
 const mint = async () => {
@@ -112,14 +153,10 @@ const mint = async () => {
         break
       case ContractStandard.LSP8:
         if (!tokenId.value) {
-          setNotification('Token ID needs to be filled', 'danger')
-          return
+          tokenIdTypeError.value = `Can't be blank`
         }
 
-        myToken.value = contract(LSP8Mintable.abi as any, mintToken.value, {
-          gas: DEFAULT_GAS,
-          gasPrice: DEFAULT_GAS_PRICE,
-        })
+        myToken.value = contract(LSP8Mintable.abi as any, mintToken.value)
 
         await myToken.value.methods
           .mint(mintReceiver.value, tokenId.value, false, '0x')
@@ -131,12 +168,13 @@ const mint = async () => {
             console.log(JSON.stringify(payload, null, 2))
           })
 
+        const tokenIdTypeData = LSP8TokenIdTypesData[tokenIdType.value]
         const metadataKey = ERC725.encodeKeyName(
-          'LSP8MetadataJSON:<bytes32>',
+          `LSP8MetadataTokenURI:<${tokenIdTypeData}>`,
           tokenId.value
         )
         await myToken.value.methods
-          .setData(metadataKey, metadataJsonUrl)
+          .setData(metadataKey, metadataJsonUrl) // TODO replace fixed metadata with values from the form
           .send({ from: erc725AccountAddress })
           .on('receipt', function (receipt: any) {
             console.log(receipt)
@@ -180,16 +218,22 @@ const mint = async () => {
         </div>
       </div>
       <div v-if="tokenType === ContractStandard.LSP8" class="field">
-        <label class="label">Token id (on blur converts to bytes32)</label>
+        <label class="label"
+          >Token Id ({{ LSP8TokenIdTypes[tokenIdType] }})</label
+        >
         <div class="control">
           <input
             v-model="tokenId"
             class="input"
+            :class="{ 'is-danger': tokenIdTypeError }"
             type="text"
             data-testid="transfer-address"
-            placeholder="0xbb204573da1a42ab80f38995444b17124110b946ba189157ffcc7ba2b3375bf8"
-            @blur="handleBlurTokenId"
+            placeholder="Enter token Id"
+            @keyup="handleChangeTokenId"
           />
+          <p v-if="tokenIdTypeError" class="help is-danger">
+            {{ tokenIdTypeError }}
+          </p>
         </div>
       </div>
       <div class="field">

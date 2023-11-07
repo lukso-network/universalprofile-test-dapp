@@ -1,9 +1,9 @@
 import BN from 'bn.js'
 import { ERC725JSONSchema } from '@erc725/erc725.js'
 import { INTERFACE_IDS } from '@lukso/lsp-smart-contracts'
-import lsp3Schema from '@erc725/erc725.js/schemas/LSP3UniversalProfileMetadata.json'
-import lsp4Schema from '@erc725/erc725.js/schemas/LSP4DigitalAsset.json'
-import lsp9Schema from '@erc725/erc725.js/schemas/LSP9Vault.json'
+import LSP3ProfileMetadata from '@erc725/erc725.js/schemas/LSP3ProfileMetadata.json'
+import LSP4DigitalAsset from '@erc725/erc725.js/schemas/LSP4DigitalAsset.json'
+import LSP9Vault from '@erc725/erc725.js/schemas/LSP9Vault.json'
 import useErc725 from '@/compositions/useErc725'
 import { eip165ABI } from '@/abis/eip165ABI'
 import { erc20ABI } from '@/abis/erc20ABI'
@@ -56,19 +56,25 @@ export const lspTypeOptions: Record<
 > = {
   [LSPType.LSP3UniversalProfileMetadata]: {
     interfaceId: INTERFACE_IDS.LSP0ERC725Account,
-    lsp2Schema: getSupportedStandardObject(lsp3Schema as ERC725JSONSchema[]),
+    lsp2Schema: getSupportedStandardObject(
+      LSP3ProfileMetadata as ERC725JSONSchema[]
+    ),
   },
   [LSPType.LSP7DigitalAsset]: {
     interfaceId: INTERFACE_IDS.LSP7DigitalAsset,
-    lsp2Schema: getSupportedStandardObject(lsp4Schema as ERC725JSONSchema[]),
+    lsp2Schema: getSupportedStandardObject(
+      LSP4DigitalAsset as ERC725JSONSchema[]
+    ),
   },
   [LSPType.LSP8IdentifiableDigitalAsset]: {
     interfaceId: INTERFACE_IDS.LSP8IdentifiableDigitalAsset,
-    lsp2Schema: getSupportedStandardObject(lsp4Schema as ERC725JSONSchema[]),
+    lsp2Schema: getSupportedStandardObject(
+      LSP4DigitalAsset as ERC725JSONSchema[]
+    ),
   },
   [LSPType.LSP9Vault]: {
     interfaceId: INTERFACE_IDS.LSP9Vault,
-    lsp2Schema: getSupportedStandardObject(lsp9Schema as ERC725JSONSchema[]),
+    lsp2Schema: getSupportedStandardObject(LSP9Vault as ERC725JSONSchema[]),
   },
   [LSPType.EoA]: {
     interfaceId: '',
