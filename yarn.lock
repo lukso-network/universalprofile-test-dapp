@@ -568,7 +568,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@erc725/erc725.js@npm:0.21.1, @erc725/erc725.js@npm:^0.21.0":
+"@erc725/erc725.js@npm:0.21.2":
+  version: 0.21.2
+  resolution: "@erc725/erc725.js@npm:0.21.2"
+  dependencies:
+    add: ^2.0.6
+    ethereumjs-util: ^7.1.5
+    web3-eth-abi: ^1.10.0
+    web3-providers-http: ^1.10.0
+    web3-utils: ^1.10.0
+  checksum: c046d71386dc6ca8639fdd7aa2863082096845e0bbf311b7c33ad4e14b935fe7ecbac8d3a0f72f9db3ac2cc652fb6423c52224fe5cf4e5552ecbb7fa541a0f7e
+  languageName: node
+  linkType: hard
+
+"@erc725/erc725.js@npm:^0.21.0":
   version: 0.21.1
   resolution: "@erc725/erc725.js@npm:0.21.1"
   dependencies:
@@ -2205,9 +2218,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lukso/lsp-factory.js@npm:3.2.0":
-  version: 3.2.0
-  resolution: "@lukso/lsp-factory.js@npm:3.2.0"
+"@lukso/lsp-factory.js@npm:3.2.1":
+  version: 3.2.1
+  resolution: "@lukso/lsp-factory.js@npm:3.2.1"
   dependencies:
     "@erc725/erc725.js": ^0.21.0
     "@ethersproject/abi": ^5.7.0
@@ -2219,11 +2232,24 @@ __metadata:
     ipfs-http-client: 52.0.3
     ipfs-utils: 8.1.6
     rxjs: ^7.8.0
-  checksum: c796a999ba3e8bc0a0954bf31c38a33a378e8936e83fab6c56756f0ac8c0d13210ac433e3f8821bd3da9e7f19b64b160cdbf04da8ed40193f3f30e485e32427f
+  checksum: 378e5b666de6045cf24a5df111f8633e82d2672f580f80390e557d6f2f6d882f42306da070aade548862c6dd3012760287790e4c4fd314cdc393ceaffe073823
   languageName: node
   linkType: hard
 
-"@lukso/lsp-smart-contracts@npm:0.12.0, @lukso/lsp-smart-contracts@npm:^0.12.0":
+"@lukso/lsp-smart-contracts@npm:0.12.1":
+  version: 0.12.1
+  resolution: "@lukso/lsp-smart-contracts@npm:0.12.1"
+  dependencies:
+    "@account-abstraction/contracts": ^0.6.0
+    "@erc725/smart-contracts": ^6.0.0
+    "@openzeppelin/contracts": ^4.9.2
+    "@openzeppelin/contracts-upgradeable": ^4.9.2
+    solidity-bytes-utils: 0.8.0
+  checksum: dab9a972a2886789434bce8940b562bdd07fa5ac5287664a8f19cd41dd115ffa15d26a4fac8fc49448022c2b207feb84cd65a48cf0097963d1a0ff91b48fde40
+  languageName: node
+  linkType: hard
+
+"@lukso/lsp-smart-contracts@npm:^0.12.0":
   version: 0.12.0
   resolution: "@lukso/lsp-smart-contracts@npm:0.12.0"
   dependencies:
@@ -4626,6 +4652,13 @@ __metadata:
   bin:
     acorn: bin/acorn
   checksum: 538ba38af0cc9e5ef983aee196c4b8b4d87c0c94532334fa7e065b2c8a1f85863467bb774231aae91613fcda5e68740c15d97b1967ae3394d20faddddd8af61d
+  languageName: node
+  linkType: hard
+
+"add@npm:^2.0.6":
+  version: 2.0.6
+  resolution: "add@npm:2.0.6"
+  checksum: e2d23d40494565dfed4acd65e478570c444db5ac6c053551ed429c39ea0f2c99d83df63e7befec936df601827d2254d06a2fb6f7dcfd2022e810b25eab818b8c
   languageName: node
   linkType: hard
 
@@ -14958,9 +14991,9 @@ __metadata:
   resolution: "universalprofile-test-dapp@workspace:."
   dependencies:
     "@depay/web3-mock": ^14.17.0
-    "@erc725/erc725.js": 0.21.1
-    "@lukso/lsp-factory.js": 3.2.0
-    "@lukso/lsp-smart-contracts": 0.12.0
+    "@erc725/erc725.js": 0.21.2
+    "@lukso/lsp-factory.js": 3.2.1
+    "@lukso/lsp-smart-contracts": 0.12.1
     "@lukso/web3-onboard-config": 1.0.3
     "@testing-library/jest-dom": 5.17.0
     "@testing-library/user-event": 14.4.3
