@@ -66,7 +66,7 @@ jobs:
         run: yarn build
 
       - name: 🎯 Test
-        run: yarn test:unit
+        run: yarn test
 
       - name: Deploy
         uses: cloudflare/wrangler-action@2.0.0
