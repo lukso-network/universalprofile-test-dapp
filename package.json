@@ -12,8 +12,8 @@
     "lint": "npm-run-all --aggregate-output --continue-on-error --parallel 'lint:*!(fix)'",
     "lint:js": "eslint src --ext .js,.ts,.vue",
     "lint:css": "stylelint \"**/*.{css,scss,vue}\"",
-    "lint:format": "prettier --check --loglevel=warn .",
-    "lint:format:fix": "prettier --write --loglevel=warn .",
+    "lint:format": "prettier --check --log-level=warn .",
+    "lint:format:fix": "prettier --write --log-level=warn .",
     "lint:types": "tsc --noEmit",
     "prepare": "husky install"
   },
