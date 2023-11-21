@@ -298,7 +298,6 @@ export async function recalculateAssets() {
         lsp8Tokens.push(isLSP8)
       }
     }
-    debugger
     setState('lsp7', lsp7Tokens)
     setState('lsp8', lsp8Tokens)
     localStorage?.setItem(

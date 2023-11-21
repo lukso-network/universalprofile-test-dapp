@@ -16,7 +16,6 @@ const config = {
 }
 
 const getInstance = (address: string, schema?: ERC725JSONSchema[]) => {
-  debugger
   const erc725 = new ERC725(
     schema
       ? schema
