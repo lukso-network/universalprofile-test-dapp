@@ -15,7 +15,8 @@ const config = {
   ipfsGateway: defaultNetworkConfig.ipfs.url,
 }
 
-const getInstance = (address: string, schema = {} as ERC725JSONSchema[]) => {
+const getInstance = (address: string, schema?: ERC725JSONSchema[]) => {
+  debugger
   const erc725 = new ERC725(
     schema
       ? schema
