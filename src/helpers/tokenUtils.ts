@@ -249,7 +249,7 @@ export function addTokenToLocalStore(address: string) {
   }
 }
 
-export async function recalcTokens() {
+export async function recalculateAssets() {
   const { getInstance } = useErc725()
 
   const address = store['address']
@@ -298,6 +298,7 @@ export async function recalcTokens() {
         lsp8Tokens.push(isLSP8)
       }
     }
+    debugger
     setState('lsp7', lsp7Tokens)
     setState('lsp8', lsp8Tokens)
     localStorage?.setItem(
@@ -308,7 +309,8 @@ export async function recalcTokens() {
         lsp8: lsp8Tokens,
       })
     )
-  } catch (err) {
+  } catch (error: unknown) {
+    console.error(error)
     // There are going to be errors here during unit tests
     // because we're not mocking the whole deployment of the UP
   }

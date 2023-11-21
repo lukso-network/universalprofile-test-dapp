@@ -3,7 +3,7 @@ import { Store, Channel } from '@/types'
 import { MEANS_OF_CONNECTION } from '@/helpers/config'
 import UniversalProfile from '@lukso/lsp-smart-contracts/artifacts/UniversalProfile.json'
 import KeyManager from '@lukso/lsp-smart-contracts/artifacts/LSP6KeyManager.json'
-import { recalcTokens } from '@/helpers/tokenUtils'
+import { recalculateAssets } from '@/helpers/tokenUtils'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
 
 export const store = reactive<Store>({
@@ -61,7 +61,7 @@ export function useState() {
         setState('lsp7', lsp7)
         setState('lsp8', lsp8)
       } catch (err) {
-        await recalcTokens()
+        await recalculateAssets()
       }
       setState('isConnected', true)
     },
@@ -78,6 +78,6 @@ export function useState() {
 
       window.erc725Account = undefined
     },
-    recalcTokens,
+    recalcTokens: recalculateAssets,
   }
 }

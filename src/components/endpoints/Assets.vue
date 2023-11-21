@@ -9,7 +9,7 @@ import { Lsp4Metadata, Token } from '@/types'
 import { ContractStandard } from '@/enums'
 import CustomSelect from '@/components/shared/CustomSelect.vue'
 import { useLspFactory } from '@/compositions/useLspFactory'
-import { addTokenToLocalStore, recalcTokens } from '@/helpers/tokenUtils'
+import { addTokenToLocalStore, recalculateAssets } from '@/helpers/tokenUtils'
 import { useERC20 } from '@/compositions/useErc20'
 
 const { notification, clearNotification, hasNotification, setNotification } =
@@ -130,7 +130,7 @@ const create = async () => {
         console.log('Standard not supported')
     }
     isTokenCreated.value = true
-    await recalcTokens()
+    await recalculateAssets()
     setState('tokenAddress', tokenAddress.value)
     setNotification('Token created', 'info')
   } catch (error) {
