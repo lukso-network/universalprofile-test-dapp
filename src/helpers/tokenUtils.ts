@@ -10,6 +10,8 @@ import { erc20ABI } from '@/abis/erc20ABI'
 import { store, setState } from '@/stores/index'
 import { getSelectedNetworkConfig } from '@/helpers/config'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
+import { rightPad, fromUtf8, leftPad } from 'web3-utils'
+import { LSP8_TOKEN_ID_TYPES } from '@lukso/lsp-smart-contracts'
 
 const { lsp7TokenDivisible, lsp7TokenNonDivisible } = getSelectedNetworkConfig()
 
@@ -312,5 +314,28 @@ export async function recalculateAssets() {
     console.error(error)
     // There are going to be errors here during unit tests
     // because we're not mocking the whole deployment of the UP
+  }
+}
+
+/**
+ * Pad tokenId value based on the type.
+ *
+ * @param tokenIdType
+ * @param tokenId
+ * @returns
+ */
+export const padTokenId = (tokenIdType: number, tokenId: string) => {
+  switch (tokenIdType) {
+    case LSP8_TOKEN_ID_TYPES.NUMBER:
+      return `0x${leftPad(tokenId, 64)}`
+    case LSP8_TOKEN_ID_TYPES.STRING:
+      return rightPad(fromUtf8(tokenId), 64)
+    case LSP8_TOKEN_ID_TYPES.UNIQUE_ID:
+    case LSP8_TOKEN_ID_TYPES.HASH:
+      return rightPad(tokenId, 64)
+    case LSP8_TOKEN_ID_TYPES.ADDRESS:
+      return leftPad(tokenId, 64)
+    default:
+      break
   }
 }

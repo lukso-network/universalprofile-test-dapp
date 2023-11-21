@@ -7,7 +7,7 @@ import {
 import useWalletConnectV2 from './useWalletConnectV2'
 import useWeb3Onboard from './useWeb3Onboard'
 import { ref } from 'vue'
-import { TransactionConfig, TransactionReceipt } from 'web3-core'
+import { TransactionConfig } from 'web3-core'
 import { resetNetworkConfig, setNetworkConfig } from '@/helpers/config'
 import { getState, useState } from '@/stores'
 import EthereumProvider from '@walletconnect/ethereum-provider/dist/types/EthereumProvider'
@@ -160,30 +160,7 @@ const isAddress = (address: string): boolean => {
   return baseIsAddress(address)
 }
 
-export default function useWeb3Connection(): {
-  setupProvider: (
-    meansOfConnection: string
-  ) => Promise<EthereumProvider | undefined>
-  getProvider: () => EthereumProvider
-  getWeb3: () => Web3
-  getChainId: () => Promise<number>
-  contract: (
-    jsonInterface: AbiItem[],
-    address?: string,
-    options?: ContractOptions
-  ) => Contract
-  getBalance: (address: string) => Promise<string>
-  sendTransaction: (
-    transaction: TransactionConfig
-  ) => Promise<TransactionReceipt>
-  accounts: () => Promise<string>
-  requestAccounts: () => Promise<string[]>
-  sign: (message: string, address: string) => Promise<string>
-  recover: (message: string, signature: string) => Promise<string>
-  isAddress: (address: string) => boolean
-  sendRequest: (request: any) => Promise<any>
-  disconnect: () => Promise<void>
-} {
+export default function useWeb3Connection() {
   return {
     setupProvider,
     getProvider,

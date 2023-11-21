@@ -16,12 +16,13 @@ import {
   LSP8TokenIdTypesData,
 } from '@/enums'
 import LSPSelect from '@/components/shared/LSPSelect.vue'
-import { TokenInfo, LSPType } from '@/helpers/tokenUtils'
+import { TokenInfo, LSPType, padTokenId } from '@/helpers/tokenUtils'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
 import useErc725 from '@/compositions/useErc725'
 import LSP8IdentifiableDigitalAsset from '@erc725/erc725.js/schemas/LSP8IdentifiableDigitalAsset.json'
 import { isHex } from 'web3-utils'
 import { isAddress } from 'ethers/lib/utils'
+import { LSP8_TOKEN_ID_TYPES } from '@lukso/lsp-smart-contracts'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
@@ -95,24 +96,24 @@ const handleChangeTokenId = (event: Event) => {
   tokenIdTypeError.value = ''
 
   switch (tokenIdType.value) {
-    case 0:
-      if (typeof parseInt(value) !== 'number') {
+    case LSP8_TOKEN_ID_TYPES.NUMBER:
+      if (isNaN(parseInt(value))) {
         return (tokenIdTypeError.value = 'Must be a number')
       }
       break
-    case 1:
+    case LSP8_TOKEN_ID_TYPES.STRING:
       if (value.length > 32) {
         return (tokenIdTypeError.value =
           'Must be a string with less than 32 characters')
       }
       break
-    case 2:
-    case 3:
+    case LSP8_TOKEN_ID_TYPES.UNIQUE_ID:
+    case LSP8_TOKEN_ID_TYPES.HASH:
       if (value.length !== 66 || !isHex(value)) {
         return (tokenIdTypeError.value = 'Must be a 32byte hash')
       }
       break
-    case 4:
+    case LSP8_TOKEN_ID_TYPES.ADDRESS:
       if (!isAddress(value)) {
         return (tokenIdTypeError.value = 'Must be a valid address')
       }
@@ -154,12 +155,13 @@ const mint = async () => {
       case ContractStandard.LSP8:
         if (!tokenId.value) {
           tokenIdTypeError.value = `Can't be blank`
+          return
         }
 
         myToken.value = contract(LSP8Mintable.abi as any, mintToken.value)
-
+        const tokenIdPadded = padTokenId(tokenIdType.value, tokenId.value)
         await myToken.value.methods
-          .mint(mintReceiver.value, tokenId.value, false, '0x')
+          .mint(mintReceiver.value, tokenIdPadded, false, '0x')
           .send({ from: erc725AccountAddress })
           .on('receipt', function (receipt: any) {
             console.log(receipt)
