@@ -22,7 +22,6 @@ import useErc725 from '@/compositions/useErc725'
 import LSP8IdentifiableDigitalAsset from '@erc725/erc725.js/schemas/LSP8IdentifiableDigitalAsset.json'
 import { isHex } from 'web3-utils'
 import { isAddress } from 'ethers/lib/utils'
-import CustomSelect from '@/components/shared/CustomSelect.vue'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
@@ -66,10 +65,6 @@ watchEffect(async () => {
     tokenIdType.value = Number(lsp8DigitalAsset.value)
   }
 })
-
-const handleStandardSelected = (standard: string) => {
-  tokenType.value = standard as ContractStandard
-}
 
 const handleNewLsp4Metadata = (
   metadata: Lsp4Metadata,
@@ -203,23 +198,6 @@ const mint = async () => {
   <div class="tile is-4 is-parent">
     <div class="tile is-child box">
       <p class="is-size-5 has-text-weight-bold mb-4">Mint</p>
-      <CustomSelect
-        :options="[
-          {
-            display: ContractStandard.LSP7,
-            value: ContractStandard.LSP7,
-          },
-          {
-            display: ContractStandard.LSP8,
-            value: ContractStandard.LSP8,
-          },
-          {
-            display: 'ERC20+ERC165',
-            value: ContractStandard.ERC20,
-          },
-        ]"
-        @option-selected="handleStandardSelected"
-      />
       <div class="field">
         <label class="label">Token address</label>
         <LSPSelect
