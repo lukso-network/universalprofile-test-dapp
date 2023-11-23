@@ -19,7 +19,9 @@ import LSPSelect from '@/components/shared/LSPSelect.vue'
 import { TokenInfo, LSPType, padTokenId } from '@/helpers/tokenUtils'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
 import useErc725 from '@/compositions/useErc725'
-import LSP8IdentifiableDigitalAsset from '@erc725/erc725.js/schemas/LSP8IdentifiableDigitalAsset.json'
+// TODO for now we use local schema before erc725 is fixed
+// import LSP8IdentifiableDigitalAsset from '@erc725/erc725.js/schemas/LSP8IdentifiableDigitalAsset.json'
+import LSP8IdentifiableDigitalAsset from '@/schema/LSP8IdentifiableDigitalAsset.json'
 import { isHex } from 'web3-utils'
 import { isAddress } from 'ethers/lib/utils'
 import { LSP8_TOKEN_ID_TYPES } from '@lukso/lsp-smart-contracts'
@@ -108,6 +110,10 @@ const handleChangeTokenId = (event: Event) => {
       }
       break
     case LSP8_TOKEN_ID_TYPES.UNIQUE_ID:
+      if (!isHex(value)) {
+        return (tokenIdTypeError.value = 'Must be a byte string')
+      }
+      break
     case LSP8_TOKEN_ID_TYPES.HASH:
       if (value.length !== 66 || !isHex(value)) {
         return (tokenIdTypeError.value = 'Must be a 32byte hash')
@@ -158,6 +164,7 @@ const mint = async () => {
           return
         }
 
+        // mint asset
         myToken.value = contract(LSP8Mintable.abi as any, mintToken.value)
         const tokenIdPadded = padTokenId(tokenIdType.value, tokenId.value)
         await myToken.value.methods
@@ -170,6 +177,7 @@ const mint = async () => {
             console.log(JSON.stringify(payload, null, 2))
           })
 
+        // set asset metadata
         const tokenIdTypeData = LSP8TokenIdTypesData[tokenIdType.value]
         const metadataKey = ERC725.encodeKeyName(
           `LSP8MetadataTokenURI:<${tokenIdTypeData}>`,

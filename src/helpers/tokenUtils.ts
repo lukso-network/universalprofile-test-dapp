@@ -331,8 +331,9 @@ export const padTokenId = (tokenIdType: number, tokenId: string) => {
     case LSP8_TOKEN_ID_TYPES.STRING:
       return rightPad(fromUtf8(tokenId), 64)
     case LSP8_TOKEN_ID_TYPES.UNIQUE_ID:
-    case LSP8_TOKEN_ID_TYPES.HASH:
       return rightPad(tokenId, 64)
+    case LSP8_TOKEN_ID_TYPES.HASH:
+      return tokenId // it's 32 bytes already
     case LSP8_TOKEN_ID_TYPES.ADDRESS:
       return leftPad(tokenId, 64)
     default:

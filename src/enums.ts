@@ -17,7 +17,7 @@ export const LSP8TokenIdTypes = [
 export const LSP8TokenIdTypesData = [
   'uint256',
   'string',
-  'bytes32',
+  'bytes',
   'bytes32',
   'address',
 ]
