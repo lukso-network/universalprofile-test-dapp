@@ -11,35 +11,35 @@
     "key": "0x1339e76a390b7b9ec9010000<address>",
     "keyType": "Mapping",
     "valueType": "(bytes4,string)",
-    "valueContent": "(Bytes4,URI)"
+    "valueContent": "(Bytes4,URL)"
   },
   {
     "name": "LSP8MetadataTokenURI:<uint256>",
     "key": "0x1339e76a390b7b9ec9010000<uint256>",
     "keyType": "Mapping",
     "valueType": "(bytes4,string)",
-    "valueContent": "(Bytes4,URI)"
+    "valueContent": "(Bytes4,URL)"
   },
   {
     "name": "LSP8MetadataTokenURI:<bytes32>",
     "key": "0x1339e76a390b7b9ec9010000<bytes32>",
     "keyType": "Mapping",
     "valueType": "(bytes4,string)",
-    "valueContent": "(Bytes4,URI)"
+    "valueContent": "(Bytes4,URL)"
   },
   {
     "name": "LSP8MetadataTokenURI:<string>",
     "key": "0x1339e76a390b7b9ec9010000<string>",
     "keyType": "Mapping",
     "valueType": "(bytes4,string)",
-    "valueContent": "(Bytes4,URI)"
+    "valueContent": "(Bytes4,URL)"
   },
   {
     "name": "LSP8TokenMetadataBaseURI",
     "key": "0x1a7628600c3bac7101f53697f48df381ddc36b9015e7d7c9c5633d1252aa2843",
     "keyType": "Singleton",
     "valueType": "(bytes4,string)",
-    "valueContent": "(Bytes4,URI)"
+    "valueContent": "(Bytes4,URL)"
   },
   {
     "name": "LSP8ReferenceContract",
