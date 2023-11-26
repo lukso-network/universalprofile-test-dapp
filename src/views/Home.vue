@@ -48,10 +48,8 @@ const hasExtension = computed(() => !!window.lukso)
     <div class="tile is-ancestor">
       <Sign />
       <PersonalSign />
-      <SignTransaction />
-    </div>
-    <div class="tile is-ancestor">
       <GetNetworkId />
+      <!-- <SignTransaction /> -->
     </div>
   </section>
 </template>
