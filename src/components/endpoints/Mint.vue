@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { getState } from '@/stores'
-import { onMounted, ref, watchEffect } from 'vue'
+import { onMounted, ref, toRaw, watchEffect } from 'vue'
 import { Contract } from 'web3-eth-contract'
 import useNotifications from '@/compositions/useNotifications'
 import LSP7Mintable from '@lukso/lsp-smart-contracts/artifacts/LSP7Mintable.json'
@@ -16,7 +16,12 @@ import {
   LSP8TokenIdTypesData,
 } from '@/enums'
 import LSPSelect from '@/components/shared/LSPSelect.vue'
-import { TokenInfo, LSPType, padTokenId } from '@/helpers/tokenUtils'
+import {
+  TokenInfo,
+  LSPType,
+  padTokenId,
+  encodeAssetMetadata,
+} from '@/helpers/tokenUtils'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
 import useErc725 from '@/compositions/useErc725'
 // TODO for now we use local schema before erc725 is fixed
@@ -25,6 +30,7 @@ import LSP8IdentifiableDigitalAsset from '@/schema/LSP8IdentifiableDigitalAsset.
 import { isHex } from 'web3-utils'
 import { isAddress } from 'ethers/lib/utils'
 import { LSP8_TOKEN_ID_TYPES } from '@lukso/lsp-smart-contracts'
+import { uploadAssetData } from '@/utils/uploadAssetData'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
@@ -48,9 +54,6 @@ const lsp4Metadata = ref<Lsp4Metadata>({
 const creators = ref<string[]>([getState('address')])
 const tokenIdType = ref()
 const tokenIdTypeError = ref<string>()
-
-const metadataJsonUrl =
-  '0x6f357c6a6143da573459ba01321df3eb223e96b0015c2914a1907df319804573d538c311697066733a2f2f516d51357071797167637a6d6b736e4e434a734a76333453664469776e4676426d64456f74704254337642464865'
 
 onMounted(() => {
   mintReceiver.value = getState('address')
@@ -163,6 +166,9 @@ const mint = async () => {
           tokenIdTypeError.value = `Can't be blank`
           return
         }
+
+        const assetMetadata = await uploadAssetData(toRaw(lsp4Metadata.value))
+        const metadataJsonUrl = encodeAssetMetadata(assetMetadata)
 
         // mint asset
         myToken.value = contract(LSP8Mintable.abi as any, mintToken.value)
