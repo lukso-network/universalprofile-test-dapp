@@ -350,6 +350,7 @@ export const encodeAssetMetadata = (
     LSP4DigitalAsset as ERC725JSONSchema[]
   )
   const [metadataJsonUrl] = encodedMetadata.values
+  console.log('metadataJsonUrl', metadataJsonUrl)
 
   return metadataJsonUrl
 }
