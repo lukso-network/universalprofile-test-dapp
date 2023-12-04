@@ -24,9 +24,7 @@ import {
 } from '@/helpers/tokenUtils'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
 import useErc725 from '@/compositions/useErc725'
-// TODO for now we use local schema before erc725 is fixed
-// import LSP8IdentifiableDigitalAsset from '@erc725/erc725.js/schemas/LSP8IdentifiableDigitalAsset.json'
-import LSP8IdentifiableDigitalAsset from '@/schema/LSP8IdentifiableDigitalAsset.json'
+import LSP8IdentifiableDigitalAsset from '@erc725/erc725.js/schemas/LSP8IdentifiableDigitalAsset.json'
 import { isHex } from 'web3-utils'
 import { isAddress } from 'ethers/lib/utils'
 import { LSP8_TOKEN_ID_TYPES } from '@lukso/lsp-smart-contracts'
