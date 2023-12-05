@@ -156,6 +156,33 @@ const recover = async (message: string, signature: string): Promise<string> => {
   return web3.eth.accounts.recover(message, signature)
 }
 
+const personalSign = async (
+  message: string,
+  address: string,
+  password?: string
+): Promise<string> => {
+  return await web3.eth.personal.sign(message, address, password ?? '')
+}
+
+const signTransaction = async (
+  transaction: TransactionConfig,
+  address: string
+): Promise<string> => {
+  // Even though `signTransaction` says that RLPEncodedTransaction object is returned
+  // we might get just a string that is an encoded transaction. Thus, the "typeof" check.
+  const response = await web3.eth.signTransaction(transaction, address)
+  if (typeof response === 'string') {
+    return response
+  }
+  return response.raw
+}
+
+const recoverRawTransaction = async (
+  encodedTransaction: string
+): Promise<string> => {
+  return web3.eth.accounts.recoverTransaction(encodedTransaction)
+}
+
 const isAddress = (address: string): boolean => {
   return baseIsAddress(address)
 }
@@ -180,6 +207,16 @@ export default function useWeb3Connection(): {
   requestAccounts: () => Promise<string[]>
   sign: (message: string, address: string) => Promise<string>
   recover: (message: string, signature: string) => Promise<string>
+  personalSign: (
+    message: string,
+    address: string,
+    password?: string
+  ) => Promise<string>
+  signTransaction: (
+    transaction: TransactionConfig,
+    address: string
+  ) => Promise<string>
+  recoverRawTransaction: (encodedTransaction: string) => Promise<string>
   isAddress: (address: string) => boolean
   sendRequest: (request: any) => Promise<any>
   disconnect: () => Promise<void>
@@ -197,6 +234,9 @@ export default function useWeb3Connection(): {
     requestAccounts,
     sign,
     recover,
+    personalSign,
+    signTransaction,
+    recoverRawTransaction,
     isAddress,
     sendRequest,
   }
