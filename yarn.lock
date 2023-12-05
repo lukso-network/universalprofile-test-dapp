@@ -2228,14 +2228,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lukso/web3-onboard-config@npm:1.0.3":
-  version: 1.0.3
-  resolution: "@lukso/web3-onboard-config@npm:1.0.3"
+"@lukso/web3-onboard-config@npm:1.1.1":
+  version: 1.1.1
+  resolution: "@lukso/web3-onboard-config@npm:1.1.1"
   dependencies:
     "@web3-onboard/common": ^2.3.3
     eip-712: ^1.0.0
     eventemitter3: ^5.0.1
-  checksum: e228a37bcc64aceb078d14f8ee071713e51a43103be62289ba06dc7c05ba2642f0fd8b3aa9ac4855570843e51ddf46ce847e00a4ca245b445d1b7323367f07c1
+  checksum: 06e78abba6f965ec40bc739b90cf95d74bc8b087f1a28a9f505f87ef783896c87dc93632ba1e944b3fabdd972c93fc730a15ab8c0a26aa1cb7c8746ba2d54dd6
   languageName: node
   linkType: hard
 
@@ -14953,7 +14953,7 @@ __metadata:
     "@erc725/erc725.js": 0.18.0
     "@lukso/lsp-factory.js": 3.1.1
     "@lukso/lsp-smart-contracts": 0.11.1
-    "@lukso/web3-onboard-config": 1.0.3
+    "@lukso/web3-onboard-config": 1.1.1
     "@testing-library/jest-dom": 5.17.0
     "@testing-library/user-event": 14.4.3
     "@testing-library/vue": 7.0.0
