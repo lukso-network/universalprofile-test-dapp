@@ -28,6 +28,10 @@ jest.mock('@/compositions/useWeb3Connection', () => ({
   }),
 }))
 
+jest.mock('src/helpers/env', () => ({
+  PUBLIC_API_SHARED_SECRET: '123',
+}))
+
 test('can mint token', async () => {
   render(Mint)
   await fireEvent.update(

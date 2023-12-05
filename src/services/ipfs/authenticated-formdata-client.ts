@@ -2,6 +2,7 @@ import FormData from 'form-data'
 
 import { FormDataPostHeaders } from '@/services/ipfs/formdata-base-client'
 import { CustomHeaderFormDataUploader } from '@/services/ipfs/ipfs-formdata-clients'
+import { PUBLIC_API_SHARED_SECRET } from '@/helpers/env'
 
 export class AuthenticatedFormDataUploader extends CustomHeaderFormDataUploader {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -18,7 +19,7 @@ export class AuthenticatedFormDataUploader extends CustomHeaderFormDataUploader 
     )
 
     const now = Date.now()
-    const secret = import.meta.env.VITE_APP_PUBLIC_API_SHARED_SECRET
+    const secret = PUBLIC_API_SHARED_SECRET
     return await sign(
       { iss: 'extension', iat: now / 1000, exp: (now + 120_000) / 1000 },
       secret || ''

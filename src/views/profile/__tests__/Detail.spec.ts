@@ -78,7 +78,7 @@ test('can call data from ipfs', async () => {
   })
   const screen = render(Detail)
   expect(mockFetch).toBeCalledWith(
-    'https://api.universalprofile.cloud/ipfs/123'
+    'https://api.universalprofile.cloud/api/v0123'
   )
   expect(screen.getByText('Loading...')).toBeDefined()
   await waitFor(() => {
@@ -100,7 +100,7 @@ test('can call data from ipfs if url changes', () => {
   })
   render(Detail)
   expect(mockFetch).toBeCalledWith(
-    'https://api.universalprofile.cloud/ipfs/1234'
+    'https://api.universalprofile.cloud/api/v01234'
   )
 })
 

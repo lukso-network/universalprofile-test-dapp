@@ -68,14 +68,14 @@ test('can disconnect from wallet connect V2', async () => {
   mockGetBalance.mockReturnValue('2')
   const { setConnected } = useState()
   await setConnected(
-    '0x8e54b33F8d42E59c0B4Cf02e6457CF8bb6a71094',
+    '0x9967b05ac840324F8BB6F729eD74530866679B11',
     WALLET_CONNECT
   )
 
   render(Connect)
 
   expect(mockSetupWeb3).toBeCalledTimes(1)
-  expect(screen.getByTestId('address')).toHaveTextContent('0x8e54b3...')
+  expect(screen.getByTestId('address')).toHaveTextContent('0x9967b0...')
 
   await fireEvent.click(screen.getByTestId('disconnect'))
 
@@ -99,10 +99,10 @@ test('can connect to browser extension when authorized', async () => {
   await fireEvent.click(screen.getByTestId('connect-extension'))
 
   expect(mockSetupWeb3).toBeCalledTimes(2)
-  await setConnected('0x8e54b33F8d42E59c0B4Cf02e6457CF8bb6a71094', WINDOW_LUKSO)
+  await setConnected('0x9967b05ac840324F8BB6F729eD74530866679B11', WINDOW_LUKSO)
   await waitFor(() => {
     expect(screen.getByTestId('address')).toHaveTextContent(
-      /.*0x8e54b3\.\.\..*/,
+      /.*0x9967b0\.\.\..*/,
       {
         normalizeWhitespace: true,
       }
@@ -136,11 +136,11 @@ test('can connect to browser extension when not authorized', async () => {
   )
 
   await fireEvent.click(screen.getByTestId('connect-extension'))
-  await setConnected('0x8e54b33F8d42E59c0B4Cf02e6457CF8bb6a71094', WINDOW_LUKSO)
+  await setConnected('0x9967b05ac840324F8BB6F729eD74530866679B11', WINDOW_LUKSO)
 
   await waitFor(() => {
     expect(screen.getByTestId('address')).toHaveTextContent(
-      /.*0x8e54b3\.\.\..*/,
+      /.*0x9967b0\.\.\..*/,
       { normalizeWhitespace: true }
     )
     expect(screen.getByTestId('balance')).toHaveTextContent('3 LYX')

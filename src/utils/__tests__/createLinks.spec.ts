@@ -12,5 +12,5 @@ test('createBlockScoutLink(): returns correct blockscout link', () => {
 
 test('createIpfsLink(): returns correct ipfs link', () => {
   const link = createIpfsLink('ipfs://ABC')
-  expect(link).toBe(`https://api.universalprofile.cloud/ipfs/ABC`)
+  expect(link).toBe(`https://api.universalprofile.cloud/api/v0ABC`)
 })

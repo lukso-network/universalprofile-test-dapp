@@ -67,7 +67,7 @@ test('can connect to browser extension when authorized', async () => {
   render(Accounts)
 
   await fireEvent.click(screen.getByTestId('connect-extension'))
-  await setConnected('0x8e54b33F8d42E59c0B4Cf02e6457CF8bb6a71094', WINDOW_LUKSO)
+  await setConnected('0x9967b05ac840324F8BB6F729eD74530866679B11', WINDOW_LUKSO)
 
   await waitFor(() => {
     expect(screen.getByTestId('info')).toHaveTextContent(
@@ -77,7 +77,7 @@ test('can connect to browser extension when authorized', async () => {
   expect(screen.getByTestId('chain')).toHaveTextContent('22 (0x16)')
 })
 
-test.skip('can disconnect from browser extension', async () => {
+test('can disconnect from browser extension', async () => {
   window.lukso = {} as any
   const { setConnected, setDisconnected } = useState()
   setConnected('0x517216362D594516c6f96Ee34b2c502d65B847E4', WINDOW_LUKSO)
