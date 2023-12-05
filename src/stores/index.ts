@@ -78,6 +78,6 @@ export function useState() {
 
       window.erc725Account = undefined
     },
-    recalcTokens: recalculateAssets,
+    recalculateAssets,
   }
 }

@@ -17,7 +17,7 @@ import useWeb3Connection from '@/compositions/useWeb3Connection'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
-const { recalcTokens } = useState()
+const { recalculateAssets } = useState()
 const provider = ref<Provider>()
 const { setupProvider, disconnect } = useWeb3Connection()
 const selectedNetworkConfig = getSelectedNetworkConfig()
@@ -44,7 +44,7 @@ const connectExtension = async (meansOfConnection: string) => {
 
 const handleRefresh = (e: Event) => {
   e.stopPropagation()
-  recalcTokens()
+  recalculateAssets()
 }
 </script>
 
