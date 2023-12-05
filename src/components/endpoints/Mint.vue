@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { getState } from '@/stores'
-import { onMounted, ref, toRaw, watchEffect } from 'vue'
+import { onMounted, ref, watchEffect } from 'vue'
 import { Contract } from 'web3-eth-contract'
 import useNotifications from '@/compositions/useNotifications'
 import LSP7Mintable from '@lukso/lsp-smart-contracts/artifacts/LSP7Mintable.json'
@@ -165,7 +165,7 @@ const mint = async () => {
           return
         }
 
-        const assetMetadata = await uploadAssetData(toRaw(lsp4Metadata.value))
+        const assetMetadata = await uploadAssetData(lsp4Metadata.value)
         const metadataJsonUrl = encodeAssetMetadata(assetMetadata)
 
         // mint asset
