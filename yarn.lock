@@ -12,6 +12,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@account-abstraction/contracts@npm:^0.6.0":
+  version: 0.6.0
+  resolution: "@account-abstraction/contracts@npm:0.6.0"
+  checksum: 745e838e2cb04c89a9c0df11d022c1d604b1e440c9cd65c2014edd9b1056809fec2e363b42ec09883d49dbe09f9597d8339c90d57763a1621fb515edf5fef35d
+  languageName: node
+  linkType: hard
+
 "@adobe/css-tools@npm:^4.0.1":
   version: 4.2.0
   resolution: "@adobe/css-tools@npm:4.2.0"
@@ -561,7 +568,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@erc725/erc725.js@npm:0.18.0, @erc725/erc725.js@npm:^0.18.0":
+"@erc725/erc725.js@npm:0.21.2":
+  version: 0.21.2
+  resolution: "@erc725/erc725.js@npm:0.21.2"
+  dependencies:
+    add: ^2.0.6
+    ethereumjs-util: ^7.1.5
+    web3-eth-abi: ^1.10.0
+    web3-providers-http: ^1.10.0
+    web3-utils: ^1.10.0
+  checksum: c046d71386dc6ca8639fdd7aa2863082096845e0bbf311b7c33ad4e14b935fe7ecbac8d3a0f72f9db3ac2cc652fb6423c52224fe5cf4e5552ecbb7fa541a0f7e
+  languageName: node
+  linkType: hard
+
+"@erc725/erc725.js@npm:^0.18.0":
   version: 0.18.0
   resolution: "@erc725/erc725.js@npm:0.18.0"
   dependencies:
@@ -581,6 +601,17 @@ __metadata:
     "@openzeppelin/contracts-upgradeable": ^4.9.3
     solidity-bytes-utils: 0.8.0
   checksum: 35a99b14bbdb7d1f1363ef382811c05454cc4b2191162964bdaf82b2f5d7c85eeedea5f73042cff2a119bb61f8fbb20a684e2be301e0dd683615e0f6e932cbec
+  languageName: node
+  linkType: hard
+
+"@erc725/smart-contracts@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "@erc725/smart-contracts@npm:6.0.0"
+  dependencies:
+    "@openzeppelin/contracts": ^4.9.3
+    "@openzeppelin/contracts-upgradeable": ^4.9.3
+    solidity-bytes-utils: 0.8.0
+  checksum: 23d074a2cdc4664c2da41fbd0962d733ceb1eb181eec73b05bdfe8cbceae82b3391509056f091032cb76379bea4ad11850dbb068dffc3f15b12c7e95dc784c67
   languageName: node
   linkType: hard
 
@@ -2216,7 +2247,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lukso/lsp-smart-contracts@npm:0.11.1, @lukso/lsp-smart-contracts@npm:^0.11.1":
+"@lukso/lsp-smart-contracts@npm:0.12.1":
+  version: 0.12.1
+  resolution: "@lukso/lsp-smart-contracts@npm:0.12.1"
+  dependencies:
+    "@account-abstraction/contracts": ^0.6.0
+    "@erc725/smart-contracts": ^6.0.0
+    "@openzeppelin/contracts": ^4.9.2
+    "@openzeppelin/contracts-upgradeable": ^4.9.2
+    solidity-bytes-utils: 0.8.0
+  checksum: dab9a972a2886789434bce8940b562bdd07fa5ac5287664a8f19cd41dd115ffa15d26a4fac8fc49448022c2b207feb84cd65a48cf0097963d1a0ff91b48fde40
+  languageName: node
+  linkType: hard
+
+"@lukso/lsp-smart-contracts@npm:^0.11.1":
   version: 0.11.1
   resolution: "@lukso/lsp-smart-contracts@npm:0.11.1"
   dependencies:
@@ -4618,6 +4662,13 @@ __metadata:
   bin:
     acorn: bin/acorn
   checksum: 538ba38af0cc9e5ef983aee196c4b8b4d87c0c94532334fa7e065b2c8a1f85863467bb774231aae91613fcda5e68740c15d97b1967ae3394d20faddddd8af61d
+  languageName: node
+  linkType: hard
+
+"add@npm:^2.0.6":
+  version: 2.0.6
+  resolution: "add@npm:2.0.6"
+  checksum: e2d23d40494565dfed4acd65e478570c444db5ac6c053551ed429c39ea0f2c99d83df63e7befec936df601827d2254d06a2fb6f7dcfd2022e810b25eab818b8c
   languageName: node
   linkType: hard
 
@@ -14950,9 +15001,9 @@ __metadata:
   resolution: "universalprofile-test-dapp@workspace:."
   dependencies:
     "@depay/web3-mock": ^14.17.0
-    "@erc725/erc725.js": 0.18.0
+    "@erc725/erc725.js": 0.21.2
     "@lukso/lsp-factory.js": 3.1.1
-    "@lukso/lsp-smart-contracts": 0.11.1
+    "@lukso/lsp-smart-contracts": 0.12.1
     "@lukso/web3-onboard-config": 1.1.1
     "@testing-library/jest-dom": 5.17.0
     "@testing-library/user-event": 14.4.3

@@ -1,7 +1,7 @@
 import BN from 'bn.js'
 import { ERC725JSONSchema } from '@erc725/erc725.js'
 import { INTERFACE_IDS } from '@lukso/lsp-smart-contracts'
-import lsp3Schema from '@erc725/erc725.js/schemas/LSP3UniversalProfileMetadata.json'
+import lsp3Schema from '@erc725/erc725.js/schemas/LSP3ProfileMetadata.json'
 import lsp4Schema from '@erc725/erc725.js/schemas/LSP4DigitalAsset.json'
 import lsp9Schema from '@erc725/erc725.js/schemas/LSP9Vault.json'
 import useErc725 from '@/compositions/useErc725'

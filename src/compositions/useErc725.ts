@@ -1,6 +1,5 @@
 import { ERC725, ERC725JSONSchema } from '@erc725/erc725.js'
-import LSP3UniversalProfileMetadata from '@erc725/erc725.js/schemas/LSP3UniversalProfileMetadata.json'
-import lsp3Schema from '@erc725/erc725.js/schemas/LSP3UniversalProfileMetadata.json'
+import LSP3ProfileMetadata from '@erc725/erc725.js/schemas/LSP3ProfileMetadata.json'
 import lsp4Schema from '@erc725/erc725.js/schemas/LSP4DigitalAsset.json'
 import lsp9Schema from '@erc725/erc725.js/schemas/LSP9Vault.json'
 import { Permissions } from '@erc725/erc725.js/build/main/src/types/Method'
@@ -18,8 +17,8 @@ const config = {
 
 const getInstance = (address: string) => {
   const erc725 = new ERC725(
-    LSP3UniversalProfileMetadata.concat(
-      lsp3Schema,
+    LSP3ProfileMetadata.concat(
+      LSP3ProfileMetadata,
       lsp4Schema,
       lsp9Schema
     ) as ERC725JSONSchema[],
