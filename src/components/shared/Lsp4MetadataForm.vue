@@ -26,8 +26,6 @@ const defaultValue = {
   ],
 }
 
-console.log(props.newCreators)
-// eslint-disable-next-line vue/no-setup-props-destructure
 const metadata = ref<Lsp4Metadata>(props.newMetadata || defaultValue)
 const creators = ref<string[]>([])
 

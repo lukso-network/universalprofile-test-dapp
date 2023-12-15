@@ -5,7 +5,6 @@ import { Contract } from 'web3-eth-contract'
 import useNotifications from '@/compositions/useNotifications'
 import LSP7Mintable from '@lukso/lsp-smart-contracts/artifacts/LSP7Mintable.json'
 import LSP8Mintable from '@lukso/lsp-smart-contracts/artifacts/LSP8Mintable.json'
-import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
 import Notifications from '@/components/Notification.vue'
 import { toWei } from 'web3-utils'
 import { ContractStandard } from '@/enums'
@@ -59,10 +58,7 @@ const transfer = async () => {
   const erc725AccountAddress = getState('address')
   switch (tokenType.value) {
     case ContractStandard.LSP7:
-      myToken.value = contract(LSP7Mintable.abi as any, transferToken.value, {
-        gas: DEFAULT_GAS,
-        gasPrice: DEFAULT_GAS_PRICE,
-      })
+      myToken.value = contract(LSP7Mintable.abi as any, transferToken.value)
 
       try {
         await myToken.value.methods
@@ -91,10 +87,7 @@ const transfer = async () => {
         return
       }
 
-      myToken.value = contract(LSP8Mintable.abi as any, transferToken.value, {
-        gas: DEFAULT_GAS,
-        gasPrice: DEFAULT_GAS_PRICE,
-      })
+      myToken.value = contract(LSP8Mintable.abi as any, transferToken.value)
 
       try {
         await myToken.value.methods

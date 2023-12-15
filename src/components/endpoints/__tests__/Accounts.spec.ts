@@ -67,7 +67,7 @@ test('can connect to browser extension when authorized', async () => {
   render(Accounts)
 
   await fireEvent.click(screen.getByTestId('connect-extension'))
-  await setConnected('0x8e54b33F8d42E59c0B4Cf02e6457CF8bb6a71094', WINDOW_LUKSO)
+  await setConnected('0x9967b05ac840324F8BB6F729eD74530866679B11', WINDOW_LUKSO)
 
   await waitFor(() => {
     expect(screen.getByTestId('info')).toHaveTextContent(

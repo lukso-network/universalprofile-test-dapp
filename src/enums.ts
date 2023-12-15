@@ -5,3 +5,19 @@ export enum ContractStandard {
   ERC777 = 'ERC777',
   ERC721 = 'ERC721',
 }
+
+export const LSP8TokenIdTypes = [
+  'NUMBER',
+  'STRING',
+  'UNIQUE_ID',
+  'HASH',
+  'ADDRESS',
+]
+
+export const LSP8TokenIdTypesData = [
+  'uint256',
+  'string',
+  'bytes',
+  'bytes32',
+  'address',
+]

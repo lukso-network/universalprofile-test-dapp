@@ -12,8 +12,8 @@ import { getSelectedNetworkConfig } from '@/helpers/config'
 import {
   DeployedLSP7DigitalAsset,
   DeployedLSP8IdentifiableDigitalAsset,
-  DigitalAssetDeploymentOptions,
   LSP7DigitalAssetDeploymentOptions,
+  LSP8IdentifiableDigitalAssetDeploymentOptions,
 } from '@lukso/lsp-factory.js/build/main/src/lib/interfaces/digital-asset-deployment'
 import useWeb3Connection from './useWeb3Connection'
 
@@ -45,7 +45,7 @@ const deployLSP7DigitalAsset = async (
 }
 
 const deployLSP8IdentifiableDigitalAsset = async (
-  digitalAssetDeploymentOptions: DigitalAssetDeploymentOptions
+  digitalAssetDeploymentOptions: LSP8IdentifiableDigitalAssetDeploymentOptions
 ): Promise<DeployedLSP8IdentifiableDigitalAsset> => {
   return await lspFactory.LSP8IdentifiableDigitalAsset.deploy(
     digitalAssetDeploymentOptions
