@@ -568,16 +568,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@erc725/erc725.js@npm:0.21.3":
-  version: 0.21.3
-  resolution: "@erc725/erc725.js@npm:0.21.3"
+"@erc725/erc725.js@npm:0.22.0":
+  version: 0.22.0
+  resolution: "@erc725/erc725.js@npm:0.22.0"
   dependencies:
     add: ^2.0.6
     ethereumjs-util: ^7.1.5
     web3-eth-abi: ^1.10.0
     web3-providers-http: ^1.10.0
     web3-utils: ^1.10.0
-  checksum: 2252eed206513a5fddcbdced11b89067f06b72ed395dd46d725acb0bcdcd74da3c3e44c6118bd54ea2013a32f9e7dafbf3dd995ab189e44f714e1ec160691f15
+  checksum: cadae178bf854f3c0c9b95187fb14dfc6fa1552e05ddb576cd317555d5eee3af91792f730bd8e89f8ed534b4abda0f5fe9ad206bbf0de700b9052ad1bb959609
   languageName: node
   linkType: hard
 
@@ -15137,7 +15137,7 @@ __metadata:
   resolution: "universalprofile-test-dapp@workspace:."
   dependencies:
     "@depay/web3-mock": ^14.17.0
-    "@erc725/erc725.js": 0.21.3
+    "@erc725/erc725.js": 0.22.0
     "@lukso/lsp-factory.js": 3.2.1
     "@lukso/lsp-smart-contracts": 0.14.0
     "@lukso/web3-onboard-config": 1.1.1
