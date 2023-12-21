@@ -11,7 +11,7 @@ import { store, setState } from '@/stores/index'
 import { getSelectedNetworkConfig } from '@/helpers/config'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
 import { rightPad, fromUtf8, leftPad } from 'web3-utils'
-import { LSP8_TOKEN_ID_TYPES } from '@lukso/lsp-smart-contracts'
+import { LSP8_TOKEN_ID_FORMAT } from '@lukso/lsp-smart-contracts'
 import { LSP4MetadataUrlForEncoding } from '@lukso/lsp-factory.js/build/main/src/lib/interfaces/lsp4-digital-asset'
 
 const { lsp7TokenDivisible, lsp7TokenNonDivisible } = getSelectedNetworkConfig()
@@ -327,16 +327,17 @@ export async function recalculateAssets() {
  */
 export const padTokenId = (tokenIdType: number, tokenId: string) => {
   switch (tokenIdType) {
-    case LSP8_TOKEN_ID_TYPES.NUMBER:
+    case LSP8_TOKEN_ID_FORMAT.NUMBER:
       return `0x${leftPad(tokenId, 64)}`
-    case LSP8_TOKEN_ID_TYPES.STRING:
+    case LSP8_TOKEN_ID_FORMAT.STRING:
       return rightPad(fromUtf8(tokenId), 64)
-    case LSP8_TOKEN_ID_TYPES.UNIQUE_ID:
+    case LSP8_TOKEN_ID_FORMAT.UNIQUE_ID:
       return rightPad(tokenId, 64)
-    case LSP8_TOKEN_ID_TYPES.HASH:
+    case LSP8_TOKEN_ID_FORMAT.HASH:
       return tokenId // it's 32 bytes already
-    case LSP8_TOKEN_ID_TYPES.ADDRESS:
+    case LSP8_TOKEN_ID_FORMAT.ADDRESS:
       return leftPad(tokenId, 64)
+    // TODO we might want to add mixed formats too, tbc.
     default:
       break
   }
