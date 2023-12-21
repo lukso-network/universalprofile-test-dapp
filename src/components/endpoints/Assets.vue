@@ -11,7 +11,7 @@ import CustomSelect from '@/components/shared/CustomSelect.vue'
 import { useLspFactory } from '@/compositions/useLspFactory'
 import { addTokenToLocalStore, recalculateAssets } from '@/helpers/tokenUtils'
 import { useERC20 } from '@/compositions/useErc20'
-import { LSP8_TOKEN_ID_TYPES } from '@lukso/lsp-smart-contracts'
+import { LSP8_TOKEN_ID_FORMAT } from '@lukso/lsp-smart-contracts'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
@@ -182,23 +182,23 @@ const create = async () => {
             :options="[
               {
                 display: 'NUMBER',
-                value: LSP8_TOKEN_ID_TYPES.NUMBER.toString(),
+                value: LSP8_TOKEN_ID_FORMAT.NUMBER.toString(),
               },
               {
                 display: 'STRING',
-                value: LSP8_TOKEN_ID_TYPES.STRING.toString(),
+                value: LSP8_TOKEN_ID_FORMAT.STRING.toString(),
               },
               {
                 display: 'UNIQUE_ID',
-                value: LSP8_TOKEN_ID_TYPES.UNIQUE_ID.toString(),
+                value: LSP8_TOKEN_ID_FORMAT.UNIQUE_ID.toString(),
               },
               {
                 display: 'HASH',
-                value: LSP8_TOKEN_ID_TYPES.HASH.toString(),
+                value: LSP8_TOKEN_ID_FORMAT.HASH.toString(),
               },
               {
                 display: 'ADDRESS',
-                value: LSP8_TOKEN_ID_TYPES.ADDRESS.toString(),
+                value: LSP8_TOKEN_ID_FORMAT.ADDRESS.toString(),
               },
             ]"
             @option-selected="handleSelectTokenIdType"

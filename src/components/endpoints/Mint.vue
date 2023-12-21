@@ -27,7 +27,7 @@ import useErc725 from '@/compositions/useErc725'
 import LSP8IdentifiableDigitalAsset from '@erc725/erc725.js/schemas/LSP8IdentifiableDigitalAsset.json'
 import { isHex } from 'web3-utils'
 import { isAddress } from 'ethers/lib/utils'
-import { LSP8_TOKEN_ID_TYPES } from '@lukso/lsp-smart-contracts'
+import { LSP8_TOKEN_ID_FORMAT } from '@lukso/lsp-smart-contracts'
 import { uploadAssetData } from '@/utils/uploadAssetData'
 
 const { notification, clearNotification, hasNotification, setNotification } =
@@ -99,28 +99,28 @@ const handleChangeTokenId = (event: Event) => {
   tokenIdTypeError.value = ''
 
   switch (tokenIdType.value) {
-    case LSP8_TOKEN_ID_TYPES.NUMBER:
+    case LSP8_TOKEN_ID_FORMAT.NUMBER:
       if (isNaN(parseInt(value))) {
         return (tokenIdTypeError.value = 'Must be a number')
       }
       break
-    case LSP8_TOKEN_ID_TYPES.STRING:
+    case LSP8_TOKEN_ID_FORMAT.STRING:
       if (value.length > 32) {
         return (tokenIdTypeError.value =
           'Must be a string with less than 32 characters')
       }
       break
-    case LSP8_TOKEN_ID_TYPES.UNIQUE_ID:
+    case LSP8_TOKEN_ID_FORMAT.UNIQUE_ID:
       if (!isHex(value)) {
         return (tokenIdTypeError.value = 'Must be a byte string')
       }
       break
-    case LSP8_TOKEN_ID_TYPES.HASH:
+    case LSP8_TOKEN_ID_FORMAT.HASH:
       if (value.length !== 66 || !isHex(value)) {
         return (tokenIdTypeError.value = 'Must be a 32byte hash')
       }
       break
-    case LSP8_TOKEN_ID_TYPES.ADDRESS:
+    case LSP8_TOKEN_ID_FORMAT.ADDRESS:
       if (!isAddress(value)) {
         return (tokenIdTypeError.value = 'Must be a valid address')
       }
