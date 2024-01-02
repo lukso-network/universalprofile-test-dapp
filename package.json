@@ -18,9 +18,9 @@
     "prepare": "husky install"
   },
   "dependencies": {
-    "@erc725/erc725.js": "0.21.3",
+    "@erc725/erc725.js": "0.22.0",
     "@lukso/lsp-factory.js": "3.2.1",
-    "@lukso/lsp-smart-contracts": "0.12.1",
+    "@lukso/lsp-smart-contracts": "0.14.0",
     "@lukso/web3-onboard-config": "1.1.1",
     "@pinata/sdk": "^2.1.0",
     "@tsndr/cloudflare-worker-jwt": "^2.3.2",
