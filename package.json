@@ -21,7 +21,7 @@
     "@erc725/erc725.js": "0.22.0",
     "@lukso/lsp-factory.js": "3.2.1",
     "@lukso/lsp-smart-contracts": "0.14.0",
-    "@lukso/web3-onboard-config": "1.1.1",
+    "@lukso/web3-onboard-config": "1.1.2",
     "@pinata/sdk": "^2.1.0",
     "@tsndr/cloudflare-worker-jwt": "^2.3.2",
     "@types/isomorphic-fetch": "^0.0.39",
