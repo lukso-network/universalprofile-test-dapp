@@ -1,8 +1,8 @@
 import { reactive } from 'vue'
 import { Store, Channel } from '@/types'
 import { MEANS_OF_CONNECTION } from '@/helpers/config'
-import UniversalProfile from '@lukso/lsp-smart-contracts/artifacts/UniversalProfile.json'
-import KeyManager from '@lukso/lsp-smart-contracts/artifacts/LSP6KeyManager.json'
+import LSP0ERC725Account from '@lukso/lsp0-contracts/artifacts/LSP0ERC725Account.json'
+import KeyManager from '@lukso/lsp6-contracts/artifacts/LSP6KeyManager.json'
 import { recalculateAssets } from '@/helpers/tokenUtils'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
 
@@ -42,7 +42,7 @@ export function useState() {
 
       localStorage.setItem(MEANS_OF_CONNECTION, channel)
 
-      window.erc725Account = contract(UniversalProfile.abi as any, address)
+      window.erc725Account = contract(LSP0ERC725Account.abi as any, address)
 
       try {
         const upOwner = await window.erc725Account.methods.owner().call()
