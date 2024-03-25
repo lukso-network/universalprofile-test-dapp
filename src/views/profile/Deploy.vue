@@ -15,7 +15,7 @@ import {
   DeploymentType,
 } from '@lukso/lsp-factory.js'
 import { getAndPrepareAllIpfsItems } from '@/helpers/localstorage'
-import { LSP3ProfileMetadataJSON } from '@lukso/lsp-smart-contracts'
+import { LSP3ProfileMetadataJSON } from '@lukso/lsp3-contracts'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
