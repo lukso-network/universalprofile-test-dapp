@@ -20,7 +20,12 @@
   "dependencies": {
     "@erc725/erc725.js": "0.22.0",
     "@lukso/lsp-factory.js": "3.2.1",
-    "@lukso/lsp-smart-contracts": "0.14.0",
+    "@lukso/lsp0-contracts": "^0.15.0-rc.1",
+    "@lukso/lsp3-contracts": "^0.15.0-rc.1",
+    "@lukso/lsp6-contracts": "^0.15.0-rc.1",
+    "@lukso/lsp7-contracts": "^0.15.0-rc.1",
+    "@lukso/lsp8-contracts": "^0.15.0-rc.1",
+    "@lukso/lsp9-contracts": "^0.15.0-rc.1",
     "@lukso/web3-onboard-config": "1.1.2",
     "@pinata/sdk": "^2.1.0",
     "@tsndr/cloudflare-worker-jwt": "^2.5.3",
@@ -49,7 +54,7 @@
   },
   "devDependencies": {
     "@depay/web3-mock": "^14.17.0",
-    "@testing-library/jest-dom": "5.17.0",
+    "@testing-library/jest-dom": "6.4.2",
     "@testing-library/user-event": "14.4.3",
     "@testing-library/vue": "7.0.0",
     "@types/jest": "28.1.8",

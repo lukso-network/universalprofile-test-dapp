@@ -1,6 +1,9 @@
 import BN from 'bn.js'
 import ERC725, { ERC725JSONSchema } from '@erc725/erc725.js'
-import { INTERFACE_IDS } from '@lukso/lsp-smart-contracts'
+import { INTERFACE_ID_LSP0 } from '@lukso/lsp0-contracts'
+import { INTERFACE_ID_LSP7 } from '@lukso/lsp7-contracts'
+import { INTERFACE_ID_LSP8, LSP8_TOKEN_ID_FORMAT } from '@lukso/lsp8-contracts'
+import { INTERFACE_ID_LSP9 } from '@lukso/lsp9-contracts'
 import LSP3ProfileMetadata from '@erc725/erc725.js/schemas/LSP3ProfileMetadata.json'
 import LSP4DigitalAsset from '@erc725/erc725.js/schemas/LSP4DigitalAsset.json'
 import LSP9Vault from '@erc725/erc725.js/schemas/LSP9Vault.json'
@@ -11,7 +14,6 @@ import { store, setState } from '@/stores/index'
 import { getSelectedNetworkConfig } from '@/helpers/config'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
 import { rightPad, fromUtf8, isHex, leftPad, toNumber } from 'web3-utils'
-import { LSP8_TOKEN_ID_FORMAT } from '@lukso/lsp-smart-contracts'
 import { LSP4MetadataUrlForEncoding } from '@lukso/lsp-factory.js/build/main/src/lib/interfaces/lsp4-digital-asset'
 
 const { lsp7TokenDivisible, lsp7TokenNonDivisible } = getSelectedNetworkConfig()
@@ -57,26 +59,26 @@ export const lspTypeOptions: Record<
   Exclude<LSPType, LSPType.Unknown>,
   LspTypeOption
 > = {
-  [LSPType.LSP3ProfileMetadata]: {
-    interfaceId: INTERFACE_IDS.LSP0ERC725Account,
+  [LSPType.LSP3UniversalProfileMetadata]: {
+    interfaceId: INTERFACE_ID_LSP0,
     lsp2Schema: getSupportedStandardObject(
       LSP3ProfileMetadata as ERC725JSONSchema[]
     ),
   },
   [LSPType.LSP7DigitalAsset]: {
-    interfaceId: INTERFACE_IDS.LSP7DigitalAsset,
+    interfaceId: INTERFACE_ID_LSP7,
     lsp2Schema: getSupportedStandardObject(
       LSP4DigitalAsset as ERC725JSONSchema[]
     ),
   },
   [LSPType.LSP8IdentifiableDigitalAsset]: {
-    interfaceId: INTERFACE_IDS.LSP8IdentifiableDigitalAsset,
+    interfaceId: INTERFACE_ID_LSP8,
     lsp2Schema: getSupportedStandardObject(
       LSP4DigitalAsset as ERC725JSONSchema[]
     ),
   },
   [LSPType.LSP9Vault]: {
-    interfaceId: INTERFACE_IDS.LSP9Vault,
+    interfaceId: INTERFACE_ID_LSP9,
     lsp2Schema: getSupportedStandardObject(LSP9Vault as ERC725JSONSchema[]),
   },
   [LSPType.EoA]: {
