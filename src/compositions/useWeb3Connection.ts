@@ -1,4 +1,4 @@
-import { AbiItem, isAddress as baseIsAddress } from 'web3-utils'
+import { type AbiItem, isAddress as baseIsAddress } from 'web3-utils'
 import {
   UP_CONNECTED_ADDRESS,
   WALLET_CONNECT,
@@ -7,13 +7,13 @@ import {
 import useWalletConnectV2 from './useWalletConnectV2'
 import useWeb3Onboard from './useWeb3Onboard'
 import { ref } from 'vue'
-import { TransactionConfig, TransactionReceipt } from 'web3-core'
+import type { TransactionConfig, TransactionReceipt } from 'web3-core'
 import { resetNetworkConfig, setNetworkConfig } from '@/helpers/config'
 import { getState, useState } from '@/stores'
-import EthereumProvider from '@walletconnect/ethereum-provider/dist/types/EthereumProvider'
+import type EthereumProvider from '@walletconnect/ethereum-provider/dist/types/EthereumProvider'
 import Web3 from 'web3'
-import { ContractOptions, Contract } from 'web3-eth-contract'
-import { EthereumProviderError } from 'eth-rpc-errors'
+import type { ContractOptions, Contract } from 'web3-eth-contract'
+import type { EthereumProviderError } from 'eth-rpc-errors'
 
 const web3Onboard = useWeb3Onboard()
 const web3WalletConnectV2 = useWalletConnectV2()
@@ -81,9 +81,9 @@ const setupProvider = async (
 }
 
 const disconnect = async () => {
-  if (getState('channel') == WALLET_CONNECT) {
+  if (getState('channel') === WALLET_CONNECT) {
     await provider.value?.disconnect()
-  } else if (getState('channel') == WEB3_ONBOARD) {
+  } else if (getState('channel') === WEB3_ONBOARD) {
     await web3Onboard.disconnect()
   } else {
     localStorage.removeItem(UP_CONNECTED_ADDRESS)
@@ -123,12 +123,16 @@ const estimateGas = async (transaction: TransactionConfig) => {
   return Number(await web3.eth.estimateGas(transaction))
 }
 
+const call = async (transaction: TransactionConfig) => {
+  return await web3.eth.call(transaction)
+}
+
 const sendTransaction = async (
   transaction: TransactionConfig
 ): Promise<TransactionReceipt> => {
   return await web3.eth
     .sendTransaction(transaction)
-    .on('receipt', function (receipt: any) {
+    .on('receipt', (receipt: any) => {
       console.log(receipt)
     })
     .once('sending', payload => {
@@ -139,9 +143,8 @@ const sendTransaction = async (
 const sendRequest = async (request: any): Promise<any> => {
   if (provider.value) {
     return await provider.value.request(request)
-  } else {
-    console.warn('Provider is not set up or not connected.')
   }
+  console.warn('Provider is not set up or not connected.')
 }
 
 const accounts = async () => {
@@ -187,6 +190,7 @@ export default function useWeb3Connection() {
     getBalance,
     sendTransaction,
     defaultMaxPriorityFeePerGas,
+    call,
     accounts,
     requestAccounts,
     estimateGas,

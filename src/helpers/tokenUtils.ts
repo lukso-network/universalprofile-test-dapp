@@ -1,5 +1,5 @@
 import BN from 'bn.js'
-import ERC725, { ERC725JSONSchema } from '@erc725/erc725.js'
+import ERC725, { type ERC725JSONSchema } from '@erc725/erc725.js'
 import { INTERFACE_IDS } from '@lukso/lsp-smart-contracts'
 import LSP3ProfileMetadata from '@erc725/erc725.js/schemas/LSP3ProfileMetadata.json'
 import LSP4DigitalAsset from '@erc725/erc725.js/schemas/LSP4DigitalAsset.json'
@@ -10,9 +10,9 @@ import { erc20ABI } from '@/abis/erc20ABI'
 import { store, setState } from '@/stores/index'
 import { getSelectedNetworkConfig } from '@/helpers/config'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
-import { rightPad, fromUtf8, leftPad } from 'web3-utils'
+import { rightPad, fromUtf8, isHex, leftPad, toNumber } from 'web3-utils'
 import { LSP8_TOKEN_ID_FORMAT } from '@lukso/lsp-smart-contracts'
-import { LSP4MetadataUrlForEncoding } from '@lukso/lsp-factory.js/build/main/src/lib/interfaces/lsp4-digital-asset'
+import type { LSP4MetadataUrlForEncoding } from '@lukso/lsp-factory.js/build/main/src/lib/interfaces/lsp4-digital-asset'
 
 const { lsp7TokenDivisible, lsp7TokenNonDivisible } = getSelectedNetworkConfig()
 
@@ -161,7 +161,7 @@ export const detectLSP = async (
 
       if (currentDecimals !== '0') {
         const _balance = await contract.methods
-          .balanceOf(store['address'])
+          .balanceOf(store.address)
           .call()
           .catch(() => undefined)
         balance = _balance
@@ -255,7 +255,7 @@ export function addTokenToLocalStore(address: string) {
 export async function recalculateAssets() {
   const { getInstance } = useErc725()
 
-  const address = store['address']
+  const address = store.address
   if (!address) {
     return
   }
@@ -270,11 +270,11 @@ export async function recalculateAssets() {
       return all
     }, {})
     const tokens = getTokensCreated()
-    tokens.forEach(address => {
+    for (const address of tokens) {
       if (!(address in mapAssets)) {
         mapAssets[address] = false
       }
-    })
+    }
     if (!(lsp7TokenDivisible in mapAssets)) {
       mapAssets[lsp7TokenDivisible] = false
     }
@@ -328,10 +328,13 @@ export async function recalculateAssets() {
 export const padTokenId = (tokenIdType: number, tokenId: string) => {
   switch (tokenIdType) {
     case LSP8_TOKEN_ID_FORMAT.NUMBER:
-      return `0x${leftPad(tokenId, 64)}`
+      return leftPad(toNumber(tokenId), 64)
     case LSP8_TOKEN_ID_FORMAT.STRING:
       return rightPad(fromUtf8(tokenId), 64)
     case LSP8_TOKEN_ID_FORMAT.UNIQUE_ID:
+      if (!isHex(tokenId)) {
+        throw new Error('Token ID is not a valid hex value')
+      }
       return rightPad(tokenId, 64)
     case LSP8_TOKEN_ID_FORMAT.HASH:
       return tokenId // it's 32 bytes already

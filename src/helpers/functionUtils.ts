@@ -1,7 +1,7 @@
-import { LSPType } from '@/helpers/tokenUtils'
+import type { LSPType } from '@/helpers/tokenUtils'
 import { SIGNATURE_LOOKUP_URL } from '@/helpers/config'
-import Web3 from 'web3'
-import { Unit, isAddress } from 'web3-utils'
+import type Web3 from 'web3'
+import { type Unit, isAddress } from 'web3-utils'
 
 export type MethodType = {
   label?: string
@@ -77,8 +77,9 @@ export function getSelectorLookupURL(selector: string) {
 
 export const decodeData = async (
   eth: Web3['eth'],
-  data: string
+  _data: string
 ): Promise<MethodSelect> => {
+  let data = _data
   if (/^0x/i.test(data)) {
     data = data.substring(2)
   }
@@ -108,7 +109,7 @@ export const decodeData = async (
             .map((_val, index) => {
               if (params[index] === 'bool') {
                 const val = args[`${index}`]
-                if (val != 1 && val != 0) {
+                if (val !== 1 && val !== 0) {
                   // Due to javascript truthyness any non-empty or non-zero value is encoded as true without a problem.
                   // The output packet won't match but there is really no reason to even try.
                   throw new Error('Invalid boolean value')
@@ -151,5 +152,5 @@ export const decodeData = async (
       }
     }
   }
-  throw new Error(`Unable to decode data`)
+  throw new Error('Unable to decode data')
 }

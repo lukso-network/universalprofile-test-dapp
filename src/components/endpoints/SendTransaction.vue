@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { toWei, toNumber } from 'web3-utils'
 import { ref, watch, reactive, computed } from 'vue'
-import { TransactionConfig } from 'web3-core'
+import type { TransactionConfig } from 'web3-core'
 
 import { getState, setState } from '@/stores'
 import Notifications from '@/components/Notification.vue'
@@ -14,7 +14,7 @@ import {
   getSelectedNetworkConfig,
 } from '@/helpers/config'
 import ContractFunction from '@/components/shared/ContractFunction.vue'
-import { MethodSelect, MethodType } from '@/helpers/functionUtils'
+import type { MethodSelect, MethodType } from '@/helpers/functionUtils'
 import { LSPType } from '@/helpers/tokenUtils'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
 
@@ -26,11 +26,16 @@ const {
   getBalance,
   estimateGas,
   defaultMaxPriorityFeePerGas,
+  call,
 } = useWeb3Connection()
 
 const data = ref<string>('')
 const hasData = ref(false)
 const isPending = ref(false)
+const callResults = ref<string | null>(null)
+const resultFormat = reactive<{ item: MethodSelect }>({
+  item: { label: 'results' },
+})
 
 const methods: MethodSelect[] = [
   {
@@ -351,6 +356,7 @@ const send = async () => {
 
   try {
     isPending.value = true
+    callResults.value = null
     await sendTransaction(transaction)
     setNotification('The transaction was successful')
     setState('balance', await getBalance(from))
@@ -361,6 +367,35 @@ const send = async () => {
   }
 }
 
+const rawCall = async () => {
+  clearNotification()
+
+  const from = makeValue(params.items[0])
+  console.log('from', from, params.items)
+  let transaction = {
+    from,
+    to: makeValue(params.items[1]),
+    value: makeValue(params.items[2]),
+  } as TransactionConfig
+  if (hasData.value) {
+    transaction = { ...transaction, data: data.value }
+  }
+
+  console.log(transaction)
+
+  try {
+    isPending.value = true
+    callResults.value = null
+    const result = await call(transaction)
+    callResults.value = result
+    setNotification('Call executed successfully.')
+    setState('balance', await getBalance(from))
+  } catch (error) {
+    setNotification((error as unknown as Error).message, 'danger')
+  } finally {
+    isPending.value = false
+  }
+}
 const method = reactive<{ item: MethodSelect }>({ item: methods[0] })
 const params = reactive<{ items: MethodType[] }>({
   items: [
@@ -390,14 +425,14 @@ const params = reactive<{ items: MethodType[] }>({
 })
 
 const selectMethod = (e: Event) => {
-  const value = parseInt((e.target as HTMLInputElement).value, 10)
+  const value = Number.parseInt((e.target as HTMLInputElement).value, 10)
   const { to, amount, ...item } =
     value >= methods.length
       ? items.items[value - methods.length]
       : methods[value]
-  Object.entries(item).forEach(([key, val]) => {
+  for (const [key, val] of Object.entries(item)) {
     ;(method.item as any)[key] = val
-  })
+  }
   params.items = params.items.map((param, index) => {
     if (index === 1) {
       if (
@@ -412,10 +447,10 @@ const selectMethod = (e: Event) => {
   })
   method.item.call = item.call
   hasData.value = item.call != null
-  if (to != undefined) {
+  if (to != null) {
     params.items[1].value = to
   }
-  if (amount != undefined) {
+  if (amount != null) {
     params.items[2].value = amount
   }
   defaultMaxPriorityFeePerGas().then(value => {
@@ -477,7 +512,7 @@ const hasRemove = computed<boolean>(() => {
 
 <template>
   <div class="tile is-4 is-parent">
-    <div class="tile is-child box">
+    <div class="tile is-child box" style="width: 100%">
       <p class="is-size-5 has-text-weight-bold mb-4">Transaction</p>
       <div class="field">
         <div class="select is-fullwidth mb-2">
@@ -586,6 +621,15 @@ const hasRemove = computed<boolean>(() => {
         >
           Send Transaction
         </button>
+        <button
+          :class="`button is-primary is-rounded mt-4 ${
+            isPending ? 'is-loading' : ''
+          }`"
+          data-testid="rawCall"
+          @click="rawCall"
+        >
+          Call
+        </button>
       </div>
 
       <div class="field">
@@ -593,6 +637,18 @@ const hasRemove = computed<boolean>(() => {
         <a href="https://docs.lukso.tech/guides/universal-profile/transfer-lyx"
           >transfer LYX tutorial</a
         >.
+      </div>
+
+      <div v-if="callResults">
+        <label class="label">Call result</label>
+        <ContractFunction
+          v-model="resultFormat.item.inputs"
+          custom
+          :data="callResults"
+          :data-decoder="true"
+          :hide-data="true"
+        />
+        <div class="box" style="overflow-wrap: anywhere">{{ callResults }}</div>
       </div>
 
       <div class="field">
