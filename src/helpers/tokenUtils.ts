@@ -1,5 +1,5 @@
 import BN from 'bn.js'
-import ERC725, { ERC725JSONSchema } from '@erc725/erc725.js'
+import ERC725, { type ERC725JSONSchema } from '@erc725/erc725.js'
 import { INTERFACE_IDS } from '@lukso/lsp-smart-contracts'
 import LSP3ProfileMetadata from '@erc725/erc725.js/schemas/LSP3ProfileMetadata.json'
 import LSP4DigitalAsset from '@erc725/erc725.js/schemas/LSP4DigitalAsset.json'
@@ -12,7 +12,7 @@ import { getSelectedNetworkConfig } from '@/helpers/config'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
 import { rightPad, fromUtf8, isHex, leftPad, toNumber } from 'web3-utils'
 import { LSP8_TOKEN_ID_FORMAT } from '@lukso/lsp-smart-contracts'
-import { LSP4MetadataUrlForEncoding } from '@lukso/lsp-factory.js/build/main/src/lib/interfaces/lsp4-digital-asset'
+import type { LSP4MetadataUrlForEncoding } from '@lukso/lsp-factory.js/build/main/src/lib/interfaces/lsp4-digital-asset'
 
 const { lsp7TokenDivisible, lsp7TokenNonDivisible } = getSelectedNetworkConfig()
 

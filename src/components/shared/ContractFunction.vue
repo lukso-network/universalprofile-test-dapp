@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { decodeData, MethodType } from '@/helpers/functionUtils'
+import { decodeData, type MethodType } from '@/helpers/functionUtils'
 import { reactive, computed, watch, onMounted } from 'vue'
 import { toWei, Unit, padLeft, numberToHex } from 'web3-utils'
 import ParamField from './ParamField.vue'
