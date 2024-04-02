@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite --mode development",
     "build": "vue-tsc --noEmit && vite build",
-    "build:cloudflare": "yarn lint:js && yarn lint:css && yarn lint:format && yarn lint:types && yarn test:unit && yarn build",
+    "build:cloudflare": "yarn lint:js && yarn lint:css && yarn lint:format && yarn lint:types && yarn test && yarn build",
     "preview": "vite preview",
     "test": "jest",
     "lint": "npm-run-all --aggregate-output --continue-on-error --parallel 'lint:*!(fix)'",
