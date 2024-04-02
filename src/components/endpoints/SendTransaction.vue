@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { toWei, toNumber } from 'web3-utils'
 import { ref, watch, reactive, computed } from 'vue'
-import type { TransactionConfig } from 'web3-core'
+import { TransactionConfig } from 'web3-core'
 
 import { getState, setState } from '@/stores'
 import Notifications from '@/components/Notification.vue'
@@ -14,7 +14,7 @@ import {
   getSelectedNetworkConfig,
 } from '@/helpers/config'
 import ContractFunction from '@/components/shared/ContractFunction.vue'
-import type { MethodSelect, MethodType } from '@/helpers/functionUtils'
+import { MethodSelect, MethodType } from '@/helpers/functionUtils'
 import { LSPType } from '@/helpers/tokenUtils'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
 
@@ -26,7 +26,7 @@ const {
   getBalance,
   estimateGas,
   defaultMaxPriorityFeePerGas,
-  call,
+  executeCall,
 } = useWeb3Connection()
 
 const data = ref<string>('')
@@ -324,20 +324,22 @@ const estimate = async () => {
     transaction = { ...transaction, data: data.value }
   }
 
-  try {
-    isPending.value = true
-    const gas = await estimateGas(transaction)
-    setNotification(`Estimated gas ${gas}`)
-    params.items[5].value = gas
-    setState('balance', await getBalance(from))
-  } catch (error) {
-    setNotification((error as unknown as Error).message, 'danger')
-  } finally {
-    isPending.value = false
-  }
+  isPending.value = true
+  Promise.all([estimateGas(transaction), getBalance(from)])
+    .then(([gas, balance]) => {
+      setNotification(`Estimated gas ${gas}`)
+      params.items[5].value = gas
+      setState('balance', balance)
+    })
+    .catch(error => {
+      setNotification((error as unknown as Error).message, 'danger')
+    })
+    .finally(() => {
+      isPending.value = false
+    })
 }
 
-const send = async () => {
+const send = () => {
   clearNotification()
 
   const from = makeValue(params.items[0])
@@ -353,21 +355,22 @@ const send = async () => {
   if (hasData.value) {
     transaction = { ...transaction, data: data.value }
   }
-
-  try {
-    isPending.value = true
-    callResults.value = null
-    await sendTransaction(transaction)
-    setNotification('The transaction was successful')
-    setState('balance', await getBalance(from))
-  } catch (error) {
-    setNotification((error as unknown as Error).message, 'danger')
-  } finally {
-    isPending.value = false
-  }
+  isPending.value = true
+  callResults.value = null
+  Promise.all([sendTransaction(transaction), getBalance(from)])
+    .then(([, balance]) => {
+      setNotification('The transaction was successful')
+      setState('balance', balance)
+    })
+    .catch(error => {
+      setNotification((error as unknown as Error).message, 'danger')
+    })
+    .finally(() => {
+      isPending.value = false
+    })
 }
 
-const rawCall = async () => {
+const rawCall = () => {
   clearNotification()
 
   const from = makeValue(params.items[0])
@@ -383,18 +386,21 @@ const rawCall = async () => {
 
   console.log(transaction)
 
-  try {
-    isPending.value = true
-    callResults.value = null
-    const result = await call(transaction)
-    callResults.value = result
-    setNotification('Call executed successfully.')
-    setState('balance', await getBalance(from))
-  } catch (error) {
-    setNotification((error as unknown as Error).message, 'danger')
-  } finally {
-    isPending.value = false
-  }
+  isPending.value = true
+  callResults.value = null
+  Promise.all([executeCall(transaction), getBalance(from)])
+    .then(([result, balance]) => {
+      debugger
+      callResults.value = result
+      setNotification('Call executed successfully.')
+      setState('balance', balance)
+    })
+    .catch(error => {
+      setNotification((error as unknown as Error).message, 'danger')
+    })
+    .finally(() => {
+      isPending.value = false
+    })
 }
 const method = reactive<{ item: MethodSelect }>({ item: methods[0] })
 const params = reactive<{ items: MethodType[] }>({
@@ -459,6 +465,7 @@ const selectMethod = (e: Event) => {
 }
 
 const handleData = (e?: string) => {
+  console.log(e)
   if (data.value !== e || '') {
     data.value = e || ''
   }

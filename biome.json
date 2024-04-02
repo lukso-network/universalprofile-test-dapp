@@ -8,6 +8,9 @@
       },
       "performance": {
         "noDelete": "off"
+      },
+      "style": {
+        "useImportType": "off"
       }
     }
   }

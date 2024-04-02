@@ -1,7 +1,7 @@
-import type { LSPType } from '@/helpers/tokenUtils'
+import { LSPType } from '@/helpers/tokenUtils'
 import { SIGNATURE_LOOKUP_URL } from '@/helpers/config'
-import type Web3 from 'web3'
-import { type Unit, isAddress } from 'web3-utils'
+import Web3 from 'web3'
+import { Unit, isAddress } from 'web3-utils'
 
 export type MethodType = {
   label?: string

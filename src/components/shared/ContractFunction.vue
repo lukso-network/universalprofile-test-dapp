@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { decodeData, type MethodType } from '@/helpers/functionUtils'
+import { decodeData, MethodType } from '@/helpers/functionUtils'
 import { reactive, computed, watch, onMounted } from 'vue'
-import { toWei, type Unit, padLeft, numberToHex } from 'web3-utils'
+import { toWei, Unit, padLeft, numberToHex } from 'web3-utils'
 import ParamField from './ParamField.vue'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
 import ERC725 from '@erc725/erc725.js'
@@ -193,7 +193,7 @@ const makeBytes32 = (value: string, type: string) => {
 
 if (props.dataDecoder) {
   watch(
-    () => reactiveData.items?.map(({ type }) => type),
+    () => reactiveData.items?.map(({ type }) => type).join('-'),
     async () => {
       const value = props.data
       if (value) {
@@ -220,7 +220,7 @@ if (props.dataDecoder) {
 
 const output = computed<{ error: undefined | string; value: string }>(() => {
   try {
-    if (!reactiveData.call && !props.dataDecoder) {
+    if (!props.dataDecoder && !reactiveData.call) {
       return { value: '0x', error: undefined }
     }
     const { eth } = getWeb3()
@@ -254,6 +254,7 @@ const output = computed<{ error: undefined | string; value: string }>(() => {
       value: output,
     }
   } catch (err) {
+    console.error(err)
     return { error: (err as Error).message, value: '' }
   }
 })
@@ -287,6 +288,7 @@ watch(
           emits('update:modelValue', reactiveData.items)
         } catch (err) {
           // Ignore
+          console.error(err)
         }
       } else {
         try {
@@ -296,6 +298,7 @@ watch(
           reactiveData.items = method.inputs || []
         } catch (err) {
           // Ignore
+          console.error(err)
         }
       }
     }
