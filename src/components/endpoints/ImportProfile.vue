@@ -11,6 +11,7 @@ const { notification, clearNotification, hasNotification, setNotification } =
 const web3 = useWeb3Connection()
 
 const universalProfileAddress = ref('')
+const isRecovery = ref(false)
 const controllerAddress = ref('')
 
 const onImportProfile = async () => {
@@ -18,7 +19,7 @@ const onImportProfile = async () => {
 
   try {
     const request = {
-      method: 'up_import',
+      method: isRecovery.value ? 'up_recover' : 'up_import',
       params: [universalProfileAddress.value],
     }
     let newControllerAddress: string = await web3.sendRequest(request)
@@ -46,6 +47,17 @@ const onImportProfile = async () => {
             data-testid="controller-address"
             placeholder="0x..."
           />
+        </div>
+        <div class="field mt-4">
+          <label class="checkbox">
+            <input
+              v-model="isRecovery"
+              type="checkbox"
+              :value="isRecovery"
+              data-testid="isRecovery"
+            />
+            Recover the profile into your extension
+          </label>
         </div>
       </div>
 

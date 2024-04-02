@@ -20,9 +20,16 @@ jest.mock('@/compositions/useWeb3Connection', () => ({
             }),
           }),
         }),
+        decimals: () => ({
+          call: () => jest.fn(),
+        }),
       },
     }),
   }),
+}))
+
+jest.mock('src/helpers/env', () => ({
+  PUBLIC_API_SHARED_SECRET: '123',
 }))
 
 test('can mint token', async () => {

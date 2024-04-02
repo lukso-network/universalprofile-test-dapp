@@ -176,33 +176,7 @@ const isAddress = (address: string): boolean => {
   return baseIsAddress(address)
 }
 
-export default function useWeb3Connection(): {
-  setupProvider: (
-    meansOfConnection: string
-  ) => Promise<EthereumProvider | undefined>
-  getProvider: () => EthereumProvider
-  getWeb3: () => Web3
-  getChainId: () => Promise<number>
-  contract: (
-    jsonInterface: AbiItem[],
-    address?: string,
-    options?: ContractOptions
-  ) => Contract
-  getBalance: (address: string) => Promise<string>
-  defaultMaxPriorityFeePerGas: () => Promise<number>
-  sendTransaction: (
-    transaction: TransactionConfig
-  ) => Promise<TransactionReceipt>
-  estimateGas: (transaction: TransactionConfig) => Promise<number>
-  getBaseFee: () => Promise<number>
-  accounts: () => Promise<string>
-  requestAccounts: () => Promise<string[]>
-  sign: (message: string, address: string) => Promise<string>
-  recover: (message: string, signature: string) => Promise<string>
-  isAddress: (address: string) => boolean
-  sendRequest: (request: any) => Promise<any>
-  disconnect: () => Promise<void>
-} {
+export default function useWeb3Connection() {
   return {
     setupProvider,
     getProvider,

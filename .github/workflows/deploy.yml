@@ -10,6 +10,7 @@ concurrency: deployment-${{ github.ref }}
 env:
   CF_PROJECT_NAME: 'universalprofile-test-dapp'
   PUBLIC_URL: 'https://up-test-dapp.lukso.tech'
+  VITE_APP_PUBLIC_API_SHARED_SECRET: ${{ secrets.VITE_APP_PUBLIC_API_SHARED_SECRET }}
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -66,7 +67,7 @@ jobs:
         run: yarn build
 
       - name: 🎯 Test
-        run: yarn test:unit
+        run: yarn test
 
       - name: Deploy
         uses: cloudflare/wrangler-action@2.0.0

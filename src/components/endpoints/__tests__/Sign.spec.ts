@@ -1,4 +1,3 @@
-import { DEFAULT_GAS_PRICE } from '@/helpers/config'
 import Sign from '../Sign.vue'
 import { render, fireEvent, screen, waitFor } from '@testing-library/vue'
 import { setState } from '@/stores'
@@ -32,9 +31,7 @@ window.erc725Account = {
       call: () => mockValidSignatureCall(),
     }),
   },
-  options: {
-    gasPrice: DEFAULT_GAS_PRICE,
-  },
+  options: {},
 } as Contract
 
 beforeEach(() => {

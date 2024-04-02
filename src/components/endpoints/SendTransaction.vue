@@ -209,7 +209,7 @@ const methods: MethodSelect[] = [
     call: 'setData',
     hasSpecs: [
       LSPType.UP,
-      LSPType.LSP3UniversalProfileMetadata,
+      LSPType.LSP3ProfileMetadata,
       LSPType.LSP7DigitalAsset,
       LSPType.LSP8IdentifiableDigitalAsset,
       LSPType.LSP9Vault,

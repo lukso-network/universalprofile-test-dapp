@@ -37,6 +37,12 @@ const permissions: Permissions = {
   SUPER_CALL: false,
   SUPER_STATICCALL: false,
   SUPER_DELEGATECALL: false,
+  ADDEXTENSIONS: false,
+  CHANGEEXTENSIONS: false,
+  ADDUNIVERSALRECEIVERDELEGATE: false,
+  CHANGEUNIVERSALRECEIVERDELEGATE: false,
+  REENTRANCY: false,
+  EXECUTE_RELAY_CALL: false,
 }
 const selectedPermissions = ref(permissions)
 const isPending = ref(false)

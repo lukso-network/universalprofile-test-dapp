@@ -35,7 +35,7 @@ export const NETWORKS: { [K in NetworkType]: NetworkInfo } = {
       url: 'https://erc725cache.l16.lukso.network/graphql',
     },
     ipfs: {
-      url: 'https://2eff.lukso.dev/ipfs/',
+      url: 'https://api.universalprofile.cloud/ipfs',
     },
     blockscout: {
       url: 'https://explorer.execution.l16.lukso.network',
@@ -67,7 +67,7 @@ export const NETWORKS: { [K in NetworkType]: NetworkInfo } = {
       url: 'https://erc725cache.testnet.lukso.network/graphql',
     },
     ipfs: {
-      url: 'https://2eff.lukso.dev/ipfs/',
+      url: 'https://api.universalprofile.cloud/api/v0',
     },
     blockscout: {
       url: 'https://explorer.execution.testnet.lukso.network',
