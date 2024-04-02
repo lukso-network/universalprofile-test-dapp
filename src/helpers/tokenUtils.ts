@@ -33,7 +33,7 @@ const getSupportedStandardObject = (schemas: ERC725JSONSchema[]) => {
 }
 
 export enum LSPType {
-  LSP3UniversalProfileMetadata = 'LSP3UniversalProfileMetadata',
+  LSP3ProfileMetadata = 'LSP3ProfileMetadata',
   LSP7DigitalAsset = 'LSP7DigitalAsset',
   LSP8IdentifiableDigitalAsset = 'LSP8IdentifiableDigitalAsset',
   LSP9Vault = 'LSP9Vault',
@@ -57,7 +57,7 @@ export const lspTypeOptions: Record<
   Exclude<LSPType, LSPType.Unknown>,
   LspTypeOption
 > = {
-  [LSPType.LSP3UniversalProfileMetadata]: {
+  [LSPType.LSP3ProfileMetadata]: {
     interfaceId: INTERFACE_IDS.LSP0ERC725Account,
     lsp2Schema: getSupportedStandardObject(
       LSP3ProfileMetadata as ERC725JSONSchema[]
@@ -203,7 +203,7 @@ export const detectLSP = async (
       case LSPType.LSP8IdentifiableDigitalAsset:
         shortType = 'LSP8'
         break
-      case LSPType.LSP3UniversalProfileMetadata:
+      case LSPType.LSP3ProfileMetadata:
         shortType = 'LSP3'
         break
       case LSPType.LSP9Vault:

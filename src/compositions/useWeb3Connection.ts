@@ -7,7 +7,7 @@ import {
 import useWalletConnectV2 from './useWalletConnectV2'
 import useWeb3Onboard from './useWeb3Onboard'
 import { ref } from 'vue'
-import { TransactionConfig } from 'web3-core'
+import { TransactionConfig, TransactionReceipt } from 'web3-core'
 import { resetNetworkConfig, setNetworkConfig } from '@/helpers/config'
 import { getState, useState } from '@/stores'
 import EthereumProvider from '@walletconnect/ethereum-provider/dist/types/EthereumProvider'
@@ -119,7 +119,13 @@ const getBalance = async (address: string) => {
   return web3.utils.fromWei(wei)
 }
 
-const sendTransaction = async (transaction: TransactionConfig) => {
+const estimateGas = async (transaction: TransactionConfig) => {
+  return Number(await web3.eth.estimateGas(transaction))
+}
+
+const sendTransaction = async (
+  transaction: TransactionConfig
+): Promise<TransactionReceipt> => {
   return await web3.eth
     .sendTransaction(transaction)
     .on('receipt', function (receipt: any) {
@@ -141,6 +147,16 @@ const sendRequest = async (request: any): Promise<any> => {
 const accounts = async () => {
   const [account] = await web3.eth.getAccounts()
   return account
+}
+
+const getBaseFee = async (): Promise<number> => {
+  return await web3.eth
+    .getBlock('pending')
+    .then(block => Number(block.baseFeePerGas))
+}
+
+const defaultMaxPriorityFeePerGas = async (): Promise<number> => {
+  return 2_500_000_000
 }
 
 const requestAccounts = async (): Promise<string[]> => {
@@ -170,8 +186,11 @@ export default function useWeb3Connection() {
     contract,
     getBalance,
     sendTransaction,
+    defaultMaxPriorityFeePerGas,
     accounts,
     requestAccounts,
+    estimateGas,
+    getBaseFee,
     sign,
     recover,
     isAddress,

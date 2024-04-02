@@ -112,7 +112,6 @@ const create = async () => {
           deployedAsset.LSP8IdentifiableDigitalAsset
         )
         tokenAddress.value = deployedAsset.LSP8IdentifiableDigitalAsset.address
-
         addTokenToLocalStore(
           (tokenAddress.value =
             deployedAsset.LSP8IdentifiableDigitalAsset.address)
