@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { toWei, toNumber } from 'web3-utils'
 import { ref, watch, reactive, computed } from 'vue'
-import type { TransactionConfig } from 'web3-core'
+import { TransactionConfig } from 'web3-core'
 
 import { getState, setState } from '@/stores'
 import Notifications from '@/components/Notification.vue'
@@ -14,7 +14,7 @@ import {
   getSelectedNetworkConfig,
 } from '@/helpers/config'
 import ContractFunction from '@/components/shared/ContractFunction.vue'
-import type { MethodSelect, MethodType } from '@/helpers/functionUtils'
+import { MethodSelect, MethodType } from '@/helpers/functionUtils'
 import { LSPType } from '@/helpers/tokenUtils'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
 

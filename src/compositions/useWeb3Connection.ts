@@ -1,4 +1,4 @@
-import { type AbiItem, isAddress as baseIsAddress } from 'web3-utils'
+import { AbiItem, isAddress as baseIsAddress } from 'web3-utils'
 import {
   UP_CONNECTED_ADDRESS,
   WALLET_CONNECT,
@@ -7,13 +7,13 @@ import {
 import useWalletConnectV2 from './useWalletConnectV2'
 import useWeb3Onboard from './useWeb3Onboard'
 import { ref } from 'vue'
-import type { TransactionConfig, TransactionReceipt } from 'web3-core'
+import { TransactionConfig, TransactionReceipt } from 'web3-core'
 import { resetNetworkConfig, setNetworkConfig } from '@/helpers/config'
 import { getState, useState } from '@/stores'
-import type EthereumProvider from '@walletconnect/ethereum-provider/dist/types/EthereumProvider'
+import EthereumProvider from '@walletconnect/ethereum-provider/dist/types/EthereumProvider'
 import Web3 from 'web3'
-import type { ContractOptions, Contract } from 'web3-eth-contract'
-import type { EthereumProviderError } from 'eth-rpc-errors'
+import { ContractOptions, Contract } from 'web3-eth-contract'
+import { EthereumProviderError } from 'eth-rpc-errors'
 
 const web3Onboard = useWeb3Onboard()
 const web3WalletConnectV2 = useWalletConnectV2()
