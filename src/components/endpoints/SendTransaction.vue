@@ -604,15 +604,6 @@ const hasRemove = computed<boolean>(() => {
           :class="`button is-primary is-rounded mt-4 ${
             isPending ? 'is-loading' : ''
           }`"
-          data-testid="estimate"
-          @click="estimate"
-        >
-          Estimate Gas
-        </button>
-        <button
-          :class="`button is-primary is-rounded mt-4 ${
-            isPending ? 'is-loading' : ''
-          }`"
           data-testid="send"
           @click="estimate"
         >
