@@ -6,7 +6,7 @@ import useNotifications from '@/compositions/useNotifications'
 import LSP7Mintable from '@lukso/lsp-smart-contracts/artifacts/LSP7Mintable.json'
 import LSP8Mintable from '@lukso/lsp-smart-contracts/artifacts/LSP8Mintable.json'
 import Notifications from '@/components/Notification.vue'
-import { toWei } from 'web3-utils'
+import { BN } from 'bn.js'
 import { ERC725, ERC725JSONSchema } from '@erc725/erc725.js'
 import { Lsp4Metadata } from '@/types'
 import Lsp4MetadataForm from '@/components/shared/Lsp4MetadataForm.vue'
@@ -36,7 +36,7 @@ const { contract } = useWeb3Connection()
 
 const tokenType = ref<ContractStandard>(ContractStandard.LSP7)
 const myToken = ref<Contract>()
-const mintToken = ref<string>()
+const mintTokenAddress = ref<string>()
 const tokenId = ref<string>()
 const mintReceiver = ref<string>()
 const mintAmount = ref(100)
@@ -55,14 +55,14 @@ const tokenIdTypeError = ref<string>()
 
 onMounted(() => {
   mintReceiver.value = getState('address')
-  mintToken.value = getState('tokenAddress')
+  mintTokenAddress.value = getState('tokenAddress')
 })
 
 watchEffect(async () => {
-  if (mintToken.value && tokenType.value === ContractStandard.LSP8) {
+  if (mintTokenAddress.value && tokenType.value === ContractStandard.LSP8) {
     const { getInstance } = useErc725()
     const erc725 = getInstance(
-      mintToken.value,
+      mintTokenAddress.value,
       LSP8IdentifiableDigitalAsset as ERC725JSONSchema[]
     )
     const lsp8DigitalAsset = await erc725.fetchData('LSP8TokenIdType')
@@ -84,7 +84,7 @@ const handleTokenSelected = (info: TokenInfo) => {
       ? ContractStandard.LSP7
       : ContractStandard.LSP8
   if (info.address) {
-    mintToken.value = info.address
+    mintTokenAddress.value = info.address
   }
 }
 
@@ -139,18 +139,15 @@ const mint = async () => {
   try {
     switch (tokenType.value) {
       case ContractStandard.LSP7:
-        myToken.value = contract(LSP7Mintable.abi as any, mintToken.value)
+        myToken.value = contract(LSP7Mintable.abi as any, mintTokenAddress.value)
 
-        const isNonDivisible =
-          (await myToken.value.methods.decimals().call()) === '0'
-
-        // if token is divisible (decimals = 18) we need to convert to wei
-        const amount = isNonDivisible
+        const decimals = await myToken.value.methods.decimals().call()
+        const amount = decimals === 0
           ? mintAmount.value.toString()
-          : toWei(mintAmount.value.toString())
+          : new BN(mintAmount.value).mul(new BN(10).pow(new BN(decimals)))
 
         await myToken.value.methods
-          .mint(mintReceiver.value, amount, false, '0x')
+          .mint(mintReceiver.value, amount.toString(), false, '0x')
           .send({ from: erc725AccountAddress })
           .on('receipt', function (receipt: any) {
             console.log(receipt)
@@ -169,7 +166,7 @@ const mint = async () => {
         const metadataJsonUrl = encodeAssetMetadata(assetMetadata)
 
         // mint asset
-        myToken.value = contract(LSP8Mintable.abi as any, mintToken.value)
+        myToken.value = contract(LSP8Mintable.abi as any, mintTokenAddress.value)
         const tokenIdPadded = padTokenId(tokenIdType.value, tokenId.value)
         await myToken.value.methods
           .mint(mintReceiver.value, tokenIdPadded, false, '0x')
@@ -215,7 +212,7 @@ const mint = async () => {
       <div class="field">
         <label class="label">Token address</label>
         <LSPSelect
-          :address="mintToken"
+          :address="mintTokenAddress"
           :show-types="[
             LSPType.LSP7DigitalAsset,
             LSPType.LSP8IdentifiableDigitalAsset,
@@ -224,7 +221,7 @@ const mint = async () => {
         />
         <div class="control">
           <input
-            v-model="mintToken"
+            v-model="mintTokenAddress"
             class="input is-family-code"
             type="text"
             data-testid="transfer-address"
