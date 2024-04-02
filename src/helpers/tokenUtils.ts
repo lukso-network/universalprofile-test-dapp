@@ -59,7 +59,7 @@ export const lspTypeOptions: Record<
   Exclude<LSPType, LSPType.Unknown>,
   LspTypeOption
 > = {
-  [LSPType.LSP3UniversalProfileMetadata]: {
+  [LSPType.LSP3ProfileMetadata]: {
     interfaceId: INTERFACE_ID_LSP0,
     lsp2Schema: getSupportedStandardObject(
       LSP3ProfileMetadata as ERC725JSONSchema[]
