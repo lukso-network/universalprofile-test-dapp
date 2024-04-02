@@ -139,12 +139,16 @@ const mint = async () => {
   try {
     switch (tokenType.value) {
       case ContractStandard.LSP7:
-        myToken.value = contract(LSP7Mintable.abi as any, mintTokenAddress.value)
+        myToken.value = contract(
+          LSP7Mintable.abi as any,
+          mintTokenAddress.value
+        )
 
         const decimals = await myToken.value.methods.decimals().call()
-        const amount = decimals === 0
-          ? mintAmount.value.toString()
-          : new BN(mintAmount.value).mul(new BN(10).pow(new BN(decimals)))
+        const amount =
+          decimals === 0
+            ? mintAmount.value.toString()
+            : new BN(mintAmount.value).mul(new BN(10).pow(new BN(decimals)))
 
         await myToken.value.methods
           .mint(mintReceiver.value, amount.toString(), false, '0x')
@@ -166,7 +170,10 @@ const mint = async () => {
         const metadataJsonUrl = encodeAssetMetadata(assetMetadata)
 
         // mint asset
-        myToken.value = contract(LSP8Mintable.abi as any, mintTokenAddress.value)
+        myToken.value = contract(
+          LSP8Mintable.abi as any,
+          mintTokenAddress.value
+        )
         const tokenIdPadded = padTokenId(tokenIdType.value, tokenId.value)
         await myToken.value.methods
           .mint(mintReceiver.value, tokenIdPadded, false, '0x')
