@@ -73,7 +73,7 @@ let onboard: OnboardAPI
 
 const setupWeb3Onboard = async () => {
   onboard = Onboard({
-    wallets,
+    wallets: wallets as any,
     chains,
     appMetadata,
     connect,
