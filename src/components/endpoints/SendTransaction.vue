@@ -571,16 +571,6 @@ const hasRemove = computed<boolean>(() => {
         @update:data="handleData"
       />
 
-      <div>
-        <label class="label">maxPriorityFeePerGas</label>
-        <input
-          v-model="params.items[3].value"
-          class="input"
-          type="number"
-          placeholder="0"
-          data-testid="maxPriorityFeePerGas"
-        />
-      </div>
       <div v-if="hasData" class="field">
         <label class="label">Data (optional)</label>
         <textarea
