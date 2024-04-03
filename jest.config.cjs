@@ -1,4 +1,6 @@
-const esModules = ['@lukso/lsp-smart-contracts'].join('|')
+const esModules = ['@lukso/lsp-smart-contracts', '@lukso/lsp-factory.js'].join(
+  '|'
+)
 
 module.exports = {
   transform: {
@@ -12,7 +14,7 @@ module.exports = {
   moduleNameMapper: {
     '@/(.*)$': '<rootDir>/src/$1',
   },
-  // modulePaths: ['<rootDir>'],
+  modulePaths: ['<rootDir>'],
   verbose: true,
   testEnvironmentOptions: {
     customExportConditions: ['node', 'node-addons'],
