@@ -77,16 +77,20 @@ export function getSelectorLookupURL(selector: string) {
 
 export const decodeData = async (
   eth: Web3['eth'],
-  data: string
+  _data: string
 ): Promise<MethodSelect> => {
-  if (/^0x/i.test(data)) {
+  let data = _data
+  if (data?.startsWith('0x')) {
     data = data.substring(2)
   }
   const selector = data?.substring(0, 8)
   if (selector) {
-    const signatureCache = await caches.open(SIGNATURE_CACHE)
+    let signatureCache: Cache | undefined = undefined
+    try {
+      signatureCache = await caches.open(SIGNATURE_CACHE)
+    } catch {}
     const url = getSelectorLookupURL(selector)
-    const functionSignatureResponse = await signatureCache.match(url)
+    const functionSignatureResponse = await signatureCache?.match(url)
     if (functionSignatureResponse) {
       return await functionSignatureResponse.json()
     }
@@ -102,13 +106,13 @@ export const decodeData = async (
           const params: string[] = result.text_signature
             .replace(/^[^(]*\(|\)[^)]*$/g, '')
             .split(',')
-          const args = eth.abi.decodeParameters(params, data.substring(8))
+          const args = eth.abi.decodeParameters(params, data.substring(8)) || {}
           const encodeArgs = Array(params.length)
             .fill(null)
             .map((_val, index) => {
               if (params[index] === 'bool') {
                 const val = args[`${index}`]
-                if (val != 1 && val != 0) {
+                if (val !== 1 && val !== 0) {
                   // Due to javascript truthyness any non-empty or non-zero value is encoded as true without a problem.
                   // The output packet won't match but there is really no reason to even try.
                   throw new Error('Invalid boolean value')
@@ -124,9 +128,8 @@ export const decodeData = async (
               }
               return args[`${index}`] ?? '0x'
             })
-          const newData = eth.abi
-            .encodeParameters(params, encodeArgs)
-            .substring(2)
+          const newData =
+            eth.abi.encodeParameters(params, encodeArgs).substring(2) || '0x'
           if (data.substring(8) === newData) {
             const call = result.text_signature.replace(/\(.*$/, '')
             const item = {
@@ -141,15 +144,14 @@ export const decodeData = async (
                   call in { setData: true, getData: true },
               })),
             }
-            await signatureCache.put(url, new Response(JSON.stringify(item)))
+            await signatureCache?.put(url, new Response(JSON.stringify(item)))
             return item
           }
         } catch (err) {
           // Ignore to try next record
-          console.error(err)
         }
       }
     }
   }
-  throw new Error(`Unable to decode data`)
+  throw new Error('Unable to decode data')
 }

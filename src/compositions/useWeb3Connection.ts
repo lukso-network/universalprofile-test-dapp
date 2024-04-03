@@ -81,9 +81,9 @@ const setupProvider = async (
 }
 
 const disconnect = async () => {
-  if (getState('channel') == WALLET_CONNECT) {
+  if (getState('channel') === WALLET_CONNECT) {
     await provider.value?.disconnect()
-  } else if (getState('channel') == WEB3_ONBOARD) {
+  } else if (getState('channel') === WEB3_ONBOARD) {
     await web3Onboard.disconnect()
   } else {
     localStorage.removeItem(UP_CONNECTED_ADDRESS)
@@ -123,12 +123,16 @@ const estimateGas = async (transaction: TransactionConfig) => {
   return Number(await web3.eth.estimateGas(transaction))
 }
 
-const sendTransaction = async (
+const executeCall = (transaction: TransactionConfig): Promise<string> => {
+  return web3.eth.call(transaction)
+}
+
+const sendTransaction = (
   transaction: TransactionConfig
 ): Promise<TransactionReceipt> => {
-  return await web3.eth
+  return web3.eth
     .sendTransaction(transaction)
-    .on('receipt', function (receipt: any) {
+    .on('receipt', (receipt: any) => {
       console.log(receipt)
     })
     .once('sending', payload => {
@@ -136,12 +140,12 @@ const sendTransaction = async (
     })
 }
 
-const sendRequest = async (request: any): Promise<any> => {
+const sendRequest = (request: any): Promise<any> => {
   if (provider.value) {
-    return await provider.value.request(request)
-  } else {
-    console.warn('Provider is not set up or not connected.')
+    return provider.value.request(request)
   }
+  console.warn('Provider is not set up or not connected.')
+  return Promise.resolve(null)
 }
 
 const accounts = async () => {
@@ -187,6 +191,7 @@ export default function useWeb3Connection() {
     getBalance,
     sendTransaction,
     defaultMaxPriorityFeePerGas,
+    executeCall,
     accounts,
     requestAccounts,
     estimateGas,

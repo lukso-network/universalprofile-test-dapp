@@ -28,7 +28,7 @@ jest.mock('@/compositions/useWeb3Connection', () => ({
   }),
 }))
 
-jest.mock('src/helpers/env', () => ({
+jest.mock('@/helpers/env', () => ({
   PUBLIC_API_SHARED_SECRET: '123',
 }))
 

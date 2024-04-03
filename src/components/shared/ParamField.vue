@@ -1,15 +1,23 @@
 <script setup lang="ts">
 import { reactive, computed, watch } from 'vue'
-import { toWei, Unit, padLeft, numberToHex } from 'web3-utils'
-import ERC725 from '@erc725/erc725.js'
+import { toWei, Unit, padLeft, numberToHex, hexToNumber } from 'web3-utils'
+import ERC725, { ERC725JSONSchema } from '@erc725/erc725.js'
 import LSPSelect from '@/components/shared/LSPSelect.vue'
 import { BN } from 'bn.js'
 import { MethodType } from '@/helpers/functionUtils'
 import { TokenInfo } from '@/helpers/tokenUtils'
+import LSP3ProfileMetadata from '@erc725/erc725.js/schemas/LSP3ProfileMetadata.json'
+import LSP4DigitalAsset from '@erc725/erc725.js/schemas/LSP4DigitalAsset.json'
+import LSP9Vault from '@erc725/erc725.js/schemas/LSP9Vault.json'
+
+const schemas = [...LSP3ProfileMetadata, ...LSP4DigitalAsset, ...LSP9Vault]
 
 interface ElementType {
   error?: string | undefined
   value: any
+  decoder?: string
+  decoded?: any
+  decodedError?: string
 }
 
 type Props = {
@@ -17,6 +25,7 @@ type Props = {
   modelValue: any
   custom?: boolean
   testidPrefix?: string
+  dataDecoder?: boolean
 }
 
 type Emits = {
@@ -36,13 +45,17 @@ const isArray = computed<boolean>(
   () => methodInfo.value.type?.match(/\[\]$/) != null
 )
 
-function makeWei(value: string, hex = false) {
+function makeWei(_value: string, hex = false) {
   try {
-    if (typeof value !== 'string') {
-      value = numberToHex(value)
-    }
+    const value =
+      typeof _value === 'string' && _value.startsWith('0x')
+        ? _value
+        : numberToHex(_value)
     const val = methodInfo.value.isWei
-      ? toWei(value, methodInfo.value.isWei as Unit)
+      ? toWei(
+          hexToNumber(value, true).toString(),
+          methodInfo.value.isWei as Unit
+        )
       : value
     if (hex) {
       return padLeft(val, 64)
@@ -71,7 +84,7 @@ function validate(value: any): { value: any; error?: string } {
   switch (methodInfo.value.type.replace(/\[\]$/, '')) {
     case 'address':
       if (/^(0x)?[0-9a-f]{40}/i.test(value)) {
-        if (!/^0x/.test(value)) {
+        if (!value.startsWith('0x')) {
           return { value: `0x${value}` }
         }
         return { value }
@@ -103,7 +116,7 @@ function validate(value: any): { value: any; error?: string } {
         return { value }
       }
       if (/^(0x)?[0-9a-f]{64}$/i.test(value)) {
-        if (!/^0x/.test(value)) {
+        if (!value.startsWith('0x')) {
           return { value: `0x${value}` }
         }
         return { value }
@@ -145,7 +158,7 @@ function validate(value: any): { value: any; error?: string } {
         return { value }
       }
       if (/^(0x)?[0-9a-f]{64}$/i.test(value)) {
-        if (!/^0x/.test(value)) {
+        if (!value.startsWith('0x')) {
           return { value: `0x${value}` }
         }
         return { value }
@@ -211,7 +224,7 @@ function validate(value: any): { value: any; error?: string } {
         return { value }
       }
       if (/^(0x)?[0-9a-f]{64}$/i.test(value)) {
-        if (!/^0x/.test(value)) {
+        if (!value.startsWith('0x')) {
           return { value: `0x${value}` }
         }
         return { value }
@@ -284,6 +297,32 @@ const handleChange = (index: number, e: Event) => {
   }
 }
 
+const handleLSP = (index: number, e: Event) => {
+  const { value } = e.target as HTMLInputElement
+  const item = data.items[index]
+  item.decoder = value
+  try {
+    const [keyName] = value.split(',')
+    item.decodedError = undefined
+
+    const output = ERC725.decodeData(
+      [{ keyName, value: item.value }],
+      schemas as ERC725JSONSchema[]
+    )
+    const decoded = (output as any[]).find(({ name }) => name === keyName)
+      ?.value
+    if (decoded) {
+      if (typeof decoded === 'object') {
+        item.decoded = JSON.stringify(decoded, null, 2)
+      } else {
+        item.decoded = decoded
+      }
+    }
+  } catch (error: any) {
+    item.decodedError = error.message
+  }
+}
+
 const handleSelected = (index: number, info: TokenInfo) => {
   const item = data.items[index]
   const { value, error } = validate(info.address)
@@ -314,7 +353,7 @@ const shouldBytes32 = (index: number) => {
   if (/^bytes32/.test(methodInfo.value.type)) {
     if (
       /^[0-9]+$/.test(item.value) ||
-      (methodInfo.value.isKey && !/^0x/.test(item.value))
+      (methodInfo.value.isKey && !item.value?.startsWith('0x'))
     ) {
       return true
     }
@@ -322,12 +361,12 @@ const shouldBytes32 = (index: number) => {
   return false
 }
 
-const makeBytes32 = (index: number) => {
+const makeBytes32 = (index: number, force = false) => {
   const item = data.items[index]
   if (/^bytes32/.test(methodInfo.value.type)) {
     if (
-      methodInfo.value.isKey &&
-      !/^0x/i.test(item.value) &&
+      (force || methodInfo.value.isKey) &&
+      !item.value?.startsWith('0x') &&
       /^[a-z0-9]+$/i.test(item.value)
     ) {
       const items = (item.value || '').split(',')
@@ -338,7 +377,7 @@ const makeBytes32 = (index: number) => {
       }
     }
     if (/^0x[0-9a-f]*$/i.test(item.value)) {
-      return padLeft(item.value.replace(/^0x/, ''), 64)
+      return padLeft(item.value, 64)
     }
     if (/^[0-9]*$/.test(item.value)) {
       return padLeft(item.value, 64)
@@ -354,7 +393,12 @@ const hasError = (index: number) => {
 </script>
 
 <template>
-  <div v-for="(item, index) of data.items" :key="index" class="field">
+  <div
+    v-for="(item, index) of data.items"
+    :key="index"
+    class="field"
+    style="max-width: 100%"
+  >
     <label v-if="methodInfo.type !== 'bool'" class="label"
       >{{
         methodInfo.label
@@ -367,6 +411,7 @@ const hasError = (index: number) => {
       }}<select
         v-if="props.custom && methodInfo.type.match(/^u?int256/)"
         :value="methodInfo.isWei"
+        :readonly="props.dataDecoder"
         class="ml-1"
         @change="handleUnits"
       >
@@ -399,18 +444,20 @@ const hasError = (index: number) => {
         <option value="gether">gether</option>
         <option value="tether">tether</option></select
       >{{ !props.custom && methodInfo.isWei ? methodInfo.isWei : ''
-      }}<label v-if="methodInfo.type === 'bytes32'" class="ml-2"
+      }}<label v-if="/^bytes32/.test(methodInfo.type)" class="ml-2"
         ><input
           type="checkbox"
+          :readonly="props.dataDecoder"
           :checked="methodInfo.isKey"
           :data-testid="props.testidPrefix + methodInfo.name + '_isKey'"
           @input="handleIsKey"
-        />&nbsp;Decode LSPKey</label
+        />&nbsp;Encode LSP DataKey</label
       >)
     </label>
     <LSPSelect
       v-if="methodInfo.type.match(/^address/)"
       :show-types="methodInfo.hasSpecs"
+      :readonly="props.dataDecoder"
       :address="item.value"
       @option-selected="(e: TokenInfo) => handleSelected(index, e)"
     />
@@ -418,6 +465,7 @@ const hasError = (index: number) => {
       <input
         v-if="methodInfo.type !== 'bool'"
         :value="item.value"
+        :readonly="props.dataDecoder"
         class="input is-family-code"
         type="text"
         :data-testid="props.testidPrefix + methodInfo.name"
@@ -427,6 +475,7 @@ const hasError = (index: number) => {
         ><input
           type="checkbox"
           :checked="item.value"
+          :readonly="props.dataDecoder"
           :data-testid="props.testidPrefix + methodInfo.name"
           @input="e => handleChange(index, e)"
         />&nbsp;{{
@@ -453,15 +502,36 @@ const hasError = (index: number) => {
     <p v-if="shouldWei(index)" class="help" style="overflow-wrap: anywhere">
       actual value {{ makeWei(item.value) }} ({{ makeWei(item.value, true) }})
     </p>
+    <div v-if="props.dataDecoder" class="w-100">
+      <div>
+        <label>LSP Decoder</label
+        ><input
+          :value="item.decoder"
+          class="input is-family-code"
+          type="text"
+          @input="e => handleLSP(index, e)"
+        />
+      </div>
+      <pre v-if="item.decoded" class="help" style="overflow-x: scroll">{{
+        item.decoded
+      }}</pre>
+      <p
+        v-if="item.decodedError"
+        class="help is-danger"
+        style="overflow-wrap: anywhere"
+      >
+        {{ item.decodedError }}
+      </p>
+    </div>
     <p v-if="hasError(index)" class="help is-danger">{{ hasError(index) }}</p>
-    <div v-if="isArray" class="mt-1">
+    <div v-if="!props.dataDecoder && isArray" class="mt-1">
       <button @click="handleAdd(index)">Add</button
-      ><button v-if="data.items.length > 0" @click="handleRemove(index)">
+      ><button v-if="data?.items?.length > 0" @click="handleRemove(index)">
         Remove
       </button>
     </div>
   </div>
-  <div v-if="isArray && data.items.length === 0">
+  <div v-if="!props.dataDecoder && isArray && data?.items?.length === 0">
     <label class="label">{{
       methodInfo.label
         ? methodInfo.label

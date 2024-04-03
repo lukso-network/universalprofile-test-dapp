@@ -12,7 +12,7 @@ module.exports = {
   moduleNameMapper: {
     '@/(.*)$': '<rootDir>/src/$1',
   },
-  modulePaths: ['<rootDir>'],
+  // modulePaths: ['<rootDir>'],
   verbose: true,
   testEnvironmentOptions: {
     customExportConditions: ['node', 'node-addons'],
