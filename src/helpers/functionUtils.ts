@@ -80,7 +80,7 @@ export const decodeData = async (
   _data: string
 ): Promise<MethodSelect> => {
   let data = _data
-  if (/^0x/i.test(data)) {
+  if (data?.startsWith('0x')) {
     data = data.substring(2)
   }
   const selector = data?.substring(0, 8)

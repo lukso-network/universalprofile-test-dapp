@@ -177,7 +177,7 @@ const makeBytes32 = (value: string, type: string) => {
       return padLeft(hex, 64)
     }
     if (/^0x[0-9a-f]*$/i.test(value)) {
-      return padLeft(value.replace(/^0x/, ''), 64)
+      return padLeft(value, 64)
     }
     if (/^\w*(:.*,.*)?$/.test(value)) {
       const items = (value || '').split(',')
@@ -248,7 +248,7 @@ const output = computed<{ error: undefined | string; value: string }>(() => {
     }
     const output = `${eth.abi.encodeFunctionSignature(callSig)}${eth.abi
       .encodeParameters(types, args)
-      .substring(2)}`
+      ?.substring(2)}`
     return {
       error: undefined,
       value: output,

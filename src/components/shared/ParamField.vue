@@ -10,7 +10,7 @@ import LSP3ProfileMetadata from '@erc725/erc725.js/schemas/LSP3ProfileMetadata.j
 import LSP4DigitalAsset from '@erc725/erc725.js/schemas/LSP4DigitalAsset.json'
 import LSP9Vault from '@erc725/erc725.js/schemas/LSP9Vault.json'
 
-const schemas = LSP3ProfileMetadata.concat(LSP4DigitalAsset, LSP9Vault)
+const schemas = [...LSP3ProfileMetadata, ...LSP4DigitalAsset, ...LSP9Vault]
 
 interface ElementType {
   error?: string | undefined
@@ -48,7 +48,7 @@ const isArray = computed<boolean>(
 function makeWei(_value: string, hex = false) {
   try {
     const value =
-      typeof _value === 'string' && /^0x/.test(_value)
+      typeof _value === 'string' && _value.startsWith('0x')
         ? _value
         : numberToHex(_value)
     const val = methodInfo.value.isWei
@@ -84,7 +84,7 @@ function validate(value: any): { value: any; error?: string } {
   switch (methodInfo.value.type.replace(/\[\]$/, '')) {
     case 'address':
       if (/^(0x)?[0-9a-f]{40}/i.test(value)) {
-        if (!/^0x/.test(value)) {
+        if (!value.startsWith('0x')) {
           return { value: `0x${value}` }
         }
         return { value }
@@ -116,7 +116,7 @@ function validate(value: any): { value: any; error?: string } {
         return { value }
       }
       if (/^(0x)?[0-9a-f]{64}$/i.test(value)) {
-        if (!/^0x/.test(value)) {
+        if (!value.startsWith('0x')) {
           return { value: `0x${value}` }
         }
         return { value }
@@ -158,7 +158,7 @@ function validate(value: any): { value: any; error?: string } {
         return { value }
       }
       if (/^(0x)?[0-9a-f]{64}$/i.test(value)) {
-        if (!/^0x/.test(value)) {
+        if (!value.startsWith('0x')) {
           return { value: `0x${value}` }
         }
         return { value }
@@ -224,7 +224,7 @@ function validate(value: any): { value: any; error?: string } {
         return { value }
       }
       if (/^(0x)?[0-9a-f]{64}$/i.test(value)) {
-        if (!/^0x/.test(value)) {
+        if (!value.startsWith('0x')) {
           return { value: `0x${value}` }
         }
         return { value }
@@ -353,7 +353,7 @@ const shouldBytes32 = (index: number) => {
   if (/^bytes32/.test(methodInfo.value.type)) {
     if (
       /^[0-9]+$/.test(item.value) ||
-      (methodInfo.value.isKey && !/^0x/.test(item.value))
+      (methodInfo.value.isKey && !item.value?.startsWith('0x'))
     ) {
       return true
     }
@@ -366,7 +366,7 @@ const makeBytes32 = (index: number, force = false) => {
   if (/^bytes32/.test(methodInfo.value.type)) {
     if (
       (force || methodInfo.value.isKey) &&
-      !/^0x/i.test(item.value) &&
+      !item.value?.startsWith('0x') &&
       /^[a-z0-9]+$/i.test(item.value)
     ) {
       const items = (item.value || '').split(',')
@@ -377,7 +377,7 @@ const makeBytes32 = (index: number, force = false) => {
       }
     }
     if (/^0x[0-9a-f]*$/i.test(item.value)) {
-      return padLeft(item.value.replace(/^0x/, ''), 64)
+      return padLeft(item.value, 64)
     }
     if (/^[0-9]*$/.test(item.value)) {
       return padLeft(item.value, 64)
@@ -526,12 +526,12 @@ const hasError = (index: number) => {
     <p v-if="hasError(index)" class="help is-danger">{{ hasError(index) }}</p>
     <div v-if="!props.dataDecoder && isArray" class="mt-1">
       <button @click="handleAdd(index)">Add</button
-      ><button v-if="data.items.length > 0" @click="handleRemove(index)">
+      ><button v-if="data?.items?.length > 0" @click="handleRemove(index)">
         Remove
       </button>
     </div>
   </div>
-  <div v-if="!props.dataDecoder && isArray && data.items.length === 0">
+  <div v-if="!props.dataDecoder && isArray && data?.items?.length === 0">
     <label class="label">{{
       methodInfo.label
         ? methodInfo.label
