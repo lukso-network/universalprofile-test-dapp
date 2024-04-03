@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { reactive, computed, watch } from 'vue'
-import { toWei, Unit, padLeft, numberToHex } from 'web3-utils'
+import { toWei, Unit, padLeft, numberToHex, hexToNumber } from 'web3-utils'
 import ERC725, { ERC725JSONSchema } from '@erc725/erc725.js'
 import LSPSelect from '@/components/shared/LSPSelect.vue'
 import { BN } from 'bn.js'
@@ -52,7 +52,10 @@ function makeWei(_value: string, hex = false) {
         ? _value
         : numberToHex(_value)
     const val = methodInfo.value.isWei
-      ? toWei(value, methodInfo.value.isWei as Unit)
+      ? toWei(
+          hexToNumber(value, true).toString(),
+          methodInfo.value.isWei as Unit
+        )
       : value
     if (hex) {
       return padLeft(val, 64)

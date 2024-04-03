@@ -85,9 +85,12 @@ export const decodeData = async (
   }
   const selector = data?.substring(0, 8)
   if (selector) {
-    const signatureCache = await caches.open(SIGNATURE_CACHE)
+    let signatureCache: Cache | undefined = undefined
+    try {
+      signatureCache = await caches.open(SIGNATURE_CACHE)
+    } catch {}
     const url = getSelectorLookupURL(selector)
-    const functionSignatureResponse = await signatureCache.match(url)
+    const functionSignatureResponse = await signatureCache?.match(url)
     if (functionSignatureResponse) {
       return await functionSignatureResponse.json()
     }
@@ -103,7 +106,7 @@ export const decodeData = async (
           const params: string[] = result.text_signature
             .replace(/^[^(]*\(|\)[^)]*$/g, '')
             .split(',')
-          const args = eth.abi.decodeParameters(params, data.substring(8))
+          const args = eth.abi.decodeParameters(params, data.substring(8)) || {}
           const encodeArgs = Array(params.length)
             .fill(null)
             .map((_val, index) => {
@@ -125,9 +128,8 @@ export const decodeData = async (
               }
               return args[`${index}`] ?? '0x'
             })
-          const newData = eth.abi
-            .encodeParameters(params, encodeArgs)
-            .substring(2)
+          const newData =
+            eth.abi.encodeParameters(params, encodeArgs).substring(2) || '0x'
           if (data.substring(8) === newData) {
             const call = result.text_signature.replace(/\(.*$/, '')
             const item = {
@@ -142,12 +144,11 @@ export const decodeData = async (
                   call in { setData: true, getData: true },
               })),
             }
-            await signatureCache.put(url, new Response(JSON.stringify(item)))
+            await signatureCache?.put(url, new Response(JSON.stringify(item)))
             return item
           }
         } catch (err) {
           // Ignore to try next record
-          console.error(err)
         }
       }
     }
