@@ -390,7 +390,6 @@ const rawCall = () => {
   callResults.value = null
   Promise.all([executeCall(transaction), getBalance(from)])
     .then(([result, balance]) => {
-      debugger
       callResults.value = result
       setNotification('Call executed successfully.')
       setState('balance', balance)

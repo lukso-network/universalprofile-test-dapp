@@ -11,7 +11,8 @@ import CustomSelect from '@/components/shared/CustomSelect.vue'
 import { useLspFactory } from '@/compositions/useLspFactory'
 import { addTokenToLocalStore, recalculateAssets } from '@/helpers/tokenUtils'
 import { useERC20 } from '@/compositions/useErc20'
-import { LSP8_TOKEN_ID_FORMAT } from '@lukso/lsp-smart-contracts'
+import { LSP8_TOKEN_ID_FORMAT } from '@lukso/lsp8-contracts'
+import { LSP4_TOKEN_TYPES } from '@lukso/lsp4-contracts'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
@@ -73,10 +74,11 @@ const create = async () => {
     switch (token.value.type) {
       case ContractStandard.LSP7:
         digitalAssetData = {
-          isNFT: !!token.value.isNonDivisible,
-          controllerAddress: erc725AccountAddress,
           name: token.value.name,
           symbol: token.value.symbol,
+          controllerAddress: erc725AccountAddress,
+          tokenType: LSP4_TOKEN_TYPES.TOKEN,
+          isNFT: !!token.value.isNonDivisible,
           creators: toRaw(creators.value),
           digitalAssetMetadata: {
             LSP4Metadata: {
@@ -93,16 +95,17 @@ const create = async () => {
         break
       case ContractStandard.LSP8:
         digitalAssetData = {
-          controllerAddress: erc725AccountAddress,
           name: token.value.name,
           symbol: token.value.symbol,
+          controllerAddress: erc725AccountAddress,
+          tokenType: LSP4_TOKEN_TYPES.COLLECTION,
           creators: toRaw(creators.value),
           digitalAssetMetadata: {
             LSP4Metadata: {
               ...lsp4Metadata.value,
             },
           },
-          tokenIdType: tokenIdType.value,
+          tokenIdFormat: tokenIdType.value,
         }
         console.log(digitalAssetData)
         deployedAsset =

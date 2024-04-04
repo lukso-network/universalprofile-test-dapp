@@ -1,4 +1,6 @@
-const esModules = ['@lukso/lsp-smart-contracts'].join('|')
+const esModules = ['@lukso/lsp-smart-contracts', '@lukso/lsp-factory.js'].join(
+  '|'
+)
 
 module.exports = {
   transform: {
