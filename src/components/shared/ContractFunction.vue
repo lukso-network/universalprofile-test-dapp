@@ -248,11 +248,7 @@ const output = computed<{ error: undefined | string; value: string }>(() => {
     }
     const output = `${eth.abi.encodeFunctionSignature(callSig)}${eth.abi
       .encodeParameters(types, args)
-<<<<<<< HEAD
-      .substring(2)}`
-=======
       ?.substring(2)}`
->>>>>>> main
     return {
       error: undefined,
       value: output,
