@@ -1,8 +1,8 @@
 import { reactive } from 'vue'
 import { Store, Channel } from '@/types'
 import { MEANS_OF_CONNECTION } from '@/helpers/config'
-import LSP0ERC725Account from '@lukso/lsp0-contracts/artifacts/LSP0ERC725Account.json'
-import KeyManager from '@lukso/lsp6-contracts/artifacts/LSP6KeyManager.json'
+import LSP0ERC725Account from '@lukso/lsp-smart-contracts/artifacts/LSP0ERC725Account.json'
+import KeyManager from '@lukso/lsp-smart-contracts/artifacts/LSP6KeyManager.json'
 import { recalculateAssets } from '@/helpers/tokenUtils'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
 
