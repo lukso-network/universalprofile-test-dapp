@@ -211,7 +211,7 @@ const methods: MethodSelect[] = [
   },
   {
     label: '🎛️ SetData',
-    call: 'setData',
+    call: 'setDataBatch',
     hasSpecs: [
       LSPType.UP,
       LSPType.LSP3ProfileMetadata,
