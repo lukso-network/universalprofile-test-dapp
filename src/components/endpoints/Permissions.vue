@@ -3,11 +3,11 @@ import { getState } from '@/stores'
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
 import {
-  LSP6DataKeys,
+  ERC725YDataKeys,
   ALL_PERMISSIONS,
   PERMISSIONS,
   // @ts-ignore
-} from '@lukso/lsp6-contracts'
+} from '@lukso/lsp-smart-contracts'
 import { Permissions } from '@erc725/erc725.js/build/main/src/types/Method'
 
 import { computed, ref } from 'vue'
@@ -60,7 +60,7 @@ const setPermissions = async () => {
   const erc725AccountAddress = getState('address')
 
   const key =
-    LSP6DataKeys['AddressPermissions:Permissions'] +
+    ERC725YDataKeys.LSP6['AddressPermissions:Permissions'] +
     grantPermissionAddress.value.slice(2)
   const value = encodePermissions(selectedPermissions.value)
 
