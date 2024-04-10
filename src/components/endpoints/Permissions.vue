@@ -77,8 +77,8 @@ const setPermissions = async () => {
     },
   ])
 
-  const [controllerList, currentPermissions] =
-    controllersDataResult as unknown as [string[], string]
+  const [{ value: controllerList }, { value: currentPermissions }] =
+    controllersDataResult
 
   // if we are setting permissions for a new controller, add it in the list of controller
   // and increment the `AddressPermissions[]` Array.
@@ -86,7 +86,7 @@ const setPermissions = async () => {
     currentPermissions == '0x' ||
     currentPermissions == null ||
     // we also add the controller in the list if it was not present before
-    !controllerList.includes(grantPermissionAddress.value)
+    !(controllerList as string[]).includes(grantPermissionAddress.value)
   ) {
     if (controllerList && Array.isArray(controllerList)) {
       const encodedControllerList = erc725js.encodeData([

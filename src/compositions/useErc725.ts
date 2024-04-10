@@ -4,7 +4,6 @@ import LSP4DigitalAsset from '@erc725/erc725.js/schemas/LSP4DigitalAsset.json'
 import LSP9Vault from '@erc725/erc725.js/schemas/LSP9Vault.json'
 import { Permissions } from '@erc725/erc725.js/build/main/src/types/Method'
 import { FetchDataOutput } from '@erc725/erc725.js/build/main/src/types/decodeData'
-import Web3 from 'web3'
 import { getSelectedNetworkConfig } from '@/helpers/config'
 
 window.ERC725 = ERC725
