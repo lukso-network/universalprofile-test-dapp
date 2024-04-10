@@ -65,7 +65,7 @@ watchEffect(async () => {
       mintToken.value,
       LSP8IdentifiableDigitalAsset as ERC725JSONSchema[]
     )
-    const lsp8DigitalAsset = await erc725.fetchData('LSP8TokenIdType')
+    const lsp8DigitalAsset = await erc725.fetchData('LSP8TokenIdFormat')
     tokenIdType.value = Number(lsp8DigitalAsset.value)
   }
 })
