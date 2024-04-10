@@ -9,7 +9,6 @@ import {
   // @ts-ignore
 } from '@lukso/lsp-smart-contracts'
 import { Permissions } from '@erc725/erc725.js/build/main/src/types/Method'
-import { ERC725 } from '@erc725/erc725.js'
 import LSP6Schema from '@erc725/erc725.js/schemas/LSP6KeyManager.json'
 
 import { computed, ref } from 'vue'
@@ -17,11 +16,10 @@ import useErc725 from '@/compositions/useErc725'
 import { sliceAddress } from '@/utils/sliceAddress'
 import { hexToBytes } from '@/utils/hexToBytes'
 import Web3Utils, { hexToNumber, numberToHex, padLeft } from 'web3-utils'
-import { Data } from '@erc725/erc725.js/build/main/src/types/decodeData'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
-const { encodePermissions, decodePermissions } = useErc725()
+const { encodePermissions, decodePermissions, getInstance } = useErc725()
 const grantPermissionAddress = ref('0xaf3bf2ffb025098b79caddfbdd113b3681817744')
 const permissions: Permissions = {
   CHANGEOWNER: false,
@@ -69,29 +67,40 @@ const setPermissions = async () => {
 
   let dataValuesToSet = [encodePermissions(selectedPermissions.value)]
 
-  const currentPermissions = await window.erc725Account.methods
-    .getData(dataKeysToSet[0])
-    .call()
+  const erc725js = getInstance(erc725AccountAddress, LSP6Schema)
+
+  const controllersDataResult = await erc725js.getData([
+    'AddressPermissions[]',
+    {
+      keyName: 'AddressPermissions:Permissions:<address>',
+      dynamicKeyParts: grantPermissionAddress.value,
+    },
+  ])
+
+  const [controllerList, currentPermissions] =
+    controllersDataResult as unknown as [string[], string]
 
   // if we are setting permissions for a new controller, add it in the list of controller
   // and increment the `AddressPermissions[]` Array.
-  if (currentPermissions == '0x' || currentPermissions === padLeft('0x', 64)) {
-    const erc725js = new ERC725(LSP6Schema, window.erc725Account.address)
+  if (
+    currentPermissions == '0x' ||
+    currentPermissions == null ||
+    // we also add the controller in the list if it was not present before
+    !controllerList.includes(grantPermissionAddress.value)
+  ) {
+    if (controllerList && Array.isArray(controllerList)) {
+      const encodedControllerList = erc725js.encodeData([
+        {
+          keyName: 'AddressPermissions[]',
+          value: [grantPermissionAddress.value],
+          totalArrayLength: controllerList.length + 1,
+          startingIndex: controllerList.length,
+        },
+      ])
 
-    const { value: controllerList } = await erc725js.getData(
-      'AddressPermissions[]'
-    )
-
-    const encodedControllerList = erc725js.encodeData([
-      {
-        keyName: 'AddressPermissions[]',
-        value: grantPermissionAddress.value,
-        startingIndex: (controllerList as Data[]).length,
-      },
-    ])
-
-    dataKeysToSet.push(...encodedControllerList.keys)
-    dataValuesToSet.push(...encodedControllerList.values)
+      dataKeysToSet.push(...encodedControllerList.keys)
+      dataValuesToSet.push(...encodedControllerList.values)
+    }
   }
 
   try {
