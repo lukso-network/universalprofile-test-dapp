@@ -67,9 +67,9 @@ const methods: MethodSelect[] = [
     label: '💰 Revoke Operator LSP7 v12',
     call: 'revokeOperator',
     inputs: [
-      { type: 'address', name: 'operator', value: sampleUP }, 
+      { type: 'address', name: 'operator', value: sampleUP },
       { type: 'bool', name: 'notify', value: true },
-      { type: 'bytes', name: 'operatorNotificationData', value: '0x' }
+      { type: 'bytes', name: 'operatorNotificationData', value: '0x' },
     ],
     hasSpecs: [LSPType.LSP7DigitalAsset],
   },
@@ -77,10 +77,10 @@ const methods: MethodSelect[] = [
     label: '💰 Revoke Operator LSP7 v15',
     call: 'revokeOperator',
     inputs: [
-      { type: 'address', name: 'operator', value: sampleUP }, 
+      { type: 'address', name: 'operator', value: sampleUP },
       { type: 'address', name: 'tokenOwner', value: sampleUP },
       { type: 'bool', name: 'notify', value: true },
-      { type: 'bytes', name: 'operatorNotificationData', value: '0x' }
+      { type: 'bytes', name: 'operatorNotificationData', value: '0x' },
     ],
     hasSpecs: [LSPType.LSP7DigitalAsset],
   },
@@ -101,7 +101,7 @@ const methods: MethodSelect[] = [
     inputs: [
       { type: 'address', name: 'operator', value: sampleUP },
       { type: 'bytes32', name: 'tokenId', value: '1' },
-      { type: 'bytes', name: 'operatorNotificationData', value: '0x' }
+      { type: 'bytes', name: 'operatorNotificationData', value: '0x' },
     ],
     hasSpecs: [LSPType.LSP8IdentifiableDigitalAsset],
   },
@@ -112,7 +112,7 @@ const methods: MethodSelect[] = [
       { type: 'address', name: 'operator', value: sampleUP },
       { type: 'bytes32', name: 'tokenId', value: '1' },
       { type: 'bool', name: 'notify', value: true },
-      { type: 'bytes', name: 'operatorNotificationData', value: '0x' }
+      { type: 'bytes', name: 'operatorNotificationData', value: '0x' },
     ],
     hasSpecs: [LSPType.LSP8IdentifiableDigitalAsset],
   },
