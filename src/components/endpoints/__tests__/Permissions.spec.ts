@@ -48,13 +48,15 @@ test('can update permissions for given address', async () => {
     'Permissions set'
   )
   expect(mockSend).toBeCalledWith(
-    ['0x4b80742de2bf82acb3630000af3bf2ffb025098b79caddfbdd113b3681817744',
+    [
+      '0x4b80742de2bf82acb3630000af3bf2ffb025098b79caddfbdd113b3681817744',
       '0xdf30dba06db6a30e65354d9a64c609861f089545ca58c6b4dbe31a5f338cb0e3',
-      '0xdf30dba06db6a30e65354d9a64c6098600000000000000000000000000000007'
+      '0xdf30dba06db6a30e65354d9a64c6098600000000000000000000000000000007',
     ],
-    ['0x0000000000000000000000000000000000000000000000000000000000000001',
+    [
+      '0x0000000000000000000000000000000000000000000000000000000000000001',
       '0x00000000000000000000000000000008',
-      '0xaf3bf2ffb025098b79caddfbdd113b3681817744'
+      '0xaf3bf2ffb025098b79caddfbdd113b3681817744',
     ]
   )
 })
@@ -72,5 +74,7 @@ test('can see set permission error from send function', async () => {
 
   await fireEvent.click(screen.getByTestId('setPermissions'))
 
-  expect(await screen.findByTestId('notification')).toHaveTextContent('Send error')
+  expect(await screen.findByTestId('notification')).toHaveTextContent(
+    'Send error'
+  )
 })
