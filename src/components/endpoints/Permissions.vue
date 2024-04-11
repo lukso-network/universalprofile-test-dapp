@@ -4,8 +4,8 @@ import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
 import {
   ERC725YDataKeys,
-  ALL_PERMISSIONS, 
-  PERMISSIONS 
+  ALL_PERMISSIONS,
+  PERMISSIONS,
   // @ts-ignore
 } from '@lukso/lsp-smart-contracts'
 import { Permissions } from '@erc725/erc725.js/build/main/src/types/Method'
