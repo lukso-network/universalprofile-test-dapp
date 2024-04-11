@@ -6,7 +6,7 @@ export enum ContractStandard {
   ERC721 = 'ERC721',
 }
 
-export const LSP8TokenIdTypes = [
+export const LSP8TokenIdFormats = [
   'NUMBER',
   'STRING',
   'UNIQUE_ID',
@@ -14,7 +14,7 @@ export const LSP8TokenIdTypes = [
   'ADDRESS',
 ]
 
-export const LSP8TokenIdTypesData = [
+export const LSP8TokenIdFormatsData = [
   'uint256',
   'string',
   'bytes',

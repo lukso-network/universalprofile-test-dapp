@@ -12,8 +12,8 @@ import { Lsp4Metadata } from '@/types'
 import Lsp4MetadataForm from '@/components/shared/Lsp4MetadataForm.vue'
 import {
   ContractStandard,
-  LSP8TokenIdTypes,
-  LSP8TokenIdTypesData,
+  LSP8TokenIdFormats,
+  LSP8TokenIdFormatsData,
 } from '@/enums'
 import LSPSelect from '@/components/shared/LSPSelect.vue'
 import {
@@ -182,7 +182,7 @@ const mint = async () => {
           })
 
         // set asset metadata
-        const tokenIdTypeData = LSP8TokenIdTypesData[tokenIdType.value]
+        const tokenIdTypeData = LSP8TokenIdFormatsData[tokenIdType.value]
         const metadataKey = ERC725.encodeKeyName(
           `LSP8MetadataTokenURI:<${tokenIdTypeData}>`,
           tokenId.value
@@ -233,8 +233,8 @@ const mint = async () => {
       </div>
       <div v-if="tokenType === ContractStandard.LSP8" class="field">
         <label class="label"
-          >Token Id ({{ LSP8TokenIdTypes[tokenIdType] }} in
-          {{ LSP8TokenIdTypesData[tokenIdType] }})</label
+          >Token Id ({{ LSP8TokenIdFormats[tokenIdType] }} in
+          {{ LSP8TokenIdFormatsData[tokenIdType] }})</label
         >
         <div class="control">
           <input
