@@ -66,10 +66,13 @@ test('can update permissions for given address', async () => {
 test('can see set permission error from send function', async () => {
   setState('address', '0x02f02b27eDFcBBDE762Ff2a7FC20a4Aebd495214')
 
-  mockSend.mockImplementation(() =>
-    jest.fn().mockImplementation(() => {
-      throw new Error('Send error')
-    })()
+  mockSend.mockImplementation(
+    () =>
+      // jest.fn().mockImplementation(() => {
+      {
+        throw new Error('Send error')
+      }
+    // })()
   )
 
   render(Permissions)

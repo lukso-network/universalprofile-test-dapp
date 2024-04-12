@@ -58,52 +58,53 @@ const ALL_PERMISSIONS_WITH_DELEGATECALL = padLeft(
 
 const setPermissions = async () => {
   clearNotification()
-  const erc725AccountAddress = getState('address')
-
-  let dataKeysToSet = [
-    ERC725YDataKeys.LSP6['AddressPermissions:Permissions'] +
-      grantPermissionAddress.value.slice(2),
-  ]
-
-  let dataValuesToSet = [encodePermissions(selectedPermissions.value)]
-
-  const erc725js = getInstance(erc725AccountAddress, LSP6Schema)
-
-  const controllersDataResult = await erc725js.getData([
-    'AddressPermissions[]',
-    {
-      keyName: 'AddressPermissions:Permissions:<address>',
-      dynamicKeyParts: grantPermissionAddress.value,
-    },
-  ])
-
-  const [{ value: controllerList }, { value: currentPermissions }] =
-    controllersDataResult
-
-  // if we are setting permissions for a new controller, add it in the list of controller
-  // and increment the `AddressPermissions[]` Array.
-  if (
-    currentPermissions == '0x' ||
-    currentPermissions == null ||
-    // we also add the controller in the list if it was not present before
-    !(controllerList as string[]).includes(grantPermissionAddress.value)
-  ) {
-    if (controllerList && Array.isArray(controllerList)) {
-      const encodedControllerList = erc725js.encodeData([
-        {
-          keyName: 'AddressPermissions[]',
-          value: [grantPermissionAddress.value],
-          totalArrayLength: controllerList.length + 1,
-          startingIndex: controllerList.length,
-        },
-      ])
-
-      dataKeysToSet.push(...encodedControllerList.keys)
-      dataValuesToSet.push(...encodedControllerList.values)
-    }
-  }
 
   try {
+    const erc725AccountAddress = getState('address')
+
+    let dataKeysToSet = [
+      ERC725YDataKeys.LSP6['AddressPermissions:Permissions'] +
+        grantPermissionAddress.value.slice(2),
+    ]
+
+    let dataValuesToSet = [encodePermissions(selectedPermissions.value)]
+
+    const erc725js = getInstance(erc725AccountAddress, LSP6Schema)
+
+    const controllersDataResult = await erc725js.getData([
+      'AddressPermissions[]',
+      {
+        keyName: 'AddressPermissions:Permissions:<address>',
+        dynamicKeyParts: grantPermissionAddress.value,
+      },
+    ])
+
+    const [{ value: controllerList }, { value: currentPermissions }] =
+      controllersDataResult
+
+    // if we are setting permissions for a new controller, add it in the list of controller
+    // and increment the `AddressPermissions[]` Array.
+    if (
+      currentPermissions == '0x' ||
+      currentPermissions == null ||
+      // we also add the controller in the list if it was not present before
+      !(controllerList as string[]).includes(grantPermissionAddress.value)
+    ) {
+      if (controllerList && Array.isArray(controllerList)) {
+        const encodedControllerList = erc725js.encodeData([
+          {
+            keyName: 'AddressPermissions[]',
+            value: [grantPermissionAddress.value],
+            totalArrayLength: controllerList.length + 1,
+            startingIndex: controllerList.length,
+          },
+        ])
+
+        dataKeysToSet.push(...encodedControllerList.keys)
+        dataValuesToSet.push(...encodedControllerList.values)
+      }
+    }
+
     isPending.value = true
     window.erc725Account &&
       (await window.erc725Account.methods
