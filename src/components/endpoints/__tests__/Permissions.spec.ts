@@ -1,5 +1,5 @@
 import Permissions from '../Permissions.vue'
-import { render, fireEvent, screen, waitFor } from '@testing-library/vue'
+import { render, fireEvent, screen } from '@testing-library/vue'
 import { setState } from '@/stores'
 import { Contract } from 'web3-eth-contract'
 
@@ -44,11 +44,9 @@ test('can update permissions for given address', async () => {
   await fireEvent.click(screen.getByTestId('CHANGEOWNER'))
   await fireEvent.click(screen.getByTestId('setPermissions'))
 
-  await waitFor(() => {
-    expect(screen.getByTestId('notification')).toHaveTextContent(
-      'Permissions set'
-    )
-  })
+  expect(await screen.findByTestId('notification')).toHaveTextContent(
+    'Permissions set'
+  )
   expect(mockSend).toBeCalledWith(
     [
       '0x4b80742de2bf82acb3630000af3bf2ffb025098b79caddfbdd113b3681817744',
@@ -75,7 +73,8 @@ test('can see set permission error from send function', async () => {
   render(Permissions)
 
   await fireEvent.click(screen.getByTestId('setPermissions'))
-  await waitFor(() => {
-    expect(screen.getByTestId('notification')).toHaveTextContent('Send error')
-  })
+
+  expect(await screen.findByTestId('notification')).toHaveTextContent(
+    'Send error'
+  )
 })
