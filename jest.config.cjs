@@ -20,4 +20,5 @@ module.exports = {
     customExportConditions: ['node', 'node-addons'],
   },
   globalSetup: './jest.setup.cjs',
+  testTimeout: 10000,
 }

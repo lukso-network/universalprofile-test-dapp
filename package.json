@@ -8,7 +8,7 @@
     "build": "vue-tsc --noEmit && vite build",
     "build:cloudflare": "yarn lint:js && yarn lint:css && yarn lint:format && yarn lint:types && yarn test && yarn build",
     "preview": "vite preview",
-    "test": "jest",
+    "test": "jest --runInBand",
     "lint": "npm-run-all --aggregate-output --continue-on-error --parallel 'lint:*!(fix)'",
     "lint:js": "eslint src --ext .js,.ts,.vue",
     "lint:css": "stylelint \"**/*.{css,scss,vue}\"",
@@ -18,7 +18,7 @@
     "prepare": "husky install"
   },
   "dependencies": {
-    "@erc725/erc725.js": "0.24.0",
+    "@erc725/erc725.js": "0.24.2",
     "@lukso/lsp-factory.js": "^3.3.1",
     "@lukso/lsp-smart-contracts": "^0.15.0",
     "@lukso/web3-onboard-config": "1.1.2",
