@@ -1,5 +1,5 @@
 import Permissions from '../Permissions.vue'
-import { render, fireEvent, screen } from '@testing-library/vue'
+import { render, fireEvent, screen, waitFor } from '@testing-library/vue'
 import { setState } from '@/stores'
 import { Contract } from 'web3-eth-contract'
 
@@ -31,21 +31,23 @@ beforeEach(() => {
 })
 
 test('can update permissions for given address', async () => {
-  setState('address', '0x517216362D594516c6f96Ee34b2c502d65B847E4')
+  setState('address', '0x02f02b27eDFcBBDE762Ff2a7FC20a4Aebd495214')
 
   mockSend.mockImplementation(() => ({
     on: () => ({
-      once: () => jest.fn(),
+      once: () => jest.fn().mockImplementation(() => {}),
     }),
   }))
 
   render(Permissions)
 
-  await fireEvent.click(screen.getByTestId('CHANGEOWNER'))
-  await fireEvent.click(screen.getByTestId('setPermissions'))
+  fireEvent.click(screen.getByTestId('CHANGEOWNER'))
+  fireEvent.click(screen.getByTestId('setPermissions'))
 
-  expect(screen.getByTestId('notification')).toHaveTextContent(
-    'Permissions set'
+  await waitFor(() =>
+    expect(screen.getByTestId('notification')).toHaveTextContent(
+      'Permissions set'
+    )
   )
   expect(mockSend).toBeCalledWith(
     [
@@ -62,7 +64,7 @@ test('can update permissions for given address', async () => {
 })
 
 test('can see set permission error from send function', async () => {
-  setState('address', '0x517216362D594516c6f96Ee34b2c502d65B847E4')
+  setState('address', '0x02f02b27eDFcBBDE762Ff2a7FC20a4Aebd495214')
 
   mockSend.mockImplementation(() =>
     jest.fn().mockImplementation(() => {
@@ -72,7 +74,9 @@ test('can see set permission error from send function', async () => {
 
   render(Permissions)
 
-  await fireEvent.click(screen.getByTestId('setPermissions'))
+  fireEvent.click(screen.getByTestId('setPermissions'))
 
-  expect(screen.getByTestId('notification')).toHaveTextContent('Send error')
+  await waitFor(() =>
+    expect(screen.getByTestId('notification')).toHaveTextContent('Send error')
+  )
 })
