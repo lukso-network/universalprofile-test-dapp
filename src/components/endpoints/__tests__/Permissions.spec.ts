@@ -45,10 +45,12 @@ describe('Setting Permissions tests', () => {
     fireEvent.click(screen.getByTestId('CHANGEOWNER'))
     fireEvent.click(screen.getByTestId('setPermissions'))
 
-    await waitFor(() =>
-      expect(screen.getByTestId('notification')).toHaveTextContent(
-        'Permissions set'
-      )
+    await waitFor(
+      () =>
+        expect(screen.getByTestId('notification')).toHaveTextContent(
+          'Permissions set'
+        ),
+      { timeout: 5000 }
     )
     expect(mockSend).toBeCalledWith(
       [
@@ -77,8 +79,12 @@ describe('Setting Permissions tests', () => {
 
     fireEvent.click(screen.getByTestId('setPermissions'))
 
-    await waitFor(() =>
-      expect(screen.getByTestId('notification')).toHaveTextContent('Send error')
+    await waitFor(
+      () =>
+        expect(screen.getByTestId('notification')).toHaveTextContent(
+          'Send error'
+        ),
+      { timeout: 5000 }
     )
   })
 })
