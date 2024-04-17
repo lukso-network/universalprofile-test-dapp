@@ -9,6 +9,7 @@ import {
   // @ts-ignore
 } from '@lukso/lsp-smart-contracts'
 import { Permissions } from '@erc725/erc725.js/build/main/src/types/Method'
+import LSP6Schema from '@erc725/erc725.js/schemas/LSP6KeyManager.json'
 
 import { computed, ref } from 'vue'
 import useErc725 from '@/compositions/useErc725'
@@ -18,31 +19,33 @@ import Web3Utils, { hexToNumber, numberToHex, padLeft } from 'web3-utils'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
-const { encodePermissions, decodePermissions } = useErc725()
+const { encodePermissions, decodePermissions, getInstance } = useErc725()
 const grantPermissionAddress = ref('0xaf3bf2ffb025098b79caddfbdd113b3681817744')
 const permissions: Permissions = {
-  CHANGEOWNER: false,
-  ADDCONTROLLER: false,
-  EDITPERMISSIONS: false,
-  ADDEXTENSIONS: false,
-  CHANGEEXTENSIONS: false,
-  ADDUNIVERSALRECEIVERDELEGATE: false,
-  CHANGEUNIVERSALRECEIVERDELEGATE: false,
-  REENTRANCY: false,
-  SUPER_TRANSFERVALUE: false,
-  TRANSFERVALUE: false,
-  SUPER_CALL: false,
-  CALL: false,
-  SUPER_STATICCALL: false,
-  STATICCALL: false,
-  SUPER_DELEGATECALL: false,
-  DELEGATECALL: false,
-  DEPLOY: false,
-  SUPER_SETDATA: false,
-  SETDATA: false,
-  ENCRYPT: false,
-  DECRYPT: false,
-  SIGN: false,
+    CHANGEOWNER: false,
+    ADDCONTROLLER: false,
+    EDITPERMISSIONS: false,
+    ADDEXTENSIONS: false,
+    CHANGEEXTENSIONS: false,
+    ADDUNIVERSALRECEIVERDELEGATE: false,
+    CHANGEUNIVERSALRECEIVERDELEGATE: false,
+    REENTRANCY: false,
+    SUPER_TRANSFERVALUE: false,
+    TRANSFERVALUE: false,
+    SUPER_CALL: false,
+    CALL: false,
+    SUPER_STATICCALL: false,
+    STATICCALL: false,
+    SUPER_DELEGATECALL: false,
+    DELEGATECALL: false,
+    DEPLOY: false,
+    SUPER_SETDATA: false,
+    SETDATA: false,
+    ENCRYPT: false,
+    DECRYPT: false,
+    SIGN: false,
+    EXECUTE_RELAY_CALL: false,
+    ERC4337_PERMISSION: false,
 }
 const selectedPermissions = ref(permissions)
 const isPending = ref(false)
@@ -59,16 +62,54 @@ const setPermissions = async () => {
   clearNotification()
   const erc725AccountAddress = getState('address')
 
-  const key =
-    ERC725YDataKeys['LSP6']['AddressPermissions:Permissions'] +
-    grantPermissionAddress.value.slice(2)
-  const value = encodePermissions(selectedPermissions.value)
+  let dataKeysToSet = [
+    ERC725YDataKeys.LSP6['AddressPermissions:Permissions'] +
+      grantPermissionAddress.value.slice(2),
+  ]
+
+  let dataValuesToSet = [encodePermissions(selectedPermissions.value)]
+
+  const erc725js = getInstance(erc725AccountAddress, LSP6Schema)
+
+  const controllersDataResult = await erc725js.getData([
+    'AddressPermissions[]',
+    {
+      keyName: 'AddressPermissions:Permissions:<address>',
+      dynamicKeyParts: grantPermissionAddress.value,
+    },
+  ])
+
+  const [{ value: controllerList }, { value: currentPermissions }] =
+    controllersDataResult
+
+  // if we are setting permissions for a new controller, add it in the list of controller
+  // and increment the `AddressPermissions[]` Array.
+  if (
+    currentPermissions == '0x' ||
+    currentPermissions == null ||
+    // we also add the controller in the list if it was not present before
+    !(controllerList as string[]).includes(grantPermissionAddress.value)
+  ) {
+    if (controllerList && Array.isArray(controllerList)) {
+      const encodedControllerList = erc725js.encodeData([
+        {
+          keyName: 'AddressPermissions[]',
+          value: [grantPermissionAddress.value],
+          totalArrayLength: controllerList.length + 1,
+          startingIndex: controllerList.length,
+        },
+      ])
+
+      dataKeysToSet.push(...encodedControllerList.keys)
+      dataValuesToSet.push(...encodedControllerList.values)
+    }
+  }
 
   try {
     isPending.value = true
     window.erc725Account &&
       (await window.erc725Account.methods
-        .setDataBatch([key], [value])
+        .setDataBatch(dataKeysToSet, dataValuesToSet)
         .send({
           from: erc725AccountAddress,
         })

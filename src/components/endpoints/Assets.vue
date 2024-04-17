@@ -2,31 +2,20 @@
 import { getState, setState } from '@/stores'
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
-import { ref } from 'vue'
+import { ref, toRaw } from 'vue'
 import { createBlockScoutLink } from '@/utils/createLinks'
 import Lsp4MetadataForm from '@/components/shared/Lsp4MetadataForm.vue'
-import LSP8Mintable from '@lukso/lsp-smart-contracts/artifacts/LSP8Mintable.json'
-import { Lsp4Metadata } from '@/types'
+import { Lsp4Metadata, Token } from '@/types'
 import { ContractStandard } from '@/enums'
 import CustomSelect from '@/components/shared/CustomSelect.vue'
-import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
 import { useLspFactory } from '@/compositions/useLspFactory'
-import ERC725 from '@erc725/erc725.js'
-import { BN } from 'bn.js'
-import { addTokenToLocalStore, recalcTokens } from '@/helpers/tokenUtils'
+import { addTokenToLocalStore, recalculateAssets } from '@/helpers/tokenUtils'
 import { useERC20 } from '@/compositions/useErc20'
-import useWeb3Connection from '@/compositions/useWeb3Connection'
-
-type Token = {
-  type: ContractStandard
-  name: string
-  symbol: string
-  isNonDivisible: boolean
-}
+import { LSP8_TOKEN_ID_FORMAT } from '@lukso/lsp-smart-contracts'
+import { LSP4_TOKEN_TYPES } from '@lukso/lsp4-contracts'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
-const { contract } = useWeb3Connection()
 
 const isTokenCreated = ref(false)
 const isTokenPending = ref(false)
@@ -45,15 +34,24 @@ const lsp4Metadata = ref<Lsp4Metadata>({
     },
   ],
 })
-
+const creators = ref<string[]>()
 const tokenAddress = ref<string>()
+const tokenIdType = ref('0')
 
-const handleNewLsp4Metadata = (metadata: Lsp4Metadata) => {
+const handleNewLsp4Metadata = (
+  metadata: Lsp4Metadata,
+  newCreators: string[]
+) => {
   lsp4Metadata.value = metadata
+  creators.value = newCreators
 }
 
 const handleStandardSelected = (standard: string) => {
   token.value.type = standard as ContractStandard
+}
+
+const handleSelectTokenIdType = (selectedTokenIdType: string) => {
+  tokenIdType.value = selectedTokenIdType
 }
 
 const create = async () => {
@@ -72,60 +70,51 @@ const create = async () => {
     const { deployERC20Token } = useERC20()
 
     let deployedAsset
+    let digitalAssetData
     switch (token.value.type) {
       case ContractStandard.LSP7:
-        deployedAsset = await deployLSP7DigitalAsset({
-          isNFT: token.value.isNonDivisible,
-          controllerAddress: erc725AccountAddress,
+        digitalAssetData = {
           name: token.value.name,
           symbol: token.value.symbol,
+          controllerAddress: erc725AccountAddress,
+          tokenType: LSP4_TOKEN_TYPES.TOKEN,
+          isNFT: !!token.value.isNonDivisible,
+          creators: toRaw(creators.value),
           digitalAssetMetadata: {
             LSP4Metadata: {
               ...lsp4Metadata.value,
             },
           },
-        })
+        }
+        console.log(digitalAssetData)
+        deployedAsset = await deployLSP7DigitalAsset(digitalAssetData)
         console.log('Deployed asset', deployedAsset.LSP7DigitalAsset)
         addTokenToLocalStore(
           (tokenAddress.value = deployedAsset.LSP7DigitalAsset.address)
         )
         break
       case ContractStandard.LSP8:
-        deployedAsset = await deployLSP8IdentifiableDigitalAsset({
-          controllerAddress: erc725AccountAddress,
+        digitalAssetData = {
           name: token.value.name,
           symbol: token.value.symbol,
+          controllerAddress: erc725AccountAddress,
+          tokenType: LSP4_TOKEN_TYPES.COLLECTION,
+          creators: toRaw(creators.value),
           digitalAssetMetadata: {
             LSP4Metadata: {
               ...lsp4Metadata.value,
             },
           },
-        })
+          tokenIdFormat: tokenIdType.value,
+        }
+        console.log(digitalAssetData)
+        deployedAsset =
+          await deployLSP8IdentifiableDigitalAsset(digitalAssetData)
         console.log(
           'Deployed asset',
           deployedAsset.LSP8IdentifiableDigitalAsset
         )
         tokenAddress.value = deployedAsset.LSP8IdentifiableDigitalAsset.address
-        const deployedContract = contract(
-          LSP8Mintable.abi as any,
-          tokenAddress.value,
-          {
-            gas: DEFAULT_GAS,
-            gasPrice: DEFAULT_GAS_PRICE,
-          }
-        )
-        await deployedContract.methods
-          .setData(
-            ERC725.encodeKeyName('LSP8TokenIdType'), //LSP8TokenIdType
-            `0x${new BN('3').toString('hex', 64)}`
-          )
-          .send({ from: erc725AccountAddress })
-          .on('receipt', function (receipt: any) {
-            console.log(receipt)
-          })
-          .once('sending', (payload: any) => {
-            console.log(JSON.stringify(payload, null, 2))
-          })
         addTokenToLocalStore(
           (tokenAddress.value =
             deployedAsset.LSP8IdentifiableDigitalAsset.address)
@@ -144,7 +133,7 @@ const create = async () => {
         console.log('Standard not supported')
     }
     isTokenCreated.value = true
-    await recalcTokens()
+    await recalculateAssets()
     setState('tokenAddress', tokenAddress.value)
     setNotification('Token created', 'info')
   } catch (error) {
@@ -186,6 +175,36 @@ const create = async () => {
         <label class="label">Token symbol</label>
         <div class="control">
           <input v-model="token.symbol" class="input" type="text" />
+        </div>
+      </div>
+      <div v-if="token.type === ContractStandard.LSP8" class="field">
+        <label class="label">Token Id type</label>
+        <div class="control">
+          <CustomSelect
+            :options="[
+              {
+                display: 'NUMBER',
+                value: LSP8_TOKEN_ID_FORMAT.NUMBER.toString(),
+              },
+              {
+                display: 'STRING',
+                value: LSP8_TOKEN_ID_FORMAT.STRING.toString(),
+              },
+              {
+                display: 'UNIQUE_ID',
+                value: LSP8_TOKEN_ID_FORMAT.UNIQUE_ID.toString(),
+              },
+              {
+                display: 'HASH',
+                value: LSP8_TOKEN_ID_FORMAT.HASH.toString(),
+              },
+              {
+                display: 'ADDRESS',
+                value: LSP8_TOKEN_ID_FORMAT.ADDRESS.toString(),
+              },
+            ]"
+            @option-selected="handleSelectTokenIdType"
+          />
         </div>
       </div>
       <Lsp4MetadataForm

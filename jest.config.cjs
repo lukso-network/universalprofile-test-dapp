@@ -1,4 +1,6 @@
-const esModules = ['@lukso/lsp-smart-contracts'].join('|')
+const esModules = ['@lukso/lsp-smart-contracts', '@lukso/lsp-factory.js'].join(
+  '|'
+)
 
 module.exports = {
   transform: {
@@ -18,4 +20,5 @@ module.exports = {
     customExportConditions: ['node', 'node-addons'],
   },
   globalSetup: './jest.setup.cjs',
+  testTimeout: 10000,
 }

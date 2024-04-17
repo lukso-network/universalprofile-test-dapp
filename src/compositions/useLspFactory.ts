@@ -12,8 +12,8 @@ import { getSelectedNetworkConfig } from '@/helpers/config'
 import {
   DeployedLSP7DigitalAsset,
   DeployedLSP8IdentifiableDigitalAsset,
-  DigitalAssetDeploymentOptions,
   LSP7DigitalAssetDeploymentOptions,
+  LSP8IdentifiableDigitalAssetDeploymentOptions,
 } from '@lukso/lsp-factory.js/build/main/src/lib/interfaces/digital-asset-deployment'
 import useWeb3Connection from './useWeb3Connection'
 
@@ -45,7 +45,7 @@ const deployLSP7DigitalAsset = async (
 }
 
 const deployLSP8IdentifiableDigitalAsset = async (
-  digitalAssetDeploymentOptions: DigitalAssetDeploymentOptions
+  digitalAssetDeploymentOptions: LSP8IdentifiableDigitalAssetDeploymentOptions
 ): Promise<DeployedLSP8IdentifiableDigitalAsset> => {
   return await lspFactory.LSP8IdentifiableDigitalAsset.deploy(
     digitalAssetDeploymentOptions
@@ -62,22 +62,7 @@ const uploadUniversalProfileMetaData = async (
   )
 }
 
-export function useLspFactory(): {
-  deployUniversalProfile: (
-    profileDeploymentOptions: ProfileDeploymentOptions,
-    contractDeploymentOptions?: ContractDeploymentOptions | undefined
-  ) => Promise<DeployedUniversalProfileContracts>
-  uploadUniversalProfileMetaData: (
-    profileData: ProfileDataBeforeUpload,
-    uploadOptions?: UploadOptions
-  ) => Promise<ProfileDataForEncoding>
-  deployLSP7DigitalAsset: (
-    digitalAssetDeploymentOptions: LSP7DigitalAssetDeploymentOptions
-  ) => Promise<DeployedLSP7DigitalAsset>
-  deployLSP8IdentifiableDigitalAsset: (
-    digitalAssetDeploymentOptions: DigitalAssetDeploymentOptions
-  ) => Promise<DeployedLSP8IdentifiableDigitalAsset>
-} {
+export function useLspFactory() {
   const hasExtension = !!getProvider()
   if (!hasExtension) {
     throw new Error('Extension not installed')

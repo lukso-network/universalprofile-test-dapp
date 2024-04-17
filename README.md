@@ -1,10 +1,8 @@
 # Universal Profile Test dApp
 
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/lukso-network/universalprofile-test-dapp/Build%20and%20Test?label=tests)
+A sample app to demonstrate the displaying, deploying and usage of a [Universal Profile](https://docs.lukso.tech/standards/universal-profile/lsp0-erc725account) inside a web app.
 
-A sample app to demonstrate the displaying, deploying and usage of a universal profile inside a web app.
-
-Running version: <http://up-test-dapp.lukso.tech/>
+If you are a developer, check out the [LUKSO Technical Documentation](https://docs.lukso.tech/).
 
 Stack:
 
@@ -19,7 +17,21 @@ Stack:
 - [Eslint](https://eslint.org/)
 - [Jest](https://jestjs.io/)
 
-## Project setup
+## 🚀 Deployments
+
+This project is deployed via [Cloudflare pages](https://pages.cloudflare.com/). The CI is setup in the GitHub Action side.
+
+### Preview
+
+When you create a PR, a preview URL will be appended to the PR discussion.
+
+### Production
+
+Branch: `main`
+
+- <https://up-test-dapp.lukso.tech/>
+
+## 🧑🏻‍💻 Getting Started
 
 ```sh
 yarn install
@@ -58,4 +70,4 @@ yarn upgrade-interactive
 
 ## Wallet Connect V2
 
-This project supports Wallet Connect V2, a [project ID should be set](https://docs.walletconnect.com/2.0/javascript/sign/installation) in `constants.ts` file.
+This project supports Wallet Connect V2, a [project ID should be set](https://docs.walletconnect.com/web3modal/javascript/about#installation) in `constants.ts` file.

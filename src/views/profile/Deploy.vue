@@ -10,18 +10,18 @@ import ProfileModal from '@/components/modals/ProfileModal.vue'
 import { createBlockScoutLink } from '@/utils/createLinks'
 import { formatNumber } from '@/helpers/formatNumber'
 import {
-  LSP3ProfileJSON,
   DeploymentEvent,
   DeploymentStatus,
   DeploymentType,
 } from '@lukso/lsp-factory.js'
 import { getAndPrepareAllIpfsItems } from '@/helpers/localstorage'
+import { LSP3ProfileMetadataJSON } from '@lukso/lsp-smart-contracts'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
 const isModalOpen = ref(false)
 const controllerKey = ref('')
-const selectedProfile = ref({ profile: {} as LSP3ProfileJSON, url: '' })
+const selectedProfile = ref({ profile: {} as LSP3ProfileMetadataJSON, url: '' })
 const profileDeploymentEvents = ref<DeploymentEvent[]>([])
 const isLoading = ref(false)
 const { deployUniversalProfile } = useLspFactory()
@@ -89,7 +89,7 @@ const deploy = async (controllerKey: string) => {
 }
 
 const openModal = (selectedProfileData: {
-  profile: LSP3ProfileJSON
+  profile: LSP3ProfileMetadataJSON
   url: string
 }) => {
   isModalOpen.value = true

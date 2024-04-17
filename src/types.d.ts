@@ -15,14 +15,6 @@ export type NotificationType = 'primary' | 'danger' | 'info' | 'warning'
 
 export type Channel = WINDOW_ETHEREUM | WALLET_CONNECT | WEB3_ONBOARD
 
-export enum ContractStandard {
-  LSP8 = 'LSP8',
-  LSP7 = 'LSP7',
-  ERC20 = 'ERC20',
-  ERC777 = 'ERC777',
-  ERC721 = 'ERC721',
-}
-
 export interface Store {
   isConnected: boolean
   address: string
@@ -40,4 +32,11 @@ export type Lsp4Metadata = {
   links: LinkMetdata[]
   icon?: File
   images?: File[]
+}
+
+export type Token = {
+  type?: ContractStandard
+  name: string
+  symbol: string
+  isNonDivisible?: boolean
 }

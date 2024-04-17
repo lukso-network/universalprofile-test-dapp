@@ -4,7 +4,7 @@ import { LSPType } from '@/helpers/tokenUtils'
 
 const { sampleUP, errorContract } = getSelectedNetworkConfig()
 
-export const methodSelectors: MethodSelect[] = [
+export const methods: MethodSelect[] = [
   {
     label: '💰 Default',
   },
@@ -26,13 +26,29 @@ export const methodSelectors: MethodSelect[] = [
     inputs: [
       { type: 'address', name: 'operator', value: sampleUP },
       { type: 'uint256', name: 'amount', value: '1' },
+      { type: 'bytes', name: 'operatorNotificationData', value: '0x' },
     ],
     hasSpecs: [LSPType.LSP7DigitalAsset],
   },
   {
-    label: '💰 Revoke Operator LSP7',
+    label: '💰 Revoke Operator LSP7 v12',
     call: 'revokeOperator',
-    inputs: [{ type: 'address', name: 'operator', value: sampleUP }],
+    inputs: [
+      { type: 'address', name: 'operator', value: sampleUP },
+      { type: 'bool', name: 'notify', value: true },
+      { type: 'bytes', name: 'operatorNotificationData', value: '0x' },
+    ],
+    hasSpecs: [LSPType.LSP7DigitalAsset],
+  },
+  {
+    label: '💰 Revoke Operator LSP7 v15',
+    call: 'revokeOperator',
+    inputs: [
+      { type: 'address', name: 'operator', value: sampleUP },
+      { type: 'address', name: 'tokenOwner', value: sampleUP },
+      { type: 'bool', name: 'notify', value: true },
+      { type: 'bytes', name: 'operatorNotificationData', value: '0x' },
+    ],
     hasSpecs: [LSPType.LSP7DigitalAsset],
   },
   {
@@ -52,6 +68,7 @@ export const methodSelectors: MethodSelect[] = [
     inputs: [
       { type: 'address', name: 'operator', value: sampleUP },
       { type: 'bytes32', name: 'tokenId', value: '1' },
+      { type: 'bytes', name: 'operatorNotificationData', value: '0x' },
     ],
     hasSpecs: [LSPType.LSP8IdentifiableDigitalAsset],
   },
@@ -61,6 +78,8 @@ export const methodSelectors: MethodSelect[] = [
     inputs: [
       { type: 'address', name: 'operator', value: sampleUP },
       { type: 'bytes32', name: 'tokenId', value: '1' },
+      { type: 'bool', name: 'notify', value: true },
+      { type: 'bytes', name: 'operatorNotificationData', value: '0x' },
     ],
     hasSpecs: [LSPType.LSP8IdentifiableDigitalAsset],
   },
@@ -178,10 +197,10 @@ export const methodSelectors: MethodSelect[] = [
   },
   {
     label: '🎛️ SetData',
-    call: 'setData',
+    call: 'setDataBatch',
     hasSpecs: [
       LSPType.UP,
-      LSPType.LSP3UniversalProfileMetadata,
+      LSPType.LSP3ProfileMetadata,
       LSPType.LSP7DigitalAsset,
       LSPType.LSP8IdentifiableDigitalAsset,
       LSPType.LSP9Vault,

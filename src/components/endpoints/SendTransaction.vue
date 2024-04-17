@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { toWei, numberToHex } from 'web3-utils'
+import { toWei, toNumber } from 'web3-utils'
 import { ref, watch, reactive, computed } from 'vue'
 import { TransactionConfig } from 'web3-core'
 
@@ -7,18 +7,34 @@ import { getState, setState } from '@/stores'
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
-import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
+import {
+  DEFAULT_GAS,
+  DEFAULT_GAS_PRICE,
+  DEFAULT_MAX_FEE_PER_GAS,
+  DEFAULT_MAX_PRIORITY_FEE_PER_GAS,
+  getSelectedNetworkConfig,
+} from '@/helpers/config'
 import ContractFunction from '@/components/shared/ContractFunction.vue'
 import { MethodSelect, MethodType } from '@/helpers/functionUtils'
 import { methodSelectors as methods } from '@/utils/methodSelectors'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
-const { sendTransaction, getBalance } = useWeb3Connection()
+const {
+  sendTransaction,
+  getBalance,
+  estimateGas,
+  defaultMaxPriorityFeePerGas,
+  executeCall,
+} = useWeb3Connection()
 
 const data = ref<string>('')
 const hasData = ref(false)
 const isPending = ref(false)
+const callResults = ref<string | null>(null)
+const resultFormat = reactive<{ item: MethodSelect }>({
+  item: { label: 'results' },
+})
 
 watch(
   () => getState('address'),
@@ -30,13 +46,75 @@ watch(
 function makeValue(param: MethodType) {
   const { value: _value, isWei } = param
   if (isWei) {
-    const value = typeof _value !== 'string' ? numberToHex(_value) : _value
+    const value =
+      typeof _value !== 'string' ? toNumber(_value).toString() : _value
     return toWei(value, isWei)
   }
   return _value
 }
 
-const send = async () => {
+const estimate = async () => {
+  const from = makeValue(params.items[0])
+  let transaction = {
+    from,
+    to: makeValue(params.items[1]),
+    value: makeValue(params.items[2]),
+    maxPriorityFeePerGas: makeValue(params.items[3]),
+    maxFeePerGas: makeValue(params.items[4]),
+    gas: makeValue(params.items[5]),
+    gasPrice: makeValue(params.items[6]),
+  } as TransactionConfig
+  if (hasData.value) {
+    transaction = { ...transaction, data: data.value }
+  }
+
+  isPending.value = true
+  Promise.all([estimateGas(transaction), getBalance(from)])
+    .then(([gas, balance]) => {
+      setNotification(`Estimated gas ${gas}`)
+      params.items[5].value = gas
+      setState('balance', balance)
+    })
+    .catch(error => {
+      setNotification((error as unknown as Error).message, 'danger')
+    })
+    .finally(() => {
+      isPending.value = false
+    })
+}
+
+const send = () => {
+  clearNotification()
+
+  const from = makeValue(params.items[0])
+  let transaction = {
+    from,
+    to: makeValue(params.items[1]),
+    value: makeValue(params.items[2]),
+    maxPriorityFeePerGas: makeValue(params.items[3]),
+    maxFeePerGas: makeValue(params.items[4]),
+    gas: makeValue(params.items[5]),
+    gasPrice: makeValue(params.items[6]),
+  } as TransactionConfig
+  if (hasData.value) {
+    transaction = { ...transaction, data: data.value }
+  }
+  isPending.value = true
+  callResults.value = null
+  Promise.all([sendTransaction(transaction), getBalance(from)])
+    .then(([, balance]) => {
+      setNotification('The transaction was successful')
+      setState('balance', balance)
+    })
+    .catch(error => {
+      setNotification((error as unknown as Error).message, 'danger')
+    })
+    .finally(() => {
+      isPending.value = false
+    })
+}
+
+const rawCall = () => {
   clearNotification()
 
   const from = makeValue(params.items[0])
@@ -45,8 +123,6 @@ const send = async () => {
     from,
     to: makeValue(params.items[1]),
     value: makeValue(params.items[2]),
-    gas: DEFAULT_GAS,
-    gasPrice: DEFAULT_GAS_PRICE,
   } as TransactionConfig
   if (hasData.value) {
     transaction = { ...transaction, data: data.value }
@@ -54,36 +130,58 @@ const send = async () => {
 
   console.log(transaction)
 
-  try {
-    isPending.value = true
-    await sendTransaction(transaction)
-    setNotification('The transaction was successful')
-    setState('balance', await getBalance(from))
-  } catch (error) {
-    setNotification((error as unknown as Error).message, 'danger')
-  } finally {
-    isPending.value = false
-  }
+  isPending.value = true
+  callResults.value = null
+  Promise.all([executeCall(transaction), getBalance(from)])
+    .then(([result, balance]) => {
+      callResults.value = result
+      setNotification('Call executed successfully.')
+      setState('balance', balance)
+    })
+    .catch(error => {
+      setNotification((error as unknown as Error).message, 'danger')
+    })
+    .finally(() => {
+      isPending.value = false
+    })
 }
-
 const method = reactive<{ item: MethodSelect }>({ item: methods[0] })
 const params = reactive<{ items: MethodType[] }>({
   items: [
     { type: 'address', name: 'from', value: getState('address') },
     { type: 'address', name: 'to' },
     { type: 'uint256', isWei: 'ether', name: 'amount', value: '0' },
+    {
+      type: 'uint256',
+      isWei: 'wei',
+      name: 'maxPriorityFeePerGas',
+      value: DEFAULT_MAX_PRIORITY_FEE_PER_GAS,
+    }, // 3
+    {
+      type: 'uint256',
+      isWei: 'wei',
+      name: 'maxFeePerGas',
+      value: DEFAULT_MAX_FEE_PER_GAS,
+    }, // 4
+    { type: 'uint256', isWei: 'wei', name: 'gas', value: DEFAULT_GAS }, // 5
+    {
+      type: 'uint256',
+      isWei: 'wei',
+      name: 'gasPrice',
+      value: DEFAULT_GAS_PRICE,
+    }, // 6
   ],
 })
 
 const selectMethod = (e: Event) => {
-  const value = parseInt((e.target as HTMLInputElement).value, 10)
+  const value = Number.parseInt((e.target as HTMLInputElement).value, 10)
   const { to, amount, ...item } =
     value >= methods.length
       ? items.items[value - methods.length]
       : methods[value]
-  Object.entries(item).forEach(([key, val]) => {
+  for (const [key, val] of Object.entries(item)) {
     ;(method.item as any)[key] = val
-  })
+  }
   params.items = params.items.map((param, index) => {
     if (index === 1) {
       if (
@@ -98,15 +196,19 @@ const selectMethod = (e: Event) => {
   })
   method.item.call = item.call
   hasData.value = item.call != null
-  if (to != undefined) {
+  if (to != null) {
     params.items[1].value = to
   }
-  if (amount != undefined) {
+  if (amount != null) {
     params.items[2].value = amount
   }
+  defaultMaxPriorityFeePerGas().then(value => {
+    params.items[3].value = value
+  })
 }
 
 const handleData = (e?: string) => {
+  console.log(e)
   if (data.value !== e || '') {
     data.value = e || ''
   }
@@ -160,7 +262,7 @@ const hasRemove = computed<boolean>(() => {
 
 <template>
   <div class="tile is-4 is-parent">
-    <div class="tile is-child box">
+    <div class="tile is-child box" style="width: 100%">
       <p class="is-size-5 has-text-weight-bold mb-4">Transaction</p>
       <div class="field">
         <div class="select is-fullwidth mb-2">
@@ -193,6 +295,7 @@ const hasRemove = computed<boolean>(() => {
         testid-prefix="transaction-"
         :custom="true"
       />
+
       <div class="field">
         <label class="checkbox">
           <input v-model="hasData" data-testid="hasData" type="checkbox" />
@@ -244,10 +347,28 @@ const hasRemove = computed<boolean>(() => {
           :class="`button is-primary is-rounded mt-4 ${
             isPending ? 'is-loading' : ''
           }`"
+          data-testid="estimate"
+          @click="estimate"
+        >
+          Estimate Gas
+        </button>
+        <button
+          :class="`button is-primary is-rounded mt-4 ${
+            isPending ? 'is-loading' : ''
+          }`"
           data-testid="send"
           @click="send"
         >
           Send Transaction
+        </button>
+        <button
+          :class="`button is-primary is-rounded mt-4 ${
+            isPending ? 'is-loading' : ''
+          }`"
+          data-testid="rawCall"
+          @click="rawCall"
+        >
+          Call
         </button>
       </div>
 
@@ -256,6 +377,18 @@ const hasRemove = computed<boolean>(() => {
         <a href="https://docs.lukso.tech/guides/universal-profile/transfer-lyx"
           >transfer LYX tutorial</a
         >.
+      </div>
+
+      <div v-if="callResults">
+        <label class="label">Call result</label>
+        <ContractFunction
+          v-model="resultFormat.item.inputs"
+          custom
+          :data="callResults"
+          :data-decoder="true"
+          :hide-data="true"
+        />
+        <div class="box" style="overflow-wrap: anywhere">{{ callResults }}</div>
       </div>
 
       <div class="field">

@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, watchEffect } from 'vue'
 import { Lsp4Metadata } from '@/types'
+import { getState } from '@/stores'
 
 type Emits = {
-  (event: 'newMetadata', metadata: Lsp4Metadata): void
+  (event: 'newMetadata', metadata: Lsp4Metadata, creators: string[]): void
 }
 
 type Props = {
   disabled?: boolean
   newMetadata?: Lsp4Metadata
+  newCreators?: string[]
 }
 
 const props = defineProps<Props>()
@@ -24,8 +26,8 @@ const defaultValue = {
   ],
 }
 
-// eslint-disable-next-line vue/no-setup-props-destructure
 const metadata = ref<Lsp4Metadata>(props.newMetadata || defaultValue)
+const creators = ref<string[]>([])
 
 watch(
   () => props.newMetadata,
@@ -33,6 +35,10 @@ watch(
     metadata.value = newMetadata || defaultValue
   }
 )
+
+watchEffect(() => {
+  creators.value = props.newCreators || [getState('address')]
+})
 
 const handleTokenIcon = (event: Event) => {
   const target = event.target as HTMLInputElement
@@ -69,8 +75,23 @@ const handleLinkUrlChange = (index: number, event: Event) => {
   emitMetadata()
 }
 
+const handleCreatorChange = (index: number, event: Event) => {
+  creators.value[index] = (event.target as HTMLInputElement).value
+  emitMetadata()
+}
+
+const removeCreator = (index: number) => {
+  creators.value.splice(index, 1)
+  emitMetadata()
+}
+
+const addCreator = () => {
+  creators.value.push('')
+  emitMetadata()
+}
+
 const emitMetadata = () => {
-  emits('newMetadata', metadata.value)
+  emits('newMetadata', metadata.value, creators.value)
 }
 </script>
 
@@ -149,6 +170,39 @@ const emitMetadata = () => {
       @click="addLink"
     >
       Add link
+    </button>
+  </div>
+  <div class="field mb-3">
+    <label class="label">Token Creators</label>
+    <div
+      v-for="(creator, index) in creators"
+      :key="index"
+      class="control mb-2 is-flex"
+    >
+      <input
+        :v-model="creator"
+        :value="creator"
+        class="input"
+        type="text"
+        placeholder="Title"
+        :disabled="props.disabled"
+        @keyup="event => handleCreatorChange(index, event)"
+      />
+      <button
+        class="button ml-2"
+        :disabled="props.disabled"
+        @click="removeCreator(index)"
+      >
+        Remove
+      </button>
+    </div>
+    <button
+      class="button"
+      data-testid="addCreator"
+      :disabled="props.disabled"
+      @click="addCreator"
+    >
+      Add Creator
     </button>
   </div>
 </template>

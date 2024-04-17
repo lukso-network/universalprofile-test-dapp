@@ -81,9 +81,9 @@ const setupProvider = async (
 }
 
 const disconnect = async () => {
-  if (getState('channel') == WALLET_CONNECT) {
+  if (getState('channel') === WALLET_CONNECT) {
     await provider.value?.disconnect()
-  } else if (getState('channel') == WEB3_ONBOARD) {
+  } else if (getState('channel') === WEB3_ONBOARD) {
     await web3Onboard.disconnect()
   } else {
     localStorage.removeItem(UP_CONNECTED_ADDRESS)
@@ -119,10 +119,20 @@ const getBalance = async (address: string) => {
   return web3.utils.fromWei(wei)
 }
 
-const sendTransaction = async (transaction: TransactionConfig) => {
-  return await web3.eth
+const estimateGas = async (transaction: TransactionConfig) => {
+  return Number(await web3.eth.estimateGas(transaction))
+}
+
+const executeCall = (transaction: TransactionConfig): Promise<string> => {
+  return web3.eth.call(transaction)
+}
+
+const sendTransaction = (
+  transaction: TransactionConfig
+): Promise<TransactionReceipt> => {
+  return web3.eth
     .sendTransaction(transaction)
-    .on('receipt', function (receipt: any) {
+    .on('receipt', (receipt: any) => {
       console.log(receipt)
     })
     .once('sending', payload => {
@@ -130,17 +140,27 @@ const sendTransaction = async (transaction: TransactionConfig) => {
     })
 }
 
-const sendRequest = async (request: any): Promise<any> => {
+const sendRequest = (request: any): Promise<any> => {
   if (provider.value) {
-    return await provider.value.request(request)
-  } else {
-    console.warn('Provider is not set up or not connected.')
+    return provider.value.request(request)
   }
+  console.warn('Provider is not set up or not connected.')
+  return Promise.resolve(null)
 }
 
 const accounts = async () => {
   const [account] = await web3.eth.getAccounts()
   return account
+}
+
+const getBaseFee = async (): Promise<number> => {
+  return await web3.eth
+    .getBlock('pending')
+    .then(block => Number(block.baseFeePerGas))
+}
+
+const defaultMaxPriorityFeePerGas = async (): Promise<number> => {
+  return 2_500_000_000
 }
 
 const requestAccounts = async (): Promise<string[]> => {
@@ -187,40 +207,7 @@ const isAddress = (address: string): boolean => {
   return baseIsAddress(address)
 }
 
-export default function useWeb3Connection(): {
-  setupProvider: (
-    meansOfConnection: string
-  ) => Promise<EthereumProvider | undefined>
-  getProvider: () => EthereumProvider
-  getWeb3: () => Web3
-  getChainId: () => Promise<number>
-  contract: (
-    jsonInterface: AbiItem[],
-    address?: string,
-    options?: ContractOptions
-  ) => Contract
-  getBalance: (address: string) => Promise<string>
-  sendTransaction: (
-    transaction: TransactionConfig
-  ) => Promise<TransactionReceipt>
-  accounts: () => Promise<string>
-  requestAccounts: () => Promise<string[]>
-  sign: (message: string, address: string) => Promise<string>
-  recover: (message: string, signature: string) => Promise<string>
-  personalSign: (
-    message: string,
-    address: string,
-    password?: string
-  ) => Promise<string>
-  signTransaction: (
-    transaction: TransactionConfig,
-    address: string
-  ) => Promise<string>
-  recoverRawTransaction: (encodedTransaction: string) => Promise<string>
-  isAddress: (address: string) => boolean
-  sendRequest: (request: any) => Promise<any>
-  disconnect: () => Promise<void>
-} {
+export default function useWeb3Connection() {
   return {
     setupProvider,
     getProvider,
@@ -230,8 +217,12 @@ export default function useWeb3Connection(): {
     contract,
     getBalance,
     sendTransaction,
+    defaultMaxPriorityFeePerGas,
+    executeCall,
     accounts,
     requestAccounts,
+    estimateGas,
+    getBaseFee,
     sign,
     recover,
     personalSign,

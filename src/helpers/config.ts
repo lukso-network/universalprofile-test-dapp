@@ -15,8 +15,10 @@ export const WALLET_CONNECT = 'wallet-connect-v2'
 export const WINDOW_LUKSO = 'window-lukso'
 export const WEB3_ONBOARD = 'web3Onboard'
 
-export const DEFAULT_GAS = 5_000_000
+export const DEFAULT_GAS = '50000000000000000'
 export const DEFAULT_GAS_PRICE = '10000000000'
+export const DEFAULT_MAX_PRIORITY_FEE_PER_GAS = '1'
+export const DEFAULT_MAX_FEE_PER_GAS = '1'
 
 export const MAGICVALUE = '0x1626ba7e'
 
@@ -33,7 +35,7 @@ export const NETWORKS: { [K in NetworkType]: NetworkInfo } = {
       url: 'https://erc725cache.l16.lukso.network/graphql',
     },
     ipfs: {
-      url: 'https://2eff.lukso.dev/ipfs/',
+      url: 'https://api.universalprofile.cloud/ipfs',
     },
     blockscout: {
       url: 'https://explorer.execution.l16.lukso.network',
@@ -65,7 +67,7 @@ export const NETWORKS: { [K in NetworkType]: NetworkInfo } = {
       url: 'https://erc725cache.testnet.lukso.network/graphql',
     },
     ipfs: {
-      url: 'https://2eff.lukso.dev/ipfs/',
+      url: 'https://api.universalprofile.cloud/api/v0',
     },
     blockscout: {
       url: 'https://explorer.execution.testnet.lukso.network',
@@ -73,7 +75,7 @@ export const NETWORKS: { [K in NetworkType]: NetworkInfo } = {
     chainId: 4201,
 
     // The sample values are currently just junk.
-    sampleEoA: '0x21F35075133853155758cf9C37c6A993Ca8C596e',
+    sampleEoA: '0xD634fc59DE7fCb60677322B2B114Ab70756e70be',
     sampleUP: '0x21CFF5BCe6F7845734fCC3915FEeaC7C7D89588D',
     sampleSC: '0xb4c93158DDC3043D4Cd8270d6fDC3232ba21eD32',
     errorContract: '0xFDb952E4dC30A1C55F76cdC2Ca14c13cFb69E62c',

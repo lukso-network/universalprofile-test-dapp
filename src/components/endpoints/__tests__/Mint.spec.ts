@@ -20,9 +20,16 @@ jest.mock('@/compositions/useWeb3Connection', () => ({
             }),
           }),
         }),
+        decimals: () => ({
+          call: () => jest.fn(),
+        }),
       },
     }),
   }),
+}))
+
+jest.mock('@/helpers/env', () => ({
+  PUBLIC_API_SHARED_SECRET: '123',
 }))
 
 test('can mint token', async () => {
@@ -32,7 +39,6 @@ test('can mint token', async () => {
     '0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298'
   )
   await fireEvent.click(screen.getByTestId('mint'))
-
   expect(await screen.findByTestId('notification')).toHaveTextContent(
     'Token minted'
   )
