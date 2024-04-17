@@ -4,7 +4,7 @@ import { LSPType } from '@/helpers/tokenUtils'
 
 const { sampleUP, errorContract } = getSelectedNetworkConfig()
 
-export const methods: MethodSelect[] = [
+export const methodSelectors: MethodSelect[] = [
   {
     label: '💰 Default',
   },

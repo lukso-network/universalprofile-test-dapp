@@ -12,7 +12,6 @@ import {
   DEFAULT_GAS_PRICE,
   DEFAULT_MAX_FEE_PER_GAS,
   DEFAULT_MAX_PRIORITY_FEE_PER_GAS,
-  getSelectedNetworkConfig,
 } from '@/helpers/config'
 import ContractFunction from '@/components/shared/ContractFunction.vue'
 import { MethodSelect, MethodType } from '@/helpers/functionUtils'
