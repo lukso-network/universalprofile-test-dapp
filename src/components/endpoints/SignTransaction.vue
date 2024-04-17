@@ -8,7 +8,6 @@ import { toWei } from 'web3-utils'
 import { TransactionConfig } from 'web3-core'
 import Notifications from '@/components/Notification.vue'
 import ContractFunction from '@/components/shared/ContractFunction.vue'
-import { BN } from 'bn.js'
 import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
 import { MethodSelect, MethodType } from '@/helpers/functionUtils'
 import { methodSelectors as methods } from '@/utils/methodSelectors'
@@ -105,7 +104,7 @@ const onPermissionsValidation = async () => {
     getState('address'),
     {
       gasPrice: DEFAULT_GAS_PRICE,
-      gas: new BN(DEFAULT_GAS, 10).toNumber(),
+      gas: Number.MAX_VALUE,
     }
   )
 
@@ -165,7 +164,7 @@ const onSignatureValidation = async () => {
       getState('address'),
       {
         gasPrice: DEFAULT_GAS_PRICE,
-        gas: new BN(DEFAULT_GAS, 10).toNumber(),
+        gas: Number.MAX_VALUE,
       }
     )
     const signature = joinSignature({
