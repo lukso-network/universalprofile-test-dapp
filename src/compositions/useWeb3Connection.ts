@@ -132,8 +132,11 @@ const sendTransaction = (
 ): Promise<TransactionReceipt> => {
   return web3.eth
     .sendTransaction(transaction)
+    .on('transactionHash', hash => {
+      console.log('Transaction hash:', hash)
+    })
     .on('receipt', (receipt: any) => {
-      console.log(receipt)
+      console.log('Transaction receipt:', receipt)
     })
     .once('sending', payload => {
       console.log(JSON.stringify(payload, null, 2))
