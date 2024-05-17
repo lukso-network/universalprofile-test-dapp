@@ -1,10 +1,7 @@
 import SignTransaction from '../SignTransaction.vue'
 import { render, fireEvent, screen, waitFor } from '@testing-library/vue'
 import { setState } from '@/stores'
-import {
-  DEFAULT_GAS,
-  DEFAULT_GAS_PRICE,
-} from '@/helpers/config'
+import { DEFAULT_GAS, DEFAULT_GAS_PRICE } from '@/helpers/config'
 
 const mockGetDataCall = jest.fn()
 const mockSignTransaction = jest.fn()
