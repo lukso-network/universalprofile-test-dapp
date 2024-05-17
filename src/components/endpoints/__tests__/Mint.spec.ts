@@ -21,7 +21,7 @@ jest.mock('@/compositions/useWeb3Connection', () => ({
           }),
         }),
         decimals: () => ({
-          call: () => jest.fn(),
+          call: () => 42,
         }),
       },
     }),
