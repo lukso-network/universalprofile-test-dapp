@@ -7,6 +7,7 @@ import SetData from '@/components/endpoints/SetData.vue'
 import Permissions from '@/components/endpoints/Permissions.vue'
 import Assets from '@/components/endpoints/Assets.vue'
 import Sign from '@/components/endpoints/Sign.vue'
+import SignTransaction from '@/components/endpoints/SignTransaction.vue'
 import CustomRelayer from '@/components/endpoints/CustomRelayer.vue'
 import Notifications from '@/components/Notification.vue'
 import ImportProfile from '@/components/endpoints/ImportProfile.vue'
@@ -45,6 +46,7 @@ const hasExtension = computed(() => !!window.lukso)
     </div>
     <div class="tile is-ancestor">
       <Sign />
+      <SignTransaction />
       <GetNetworkId />
     </div>
   </section>

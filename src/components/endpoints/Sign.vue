@@ -10,10 +10,17 @@ import useWeb3Connection from '@/compositions/useWeb3Connection'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
-const { sign, recover, getWeb3 } = useWeb3Connection()
+const { sign, personalSign, recover, getWeb3 } = useWeb3Connection()
+
+enum SignMethod {
+  EthSign = 'eth_sign',
+  PersonalSign = 'personal_sign',
+}
 
 const isPending = ref(false)
 const message = ref('sign message')
+const password = ref('')
+const showPassword = ref(false)
 const siweMessage = ref('By logging in, you confirm the terms and conditions')
 const signMessage = ref('')
 const signResponse = ref<string>()
@@ -22,6 +29,7 @@ const magicValue = ref<string>()
 const isSiwe = ref(false)
 const hasExpirationTime = ref(false)
 const hasNotBefore = ref(false)
+const signingMethodSelected = ref<SignMethod>(SignMethod.EthSign)
 
 const siwe = ref({
   expirationDate: getDate(),
@@ -50,7 +58,15 @@ const onSign = async () => {
     isPending.value = true
     signMessage.value = isSiwe.value ? createSiweMessage() : message.value
     console.info(signMessage.value)
-    signResponse.value = await sign(signMessage.value, erc725AccountAddress)
+    if (signingMethodSelected.value === SignMethod.EthSign) {
+      signResponse.value = await sign(signMessage.value, erc725AccountAddress)
+    } else {
+      signResponse.value = await personalSign(
+        signMessage.value,
+        erc725AccountAddress,
+        password.value
+      )
+    }
     recovery.value = undefined
     magicValue.value = undefined
 
@@ -145,12 +161,37 @@ const onSignatureValidation = async () => {
     setNotification((error as unknown as Error).message, 'danger')
   }
 }
+
+const toggleShow = () => {
+  showPassword.value = !showPassword.value
+}
 </script>
 
 <template>
   <div class="tile is-4 is-parent">
     <div class="tile is-child box">
       <p class="is-size-5 has-text-weight-bold mb-4">Sign</p>
+      <div class="field">
+        <label class="label">Select RPC</label>
+        <input
+          type="radio"
+          id="eth_sign_radio_btn"
+          data-testid="eth_sign_radio_btn"
+          value="eth_sign"
+          v-model="signingMethodSelected"
+        />
+        <label for="eth_sign_radio_btn" class="ml-1">eth_sign</label>
+
+        <input
+          type="radio"
+          id="personal_sign_radio_btn"
+          data-testid="personal_sign_radio_btn"
+          value="personal_sign"
+          v-model="signingMethodSelected"
+          class="ml-1"
+        />
+        <label for="personal_sign_radio_btn" class="ml-1">personal_sign</label>
+      </div>
       <div class="field">
         <label class="label">Message</label>
         <div class="control">
@@ -166,6 +207,40 @@ const onSignatureValidation = async () => {
             class="textarea"
             rows="3"
           />
+        </div>
+        <div
+          class="field has-addons"
+          v-if="signingMethodSelected === SignMethod.PersonalSign"
+        >
+          <div class="control is-expanded">
+            <input
+              v-if="showPassword"
+              v-model="password"
+              type="text"
+              class="input"
+              placeholder="Optional password"
+              data-testid="password"
+            />
+            <input
+              v-else
+              v-model="password"
+              type="password"
+              class="input"
+              placeholder="Optional password"
+              data-testid="password"
+            />
+          </div>
+          <div class="control">
+            <button
+              class="button"
+              data-testid="toggle-password-visibility"
+              @click="toggleShow"
+            >
+              <div
+                :class="`password-visibility ${showPassword ? 'on' : 'off'}`"
+              />
+            </button>
+          </div>
         </div>
       </div>
       <div class="field">
@@ -348,6 +423,15 @@ const onSignatureValidation = async () => {
         >].
       </div>
       <div class="field">
+        Test <code>personal_sign</code> RPC call [<a
+          href="https://docs.constellationnetwork.io/stargazer/apireference/ethereumrpcapi/personal_sign/"
+          >documentation ex. 1</a
+        >,
+        <a href="https://docs.metamask.io/wallet/reference/personal_sign/"
+          >documentation ex. 2</a
+        >].
+      </div>
+      <div class="field">
         How to implement
         <a
           href="https://docs.lukso.tech/guides/browser-extension/sign-in-with-ethereum"
@@ -391,5 +475,23 @@ const onSignatureValidation = async () => {
 
 textarea {
   resize: vertical;
+}
+
+.password-visibility {
+  height: 16px;
+  width: 30px;
+  background-repeat: no-repeat;
+  display: inline-flex;
+  background-position: center;
+  background-size: contain;
+  position: relative;
+
+  &.on {
+    background-image: url('/visibility_on.svg');
+  }
+
+  &.off {
+    background-image: url('/visibility_off.svg');
+  }
 }
 </style>

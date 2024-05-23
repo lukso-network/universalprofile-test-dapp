@@ -14,7 +14,6 @@ const setupWCV2Provider = async () => {
       'eth_getAccounts',
       'eth_getBalance',
       'eth_getId',
-      'eth_personalSign',
       'eth_requestAccounts',
       'eth_sendTransaction',
       'eth_sign',

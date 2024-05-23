@@ -5,6 +5,7 @@ import { Contract } from 'web3-eth-contract'
 import userEvent from '@testing-library/user-event'
 
 const mockSign = jest.fn()
+const mockPersonalSign = jest.fn()
 const mockRecover = jest.fn()
 const mockValidSignatureCall = jest.fn()
 const mockHashMessage = jest.fn()
@@ -13,6 +14,8 @@ jest.mock('@/compositions/useWeb3Connection', () => ({
   __esModule: true,
   default: () => ({
     sign: (message: string, address: string) => mockSign(message, address),
+    personalSign: (message: string, address: string, password: string) =>
+      mockPersonalSign(message, address, password),
     recover: (message: string, signature: string) =>
       mockRecover(message, signature),
     getWeb3: () => ({
@@ -38,11 +41,14 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-test('can sign message', async () => {
+test('can sign message using eth_sign', async () => {
   mockSign.mockReturnValue('0x123')
   setState('address', '0x517216362D594516c6f96Ee34b2c502d65B847E4')
   render(Sign)
 
+  /// Clicking first `personal_sign_radio_btn` radio button should have no effect and still use eth_sign
+  await fireEvent.click(screen.getByTestId('personal_sign_radio_btn'))
+  await fireEvent.click(screen.getByTestId('eth_sign_radio_btn'))
   await fireEvent.click(screen.getByTestId('sign'))
 
   expect(screen.getByTestId('notification')).toHaveTextContent(
@@ -53,6 +59,28 @@ test('can sign message', async () => {
     '0x517216362D594516c6f96Ee34b2c502d65B847E4'
   )
   expect(mockSign).toReturnWith('0x123')
+  expect(screen.getByTestId('signature')).toHaveTextContent('0x123')
+})
+
+test('can sign message using personal_sign', async () => {
+  mockPersonalSign.mockReturnValue('0x123')
+  setState('address', '0x517216362D594516c6f96Ee34b2c502d65B847E4')
+  render(Sign)
+
+  /// Clicking first `eth_sign_radio_btn` radio button should have no effect and still use personal_sign
+  await fireEvent.click(screen.getByTestId('eth_sign_radio_btn'))
+  await fireEvent.click(screen.getByTestId('personal_sign_radio_btn'))
+  await fireEvent.click(screen.getByTestId('sign'))
+
+  expect(screen.getByTestId('notification')).toHaveTextContent(
+    'Message signed successfully'
+  )
+  expect(mockPersonalSign).toBeCalledWith(
+    'sign message',
+    '0x517216362D594516c6f96Ee34b2c502d65B847E4',
+    ''
+  )
+  expect(mockPersonalSign).toReturnWith('0x123')
   expect(screen.getByTestId('signature')).toHaveTextContent('0x123')
 })
 
