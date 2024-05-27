@@ -23,7 +23,7 @@ const hasExtension = computed(() => !!window.lukso)
     <Notifications
       v-if="!hasExtension"
       :notification="{
-        message: 'Please instal Universal Profile browser extension.',
+        message: 'Please install Universal Profile browser extension.',
         type: 'warning',
       }"
       :hide-notification="true"
