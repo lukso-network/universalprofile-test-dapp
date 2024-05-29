@@ -9,10 +9,11 @@ import { Lsp4Metadata, Token } from '@/types'
 import { ContractStandard } from '@/enums'
 import CustomSelect from '@/components/shared/CustomSelect.vue'
 import { useLspFactory } from '@/compositions/useLspFactory'
-import { addTokenToLocalStore, recalculateAssets } from '@/helpers/tokenUtils'
+import { addTokenToLocalStore, encodeAssetMetadata, recalculateAssets } from '@/helpers/tokenUtils'
 import { useERC20 } from '@/compositions/useErc20'
 import { LSP8_TOKEN_ID_FORMAT } from '@lukso/lsp-smart-contracts'
 import { LSP4_TOKEN_TYPES } from '@lukso/lsp4-contracts'
+import { uploadAssetData } from '@/utils/uploadAssetData'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
@@ -64,6 +65,8 @@ const create = async () => {
   const erc725AccountAddress = getState('address')
   isTokenPending.value = true
 
+  const assetMetadata = await uploadAssetData(lsp4Metadata.value)
+  const metadataJsonUrl = encodeAssetMetadata(assetMetadata)
   try {
     const { deployLSP7DigitalAsset, deployLSP8IdentifiableDigitalAsset } =
       useLspFactory()
@@ -80,11 +83,7 @@ const create = async () => {
           tokenType: LSP4_TOKEN_TYPES.TOKEN,
           isNFT: !!token.value.isNonDivisible,
           creators: toRaw(creators.value),
-          digitalAssetMetadata: {
-            LSP4Metadata: {
-              ...lsp4Metadata.value,
-            },
-          },
+          digitalAssetMetadata: metadataJsonUrl,
         }
         console.log(digitalAssetData)
         deployedAsset = await deployLSP7DigitalAsset(digitalAssetData)
@@ -100,11 +99,7 @@ const create = async () => {
           controllerAddress: erc725AccountAddress,
           tokenType: LSP4_TOKEN_TYPES.COLLECTION,
           creators: toRaw(creators.value),
-          digitalAssetMetadata: {
-            LSP4Metadata: {
-              ...lsp4Metadata.value,
-            },
-          },
+          digitalAssetMetadata: metadataJsonUrl,
           tokenIdFormat: tokenIdType.value,
         }
         console.log(digitalAssetData)
