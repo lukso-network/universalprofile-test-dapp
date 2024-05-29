@@ -189,7 +189,7 @@ export const NETWORKS: { [K in NetworkType]: NetworkInfo } = {
       url: 'https://explorer.execution.mainnet.lukso.network',
     },
     chainId: 42,
-    
+
     // The sample values are currently just junk.
     sampleEoA: '0xD634fc59DE7fCb60677322B2B114Ab70756e70be',
     sampleUP: '0x21CFF5BCe6F7845734fCC3915FEeaC7C7D89588D',
