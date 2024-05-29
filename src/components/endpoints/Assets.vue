@@ -9,7 +9,11 @@ import { Lsp4Metadata, Token } from '@/types'
 import { ContractStandard } from '@/enums'
 import CustomSelect from '@/components/shared/CustomSelect.vue'
 import { useLspFactory } from '@/compositions/useLspFactory'
-import { addTokenToLocalStore, encodeAssetMetadata, recalculateAssets } from '@/helpers/tokenUtils'
+import {
+  addTokenToLocalStore,
+  encodeAssetMetadata,
+  recalculateAssets,
+} from '@/helpers/tokenUtils'
 import { useERC20 } from '@/compositions/useErc20'
 import { LSP8_TOKEN_ID_FORMAT } from '@lukso/lsp-smart-contracts'
 import { LSP4_TOKEN_TYPES } from '@lukso/lsp4-contracts'

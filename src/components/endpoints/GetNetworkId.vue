@@ -148,7 +148,9 @@ const addNetwork = async () => {
 
 onMounted(() => {
   const selectedNetworkChainId = getSelectedNetworkConfig()
-  const networkInfo = networks.find(element => hexToNumber(element.chainId) === selectedNetworkChainId.chainId)
+  const networkInfo = networks.find(
+    element => hexToNumber(element.chainId) === selectedNetworkChainId.chainId
+  )
   if (networkInfo) {
     activeNetwork.value = networkInfo
   }
