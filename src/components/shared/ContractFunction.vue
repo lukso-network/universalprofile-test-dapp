@@ -124,7 +124,9 @@ const computedCall = computed<string>(() => {
   return props.dataDecoder
     ? `${reactiveData.items?.map(({ name, type }) => `${type} ${name}`).join(', ')}`
     : reactiveData.call
-      ? `${reactiveData.call}(${reactiveData.items?.map(({ name, type }) => `${type} ${name}`).join(', ')})`
+      ? `${reactiveData.call}(${reactiveData.items
+          ?.map(({ name, type }) => `${type} ${name}`)
+          .join(', ')})`
       : ''
 })
 
@@ -175,7 +177,10 @@ const makeBytes = (value: string, type: string) => {
       return padLeft(hex, bytesCount * 2)
     }
     if (/^0x[0-9a-f]*$/i.test(value)) {
-      return padRight(value, bytesCount * 2)
+      if (/^bytes/.test(type)) {
+        return padRight(value, bytesCount * 2)
+      }
+      return padLeft(value, bytesCount * 2)
     }
     if (/^\w*(:.*,.*)?$/.test(value)) {
       const items = (value || '').split(',')
