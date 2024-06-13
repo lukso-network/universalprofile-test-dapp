@@ -91,14 +91,29 @@ export const decodeData = async (
     } catch {}
     const url = getSelectorLookupURL(selector)
     const functionSignatureResponse = await signatureCache?.match(url)
+    let methods: BytesSignatureResponse
     if (functionSignatureResponse) {
-      return await functionSignatureResponse.json()
+      const cachedResponse = await functionSignatureResponse.json()
+      const functionName = cachedResponse.call
+      const functionArgumentTypes = cachedResponse.inputs.map((input: any) => (input.type)).join(',')
+      methods = {
+        count: 1,
+        next: 0,
+        previous: 0,
+        results: [{
+          text_signature: `${functionName}(${functionArgumentTypes})`,
+          id: -1,
+          created_at: '',
+          hex_signature: '',
+          bytes_signature: ''
+        }]
+      }
+    } else {
+      methods = await fetcher<BytesSignatureResponse, void>({
+        method: 'GET',
+        url,
+      })
     }
-
-    const methods = await fetcher<BytesSignatureResponse, void>({
-      method: 'GET',
-      url,
-    })
 
     if (methods && methods.results.length > 0) {
       for (const result of methods.results.reverse()) {
