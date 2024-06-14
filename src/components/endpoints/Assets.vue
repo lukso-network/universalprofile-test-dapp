@@ -108,7 +108,7 @@ const create = async () => {
           tokenIdFormat: tokenIdType.value,
         }
         console.log(digitalAssetData)
-        deployedAsset = 
+        deployedAsset =
           await deployLSP8IdentifiableDigitalAsset(digitalAssetData)
         console.log(
           'Deployed asset',
