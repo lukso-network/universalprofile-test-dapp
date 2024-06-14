@@ -95,18 +95,22 @@ export const decodeData = async (
     if (functionSignatureResponse) {
       const cachedResponse = await functionSignatureResponse.json()
       const functionName = cachedResponse.call
-      const functionArgumentTypes = cachedResponse.inputs.map((input: any) => (input.type)).join(',')
+      const functionArgumentTypes = cachedResponse.inputs
+        .map((input: any) => input.type)
+        .join(',')
       methods = {
         count: 1,
         next: 0,
         previous: 0,
-        results: [{
-          text_signature: `${functionName}(${functionArgumentTypes})`,
-          id: -1,
-          created_at: '',
-          hex_signature: '',
-          bytes_signature: ''
-        }]
+        results: [
+          {
+            text_signature: `${functionName}(${functionArgumentTypes})`,
+            id: -1,
+            created_at: '',
+            hex_signature: '',
+            bytes_signature: '',
+          },
+        ],
       }
     } else {
       methods = await fetcher<BytesSignatureResponse, void>({
