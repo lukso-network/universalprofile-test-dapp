@@ -144,7 +144,7 @@ const sendTransaction = (
 }
 
 const sendRequest = (request: any): Promise<any> => {
-  console.log("Sending request:", request)
+  console.log('Sending request:', request)
   if (provider.value) {
     return provider.value.request(request)
   }
