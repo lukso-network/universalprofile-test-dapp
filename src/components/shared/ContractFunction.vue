@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { decodeData, MethodType } from '@/helpers/functionUtils'
 import { reactive, computed, watch, onMounted } from 'vue'
-import { toWei, Unit, padLeft, numberToHex } from 'web3-utils'
+import { toWei, Unit, padLeft, padRight, numberToHex } from 'web3-utils'
 import ParamField from './ParamField.vue'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
 import ERC725 from '@erc725/erc725.js'
@@ -126,10 +126,10 @@ const computedCall = computed<string>(() => {
         ?.map(({ name, type }) => `${type} ${name}`)
         .join(', ')}`
     : reactiveData.call
-    ? `${reactiveData.call}(${reactiveData.items
-        ?.map(({ name, type }) => `${type} ${name}`)
-        .join(', ')})`
-    : ''
+      ? `${reactiveData.call}(${reactiveData.items
+          ?.map(({ name, type }) => `${type} ${name}`)
+          .join(', ')})`
+      : ''
 })
 
 /**
@@ -179,7 +179,7 @@ const makeBytes = (value: string, type: string) => {
       return padLeft(hex, bytesCount * 2)
     }
     if (/^0x[0-9a-f]*$/i.test(value)) {
-      return padLeft(value, bytesCount * 2)
+      return padRight(value, bytesCount * 2)
     }
     if (/^\w*(:.*,.*)?$/.test(value)) {
       const items = (value || '').split(',')
@@ -235,8 +235,8 @@ const output = computed<{ error: undefined | string; value: string }>(() => {
     const args = reactiveData.items.map(({ value, type, isWei }) => {
       const makeItem = (value: any) =>
         /^bytes/.test(type)
-          ? makeBytes(value, type) ?? '0x'
-          : makeValue(value, isWei) ?? ''
+          ? (makeBytes(value, type) ?? '0x')
+          : (makeValue(value, isWei) ?? '')
       if (/\[\]$/.test(type)) {
         return value.map(makeItem)
       }
@@ -325,8 +325,8 @@ onMounted(() => {
         props.dataDecoder
           ? 'Decode Types'
           : !props.custom
-          ? `Function ${computedCall}`
-          : 'Function'
+            ? `Function ${computedCall}`
+            : 'Function'
       }}</label>
       <div v-if="props.custom" class="field">
         <input
