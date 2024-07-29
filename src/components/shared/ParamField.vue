@@ -309,8 +309,9 @@ const handleLSP = (index: number, e: Event) => {
       [{ keyName, value: item.value }],
       schemas as ERC725JSONSchema[]
     )
-    const decoded = (output as any[]).find(({ name }) => name === keyName)
-      ?.value
+    const decoded = (output as any[]).find(
+      ({ name }) => name === keyName
+    )?.value
     if (decoded) {
       if (typeof decoded === 'object') {
         item.decoded = JSON.stringify(decoded, null, 2)
@@ -404,8 +405,8 @@ const hasError = (index: number) => {
         methodInfo.label
           ? methodInfo.label
           : isArray
-          ? `${methodInfo.name}[${index + 1}]`
-          : methodInfo.name
+            ? `${methodInfo.name}[${index + 1}]`
+            : methodInfo.name
       }}
       ({{ methodInfo.type.replace(/\[\]$/, '')
       }}<select
@@ -482,8 +483,8 @@ const hasError = (index: number) => {
           methodInfo.label
             ? methodInfo.label
             : isArray
-            ? `${methodInfo.name}[${index + 1}]`
-            : methodInfo.name
+              ? `${methodInfo.name}[${index + 1}]`
+              : methodInfo.name
         }}
         ({{ methodInfo.type.replace(/\[\]$/, '') }})</label
       >
@@ -536,8 +537,8 @@ const hasError = (index: number) => {
       methodInfo.label
         ? methodInfo.label
         : isArray
-        ? `${methodInfo.name}`
-        : methodInfo.name
+          ? `${methodInfo.name}`
+          : methodInfo.name
     }}</label>
     <button @click="handleAdd(0)">Add</button>
   </div>
