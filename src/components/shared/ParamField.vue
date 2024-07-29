@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { reactive, computed, watch } from 'vue'
-import { toWei, Unit, padLeft, numberToHex, hexToNumber } from 'web3-utils'
+import {
+  toWei,
+  Unit,
+  padLeft,
+  padRight,
+  numberToHex,
+  hexToNumber,
+} from 'web3-utils'
 import ERC725, { ERC725JSONSchema } from '@erc725/erc725.js'
 import LSPSelect from '@/components/shared/LSPSelect.vue'
 import { BN } from 'bn.js'
@@ -378,7 +385,7 @@ const makeBytes32 = (index: number, force = false) => {
       }
     }
     if (/^0x[0-9a-f]*$/i.test(item.value)) {
-      return padLeft(item.value, 64)
+      return padRight(item.value, 64)
     }
     if (/^[0-9]*$/.test(item.value)) {
       return padLeft(item.value, 64)

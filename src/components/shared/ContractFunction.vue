@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { decodeData, MethodType } from '@/helpers/functionUtils'
 import { reactive, computed, watch, onMounted } from 'vue'
-import { toWei, Unit, padLeft, numberToHex } from 'web3-utils'
+import { toWei, Unit, padLeft, padRight, numberToHex } from 'web3-utils'
 import ParamField from './ParamField.vue'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
 import ERC725 from '@erc725/erc725.js'
@@ -175,7 +175,7 @@ const makeBytes = (value: string, type: string) => {
       return padLeft(hex, bytesCount * 2)
     }
     if (/^0x[0-9a-f]*$/i.test(value)) {
-      return padLeft(value, bytesCount * 2)
+      return padRight(value, bytesCount * 2)
     }
     if (/^\w*(:.*,.*)?$/.test(value)) {
       const items = (value || '').split(',')
