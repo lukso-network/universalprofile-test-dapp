@@ -96,6 +96,24 @@ const networks = [
     id: 'l16',
     chainId: '0xb0c',
   },
+  {
+    name: 'Base Sepolia',
+    http: {
+      url: 'https://base-sepolia-rpc.publicnode.com/',
+    },
+    ws: {
+      url: 'wss://base-sepolia-rpc.publicnode.com',
+    },
+    relayer: {
+      url: undefined,
+    },
+    explorer: {
+      url: 'https://sepolia.basescan.org/tx/{transactionId}',
+    },
+    isCustom: false,
+    id: 'base-sepolia',
+    chainId: '0x14a34',
+  },
 ]
 
 const getNetworkId = async () => {
