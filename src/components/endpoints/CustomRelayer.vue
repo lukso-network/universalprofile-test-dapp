@@ -11,7 +11,7 @@ const web3 = useWeb3Connection()
 
 const name = ref('My Relayer')
 const apiUrl = ref('https://service-relayer.staging.lukso.dev/api')
-const chainId = ref('2828')
+const chainId = ref('4201')
 const chainIds = ref<number[]>([+chainId.value])
 const showLabel = ref(false)
 
