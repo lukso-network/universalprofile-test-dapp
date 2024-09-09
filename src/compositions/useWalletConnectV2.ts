@@ -33,7 +33,6 @@ const setupWCV2Provider = async () => {
     },
     rpcMap: {
       42: 'https://rpc.mainnet.lukso.network',
-      2828: 'https://rpc.l16.lukso.network',
       4201: 'https://rpc.testnet.lukso.network',
     },
     showQrModal: true,

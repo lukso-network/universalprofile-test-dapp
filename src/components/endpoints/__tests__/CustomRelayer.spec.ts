@@ -3,8 +3,8 @@ import { render, fireEvent, screen } from '@testing-library/vue'
 
 const data = {
   name: 'my test relayer',
-  apiUrl: 'https://relayer.l16.staging.lukso.dev/api/v3/',
-  chainIds: [2828],
+  apiUrl: 'https://relayer.testnet.lukso.network/v1/relayer',
+  chainIds: [4201],
 }
 
 const mockSendRequest = jest.fn()
@@ -23,7 +23,7 @@ test('can add relayer', async () => {
   await fireEvent.update(screen.getByTestId('relayer-url'), data.apiUrl)
   await fireEvent.click(screen.getByTestId('add-relayer'))
 
-  expect(screen.getByTestId('chain-id-list')).toHaveTextContent(/2828/)
+  expect(screen.getByTestId('chain-id-list')).toHaveTextContent(/4201/)
 
   expect(mockSendRequest).toHaveBeenCalledWith({
     method: 'up_addTransactionRelayer',

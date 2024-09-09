@@ -79,24 +79,6 @@ const networks = [
     chainId: '0x2a',
   },
   {
-    name: 'L16 Testnet',
-    http: {
-      url: 'https://rpc.l16.lukso.network',
-    },
-    ws: {
-      url: 'wss://ws.rpc.l16.lukso.network',
-    },
-    relayer: {
-      url: 'https://service-relayer.staging.lukso.dev/api',
-    },
-    explorer: {
-      url: 'https://explorer.execution.l16.lukso.network/tx/{transactionId}/internal-transactions',
-    },
-    isCustom: false,
-    id: 'l16',
-    chainId: '0xb0c',
-  },
-  {
     name: 'Base Sepolia',
     http: {
       url: 'https://base-sepolia-rpc.publicnode.com/',
