@@ -3,7 +3,7 @@ import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
 import { getSelectedNetworkConfig, setNetworkConfig } from '@/helpers/config'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { hexToNumber, numberToHex } from 'web3-utils'
 
 export type NetworkInfo = {
@@ -20,28 +20,12 @@ export type NetworkInfo = {
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
 const web3 = useWeb3Connection()
-
 const defaultNetworkConfig = getSelectedNetworkConfig()
-const defaultNetwork: NetworkInfo = {
-  name: defaultNetworkConfig.name,
-  http: defaultNetworkConfig.rpc,
-  ws: {
-    url: 'wss://ws-rpc.testnet.lukso.network',
-  },
-  relayer: {
-    url: 'https://relayer.testnet.lukso.network/api',
-  },
-  explorer: defaultNetworkConfig.blockscout,
-  isCustom: false,
-  id: defaultNetworkConfig.name,
-  chainId: numberToHex(defaultNetworkConfig.chainId),
-}
-
 const networkId = ref('')
 const err = ref('')
-const activeNetwork = ref<NetworkInfo>(defaultNetwork)
+const activeNetwork = ref<NetworkInfo>()
 
-const networks = [
+const networks: NetworkInfo[] = [
   {
     name: 'Lukso Testnet',
     http: {
@@ -129,6 +113,7 @@ const getNetworkId = async () => {
 }
 
 const changeNetwork = async () => {
+  if (!activeNetwork.value) return
   try {
     await web3.sendRequest({
       method: 'wallet_switchEthereumChain',
@@ -145,13 +130,14 @@ const changeNetwork = async () => {
 }
 
 const changeDappNetwork = async () => {
+  if (!activeNetwork.value) return
   try {
     let currentChainId = getSelectedNetworkConfig().chainId
     if (numberToHex(currentChainId) !== activeNetwork.value.chainId) {
       setNetworkConfig(hexToNumber(activeNetwork.value.chainId) as number)
       currentChainId = getSelectedNetworkConfig().chainId
+      location.reload()
     }
-    location.reload()
   } catch (error) {
     console.error(error)
     setNotification((error as unknown as Error).message, 'danger')
@@ -159,6 +145,7 @@ const changeDappNetwork = async () => {
 }
 
 const addNetwork = async () => {
+  if (!activeNetwork.value) return
   try {
     await web3.sendRequest({
       method: 'wallet_addEthereumChain',
@@ -176,6 +163,16 @@ const addNetwork = async () => {
     setNotification((addError as unknown as Error).message, 'danger')
   }
 }
+
+onMounted(() => {
+  const selectedNetworkChainId = getSelectedNetworkConfig()
+  const networkInfo = networks.find(
+    element => hexToNumber(element.chainId) === selectedNetworkChainId.chainId
+  )
+  if (networkInfo) {
+    activeNetwork.value = networkInfo
+  }
+})
 </script>
 
 <template>
@@ -206,7 +203,7 @@ const addNetwork = async () => {
           data-testid="getNetworkId"
           @click="changeNetwork"
         >
-          Switch Network to {{ activeNetwork.name }}
+          Switch Network to {{ activeNetwork?.name }}
         </button>
       </div>
       <div>
@@ -224,7 +221,7 @@ const addNetwork = async () => {
           data-testid="changeDappNetworkButton"
           @click="changeDappNetwork"
         >
-          Switch Network in DApp to {{ activeNetwork.name }}
+          Switch Network in DApp to {{ activeNetwork?.name }}
         </button>
         <div style="padding-top: 8px">
           DApp uses <b>{{ defaultNetworkConfig.name }}</b> network.
