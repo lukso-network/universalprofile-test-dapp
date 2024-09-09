@@ -126,10 +126,10 @@ const computedCall = computed<string>(() => {
         ?.map(({ name, type }) => `${type} ${name}`)
         .join(', ')}`
     : reactiveData.call
-    ? `${reactiveData.call}(${reactiveData.items
-        ?.map(({ name, type }) => `${type} ${name}`)
-        .join(', ')})`
-    : ''
+      ? `${reactiveData.call}(${reactiveData.items
+          ?.map(({ name, type }) => `${type} ${name}`)
+          .join(', ')})`
+      : ''
 })
 
 /**
@@ -233,7 +233,7 @@ const output = computed<{ error: undefined | string; value: string }>(() => {
     const args = reactiveData.items.map(({ value, type, isWei }) => {
       const makeItem = (value: any) =>
         /^bytes32/.test(type)
-          ? makeBytes32(value, type) ?? '0x'
+          ? (makeBytes32(value, type) ?? '0x')
           : makeValue(value, isWei) || ''
       if (/\[\]$/.test(type)) {
         return value.map(makeItem)
@@ -320,8 +320,8 @@ onMounted(() => {
         props.dataDecoder
           ? 'Decode Types'
           : !props.custom
-          ? `Function ${computedCall}`
-          : 'Function'
+            ? `Function ${computedCall}`
+            : 'Function'
       }}</label>
       <div v-if="props.custom" class="field">
         <input
