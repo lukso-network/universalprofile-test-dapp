@@ -7,7 +7,11 @@ import {
 import useWalletConnectV2 from './useWalletConnectV2'
 import useWeb3Onboard from './useWeb3Onboard'
 import { ref } from 'vue'
-import { TransactionConfig, TransactionReceipt } from 'web3-core'
+import {
+  TransactionConfig,
+  TransactionReceipt,
+  provider as ProviderType,
+} from 'web3-core'
 import { resetNetworkConfig, setNetworkConfig } from '@/helpers/config'
 import { getState, useState } from '@/stores'
 import EthereumProvider from '@walletconnect/ethereum-provider/dist/types/EthereumProvider'
@@ -23,7 +27,7 @@ const provider = ref<EthereumProvider>()
 let web3: Web3
 
 const setupWeb3 = async (provider: EthereumProvider): Promise<void> => {
-  web3 = new Web3(provider)
+  web3 = new Web3(provider as ProviderType)
   window.web3 = web3
   web3.eth
     ?.getChainId()
@@ -38,7 +42,7 @@ const setupWeb3 = async (provider: EthereumProvider): Promise<void> => {
 
 const setupProvider = async (
   meansOfConnection: string
-): Promise<EthereumProvider | undefined> => {
+): Promise<ProviderType | undefined> => {
   try {
     const isWalletConnectUsed = meansOfConnection === WALLET_CONNECT
     const isWeb3OnboardUsed = meansOfConnection === WEB3_ONBOARD
@@ -68,7 +72,7 @@ const setupProvider = async (
       setConnected(address, meansOfConnection)
       localStorage.setItem(UP_CONNECTED_ADDRESS, address)
     }
-    return provider.value
+    return provider.value as ProviderType
   } catch (error) {
     const epError = error as EthereumProviderError<Error>
 
