@@ -2,11 +2,12 @@ import Onboard, { OnboardAPI } from '@web3-onboard/core'
 import injectedModule from '@web3-onboard/injected-wallets'
 import luksoModule from '@lukso/web3-onboard-config'
 import { ConnectModalOptions } from '@web3-onboard/core/dist/types'
+import { InjectedWalletModule } from '@web3-onboard/injected-wallets/dist/types'
 
 const lukso = luksoModule()
 
 const injected = injectedModule({
-  custom: [lukso],
+  custom: [lukso as InjectedWalletModule],
   sort: wallets => {
     const sorted = wallets.reduce<any[]>((sorted, wallet) => {
       if (wallet.label === 'Universal Profiles') {

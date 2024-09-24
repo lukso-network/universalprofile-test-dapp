@@ -126,10 +126,10 @@ const computedCall = computed<string>(() => {
         ?.map(({ name, type }) => `${type} ${name}`)
         .join(', ')}`
     : reactiveData.call
-    ? `${reactiveData.call}(${reactiveData.items
-        ?.map(({ name, type }) => `${type} ${name}`)
-        .join(', ')})`
-    : ''
+      ? `${reactiveData.call}(${reactiveData.items
+          ?.map(({ name, type }) => `${type} ${name}`)
+          .join(', ')})`
+      : ''
 })
 
 /**
