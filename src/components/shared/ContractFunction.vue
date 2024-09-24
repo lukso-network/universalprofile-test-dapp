@@ -235,8 +235,8 @@ const output = computed<{ error: undefined | string; value: string }>(() => {
     const args = reactiveData.items.map(({ value, type, isWei }) => {
       const makeItem = (value: any) =>
         /^bytes/.test(type)
-          ? makeBytes(value, type) ?? '0x'
-          : makeValue(value, isWei) ?? ''
+          ? (makeBytes(value, type) ?? '0x')
+          : (makeValue(value, isWei) ?? '')
       if (/\[\]$/.test(type)) {
         return value.map(makeItem)
       }
@@ -325,8 +325,8 @@ onMounted(() => {
         props.dataDecoder
           ? 'Decode Types'
           : !props.custom
-          ? `Function ${computedCall}`
-          : 'Function'
+            ? `Function ${computedCall}`
+            : 'Function'
       }}</label>
       <div v-if="props.custom" class="field">
         <input
