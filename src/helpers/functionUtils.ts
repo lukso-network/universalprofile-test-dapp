@@ -91,22 +91,30 @@ export const decodeData = async (
     } catch {}
     const url = getSelectorLookupURL(selector)
     const functionSignatureResponse = await signatureCache?.match(url)
+
+    let functionSignatures: string[] = []
     if (functionSignatureResponse) {
-      return await functionSignatureResponse.json()
+      const response = await functionSignatureResponse.json()
+      if (response.functionSignature) {
+        functionSignatures.push(response.functionSignature)
+      }
+    }
+    if (functionSignatures.length === 0) {
+      const methods = await fetcher<BytesSignatureResponse, void>({
+        method: 'GET',
+        url,
+      })
+      functionSignatures = methods.results.map(result => result.text_signature)
     }
 
-    const methods = await fetcher<BytesSignatureResponse, void>({
-      method: 'GET',
-      url,
-    })
-
-    if (methods && methods.results.length > 0) {
-      for (const result of methods.results.reverse()) {
+    if (functionSignatures.length > 0) {
+      for (const functionSignature of functionSignatures.reverse()) {
         try {
-          const params: string[] = result.text_signature
+          const params: string[] = functionSignature
             .replace(/^[^(]*\(|\)[^)]*$/g, '')
             .split(',')
           const args = eth.abi.decodeParameters(params, data.substring(8)) || {}
+          console.log('decodeData args/params', args, params)
           const encodeArgs = Array(params.length)
             .fill(null)
             .map((_val, index) => {
@@ -126,14 +134,16 @@ export const decodeData = async (
                   throw new Error('Invalid address value')
                 }
               }
+              console.log('value at', index, args[`${index}`])
               return args[`${index}`] ?? '0x'
             })
           const newData =
             eth.abi.encodeParameters(params, encodeArgs).substring(2) || '0x'
           if (data.substring(8) === newData) {
-            const call = result.text_signature.replace(/\(.*$/, '')
+            const call = functionSignature.replace(/\(.*$/, '')
             const item = {
-              label: `Decoded ${result.text_signature.replace(/\(.*$/, '')}`,
+              label: `Decoded ${functionSignature}`,
+              functionSignature: functionSignature,
               call,
               inputs: params.map((type, index) => ({
                 type,
