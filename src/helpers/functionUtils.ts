@@ -114,7 +114,6 @@ export const decodeData = async (
             .replace(/^[^(]*\(|\)[^)]*$/g, '')
             .split(',')
           const args = eth.abi.decodeParameters(params, data.substring(8)) || {}
-          console.log('decodeData args/params', args, params)
           const encodeArgs = Array(params.length)
             .fill(null)
             .map((_val, index) => {
@@ -134,7 +133,6 @@ export const decodeData = async (
                   throw new Error('Invalid address value')
                 }
               }
-              console.log('value at', index, args[`${index}`])
               return args[`${index}`] ?? '0x'
             })
           const newData =
