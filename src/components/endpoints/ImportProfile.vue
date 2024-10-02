@@ -12,15 +12,23 @@ const web3 = useWeb3Connection()
 
 const universalProfileAddress = ref('')
 const isRecovery = ref(false)
+const isDeviceToDeviceImportMode = ref(false)
 const controllerAddress = ref('')
 
 const onImportProfile = async () => {
   clearNotification()
 
   try {
+    let params: any[] = [universalProfileAddress.value]
+    // Extension versions prior to 3.0.0.58 will not support more than 1 parameter in the array.
+    // Thus, 'false' must not be passed or it will break the up_import in test-dapp for extension version < 3.0.0.58
+    if (isDeviceToDeviceImportMode.value) {
+      params.push(isDeviceToDeviceImportMode.value)
+    }
+
     const request = {
       method: isRecovery.value ? 'up_recover' : 'up_import',
-      params: [universalProfileAddress.value],
+      params,
     }
     let newControllerAddress: string = await web3.sendRequest(request)
     if (newControllerAddress) {
@@ -57,6 +65,18 @@ const onImportProfile = async () => {
               data-testid="isRecovery"
             />
             Recover the profile into your extension
+          </label>
+        </div>
+        <div class="field mt-4">
+          <label class="checkbox">
+            <input
+              v-model="isDeviceToDeviceImportMode"
+              type="checkbox"
+              :value="isDeviceToDeviceImportMode"
+              data-testid="isDeviceToDeviceImportMode"
+            />
+            Immitate device-to-device import (sets isDeviceToDeviceImport to
+            `true`)
           </label>
         </div>
       </div>
