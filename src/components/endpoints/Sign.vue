@@ -153,7 +153,7 @@ const onSignatureValidation = async () => {
     }
 
     if (magicValue.value === MAGICVALUE) {
-      setNotification(`Signature validated successfully`, 'info')
+      setNotification('Signature validated successfully', 'info')
     } else {
       setNotification("Response doesn't match magic value", 'danger')
     }
