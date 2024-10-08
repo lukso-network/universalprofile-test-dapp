@@ -65,7 +65,7 @@ jobs:
 
       - name: 🛠 Build Provider
         run: yarn build:provider
-      
+
       - name: 🛠 Build
         run: yarn build
 
