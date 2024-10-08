@@ -14,7 +14,8 @@
     "allowJs": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@lukso/embedded-wallet": ["node_modules/@lukso/embedded-wallet/src"]
     },
     "types": ["vite/client", "jest", "node", "@testing-library/jest-dom"],
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]

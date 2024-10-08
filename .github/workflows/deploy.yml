@@ -63,6 +63,9 @@ jobs:
       - name: 🎨 Lint Types
         run: yarn lint:types
 
+      - name: 🛠 Build Provider
+        run: yarn build:provider
+      
       - name: 🛠 Build
         run: yarn build
 
