@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@erc725/erc725.js": "0.24.2",
+    "@lukso/embedded-provider": "workspace:^",
     "@lukso/lsp-factory.js": "^3.3.1",
     "@lukso/lsp-smart-contracts": "^0.15.0",
     "@lukso/web3-onboard-config": "1.1.2",
@@ -102,5 +103,8 @@
   "packageManager": "yarn@3.3.0",
   "resolutions": {
     "wagmi": "~1.2.0"
-  }
+  },
+  "workspaces": [
+    "packages/*"
+  ]
 }

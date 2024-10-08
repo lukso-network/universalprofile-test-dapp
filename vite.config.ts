@@ -20,7 +20,9 @@ export default defineConfig({
       https: resolveModule('https-browserify'),
       stream: resolveModule('stream-browserify'),
       buffer: resolveModule('buffer/'),
+      '@lukso/embedded-provider': '/node_modules/@lukso/embedded-provider/src',
     },
+    extensions: ['.ts', '.js', '.json', '.vue'],
   },
   esbuild: process.env.NODE_ENV === 'production' ? {} : undefined,
   build: {
