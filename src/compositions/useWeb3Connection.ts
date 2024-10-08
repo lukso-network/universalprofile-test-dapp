@@ -19,11 +19,7 @@ import Web3 from 'web3'
 import { ContractOptions, Contract } from 'web3-eth-contract'
 import { EthereumProviderError } from 'eth-rpc-errors'
 import { createServer, createClient } from '@lukso/embedded-provider'
-import {
-  JSONRPCErrorResponse,
-  JSONRPCResponse,
-  JSONRPCSuccessResponse,
-} from 'json-rpc-2.0'
+import { JSONRPCErrorResponse, JSONRPCSuccessResponse } from 'json-rpc-2.0'
 const oldProvider = window.lukso
 const server = createServer()
 server.addMethod('exampleMethod', params => {

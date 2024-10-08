@@ -9,7 +9,6 @@ import {
 } from '@/helpers/config'
 import { NetworkInfo } from '@/interfaces/network'
 import { ref } from 'vue'
-import { hexToNumber, numberToHex } from 'web3-utils'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()

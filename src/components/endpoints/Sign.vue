@@ -174,20 +174,20 @@ const toggleShow = () => {
       <div class="field">
         <label class="label">Select RPC</label>
         <input
-          type="radio"
           id="eth_sign_radio_btn"
+          v-model="signingMethodSelected"
+          type="radio"
           data-testid="eth_sign_radio_btn"
           value="eth_sign"
-          v-model="signingMethodSelected"
         />
         <label for="eth_sign_radio_btn" class="ml-1">eth_sign</label>
 
         <input
-          type="radio"
           id="personal_sign_radio_btn"
+          v-model="signingMethodSelected"
+          type="radio"
           data-testid="personal_sign_radio_btn"
           value="personal_sign"
-          v-model="signingMethodSelected"
           class="ml-1"
         />
         <label for="personal_sign_radio_btn" class="ml-1">personal_sign</label>
@@ -209,8 +209,8 @@ const toggleShow = () => {
           />
         </div>
         <div
-          class="field has-addons"
           v-if="signingMethodSelected === SignMethod.PersonalSign"
+          class="field has-addons"
         >
           <div class="control is-expanded">
             <input
