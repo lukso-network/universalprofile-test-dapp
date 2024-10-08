@@ -60,11 +60,11 @@ jobs:
       - name: 🎨 Lint Format
         run: yarn lint:format
 
-      - name: 🎨 Lint Types
-        run: yarn lint:types
-
       - name: 🛠 Build Provider
         run: yarn build:provider
+
+      - name: 🎨 Lint Types
+        run: yarn lint:types
 
       - name: 🛠 Build
         run: yarn build
