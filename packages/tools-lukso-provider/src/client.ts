@@ -25,7 +25,7 @@ async function testWindow(_up?: Window) {
         event.data.target === WALLET_RESPONSE_KEY
       ) {
         const msg = JSON.parse(event.data.data)
-        console.log('client', msg)
+        console.log('client', msg, up)
         up.removeEventListener('message', testFn)
         if (msg.success) {
           resolve(up)
@@ -34,7 +34,7 @@ async function testWindow(_up?: Window) {
     }
 
     up.addEventListener('message', testFn)
-    console.log('client', 'find wallet')
+    console.log('client', 'find wallet', up)
     up.postMessage(
       {
         target: WALLET_TARGET_KEY,
@@ -45,6 +45,7 @@ async function testWindow(_up?: Window) {
 
     setTimeout(() => {
       up.removeEventListener('message', testFn)
+      console.log('client', 'No UP found', up)
       reject(new Error('No UP found'))
     }, 1000)
   })
@@ -73,14 +74,47 @@ async function findUP(authURL?: string) {
   throw new Error('No UP found')
 }
 
-export function createClient(authURL?: string | Window) {
+async function findDestination(
+  authURL?: string | Window,
+  search = false
+): Promise<Window> {
+  let up =
+    (typeof authURL === 'object' && authURL instanceof Window) ||
+    authURL == null
+      ? await testWindow(authURL)
+      : await findUP(authURL)
+  if (search && !up) {
+    let retry = 3
+    while (retry > 0) {
+      let current = window
+      while (current) {
+        up = await testWindow(current)
+        if (up) {
+          break
+        }
+        if (current === window.top) {
+          break
+        }
+        current = current.opener || current.parent
+      }
+      if (up) {
+        break
+      }
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      retry--
+    }
+  }
+  if (!up) {
+    throw new Error('No UP found')
+  }
+  return up
+}
+
+export function createClient(authURL?: string | Window, search = true) {
+  const doSearch = findDestination(authURL, search)
   const client = new JSONRPCClient(async (jsonRPCRequest: any) => {
+    const up = await doSearch
     const channel = walletWindow ? _channel : _channel++
-    const up =
-      (typeof authURL === 'object' && authURL instanceof Window) ||
-      authURL == null
-        ? await testWindow(authURL)
-        : await findUP(authURL)
     return new Promise((resolve, reject) => {
       const requestId = `${channel}:${jsonRPCRequest.id}`
       pendingRequests.set(requestId, {

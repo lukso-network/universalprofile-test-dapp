@@ -201,6 +201,9 @@ export function getSelectedNetworkType(): NetworkType {
   const selectedNetwork = localStorage.getItem(
     SELECTED_NETWORK_KEY
   ) as NetworkType
+  if (selectedNetwork && !(selectedNetwork in NETWORKS)) {
+    return DEFAULT_NETWORK
+  }
   if (selectedNetwork) {
     return selectedNetwork
   }
