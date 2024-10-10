@@ -1,5 +1,6 @@
 import { AbiItem, isAddress as baseIsAddress } from 'web3-utils'
 import {
+  getSelectedNetworkConfig,
   UP_CONNECTED_ADDRESS,
   WALLET_CONNECT,
   WEB3_ONBOARD,
@@ -18,6 +19,57 @@ import EthereumProvider from '@walletconnect/ethereum-provider/dist/types/Ethere
 import Web3 from 'web3'
 import { ContractOptions, Contract } from 'web3-eth-contract'
 import { EthereumProviderError } from 'eth-rpc-errors'
+import { createServer, createClient } from '@lukso/embedded-provider'
+import { JSONRPCErrorResponse, JSONRPCSuccessResponse } from 'json-rpc-2.0'
+const oldProvider = window.lukso
+if (oldProvider) {
+  const server = createServer()
+  server.addMethod('exampleMethod', params => {
+    console.log('params', params)
+    return `Hello, ${params.name}!`
+  })
+  server.applyMiddleware(async (next, request) => {
+    const { method, params, id, jsonrpc } = request
+    try {
+      console.log('request', request)
+      const response = await oldProvider.request({ method, params })
+      console.log('response', response)
+      return { id, jsonrpc, result: response } as JSONRPCSuccessResponse
+    } catch (error) {
+      console.error(error)
+      console.log({ id, jsonrpc, error } as JSONRPCErrorResponse)
+    }
+    console.log('request', request)
+    if (request.method === 'exampleMethod2') {
+      console.log('exampleMethod2')
+      return {
+        jsonrpc,
+        id,
+        result: { message: 'Hello, World!' } as any,
+      } as JSONRPCSuccessResponse
+    }
+    return await next(request)
+  })
+}
+const client = createClient()
+// client.request('exampleMethod', { name: 'World' }).then(result => {
+//   console.log('result', result)
+// })
+// client.request('exampleMethod2', { name: 'World' }).then(result => {
+//   console.log('result2', result)
+// })
+const oldRequest = client.request.bind(client)
+client.request = (method, params) => {
+  if (typeof method === 'string') {
+    return oldRequest(method, params)
+  }
+  const { method: _method, params: _params } = method as {
+    method: string
+    params: unknown[]
+  }
+  return oldRequest(_method, _params)
+}
+window.lukso = client
 
 const web3Onboard = useWeb3Onboard()
 const web3WalletConnectV2 = useWalletConnectV2()
@@ -128,6 +180,11 @@ const estimateGas = async (transaction: TransactionConfig) => {
 }
 
 const executeCall = (transaction: TransactionConfig): Promise<string> => {
+  const { url } = getSelectedNetworkConfig().http || {}
+  if (!url) {
+    throw new Error('No RPC URL provided for the network')
+  }
+  const web3 = new Web3(url)
   return web3.eth.call(transaction)
 }
 

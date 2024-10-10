@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import path from 'path'
+import path from 'node:path'
 
 console.log(process.cwd())
 
@@ -20,7 +20,9 @@ export default defineConfig({
       https: resolveModule('https-browserify'),
       stream: resolveModule('stream-browserify'),
       buffer: resolveModule('buffer/'),
+      '@lukso/embedded-provider': '/node_modules/@lukso/embedded-provider/src',
     },
+    extensions: ['.ts', '.js', '.json', '.vue'],
   },
   esbuild: process.env.NODE_ENV === 'production' ? {} : undefined,
   build: {
