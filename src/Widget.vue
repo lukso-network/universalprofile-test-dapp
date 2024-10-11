@@ -7,7 +7,7 @@ window.lukso = createClient()
 const web3 = new Web3(window.lukso)
 const chainId = ref<number | null>(null)
 const accounts = ref<string[]>([])
-const errors = ref<string[]>([])
+const errors = ref<Error[]>([])
 window.web3 = web3
 web3.eth
   ?.getChainId()
@@ -37,7 +37,9 @@ web3.eth
     <div class="container">
       <div class="notification is-danger" v-if="errors.length > 0">
         <button class="delete" @click="errors = []"></button>
-        <pre v-for="error in errors" :key="error">{{ error.stack }}</pre>
+        <pre v-for="(error, index) in errors" :key="index">{{
+          error.stack
+        }}</pre>
       </div>
       <div class="columns">
         <div class="column">

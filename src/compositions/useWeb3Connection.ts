@@ -29,7 +29,15 @@ if (oldProvider) {
     return `Hello, ${params.name}!`
   })
   server.applyMiddleware(async (next, request) => {
-    const { method, params, id, jsonrpc } = request
+    const { method: _method, params: _params, id, jsonrpc } = request
+    const method =
+      typeof _method === 'string'
+        ? _method
+        : (_method as unknown as { method: string; params: unknown[] }).method
+    const params =
+      typeof _method === 'string'
+        ? _params
+        : (_method as unknown as { method: string; params: unknown[] }).params
     try {
       console.log('request', request)
       const response = await oldProvider.request({ method, params })

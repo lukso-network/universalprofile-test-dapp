@@ -5,6 +5,8 @@ type Item = {
   reject: (reason: unknown) => unknown
   sent: boolean
   id: number | string
+  method: string
+  params: unknown[]
 }
 const pendingRequests = new Map<string, Item>()
 
@@ -148,8 +150,15 @@ export function createClient(authURL?: string | Window, search = true) {
             client.receive({ ...response, id: item.id }) // Handle the response
             resolve() // Resolve the corresponding promise
           } else if (response.error) {
+            const { error: _error, jsonrpc } = response
+            const { method, params, id } = item
+            const error = {
+              ..._error,
+              message: `${_error.message} ${JSON.stringify(method)}(${JSON.stringify(params)})`,
+            }
+            console.error('error', { error, method, params, id, jsonrpc })
             client.receive({ ...response, id: item.id })
-            reject(response.error) // Reject in case of error
+            reject(error) // Reject in case of error
           }
           pendingRequests.delete(response.id) // Clean up the request
         }
@@ -163,11 +172,14 @@ export function createClient(authURL?: string | Window, search = true) {
   const client = new JSONRPCClient(async (jsonRPCRequest: any) => {
     const up = await doSearch
     return new Promise((resolve, reject) => {
-      pendingRequests.set(jsonRPCRequest.id, {
+      const { id, method, params } = jsonRPCRequest
+      pendingRequests.set(id, {
         resolve,
         reject,
         sent: false,
-        id: jsonRPCRequest.id,
+        id,
+        method,
+        params,
       })
       up.remote.postMessage(jsonRPCRequest)
     })
