@@ -49,6 +49,7 @@ const handleClick = () => {
         <router-link class="navbar-item" to="/iframe"
           >EIP-5593 IFrame</router-link
         >
+        <router-link class="navbar-item" to="/grid">Grid IFrame</router-link>
 
         <div class="navbar-item has-dropdown is-hoverable">
           <router-link class="navbar-item" to="/profiles">Profiles</router-link>

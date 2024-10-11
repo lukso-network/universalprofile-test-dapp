@@ -7,51 +7,55 @@ type Item = {
   id: number | string
 }
 const pendingRequests = new Map<string, Item>()
-let _channel = 1
-let walletWindow: Window | null = null
 
-export const WALLET_TARGET_KEY = 'universalprofile-embedded'
-export const WALLET_RESPONSE_KEY = 'universalprofile-embedded-response'
+type RemoteWallet = {
+  window: Window
+  remote: MessagePort
+  local: MessagePort
+}
 
-async function testWindow(_up?: Window) {
-  const up = _up || typeof window !== 'undefined' ? window : undefined
+let walletWindow: RemoteWallet | null = null
+
+async function testWindow(
+  _up: Window | undefined | null
+): Promise<RemoteWallet> {
+  const up = _up || (typeof window !== 'undefined' ? window : undefined)
   if (!up) {
     throw new Error('No UP found')
   }
-  return new Promise<Window>((resolve, reject) => {
+  return new Promise<RemoteWallet>((resolve, reject) => {
+    let timeout: number | NodeJS.Timeout = 0
+    const channel = new MessageChannel()
     const testFn = (event: MessageEvent) => {
-      if (
-        typeof event.data === 'object' &&
-        event.data.target === WALLET_RESPONSE_KEY
-      ) {
-        const msg = JSON.parse(event.data.data)
-        console.log('client', msg, up)
+      console.log('client init', event.data)
+      if (event.data === 'upProvider:windowInitialized') {
+        console.log('client', event.data, up)
         up.removeEventListener('message', testFn)
-        if (msg.success) {
-          resolve(up)
+        if (timeout) {
+          clearTimeout(timeout)
+          timeout = 0
         }
+        resolve({ window: up, remote: event.ports[0], local: channel.port1 })
       }
     }
+    channel.port1.addEventListener('message', testFn)
+    channel.port1.start()
+    window.addEventListener('message', testFn)
+    console.log('client', 'send find wallet', up.location.href, up)
+    up.postMessage('upProvider:hasProvider', '*', [channel.port2])
 
-    up.addEventListener('message', testFn)
-    console.log('client', 'find wallet', up)
-    up.postMessage(
-      {
-        target: WALLET_TARGET_KEY,
-        data: JSON.stringify({ type: 'universalprofile', is: true }),
-      },
-      '*'
-    )
+    timeout = setTimeout(() => {
+      timeout = 0
+      window.removeEventListener('message', testFn)
+      channel.port1.removeEventListener('message', testFn)
 
-    setTimeout(() => {
-      up.removeEventListener('message', testFn)
-      console.log('client', 'No UP found', up)
+      console.log('client', 'No UP found', up.location.href, up)
       reject(new Error('No UP found'))
     }, 1000)
   })
 }
 
-async function findUP(authURL?: string) {
+async function findUP(authURL: string | Window | undefined | null) {
   let current = walletWindow || window.opener || window.parent
   if (current) {
     const up = await testWindow(current)
@@ -60,7 +64,10 @@ async function findUP(authURL?: string) {
       return up
     }
   }
-  if (!authURL) {
+  if (authURL == null) {
+    throw new Error('No UP found')
+  }
+  if (typeof authURL === 'object' && authURL instanceof Window) {
     throw new Error('No UP found')
   }
   current = window.open(authURL, 'UE Wallet', 'width=400,height=600')
@@ -75,27 +82,45 @@ async function findUP(authURL?: string) {
 }
 
 async function findDestination(
-  authURL?: string | Window,
+  authURL: string | Window | undefined | null,
   search = false
-): Promise<Window> {
-  let up =
+): Promise<RemoteWallet> {
+  let up: RemoteWallet | undefined =
     (typeof authURL === 'object' && authURL instanceof Window) ||
     authURL == null
-      ? await testWindow(authURL)
+      ? await testWindow(authURL).catch(error => {
+          if (search) {
+            return undefined
+          }
+          throw error
+        })
       : await findUP(authURL)
   if (search && !up) {
     let retry = 3
     while (retry > 0) {
-      let current = window
+      let current: Window | undefined =
+        window.opener && window.opener !== window
+          ? window.opener
+          : window.parent && window.parent !== window
+            ? window.parent
+            : undefined
+      console.log('search', current?.location.href)
       while (current) {
-        up = await testWindow(current)
+        up = await testWindow(current).catch(() => undefined)
         if (up) {
           break
         }
         if (current === window.top) {
           break
         }
-        current = current.opener || current.parent
+        console.log('current', current.location.href)
+        current =
+          current.opener && current.opener !== current
+            ? current.opener
+            : current.parent && current.parent !== current
+              ? current.parent
+              : null
+        console.log('next', current?.location.href)
       }
       if (up) {
         break
@@ -111,41 +136,10 @@ async function findDestination(
 }
 
 export function createClient(authURL?: string | Window, search = true) {
-  const doSearch = findDestination(authURL, search)
-  const client = new JSONRPCClient(async (jsonRPCRequest: any) => {
-    const up = await doSearch
-    const channel = walletWindow ? _channel : _channel++
-    return new Promise((resolve, reject) => {
-      const requestId = `${channel}:${jsonRPCRequest.id}`
-      pendingRequests.set(requestId, {
-        resolve,
-        reject,
-        sent: false,
-        id: jsonRPCRequest.id,
-      })
-      up.postMessage(
-        {
-          target: WALLET_TARGET_KEY,
-          data: JSON.stringify({
-            ...jsonRPCRequest,
-            id: requestId,
-          }),
-        },
-        '*'
-      )
-    })
-  })
-
-  window.addEventListener('message', event => {
-    try {
-      if (
-        typeof event.data === 'object' &&
-        event.data.target === WALLET_RESPONSE_KEY
-      ) {
-        const response = JSON.parse(event.data.data)
-        if (response.type === 'universalprofile') {
-          return
-        }
+  const doSearch = findDestination(authURL, search).then(up => {
+    up.local?.addEventListener('message', event => {
+      try {
+        const response = event.data
         console.log('client', response)
         const item = pendingRequests.get(response.id)
         if (response.id && item) {
@@ -159,10 +153,24 @@ export function createClient(authURL?: string | Window, search = true) {
           }
           pendingRequests.delete(response.id) // Clean up the request
         }
+      } catch (error) {
+        console.error('Error parsing JSON RPC response', error, event)
       }
-    } catch (error) {
-      console.error('Error parsing JSON RPC response', error, event)
-    }
+    })
+    up.local?.start()
+    return up
+  })
+  const client = new JSONRPCClient(async (jsonRPCRequest: any) => {
+    const up = await doSearch
+    return new Promise((resolve, reject) => {
+      pendingRequests.set(jsonRPCRequest.id, {
+        resolve,
+        reject,
+        sent: false,
+        id: jsonRPCRequest.id,
+      })
+      up.remote.postMessage(jsonRPCRequest)
+    })
   })
   return client
 }

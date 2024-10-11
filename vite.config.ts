@@ -29,6 +29,12 @@ export default defineConfig({
     commonjsOptions: {
       transformMixedEsModules: true,
     },
+    rollupOptions: {
+      input: {
+        main: 'index.html',
+        widget: 'widget.html',
+      },
+    },
   },
   base: process.env.PUBLIC_PATH || '/',
 })

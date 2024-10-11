@@ -1,5 +1,5 @@
 import { JSONRPCServer } from 'json-rpc-2.0'
-import { WALLET_RESPONSE_KEY, WALLET_TARGET_KEY } from './client'
+import { v4 as uuidv4 } from 'uuid'
 
 export function createServer() {
   const server = new JSONRPCServer()
@@ -9,42 +9,46 @@ export function createServer() {
     return `Hello, ${params.name}!`
   })
 
-  // Listen for messages from the client
-  window.addEventListener('message', (event: MessageEvent) => {
-    try {
-      if (
-        typeof event.data === 'object' &&
-        event.data.target === WALLET_TARGET_KEY
-      ) {
-        const jsonRPCRequest = JSON.parse(event.data.data)
-        console.log('server', jsonRPCRequest)
-        if (jsonRPCRequest?.type === 'universalprofile' && jsonRPCRequest.is) {
-          console.log('server', 'respond true')
-          event.source?.postMessage(
-            {
-              target: WALLET_RESPONSE_KEY,
-              data: JSON.stringify({ type: 'universalprofile', success: true }),
-            },
-            { targetOrigin: event.origin }
-          )
-          return
-        }
-
-        server.receive(jsonRPCRequest).then(response => {
-          if (response) {
-            event.source?.postMessage(
-              { target: WALLET_RESPONSE_KEY, data: JSON.stringify(response) },
-              {
-                targetOrigin: event.origin,
-              }
-            )
+  console.log('server listen', window.location.href, window)
+  window.addEventListener('message', event => {
+    if (event.data === 'upProvider:hasProvider') {
+      const channel = new MessageChannel()
+      const channelId = uuidv4()
+      console.log('server hasProvider', event.data, event.ports)
+      // Listen for messages from the client
+      const ports = event.ports
+      channel.port1.addEventListener('message', (event: MessageEvent) => {
+        console.log('server raw', event.data)
+        try {
+          const request = {
+            ...event.data,
+            id: `${channelId}:${JSON.stringify(event.data.id)}`,
           }
-        })
-      }
-    } catch (error) {
-      console.error('Error parsing JSON RPC request', error, event)
+          server.receive(request).then(response => {
+            if (response && typeof response.id === 'string') {
+              if (!response.id.startsWith(`${channelId}:`)) {
+                console.error(
+                  `Invalid response id ${response.id} on channel ${channelId}`
+                )
+                return
+              }
+              ports[0]?.postMessage({
+                ...response,
+                id: JSON.parse(response.id.replace(`${channelId}:`, '')),
+              })
+            }
+          })
+        } catch (error) {
+          console.error('Error parsing JSON RPC request', error, event)
+        }
+      })
+      channel.port1.start()
+
+      console.log('server accept', channel.port2)
+      event.source?.postMessage('upProvider:windowInitialized', {
+        transfer: [channel.port2],
+      })
     }
   })
-
   return server
 }

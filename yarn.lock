@@ -2360,9 +2360,11 @@ __metadata:
   resolution: "@lukso/embedded-provider@workspace:packages/tools-lukso-provider"
   dependencies:
     "@mixer/postmessage-rpc": ^1.1.4
+    "@types/uuid": ^10.0.0
     json-rpc-2.0: ^1.7.0
     tsup: ^8.3.0
     typescript: ^5.6.2
+    uuid: ^10.0.0
   languageName: unknown
   linkType: soft
 
@@ -4201,6 +4203,13 @@ __metadata:
   version: 1.11.6
   resolution: "@types/underscore@npm:1.11.6"
   checksum: 89b92c35d1b464c9fcddc2683ea41ad1aaa0b298e7243e5ae808ea3dfd545062ca83b0d63515f89578f84cb479de877dbb61f1bb2fcc2a7e5755812f42b09b8b
+  languageName: node
+  linkType: hard
+
+"@types/uuid@npm:^10.0.0":
+  version: 10.0.0
+  resolution: "@types/uuid@npm:10.0.0"
+  checksum: e3958f8b0fe551c86c14431f5940c3470127293280830684154b91dc7eb3514aeb79fe3216968833cf79d4d1c67f580f054b5be2cd562bebf4f728913e73e944
   languageName: node
   linkType: hard
 
@@ -17178,6 +17187,15 @@ __metadata:
   version: 1.0.1
   resolution: "utils-merge@npm:1.0.1"
   checksum: c81095493225ecfc28add49c106ca4f09cdf56bc66731aa8dabc2edbbccb1e1bfe2de6a115e5c6a380d3ea166d1636410b62ef216bb07b3feb1cfde1d95d5080
+  languageName: node
+  linkType: hard
+
+"uuid@npm:^10.0.0":
+  version: 10.0.0
+  resolution: "uuid@npm:10.0.0"
+  bin:
+    uuid: dist/bin/uuid
+  checksum: 4b81611ade2885d2313ddd8dc865d93d8dccc13ddf901745edca8f86d99bc46d7a330d678e7532e7ebf93ce616679fb19b2e3568873ac0c14c999032acb25869
   languageName: node
   linkType: hard
 
