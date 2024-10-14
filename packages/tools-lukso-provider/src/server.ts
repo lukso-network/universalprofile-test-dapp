@@ -1,6 +1,29 @@
 import { JSONRPCServer } from 'json-rpc-2.0'
 import { v4 as uuidv4 } from 'uuid'
 
+const channels = new Map<string, ChannelEntry>()
+export class ChannelEntry {
+  constructor(
+    public channel: MessageChannel,
+    public window: Window,
+    public element: HTMLIFrameElement | null,
+    public id: string
+  ) {
+    channels.set(id, this)
+  }
+}
+
+export function findChannel(id: string | Window | HTMLIFrameElement) {
+  if (typeof id === 'string') {
+    return channels.get(id)
+  }
+  for (const item of channels.values()) {
+    if (item.window === id || item.element === id) {
+      return item
+    }
+  }
+  return null
+}
 export function createServer() {
   const server = new JSONRPCServer()
 
@@ -12,8 +35,27 @@ export function createServer() {
   console.log('server listen', window.location.href, window)
   window.addEventListener('message', event => {
     if (event.data === 'upProvider:hasProvider') {
-      const channel = new MessageChannel()
-      const channelId = uuidv4()
+      let iframe: HTMLIFrameElement | null = null
+      for (const element of document.querySelectorAll('iframe')) {
+        if (element.contentWindow === event.source) {
+          console.log('server hasProvider', element)
+          iframe = element
+          break
+        }
+      }
+      const previous = iframe
+        ? findChannel(iframe)
+        : findChannel(event.source as Window)
+      let channelId: string
+      let channel: MessageChannel
+      if (previous) {
+        channelId = previous.id
+        channel = previous.channel
+      } else {
+        channelId = uuidv4()
+        channel = new MessageChannel()
+        new ChannelEntry(channel, event.source as Window, iframe, channelId)
+      }
       console.log('server hasProvider', event.data, event.ports)
       // Listen for messages from the client
       const ports = event.ports
