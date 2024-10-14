@@ -48,18 +48,7 @@ export function createServer() {
         : findChannel(event.source as Window)
       let channelId: string
       let channel: MessageChannel
-      if (previous) {
-        channelId = previous.id
-        channel = previous.channel
-      } else {
-        channelId = uuidv4()
-        channel = new MessageChannel()
-        new ChannelEntry(channel, event.source as Window, iframe, channelId)
-      }
-      console.log('server hasProvider', event.data, event.ports)
-      // Listen for messages from the client
-      const ports = event.ports
-      channel.port1.addEventListener('message', (event: MessageEvent) => {
+      const channelHandler = (event: MessageEvent) => {
         console.log('server raw', event.data)
         try {
           const request = {
@@ -83,7 +72,21 @@ export function createServer() {
         } catch (error) {
           console.error('Error parsing JSON RPC request', error, event)
         }
-      })
+      }
+      if (previous) {
+        channelId = previous.id
+        channel = previous.channel
+        channel.port1.removeEventListener('message', channelHandler)
+        channel = previous.channel = new MessageChannel()
+      } else {
+        channelId = uuidv4()
+        channel = new MessageChannel()
+        new ChannelEntry(channel, event.source as Window, iframe, channelId)
+      }
+      console.log('server hasProvider', event.data, event.ports)
+      // Listen for messages from the client
+      const ports = event.ports
+      channel.port1.addEventListener('message', channelHandler)
       channel.port1.start()
 
       console.log('server accept', channel.port2)
