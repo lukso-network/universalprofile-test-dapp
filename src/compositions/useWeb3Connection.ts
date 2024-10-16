@@ -19,64 +19,16 @@ import EthereumProvider from '@walletconnect/ethereum-provider/dist/types/Ethere
 import Web3 from 'web3'
 import { ContractOptions, Contract } from 'web3-eth-contract'
 import { EthereumProviderError } from 'eth-rpc-errors'
-import { createServer, createClient } from '@lukso/embedded-provider'
-import { JSONRPCErrorResponse, JSONRPCSuccessResponse } from 'json-rpc-2.0'
+import {
+  createGlobalUPProvider,
+  createClientUPProvider,
+} from '@lukso/embedded-provider'
 const oldProvider = window.lukso
 if (oldProvider) {
-  const server = createServer()
-  server.addMethod('exampleMethod', params => {
-    console.log('params', params)
-    return `Hello, ${params.name}!`
-  })
-  server.applyMiddleware(async (next, request) => {
-    const { method: _method, params: _params, id, jsonrpc } = request
-    const method =
-      typeof _method === 'string'
-        ? _method
-        : (_method as unknown as { method: string; params: unknown[] }).method
-    const params =
-      typeof _method === 'string'
-        ? _params
-        : (_method as unknown as { method: string; params: unknown[] }).params
-    try {
-      console.log('request', request)
-      const response = await oldProvider.request({ method, params })
-      console.log('response', response)
-      return { id, jsonrpc, result: response } as JSONRPCSuccessResponse
-    } catch (error) {
-      console.error(error)
-      console.log({ id, jsonrpc, error } as JSONRPCErrorResponse)
-    }
-    console.log('request', request)
-    if (request.method === 'exampleMethod2') {
-      console.log('exampleMethod2')
-      return {
-        jsonrpc,
-        id,
-        result: { message: 'Hello, World!' } as any,
-      } as JSONRPCSuccessResponse
-    }
-    return await next(request)
-  })
+  const server = createGlobalUPProvider()
+  server.setupProvider(oldProvider, ['https://rpc.mainnet.lukso.network'])
 }
-const client = createClient()
-// client.request('exampleMethod', { name: 'World' }).then(result => {
-//   console.log('result', result)
-// })
-// client.request('exampleMethod2', { name: 'World' }).then(result => {
-//   console.log('result2', result)
-// })
-const oldRequest = client.request.bind(client)
-client.request = (method, params) => {
-  if (typeof method === 'string') {
-    return oldRequest(method, params)
-  }
-  const { method: _method, params: _params } = method as {
-    method: string
-    params: unknown[]
-  }
-  return oldRequest(_method, _params)
-}
+const client = createClientUPProvider()
 window.lukso = client
 
 const web3Onboard = useWeb3Onboard()

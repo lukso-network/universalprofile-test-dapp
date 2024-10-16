@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { createClient } from '@lukso/embedded-provider'
+import { createClientUPProvider } from '@lukso/embedded-provider'
 import { ref } from 'vue'
 import Web3 from 'web3'
-window.lukso = createClient()
+window.lukso = createClientUPProvider()
 
 const web3 = new Web3(window.lukso)
 const chainId = ref<number | null>(null)

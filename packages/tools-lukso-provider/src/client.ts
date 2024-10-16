@@ -29,9 +29,8 @@ async function testWindow(
     let timeout: number | NodeJS.Timeout = 0
     const channel = new MessageChannel()
     const testFn = (event: MessageEvent) => {
-      console.log('client init', event.data)
       if (event.data === 'upProvider:windowInitialized') {
-        console.log('client', event.data, up)
+        console.log('client init', event.data, up)
         up.removeEventListener('message', testFn)
         if (timeout) {
           clearTimeout(timeout)
@@ -137,12 +136,25 @@ async function findDestination(
   return up
 }
 
-export function createClient(authURL?: string | Window, search = true) {
+export function createClientUPProvider(
+  authURL?: string | Window,
+  search = true
+) {
+  let chainId = 0
+  let accounts: string[] = []
   const doSearch = findDestination(authURL, search).then(up => {
     up.local?.addEventListener('message', event => {
       try {
         const response = event.data
         console.log('client', response)
+        switch (response.method) {
+          case 'chainChanged':
+            chainId = response.params[0]
+            return
+          case 'accountsChanged':
+            accounts = response.params
+            return
+        }
         const item = pendingRequests.get(response.id)
         if (response.id && item) {
           const { resolve, reject } = item
@@ -167,6 +179,7 @@ export function createClient(authURL?: string | Window, search = true) {
       }
     })
     up.local?.start()
+
     return up
   })
   const client = new JSONRPCClient(async (jsonRPCRequest: any) => {
@@ -184,5 +197,26 @@ export function createClient(authURL?: string | Window, search = true) {
       up.remote.postMessage(jsonRPCRequest)
     })
   })
-  return client
+  const oldRequest = client.request.bind(client)
+  client.request = async (method, params) => {
+    await doSearch
+    // make it compatible with old and new type RPC.
+    if (typeof method === 'string') {
+      return await oldRequest(method, params)
+    }
+    const { method: _method, params: _params } = method as {
+      method: string
+      params: unknown[]
+    }
+    return await oldRequest(_method, _params)
+  }
+  return Object.freeze({
+    request: client.request.bind(client),
+    get chainId() {
+      return chainId
+    },
+    get accounts() {
+      return accounts
+    },
+  })
 }

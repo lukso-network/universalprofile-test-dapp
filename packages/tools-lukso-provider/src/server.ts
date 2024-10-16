@@ -1,39 +1,90 @@
-import { JSONRPCServer } from 'json-rpc-2.0'
+import {
+  JSONRPCErrorResponse,
+  JSONRPCServer,
+  JSONRPCSuccessResponse,
+} from 'json-rpc-2.0'
 import { v4 as uuidv4 } from 'uuid'
 
-const channels = new Map<string, ChannelEntry>()
 export class ChannelEntry {
+  private readonly accounts: [`0x${string}` | '', `0x${string}` | ''] = ['', '']
+  private chainId = 0
+  private rpcUrls: string[] = []
   constructor(
-    public channel: MessageChannel,
-    public window: Window,
-    public element: HTMLIFrameElement | null,
-    public id: string
-  ) {
-    channels.set(id, this)
+    public readonly channel: MessageChannel,
+    public readonly toClient: MessagePort,
+    public readonly window: Window,
+    public readonly element: HTMLIFrameElement | null,
+    public readonly id: string
+  ) {}
+  public async send(method: string, params: unknown[]): Promise<void> {
+    this.channel.port2.postMessage({
+      jsonrpc: '2.0',
+      id: uuidv4(),
+      method,
+      params,
+    })
   }
-}
-
-export function findChannel(id: string | Window | HTMLIFrameElement) {
-  if (typeof id === 'string') {
-    return channels.get(id)
+  public async allowAccounts(
+    [primary, page]: [`0x${string}` | '', `0x${string}` | ''],
+    chainId: number
+  ): Promise<void> {
+    console.log('allowAccounts', primary, page)
+    if (this.accounts[0] !== primary || this.accounts[1] !== page) {
+      this.accounts[0] = primary
+      this.accounts[1] = page
+      await this.send('accountsChanged', [...this.accounts])
+    }
+    await this.setChainId(chainId)
   }
-  for (const item of channels.values()) {
-    if (item.window === id || item.element === id) {
-      return item
+  public get enabled(): boolean {
+    return this.accounts[0] !== '' && this.accounts[1] !== ''
+  }
+  public async disable(): Promise<void> {
+    this.accounts[0] = ''
+    await this.send('accountsChanged', [...this.accounts])
+  }
+  public async setChainId(chainId: number): Promise<void> {
+    if (this.chainId !== chainId) {
+      this.chainId = chainId
+      await this.send('chainChanged', [chainId])
     }
   }
-  return null
+  public async setRpcUrls(rpcUrls: string[]): Promise<void> {
+    if (
+      rpcUrls.length !== this.rpcUrls.length ||
+      rpcUrls.some((url, index) => url !== this.rpcUrls[index])
+    ) {
+      this.rpcUrls = rpcUrls
+      await this.send('rpcUrlsChanged', rpcUrls)
+    }
+  }
 }
-export function createServer() {
-  const server = new JSONRPCServer()
 
-  // Define your server-side methods
-  server.addMethod('exampleMethod', params => {
-    return `Hello, ${params.name}!`
-  })
+let globalUPProvider: ReturnType<typeof createGlobalUPProvider> | null = null
+
+export function getUPProviderChannel(
+  id: string | Window | HTMLIFrameElement
+): ChannelEntry | null {
+  if (!globalUPProvider) {
+    throw new Error('Global UP Provider not set up')
+  }
+  return globalUPProvider.getChannel(id)
+}
+
+export function createGlobalUPProvider(
+  _provider?: any,
+  _rpcUrls?: string | string[]
+) {
+  if (globalUPProvider) {
+    throw new Error('Global UP Provider already exists')
+  }
+  const server = new JSONRPCServer()
+  const channels = new Map<string, ChannelEntry>()
 
   console.log('server listen', window.location.href, window)
-  window.addEventListener('message', event => {
+
+  // Server handler to accept new client provider connections
+  const providerHandler = (event: MessageEvent) => {
     if (event.data === 'upProvider:hasProvider') {
       let iframe: HTMLIFrameElement | null = null
       for (const element of document.querySelectorAll('iframe')) {
@@ -44,10 +95,11 @@ export function createServer() {
         }
       }
       const previous = iframe
-        ? findChannel(iframe)
-        : findChannel(event.source as Window)
+        ? getUPProviderChannel(iframe)
+        : getUPProviderChannel(event.source as Window)
       let channelId: string
       let channel: MessageChannel
+      const toClient = event.ports[0]
       const channelHandler = (event: MessageEvent) => {
         console.log('server raw', event.data)
         try {
@@ -63,7 +115,7 @@ export function createServer() {
                 )
                 return
               }
-              ports[0]?.postMessage({
+              toClient?.postMessage({
                 ...response,
                 id: JSON.parse(response.id.replace(`${channelId}:`, '')),
               })
@@ -77,15 +129,21 @@ export function createServer() {
         channelId = previous.id
         channel = previous.channel
         channel.port1.removeEventListener('message', channelHandler)
-        channel = previous.channel = new MessageChannel()
+        channel.port1.close()
+        channel = new MessageChannel()
       } else {
         channelId = uuidv4()
         channel = new MessageChannel()
-        new ChannelEntry(channel, event.source as Window, iframe, channelId)
       }
+      const channel_ = new ChannelEntry(
+        channel,
+        toClient,
+        event.source as Window,
+        iframe,
+        channelId
+      )
+      channels.set(channelId, channel_)
       console.log('server hasProvider', event.data, event.ports)
-      // Listen for messages from the client
-      const ports = event.ports
       channel.port1.addEventListener('message', channelHandler)
       channel.port1.start()
 
@@ -94,6 +152,143 @@ export function createServer() {
         transfer: [channel.port2],
       })
     }
+  }
+  window.addEventListener('message', providerHandler)
+
+  let provider: any = _provider ?? null
+  let rpcUrls: string[] = Array.isArray(_rpcUrls)
+    ? _rpcUrls
+    : _rpcUrls != null
+      ? [_rpcUrls]
+      : []
+  let primary: `0x${string}` | '' = ''
+  let page: `0x${string}` | '' = ''
+  let chainId = 0
+
+  // Server handler to forward requests to the provider
+  server.applyMiddleware(async (next, request) => {
+    const { method: _method, params: _params, id, jsonrpc } = request
+    const method =
+      typeof _method === 'string'
+        ? _method
+        : (_method as unknown as { method: string; params: unknown[] }).method
+    const params =
+      typeof _method === 'string'
+        ? _params
+        : (_method as unknown as { method: string; params: unknown[] }).params
+    try {
+      if (!provider) {
+        throw new Error('Global Provider not connected')
+      }
+      const response = await provider.request({ method, params })
+      console.log('response', request, response)
+      return { id, jsonrpc, result: response } as JSONRPCSuccessResponse
+    } catch (error) {
+      if (
+        /method (.*?) not supported./.test(
+          (error as { message: string }).message || ''
+        )
+      ) {
+        console.error(error)
+        const response = { id, jsonrpc, error } as JSONRPCErrorResponse
+        console.log('response error', request, response)
+        return response
+      }
+    }
+    console.log('request', request)
+    // Implement custom methods here.
+    if (request.method === 'exampleMethod2') {
+      console.log('exampleMethod2')
+      return {
+        jsonrpc,
+        id,
+        result: { message: 'Hello, World!' } as any,
+      } as JSONRPCSuccessResponse
+    }
+    return await next(request)
   })
-  return server
+
+  const upProvider = Object.freeze({
+    channels,
+    server,
+    close() {
+      window.removeEventListener('message', providerHandler)
+    },
+    get provider(): any {
+      return provider
+    },
+    get primary(): `0x${string}` | '' {
+      return primary
+    },
+    get account1(): `0x${string}` | '' {
+      return page
+    },
+    getChannel(id: string | Window | HTMLIFrameElement): ChannelEntry | null {
+      if (typeof id === 'string') {
+        return channels.get(id) || null
+      }
+      for (const item of channels.values()) {
+        if (item.window === id || item.element === id) {
+          return item
+        }
+      }
+      return null
+    },
+    async setupProvider(
+      _provider: any,
+      _rpcUrls: string | string[]
+    ): Promise<void> {
+      provider = _provider
+      const newRpcUrls = Array.isArray(_rpcUrls) ? _rpcUrls : [_rpcUrls]
+      if (newRpcUrls.some((url, index) => url !== rpcUrls[index])) {
+        rpcUrls = newRpcUrls
+        for (const item of channels.values()) {
+          await item.setRpcUrls(rpcUrls)
+        }
+      }
+      const _chainId = await provider.request({
+        method: 'eth_chainId',
+        params: [],
+      })
+      for (const item of channels.values()) {
+        await item.setChainId(chainId)
+      }
+      const accounts = await provider.request({
+        method: 'eth_accounts',
+        params: [],
+      })
+      const _primary = accounts[0] || ''
+      if (primary !== _primary || chainId !== _chainId) {
+        chainId = _chainId
+        primary = _primary
+        for (const item of channels.values()) {
+          await item.allowAccounts([primary, page], chainId)
+        }
+      }
+      provider.on(
+        'accountsChanged',
+        async ([_primary]: [`0x${string}` | '']) => {
+          if (primary !== _primary) {
+            primary = _primary
+            for (const item of channels.values()) {
+              await item.allowAccounts([primary, page], chainId)
+            }
+          }
+        }
+      )
+    },
+    async injectAddress1(_page: `0x${string}` | ''): Promise<void> {
+      if (page !== _page) {
+        if (_page !== '' && !/0x[0-9a-f]{40}/i.test(_page)) {
+          throw new Error('injectAddress1: invalid address')
+        }
+        page = _page || ''
+        for (const item of channels.values()) {
+          await item.allowAccounts([primary, page], chainId)
+        }
+      }
+    },
+  })
+  globalUPProvider = upProvider
+  return upProvider
 }
