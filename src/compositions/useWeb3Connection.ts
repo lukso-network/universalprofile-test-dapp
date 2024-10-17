@@ -53,7 +53,8 @@ const setupWeb3 = async (provider: EthereumProvider): Promise<void> => {
 }
 
 const setupProvider = async (
-  meansOfConnection: string
+  meansOfConnection: string,
+  userOperation: boolean
 ): Promise<ProviderType | undefined> => {
   try {
     const isWalletConnectUsed = meansOfConnection === WALLET_CONNECT
@@ -75,7 +76,7 @@ const setupProvider = async (
       let accounts = await web3.eth.getAccounts()
 
       address = accounts[0]
-      if (!address) {
+      if (!address && userOperation) {
         accounts = await requestAccounts()
         address = accounts[0]
       }
@@ -88,7 +89,7 @@ const setupProvider = async (
   } catch (error) {
     const epError = error as EthereumProviderError<Error>
 
-    if (epError.code === 4100) {
+    if (epError.code === 4100 && userOperation) {
       const address = (await requestAccounts())[0]
       setConnected(address, meansOfConnection)
       localStorage.setItem(UP_CONNECTED_ADDRESS, address)

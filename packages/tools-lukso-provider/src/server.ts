@@ -14,8 +14,26 @@ export class ChannelEntry {
     public readonly toClient: MessagePort,
     public readonly window: Window,
     public readonly element: HTMLIFrameElement | null,
-    public readonly id: string
-  ) {}
+    public readonly id: string,
+    public readonly server: JSONRPCServer,
+    private readonly getter: () => boolean,
+    private readonly setter: (value: boolean) => void
+  ) {
+    Object.defineProperty(this, 'enabled', {
+      get() {
+        return this.getter()
+      },
+      set(value: boolean) {
+        if (value !== getter()) {
+          this.setter(value)
+          this.send('accountsChanged', [
+            this.getter() ? this.accounts[0] : '',
+            this.accounts[1],
+          ])
+        }
+      },
+    })
+  }
   public async send(method: string, params: unknown[]): Promise<void> {
     this.channel.port2.postMessage({
       jsonrpc: '2.0',
@@ -32,16 +50,12 @@ export class ChannelEntry {
     if (this.accounts[0] !== primary || this.accounts[1] !== page) {
       this.accounts[0] = primary
       this.accounts[1] = page
-      await this.send('accountsChanged', [...this.accounts])
+      await this.send('accountsChanged', [this.getter() ? primary : '', page])
     }
     await this.setChainId(chainId)
   }
   public get enabled(): boolean {
     return this.accounts[0] !== '' && this.accounts[1] !== ''
-  }
-  public async disable(): Promise<void> {
-    this.accounts[0] = ''
-    await this.send('accountsChanged', [...this.accounts])
   }
   public async setChainId(chainId: number): Promise<void> {
     if (this.chainId !== chainId) {
@@ -78,8 +92,16 @@ export function createGlobalUPProvider(
   if (globalUPProvider) {
     throw new Error('Global UP Provider already exists')
   }
-  const server = new JSONRPCServer()
   const channels = new Map<string, ChannelEntry>()
+  let provider: any = _provider ?? null
+  let rpcUrls: string[] = Array.isArray(_rpcUrls)
+    ? _rpcUrls
+    : _rpcUrls != null
+      ? [_rpcUrls]
+      : []
+  let primary: `0x${string}` | '' = ''
+  let page: `0x${string}` | '' = ''
+  let chainId = 0
 
   console.log('server listen', window.location.href, window)
 
@@ -100,6 +122,59 @@ export function createGlobalUPProvider(
       let channelId: string
       let channel: MessageChannel
       const toClient = event.ports[0]
+      const server = new JSONRPCServer()
+      let enabled = false
+      // Server handler to forward requests to the provider
+      server.applyMiddleware(async (next, request) => {
+        const { method: _method, params: _params, id, jsonrpc } = request
+        const method =
+          typeof _method === 'string'
+            ? _method
+            : (_method as unknown as { method: string; params: unknown[] })
+                .method
+        const params =
+          typeof _method === 'string'
+            ? _params
+            : (_method as unknown as { method: string; params: unknown[] })
+                .params
+        if (method === 'eth_requestAccounts') {
+          console.log('short circuit response', request, [primary, page])
+          return {
+            ...request,
+            result: [enabled ? primary : '', page],
+          } as JSONRPCSuccessResponse
+        }
+        try {
+          if (!provider) {
+            throw new Error('Global Provider not connected')
+          }
+          const response = await provider.request({ method, params })
+          console.log('response', request, response)
+          return { id, jsonrpc, result: response } as JSONRPCSuccessResponse
+        } catch (error) {
+          if (
+            /method (.*?) not supported./.test(
+              (error as { message: string }).message || ''
+            )
+          ) {
+            console.error(error)
+            const response = { id, jsonrpc, error } as JSONRPCErrorResponse
+            console.log('response error', request, response)
+            return response
+          }
+        }
+        console.log('request', request)
+        // Implement custom methods here.
+        if (request.method === 'exampleMethod2') {
+          console.log('exampleMethod2')
+          return {
+            jsonrpc,
+            id,
+            result: { message: 'Hello, World!' } as any,
+          } as JSONRPCSuccessResponse
+        }
+        return await next(request)
+      })
       const channelHandler = (event: MessageEvent) => {
         console.log('server raw', event.data)
         try {
@@ -140,7 +215,12 @@ export function createGlobalUPProvider(
         toClient,
         event.source as Window,
         iframe,
-        channelId
+        channelId,
+        server,
+        () => enabled,
+        value => {
+          enabled = value
+        }
       )
       channels.set(channelId, channel_)
       console.log('server hasProvider', event.data, event.ports)
@@ -155,62 +235,8 @@ export function createGlobalUPProvider(
   }
   window.addEventListener('message', providerHandler)
 
-  let provider: any = _provider ?? null
-  let rpcUrls: string[] = Array.isArray(_rpcUrls)
-    ? _rpcUrls
-    : _rpcUrls != null
-      ? [_rpcUrls]
-      : []
-  let primary: `0x${string}` | '' = ''
-  let page: `0x${string}` | '' = ''
-  let chainId = 0
-
-  // Server handler to forward requests to the provider
-  server.applyMiddleware(async (next, request) => {
-    const { method: _method, params: _params, id, jsonrpc } = request
-    const method =
-      typeof _method === 'string'
-        ? _method
-        : (_method as unknown as { method: string; params: unknown[] }).method
-    const params =
-      typeof _method === 'string'
-        ? _params
-        : (_method as unknown as { method: string; params: unknown[] }).params
-    try {
-      if (!provider) {
-        throw new Error('Global Provider not connected')
-      }
-      const response = await provider.request({ method, params })
-      console.log('response', request, response)
-      return { id, jsonrpc, result: response } as JSONRPCSuccessResponse
-    } catch (error) {
-      if (
-        /method (.*?) not supported./.test(
-          (error as { message: string }).message || ''
-        )
-      ) {
-        console.error(error)
-        const response = { id, jsonrpc, error } as JSONRPCErrorResponse
-        console.log('response error', request, response)
-        return response
-      }
-    }
-    console.log('request', request)
-    // Implement custom methods here.
-    if (request.method === 'exampleMethod2') {
-      console.log('exampleMethod2')
-      return {
-        jsonrpc,
-        id,
-        result: { message: 'Hello, World!' } as any,
-      } as JSONRPCSuccessResponse
-    }
-    return await next(request)
-  })
-
   const upProvider = Object.freeze({
     channels,
-    server,
     close() {
       window.removeEventListener('message', providerHandler)
     },

@@ -1,4 +1,5 @@
 import { JSONRPCClient } from 'json-rpc-2.0'
+import { v4 as uuidv4 } from 'uuid'
 
 type Item = {
   resolve: () => unknown
@@ -142,6 +143,7 @@ export function createClientUPProvider(
 ) {
   let chainId = 0
   let accounts: string[] = []
+  let rpcUrls: string[] = []
   const doSearch = findDestination(authURL, search).then(up => {
     up.local?.addEventListener('message', event => {
       try {
@@ -153,6 +155,9 @@ export function createClientUPProvider(
             return
           case 'accountsChanged':
             accounts = response.params
+            return
+          case 'rpcUrlsChanged':
+            rpcUrls = response.params
             return
         }
         const item = pendingRequests.get(response.id)
@@ -198,17 +203,68 @@ export function createClientUPProvider(
     })
   })
   const oldRequest = client.request.bind(client)
+  const wrapper = async (method: string, params: unknown[]) => {
+    switch (method) {
+      case 'eth_chainId':
+        return chainId
+      case 'eth_accounts':
+        return accounts
+      case 'eth_call':
+        if (rpcUrls.length > 0) {
+          console.log('client direct rpc', rpcUrls, method, params)
+          const urls = [...rpcUrls]
+          const errors = []
+          while (urls.length > 0) {
+            const url = urls.shift()
+            try {
+              if (!url) {
+                throw new Error('No RPC URL found')
+              }
+              const result = fetch(url, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  jsonrpc: '2.0',
+                  id: uuidv4(),
+                  method,
+                  params,
+                }),
+              }).then(response => {
+                if (response.ok) {
+                  return response.json()
+                }
+                throw new Error('Network response was not ok')
+              })
+              return result
+            } catch (error) {
+              console.error('error', error)
+              errors.push(error)
+            }
+          }
+          const err: any = new Error(
+            `All RPC URLs failed: ${errors.map(e => (e as { message: string }).message).join(', ')}`
+          )
+          err.errors = errors
+          throw err
+        }
+    }
+    if (/^(eth_chainId|eth_accounts|eth_call)$/.test(method)) {
+    }
+    return oldRequest(method, params)
+  }
   client.request = async (method, params) => {
     await doSearch
     // make it compatible with old and new type RPC.
     if (typeof method === 'string') {
-      return await oldRequest(method, params)
+      return await wrapper(method, params)
     }
     const { method: _method, params: _params } = method as {
       method: string
       params: unknown[]
     }
-    return await oldRequest(_method, _params)
+    return await wrapper(_method, _params)
   }
   return Object.freeze({
     request: client.request.bind(client),
