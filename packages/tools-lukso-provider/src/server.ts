@@ -9,6 +9,7 @@ export class ChannelEntry {
   private readonly accounts: [`0x${string}` | '', `0x${string}` | ''] = ['', '']
   private chainId = 0
   private rpcUrls: string[] = []
+
   constructor(
     public readonly channel: MessageChannel,
     public readonly toClient: MessagePort,
@@ -34,6 +35,7 @@ export class ChannelEntry {
       },
     })
   }
+
   public async send(method: string, params: unknown[]): Promise<void> {
     this.channel.port2.postMessage({
       jsonrpc: '2.0',
@@ -42,6 +44,7 @@ export class ChannelEntry {
       params,
     })
   }
+
   public async allowAccounts(
     [primary, page]: [`0x${string}` | '', `0x${string}` | ''],
     chainId: number
@@ -54,15 +57,18 @@ export class ChannelEntry {
     }
     await this.setChainId(chainId)
   }
+
   public get enabled(): boolean {
     return this.accounts[0] !== '' && this.accounts[1] !== ''
   }
+
   public async setChainId(chainId: number): Promise<void> {
     if (this.chainId !== chainId) {
       this.chainId = chainId
       await this.send('chainChanged', [chainId])
     }
   }
+
   public async setRpcUrls(rpcUrls: string[]): Promise<void> {
     if (
       rpcUrls.length !== this.rpcUrls.length ||
