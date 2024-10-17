@@ -25,7 +25,8 @@ window.addEventListener('load', matchSize)
       scrolling="yes"
       :src="base + 'widget.html'"
       sandbox="allow-same-origin allow-scripts"
-      @load="matchSize"
+      width="100%"
+      height="400px"
     ></iframe>
   </div>
 </template>

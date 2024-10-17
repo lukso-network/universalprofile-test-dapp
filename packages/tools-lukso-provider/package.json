@@ -8,6 +8,7 @@
   "dependencies": {
     "@mixer/postmessage-rpc": "^1.1.4",
     "@types/uuid": "^10.0.0",
+    "eventemitter3": "^5.0.1",
     "json-rpc-2.0": "^1.7.0",
     "uuid": "^10.0.0"
   },

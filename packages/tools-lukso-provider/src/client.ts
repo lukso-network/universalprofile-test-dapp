@@ -205,10 +205,6 @@ export function createClientUPProvider(
   const oldRequest = client.request.bind(client)
   const wrapper = async (method: string, params: unknown[]) => {
     switch (method) {
-      case 'eth_chainId':
-        return chainId
-      case 'eth_accounts':
-        return accounts
       case 'eth_call':
         if (rpcUrls.length > 0) {
           console.log('client direct rpc', rpcUrls, method, params)

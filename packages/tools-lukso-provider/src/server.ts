@@ -4,8 +4,18 @@ import {
   JSONRPCSuccessResponse,
 } from 'json-rpc-2.0'
 import { v4 as uuidv4 } from 'uuid'
+import EventEmitter3 from 'eventemitter3'
 
-export class ChannelEntry {
+interface MyEvents {
+  connected: () => void
+  disconnected: () => void
+  accounts: () => void
+  requestAccounts: () => void
+  chainChanged: (chainId: number) => void
+  injected: (page: `0x${string}` | '') => void
+}
+
+export class ChannelEntry extends EventEmitter3<MyEvents> {
   private readonly accounts: [`0x${string}` | '', `0x${string}` | ''] = ['', '']
   private chainId = 0
   private rpcUrls: string[] = []
@@ -20,20 +30,7 @@ export class ChannelEntry {
     private readonly getter: () => boolean,
     private readonly setter: (value: boolean) => void
   ) {
-    Object.defineProperty(this, 'enabled', {
-      get() {
-        return this.getter()
-      },
-      set(value: boolean) {
-        if (value !== getter()) {
-          this.setter(value)
-          this.send('accountsChanged', [
-            this.getter() ? this.accounts[0] : '',
-            this.accounts[1],
-          ])
-        }
-      },
-    })
+    super()
   }
 
   public async send(method: string, params: unknown[]): Promise<void> {
@@ -50,22 +47,46 @@ export class ChannelEntry {
     chainId: number
   ): Promise<void> {
     console.log('allowAccounts', primary, page)
-    if (this.accounts[0] !== primary || this.accounts[1] !== page) {
+    const primaryChanged = this.accounts[0] !== primary
+    const pageChanged = this.accounts[1] !== page
+    if (primaryChanged || pageChanged) {
       this.accounts[0] = primary
       this.accounts[1] = page
       await this.send('accountsChanged', [this.getter() ? primary : '', page])
+      if (primaryChanged) {
+        this.emit(
+          this.getter() && this.accounts[0] ? 'connected' : 'disconnected'
+        )
+      }
+      if (pageChanged) {
+        this.emit('injected', page)
+      }
     }
     await this.setChainId(chainId)
   }
 
   public get enabled(): boolean {
-    return this.accounts[0] !== '' && this.accounts[1] !== ''
+    return this.getter()
+  }
+
+  public set enabled(value: boolean) {
+    if (value !== this.enabled) {
+      this.setter(value)
+      this.send('accountsChanged', [
+        this.getter() ? this.accounts[0] : '',
+        this.accounts[1],
+      ])
+      this.emit(
+        this.getter() && this.accounts[0] ? 'connected' : 'disconnected'
+      )
+    }
   }
 
   public async setChainId(chainId: number): Promise<void> {
     if (this.chainId !== chainId) {
       this.chainId = chainId
       await this.send('chainChanged', [chainId])
+      this.emit('chainChanged', chainId)
     }
   }
 
@@ -131,24 +152,66 @@ export function createGlobalUPProvider(
       const server = new JSONRPCServer()
       let enabled = false
       // Server handler to forward requests to the provider
+      if (previous) {
+        channelId = previous.id
+        channel = previous.channel
+        channel.port1.close()
+        channel = new MessageChannel()
+      } else {
+        channelId = uuidv4()
+        channel = new MessageChannel()
+      }
+      const channel_ = new ChannelEntry(
+        channel,
+        toClient,
+        event.source as Window,
+        iframe,
+        channelId,
+        server,
+        () => enabled,
+        value => {
+          enabled = value
+        }
+      )
       server.applyMiddleware(async (next, request) => {
         const { method: _method, params: _params, id, jsonrpc } = request
         const method =
           typeof _method === 'string'
             ? _method
-            : (_method as unknown as { method: string; params: unknown[] })
-                .method
+            : (
+                _method as unknown as {
+                  method: string
+                  params: unknown[]
+                }
+              ).method
         const params =
           typeof _method === 'string'
             ? _params
-            : (_method as unknown as { method: string; params: unknown[] })
-                .params
-        if (method === 'eth_requestAccounts') {
-          console.log('short circuit response', request, [primary, page])
-          return {
-            ...request,
-            result: [enabled ? primary : '', page],
-          } as JSONRPCSuccessResponse
+            : (
+                _method as unknown as {
+                  method: string
+                  params: unknown[]
+                }
+              ).params
+        switch (method) {
+          case 'eth_requestAccounts':
+            console.log('short circuit response', request, [primary, page])
+            channel_.emit('requestAccounts')
+            return {
+              ...request,
+              result: [enabled ? primary : '', page],
+            } as JSONRPCSuccessResponse
+          case 'eth_chainId':
+            return {
+              ...request,
+              result: chainId,
+            } as JSONRPCSuccessResponse
+          case 'eth_accounts':
+            channel_.emit('accounts')
+            return {
+              ...request,
+              result: [enabled ? primary : '', page],
+            } as JSONRPCSuccessResponse
         }
         try {
           if (!provider) {
@@ -156,7 +219,11 @@ export function createGlobalUPProvider(
           }
           const response = await provider.request({ method, params })
           console.log('response', request, response)
-          return { id, jsonrpc, result: response } as JSONRPCSuccessResponse
+          return {
+            id,
+            jsonrpc,
+            result: response,
+          } as JSONRPCSuccessResponse
         } catch (error) {
           if (
             /method (.*?) not supported./.test(
@@ -164,7 +231,11 @@ export function createGlobalUPProvider(
             )
           ) {
             console.error(error)
-            const response = { id, jsonrpc, error } as JSONRPCErrorResponse
+            const response = {
+              id,
+              jsonrpc,
+              error,
+            } as JSONRPCErrorResponse
             console.log('response error', request, response)
             return response
           }
@@ -206,28 +277,6 @@ export function createGlobalUPProvider(
           console.error('Error parsing JSON RPC request', error, event)
         }
       }
-      if (previous) {
-        channelId = previous.id
-        channel = previous.channel
-        channel.port1.removeEventListener('message', channelHandler)
-        channel.port1.close()
-        channel = new MessageChannel()
-      } else {
-        channelId = uuidv4()
-        channel = new MessageChannel()
-      }
-      const channel_ = new ChannelEntry(
-        channel,
-        toClient,
-        event.source as Window,
-        iframe,
-        channelId,
-        server,
-        () => enabled,
-        value => {
-          enabled = value
-        }
-      )
       channels.set(channelId, channel_)
       console.log('server hasProvider', event.data, event.ports)
       channel.port1.addEventListener('message', channelHandler)
