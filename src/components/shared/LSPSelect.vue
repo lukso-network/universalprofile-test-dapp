@@ -244,11 +244,11 @@ watch(
       items.push({
         type: LSPType.ERROR_TEST,
         address: errorContract,
-        label: `ErrorTesting Contract...`,
+        label: 'ErrorTesting Contract...',
       })
     }
 
-    let children
+    let children: Array<{ type: LSPType; label: string }>
     if (
       props.showTypes
         ? props.showTypes.includes(LSPType.LSP7DigitalAsset)

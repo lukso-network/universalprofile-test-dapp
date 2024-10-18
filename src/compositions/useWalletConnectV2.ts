@@ -29,7 +29,7 @@ const setupWCV2Provider = async () => {
       name: 'UP Test DApp',
       description: 'UP Test DApp',
       url: document.location.origin,
-      icons: [document.location.origin + '/lukso.png'],
+      icons: [`${document.location.origin}/lukso.png`],
     },
     rpcMap: {
       42: 'https://rpc.mainnet.lukso.network',

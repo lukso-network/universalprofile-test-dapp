@@ -9,7 +9,7 @@ interface ERC20DeploymentOptions {
   tokenSymbol: string
 }
 
-interface DeployedERC20Token {
+export interface DeployedERC20Token {
   ERC20Token: DeployedContract
 }
 
@@ -29,7 +29,7 @@ async function deployERC20Token({
         arguments: [tokenName, tokenSymbol],
       })
       .send({ from })
-      .on('receipt', function (receipt: any) {
+      .on('receipt', (receipt: any) => {
         console.log('erc20 receipt', receipt)
         resolve({
           ERC20Token: {
