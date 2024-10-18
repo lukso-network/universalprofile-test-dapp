@@ -10,7 +10,8 @@
         "noDelete": "off"
       },
       "style": {
-        "useImportType": "off"
+        "useImportType": "off",
+        "useShorthandFunctionType": "off"
       }
     }
   }
