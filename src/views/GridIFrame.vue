@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import GridPanelDialog from '@/components/grid/GridPanelDialog.vue'
+import { getUPProviderChannel } from '@lukso/embedded-provider'
 import { ref } from 'vue'
 
 const base = ref<string>(import.meta.env.BASE_URL || '/')
@@ -19,6 +21,9 @@ window.addEventListener('load', matchSize)
   <div class="has-background-white">
     <section class="section">
       <h1 class="title is-large">Content within Grid iframe</h1>
+    </section>
+    <section class="section">
+      <GridPanelDialog :channel="getUPProviderChannel(frameElement)" />
     </section>
     <iframe
       ref="frameElement"

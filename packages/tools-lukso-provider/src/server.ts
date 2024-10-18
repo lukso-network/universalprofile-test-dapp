@@ -6,7 +6,7 @@ import {
 import { v4 as uuidv4 } from 'uuid'
 import EventEmitter3 from 'eventemitter3'
 
-interface MyEvents {
+interface ChannleEntryEvents {
   connected: () => void
   disconnected: () => void
   accounts: () => void
@@ -15,7 +15,7 @@ interface MyEvents {
   injected: (page: `0x${string}` | '') => void
 }
 
-export class ChannelEntry extends EventEmitter3<MyEvents> {
+class ChannelEntry extends EventEmitter3<ChannleEntryEvents> {
   private readonly accounts: [`0x${string}` | '', `0x${string}` | ''] = ['', '']
   private chainId = 0
   private rpcUrls: string[] = []
@@ -103,19 +103,19 @@ export class ChannelEntry extends EventEmitter3<MyEvents> {
 
 let globalUPProvider: ReturnType<typeof createGlobalUPProvider> | null = null
 
-export function getUPProviderChannel(
-  id: string | Window | HTMLIFrameElement
+function getUPProviderChannel(
+  id: string | Window | HTMLIFrameElement | null
 ): ChannelEntry | null {
+  if (id == null) {
+    return null
+  }
   if (!globalUPProvider) {
     throw new Error('Global UP Provider not set up')
   }
   return globalUPProvider.getChannel(id)
 }
 
-export function createGlobalUPProvider(
-  _provider?: any,
-  _rpcUrls?: string | string[]
-) {
+function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]) {
   if (globalUPProvider) {
     throw new Error('Global UP Provider already exists')
   }
@@ -241,15 +241,6 @@ export function createGlobalUPProvider(
           }
         }
         console.log('request', request)
-        // Implement custom methods here.
-        if (request.method === 'exampleMethod2') {
-          console.log('exampleMethod2')
-          return {
-            jsonrpc,
-            id,
-            result: { message: 'Hello, World!' } as any,
-          } as JSONRPCSuccessResponse
-        }
         return await next(request)
       })
       const channelHandler = (event: MessageEvent) => {
@@ -304,7 +295,9 @@ export function createGlobalUPProvider(
     get account1(): `0x${string}` | '' {
       return page
     },
-    getChannel(id: string | Window | HTMLIFrameElement): ChannelEntry | null {
+    getChannel(
+      id: string | Window | HTMLIFrameElement | null
+    ): ChannelEntry | null {
       if (typeof id === 'string') {
         return channels.get(id) || null
       }
@@ -373,3 +366,5 @@ export function createGlobalUPProvider(
   globalUPProvider = upProvider
   return upProvider
 }
+
+export { ChannelEntry, getUPProviderChannel, createGlobalUPProvider }

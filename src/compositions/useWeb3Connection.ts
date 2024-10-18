@@ -21,15 +21,15 @@ import { ContractOptions, Contract } from 'web3-eth-contract'
 import { EthereumProviderError } from 'eth-rpc-errors'
 import {
   createGlobalUPProvider,
-  createClientUPProvider,
+  // createClientUPProvider,
 } from '@lukso/embedded-provider'
 const oldProvider = window.lukso
 if (oldProvider) {
   const server = createGlobalUPProvider()
   server.setupProvider(oldProvider, ['https://rpc.mainnet.lukso.network'])
 }
-const client = createClientUPProvider()
-window.lukso = client
+// const client = createClientUPProvider()
+// window.lukso = client
 
 const web3Onboard = useWeb3Onboard()
 const web3WalletConnectV2 = useWalletConnectV2()

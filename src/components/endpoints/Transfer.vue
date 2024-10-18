@@ -70,7 +70,7 @@ const transfer = async () => {
             '0x'
           )
           .send({ from: erc725AccountAddress })
-          .on('receipt', function (receipt: any) {
+          .on('receipt', (receipt: any) => {
             console.log(receipt)
           })
           .once('sending', (payload: any) => {
@@ -99,7 +99,7 @@ const transfer = async () => {
             '0x'
           )
           .send({ from: erc725AccountAddress })
-          .on('receipt', function (receipt: any) {
+          .on('receipt', (receipt: any) => {
             console.log(receipt)
           })
           .once('sending', (payload: any) => {
