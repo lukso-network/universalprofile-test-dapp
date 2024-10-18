@@ -22,7 +22,7 @@ const onImportProfile = async () => {
       method: isRecovery.value ? 'up_recover' : 'up_import',
       params: [universalProfileAddress.value],
     }
-    let newControllerAddress: string = await web3.sendRequest(request)
+    const newControllerAddress: string = await web3.sendRequest(request)
     if (newControllerAddress) {
       controllerAddress.value = newControllerAddress
     }
