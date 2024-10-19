@@ -17,18 +17,18 @@ function handlePageAddress(info: TokenInfo) {
     pageAddress.value = info.address
   }
 }
-watch(
-  () => [enabled.value, props.channel.ref.value, pageAddress.value || ''] as [boolean, HTMLIFrameElement | null, `0x${string}` | ''],
-  ([value, _channel, pageAddress]: [boolean, HTMLIFrameElement | null, `0x${string}` | '']) => {
-    const channel = getUPProviderChannel(_channel)
-    console.log('watch panel', value, channel?.enabled || false, pageAddress)
-    if (channel) {
-      channel.allowAccounts([getState('address'), pageAddress], getState('chainId'))
-      channel.enabled = value
-    }
-  },
-  { immediate: true }
-)
+function updateProvider() {
+  const channel = getUPProviderChannel(props.channel.ref.value)
+  console.log('watch panel', enabled.value, channel != null, channel?.enabled || false, pageAddress.value)
+  if (channel) {
+    channel.allowAccounts([getState('address'), pageAddress], getState('chainId'))
+    channel.enabled = enabled.value
+  }
+}
+watch(() => getState('chainId'), updateProvider)
+watch(enabled, updateProvider)
+watch(props.channel.ref, updateProvider)
+watch(pageAddress, updateProvider)
 </script>
 
 <template>
