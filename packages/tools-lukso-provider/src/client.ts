@@ -22,34 +22,35 @@ interface RemoteWalletEvents {
 }
 
 type RemoteWalletOptions = {
-  client: JSONRPCClient
+  client?: JSONRPCClient
   chainId: () => number
   accounts: () => (`0x${string}` | '')[]
+  window?: Window
+  clientChannel?: MessagePort
 }
 
 const pendingRequests = new Map<string, Item>()
 export class RemoteWallet extends EventEmitter3<RemoteWalletEvents> {
-  constructor(
-    public readonly window: Window,
-    public readonly clientChannel: MessagePort,
-    private readonly options: RemoteWalletOptions
-  ) {
+  constructor(private options: RemoteWalletOptions) {
     super()
   }
+  get clientChannel(): MessagePort | null {
+    return this.options?.clientChannel || null
+  }
   async request(method: string, params: JSONRPCParams, clientParams: any): Promise<any> {
-    return this.options.client.request(method, params, clientParams)
+    return this.options?.client?.request(method, params, clientParams) || null
   }
   get chainId() {
-    return this.options.chainId()
+    return this.options?.chainId() || 0
   }
   get accounts() {
-    return this.options.accounts()
+    return this.options?.accounts() || []
   }
 }
 
 let walletWindow: RemoteWallet | null = null
 
-async function testWindow(_up: Window | undefined | null, options: RemoteWalletOptions): Promise<RemoteWallet> {
+async function testWindow(_up: Window | undefined | null, remote: RemoteWallet, options: RemoteWalletOptions): Promise<RemoteWallet> {
   const up = _up || (typeof window !== 'undefined' ? window : undefined)
   if (!up) {
     throw new Error('No UP found')
@@ -65,7 +66,8 @@ async function testWindow(_up: Window | undefined | null, options: RemoteWalletO
           clearTimeout(timeout)
           timeout = 0
         }
-        const remote = new RemoteWallet(up, channel.port1, options)
+        options.clientChannel = channel.port1
+        options.window = up
         resolve(remote)
       }
     }
@@ -86,10 +88,10 @@ async function testWindow(_up: Window | undefined | null, options: RemoteWalletO
   })
 }
 
-async function findUP(authURL: string | Window | undefined | null, options: RemoteWalletOptions): Promise<RemoteWallet> {
+async function findUP(authURL: string | Window | undefined | null, remote: RemoteWallet, options: RemoteWalletOptions): Promise<RemoteWallet> {
   let current = window.opener || window.parent || walletWindow
   if (current) {
-    const up = await testWindow(current, options)
+    const up = await testWindow(current, remote, options)
     if (up) {
       walletWindow = up
       return up
@@ -103,7 +105,7 @@ async function findUP(authURL: string | Window | undefined | null, options: Remo
   }
   current = window.open(authURL, 'UE Wallet', 'width=400,height=600')
   if (current) {
-    const up = await testWindow(current, options)
+    const up = await testWindow(current, remote, options)
     if (walletWindow) {
       walletWindow = up
       return up
@@ -112,23 +114,23 @@ async function findUP(authURL: string | Window | undefined | null, options: Remo
   throw new Error('No UP found')
 }
 
-async function findDestination(authURL: string | Window | undefined | null, options: RemoteWalletOptions, search = false): Promise<RemoteWallet> {
+async function findDestination(authURL: string | Window | undefined | null, remote: RemoteWallet, options: RemoteWalletOptions, search = false): Promise<RemoteWallet> {
   let up: RemoteWallet | undefined =
     (typeof authURL === 'object' && authURL instanceof Window) || authURL == null
-      ? await testWindow(authURL, options).catch(error => {
+      ? await testWindow(authURL, remote, options).catch(error => {
           if (search) {
             return undefined
           }
           throw error
         })
-      : await findUP(authURL, options)
+      : await findUP(authURL, remote, options)
   if (search && !up) {
     let retry = 3
     while (retry > 0) {
       let current: Window | undefined = window.opener && window.opener !== window ? window.opener : window.parent && window.parent !== window ? window.parent : undefined
       console.log('search', current?.location.href)
       while (current) {
-        up = await testWindow(current, options).catch(() => undefined)
+        up = await testWindow(current, remote, options).catch(() => undefined)
         if (up) {
           break
         }
@@ -156,8 +158,17 @@ export async function createClientUPProvider(authURL?: string | Window, search =
   let chainId = 0
   let accounts: (`0x${string}` | '')[] = []
   let rpcUrls: string[] = []
-  const doSearch = (client: JSONRPCClient) =>
-    findDestination(authURL, { client, chainId: () => chainId, accounts: () => accounts }, search).then(up => {
+  const options: RemoteWalletOptions = {
+    chainId: () => chainId,
+    accounts: () => accounts,
+  }
+  const remote = new RemoteWallet(options)
+  let searchPromise: Promise<RemoteWallet> | null
+  const doSearch = async (client: JSONRPCClient): Promise<RemoteWallet> => {
+    if (searchPromise) {
+      return searchPromise
+    }
+    searchPromise = findDestination(authURL, remote, options, search).then(up => {
       up.clientChannel?.addEventListener('message', event => {
         try {
           const response = event.data
@@ -202,9 +213,14 @@ export async function createClientUPProvider(authURL?: string | Window, search =
       up.clientChannel?.start()
       return up
     })
-  let up: RemoteWallet
+    return searchPromise
+  }
+
   const client = new JSONRPCClient(async (jsonRPCRequest: any) => {
-    up = await doSearch(client)
+    const up = await doSearch(client).then(up => {
+      options.client = client
+      return up
+    })
     return new Promise((resolve, reject) => {
       const { id, method, params } = jsonRPCRequest
       pendingRequests.set(id, {
@@ -215,10 +231,12 @@ export async function createClientUPProvider(authURL?: string | Window, search =
         method,
         params,
       })
-      up.clientChannel.postMessage(jsonRPCRequest)
+      up.clientChannel?.postMessage(jsonRPCRequest)
     })
   })
+
   const oldRequest = client.request.bind(client)
+
   const wrapper = async (method: string, params: unknown[]) => {
     switch (method) {
       case 'eth_call':
@@ -264,7 +282,7 @@ export async function createClientUPProvider(authURL?: string | Window, search =
   }
 
   client.request = async (method, params) => {
-    await doSearch
+    await doSearch(client)
     // make it compatible with old and new type RPC.
     if (typeof method === 'string') {
       return await wrapper(method, params)
@@ -276,5 +294,6 @@ export async function createClientUPProvider(authURL?: string | Window, search =
     return await wrapper(_method, _params)
   }
 
-  return await doSearch(client)
+  doSearch(client)
+  return remote
 }
