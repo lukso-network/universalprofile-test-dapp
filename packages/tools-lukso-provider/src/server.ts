@@ -37,10 +37,11 @@ class ChannelEntry extends EventEmitter3<ChannelEntryEvents> {
     })
   }
 
-  public async allowAccounts([primary, ..._page]: (`0x${string}` | '')[], chainId: number): Promise<void> {
+  public async allowAccounts(enabled: boolean, [primary, ..._page]: (`0x${string}` | '')[], chainId: number): Promise<void> {
     console.log('allowAccounts', primary, _page)
-    const primaryChanged = this.accounts[0] !== primary
+    const primaryChanged = this.accounts[0] !== primary || this.getter() !== enabled
     const pageChanged = this.accounts.slice(1).some((value, index) => value !== _page[index])
+    this.setter(enabled)
     if (primaryChanged || pageChanged) {
       this.accounts[0] = primary
       this.accounts.length = 1 + (_page.length || 0)
@@ -86,7 +87,104 @@ class ChannelEntry extends EventEmitter3<ChannelEntryEvents> {
   }
 }
 
-let globalUPProvider: ReturnType<typeof createGlobalUPProvider> | null = null
+type GlobalProviderOptions = {
+  providerHandler?: (e: MessageEvent) => void
+  accounts: (`0x${string}` | '')[]
+  provider: any
+  primary: `0x${string}` | ''
+  promise: Promise<void>
+  rpcUrls: string[]
+  chainId: number
+}
+export class GlobalProvider extends EventEmitter3 {
+  constructor(
+    public readonly channels: Map<string, ChannelEntry>,
+    private readonly options: GlobalProviderOptions
+  ) {
+    super()
+  }
+  close() {
+    if (this.options.providerHandler) {
+      window.removeEventListener('message', this.options.providerHandler)
+    }
+  }
+  get provider(): any {
+    return this.options.provider
+  }
+  get accounts(): (`0x${string}` | '')[] {
+    return [this.options.primary || '', ...this.options.accounts.slice(1)]
+  }
+  getChannel(id: string | Window | HTMLIFrameElement | null): ChannelEntry | null {
+    if (typeof id === 'string') {
+      return this.channels.get(id) || null
+    }
+    for (const item of this.channels.values()) {
+      if (item.window === id || item.element === id) {
+        return item
+      }
+    }
+    return null
+  }
+  async injectAddresses(...page: (`0x${string}` | '')[]) {
+    const changed = this.options.accounts.slice(1).some((value, index) => page?.[index] !== value)
+    if (changed) {
+      this.options.accounts = [this.options.primary, ...page]
+      for (const item of this.channels.values()) {
+        await item.allowAccounts(item.enabled, [this.options.primary, ...this.options.accounts.slice(1)], this.options.chainId)
+      }
+    }
+  }
+  async setupProvider(_provider: any, _rpcUrls: string | string[]): Promise<void> {
+    this.options.promise = new Promise<void>((resolve, reject) => {
+      ;(async () => {
+        try {
+          this.options.provider = _provider
+          const newRpcUrls = Array.isArray(_rpcUrls) ? _rpcUrls : [_rpcUrls]
+          if (newRpcUrls.some((url, index) => url !== this.options.rpcUrls[index])) {
+            this.options.rpcUrls = newRpcUrls
+            for (const item of this.channels.values()) {
+              await item.setRpcUrls(this.options.rpcUrls)
+            }
+          }
+          const _chainId = await this.options.provider.request({
+            method: 'eth_chainId',
+            params: [],
+          })
+          for (const item of this.channels.values()) {
+            await item.setChainId(this.options.chainId)
+          }
+          const _accounts = await this.options.provider.request({
+            method: 'eth_accounts',
+            params: [],
+          })
+          const _primary = _accounts[0] || ''
+          if (this.options.primary !== _primary || this.options.chainId !== _chainId) {
+            this.options.chainId = _chainId
+            this.options.primary = _primary
+            this.options.accounts[0] = _primary
+            for (const item of this.channels.values()) {
+              await item.allowAccounts(item.enabled, [this.options.primary, ...this.options.accounts.slice(1)], this.options.chainId)
+            }
+          }
+          this.options.provider.on('accountsChanged', async ([_primary]: [`0x${string}` | '']) => {
+            if (this.options.primary !== _primary) {
+              this.options.primary = _primary
+              this.options.accounts[0] = _primary
+              for (const item of this.channels.values()) {
+                await item.allowAccounts(item.enabled, [this.options.primary, ...this.options.accounts.slice(1)], this.options.chainId)
+              }
+            }
+          })
+          resolve()
+        } catch (err) {
+          reject(err)
+        }
+      })()
+    })
+  }
+}
+
+let globalUPProvider: GlobalProvider | null = null
 
 function getUPProviderChannel(id: string | Window | HTMLIFrameElement | null): ChannelEntry | null {
   if (id == null) {
@@ -98,22 +196,25 @@ function getUPProviderChannel(id: string | Window | HTMLIFrameElement | null): C
   return globalUPProvider.getChannel(id)
 }
 
-function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]) {
+function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]): GlobalProvider {
   if (globalUPProvider) {
-    throw new Error('Global UP Provider already exists')
+    return globalUPProvider
   }
   const channels = new Map<string, ChannelEntry>()
-  let provider: any = _provider ?? null
-  let rpcUrls: string[] = Array.isArray(_rpcUrls) ? _rpcUrls : _rpcUrls != null ? [_rpcUrls] : []
-  let primary: `0x${string}` | '' = ''
-  let chainId = 0
-  let accounts: (`0x${string}` | '')[] = []
-  let promise: Promise<void> = Promise.resolve()
+  const options: GlobalProviderOptions = {
+    provider: _provider ?? null,
+    rpcUrls: Array.isArray(_rpcUrls) ? _rpcUrls : _rpcUrls != null ? [_rpcUrls] : [],
+    primary: '',
+    chainId: 0,
+    accounts: [],
+    promise: Promise.resolve(),
+  }
+  globalUPProvider = new GlobalProvider(channels, options)
 
   console.log('server listen', window.location.href, window)
 
   // Server handler to accept new client provider connections
-  const providerHandler = (event: MessageEvent) => {
+  options.providerHandler = (event: MessageEvent) => {
     if (event.data === 'upProvider:hasProvider') {
       let iframe: HTMLIFrameElement | null = null
       for (const element of document.querySelectorAll('iframe')) {
@@ -146,6 +247,7 @@ function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]) {
         }
       )
       server.applyMiddleware(async (next, request) => {
+        await options.promise
         const { method: _method, params: _params, id, jsonrpc } = request
         const method =
           typeof _method === 'string'
@@ -167,43 +269,43 @@ function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]) {
               ).params
         switch (method) {
           case 'chainChanged':
-            console.log('short circuit response', request, [chainId])
-            channel_.emit('chainChanged', chainId)
+            console.log('short circuit response', request, [options.chainId])
+            channel_.emit('chainChanged', options.chainId)
             return {
               ...request,
-              result: [chainId],
+              result: [options.chainId],
             } as JSONRPCSuccessResponse
           case 'accounts':
-            console.log('short circuit response', request, [primary, ...channel_.accounts.slice(1)])
-            channel_.emit('requestAccounts', [enabled ? primary : '', ...channel_.accounts.slice(1)])
+            console.log('short circuit response', request, [options.primary, ...channel_.accounts.slice(1)])
+            channel_.emit('requestAccounts', [enabled ? options.primary : '', ...channel_.accounts.slice(1)])
             return {
               ...request,
-              result: [enabled ? primary : '', ...channel_.accounts.slice(1)],
+              result: [enabled ? options.primary : '', ...channel_.accounts.slice(1)],
             } as JSONRPCSuccessResponse
           case 'eth_requestAccounts':
-            console.log('short circuit response', request, [primary, ...channel_.accounts.slice(1)])
-            channel_.emit('requestAccounts', [enabled ? primary : '', ...channel_.accounts.slice(1)])
+            console.log('short circuit response', request, [options.primary, ...channel_.accounts.slice(1)])
+            channel_.emit('requestAccounts', [enabled ? options.primary : '', ...channel_.accounts.slice(1)])
             return {
               ...request,
-              result: [enabled ? primary : '', ...channel_.accounts.slice(1)],
+              result: [enabled ? options.primary : '', ...channel_.accounts.slice(1)],
             } as JSONRPCSuccessResponse
           case 'eth_chainId':
             return {
               ...request,
-              result: chainId,
+              result: options.chainId,
             } as JSONRPCSuccessResponse
           case 'eth_accounts':
-            channel_.emit('accountsChanged', [enabled ? primary : '', ...channel_.accounts.slice(1)])
+            channel_.emit('accountsChanged', [enabled ? options.primary : '', ...channel_.accounts.slice(1)])
             return {
               ...request,
-              result: [enabled ? primary : '', ...channel_.accounts.slice(1)],
+              result: [enabled ? options.primary : '', ...channel_.accounts.slice(1)],
             } as JSONRPCSuccessResponse
         }
         try {
-          if (!provider) {
+          if (!options.provider) {
             throw new Error('Global Provider not connected')
           }
-          const response = await provider.request({ method, params })
+          const response = await options.provider.request({ method, params })
           console.log('response', request, response)
           return {
             id,
@@ -254,92 +356,11 @@ function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]) {
       serverChannel.start()
 
       console.log('server accept', serverChannel)
-      serverChannel?.postMessage({ type: 'upProvider:windowInitialized', chainId, accounts, rpcUrls })
+      serverChannel?.postMessage({ type: 'upProvider:windowInitialized', chainId: options.chainId, accounts: options.accounts, rpcUrls: options.rpcUrls })
     }
   }
-  window.addEventListener('message', providerHandler)
-
-  const upProvider = Object.freeze({
-    channels,
-    close() {
-      window.removeEventListener('message', providerHandler)
-    },
-    get provider(): any {
-      return provider
-    },
-    get accounts(): (`0x${string}` | '')[] {
-      return [primary || '', ...accounts.slice(1)]
-    },
-    getChannel(id: string | Window | HTMLIFrameElement | null): ChannelEntry | null {
-      if (typeof id === 'string') {
-        return channels.get(id) || null
-      }
-      for (const item of channels.values()) {
-        if (item.window === id || item.element === id) {
-          return item
-        }
-      }
-      return null
-    },
-    async injectAddresses(...page: (`0x${string}` | '')[]) {
-      const changed = accounts.slice(1).some((value, index) => page?.[index] !== value)
-      if (changed) {
-        accounts = [accounts[0], ...page]
-        for (const item of channels.values()) {
-          await item.allowAccounts([primary, ...accounts.slice(1)], chainId)
-        }
-      }
-    },
-    async setupProvider(_provider: any, _rpcUrls: string | string[]): Promise<void> {
-      promise = new Promise<void>((resolve, reject) => {
-        ;(async () => {
-          try {
-            provider = _provider
-            const newRpcUrls = Array.isArray(_rpcUrls) ? _rpcUrls : [_rpcUrls]
-            if (newRpcUrls.some((url, index) => url !== rpcUrls[index])) {
-              rpcUrls = newRpcUrls
-              for (const item of channels.values()) {
-                await item.setRpcUrls(rpcUrls)
-              }
-            }
-            const _chainId = await provider.request({
-              method: 'eth_chainId',
-              params: [],
-            })
-            for (const item of channels.values()) {
-              await item.setChainId(chainId)
-            }
-            const _accounts = await provider.request({
-              method: 'eth_accounts',
-              params: [],
-            })
-            const _primary = _accounts[0] || ''
-            if (primary !== _primary || chainId !== _chainId) {
-              chainId = _chainId
-              primary = _primary
-              accounts[0] = _primary
-              for (const item of channels.values()) {
-                await item.allowAccounts([primary, ...accounts.slice(1)], chainId)
-              }
-            }
-            provider.on('accountsChanged', async ([_primary]: [`0x${string}` | '']) => {
-              if (primary !== _primary) {
-                primary = _primary
-                for (const item of channels.values()) {
-                  await item.allowAccounts([primary, ...accounts.slice(1)], chainId)
-                }
-              }
-            })
-            resolve()
-          } catch (err) {
-            reject(err)
-          }
-        })()
-      })
-    },
-  })
-  globalUPProvider = upProvider
-  return upProvider
+  window.addEventListener('message', options.providerHandler)
+  return globalUPProvider
 }
 
 export { ChannelEntry, getUPProviderChannel, createGlobalUPProvider }

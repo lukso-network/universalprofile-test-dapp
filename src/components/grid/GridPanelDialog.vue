@@ -21,14 +21,13 @@ function updateProvider() {
   const channel = getUPProviderChannel(props.channel.ref.value)
   console.log('watch panel', enabled.value, channel != null, channel?.enabled || false, pageAddress.value)
   if (channel) {
-    channel.allowAccounts([getState('address'), pageAddress], getState('chainId'))
-    channel.enabled = enabled.value
+    channel.allowAccounts(enabled.value, [getState('address'), pageAddress.value], getState('chainId'))
   }
 }
-watch(() => getState('chainId'), updateProvider)
-watch(enabled, updateProvider)
-watch(props.channel.ref, updateProvider)
-watch(pageAddress, updateProvider)
+watch(() => () => getState('chainId'), updateProvider)
+watch(() => enabled.value, updateProvider)
+watch(() => props.channel.ref.value, updateProvider)
+watch(() => pageAddress.value, updateProvider, { immediate: true })
 </script>
 
 <template>
