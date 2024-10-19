@@ -1,6 +1,7 @@
 # tools-lukso-provider
 
 Here is a small diagram to show how the client and providers (servers) talk to each other. The upProviderProxy needs pretty much 100% of the functionality the Parent upProvider needs because it also has the connectivity endpoints.
+
 ```mermaid
 graph TD
     %% Define the main page and its upProviders
@@ -15,7 +16,7 @@ graph TD
         subgraph Iframe1["Grid Iframe 1"]
             ClientUp1["Client upProvider (Iframe 1)"]
         end
-        
+
         subgraph Iframe2["Grid Iframe 2"]
             ClientUp2["Client upProvider (Iframe 2)"]
         end
@@ -29,7 +30,7 @@ graph TD
     ClientUp1 -- Enable/Disable --> ParentUp
     ClientUp2 -- Enable/Disable --> ParentUp
     ClientUp3 -- Enable/Disable --> ParentUp
-    
+
     %% External connections from Parent upProvider
     subgraph Popup["Embedded Wallet Popup"]
       RemoteParent -- Option A --> RootProvider["Root Provider (window.lukso)"]

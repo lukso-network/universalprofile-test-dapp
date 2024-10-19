@@ -198,13 +198,7 @@ export const methodSelectors: MethodSelect[] = [
   {
     label: '🎛️ SetData',
     call: 'setDataBatch',
-    hasSpecs: [
-      LSPType.UP,
-      LSPType.LSP3ProfileMetadata,
-      LSPType.LSP7DigitalAsset,
-      LSPType.LSP8IdentifiableDigitalAsset,
-      LSPType.LSP9Vault,
-    ],
+    hasSpecs: [LSPType.UP, LSPType.LSP3ProfileMetadata, LSPType.LSP7DigitalAsset, LSPType.LSP8IdentifiableDigitalAsset, LSPType.LSP9Vault],
     inputs: [
       {
         type: 'bytes32[]',
@@ -254,16 +248,12 @@ export const methodSelectors: MethodSelect[] = [
       {
         type: 'address[]',
         name: 'addresses',
-        value: [
-          '0x69909C12C875271AdC49155Cc8D01dBF67FE82f1',
-          '0xB27F5845E6Ce846C02209Bd2497780099611b9a0',
-        ],
+        value: ['0x69909C12C875271AdC49155Cc8D01dBF67FE82f1', '0xB27F5845E6Ce846C02209Bd2497780099611b9a0'],
       },
       {
         type: 'bytes32',
         name: 'data',
-        value:
-          '0x40b8bec57d7b5ff0dbd9e9acd0a47dfeb0101e1a203766f5ccab00445fbf39e9',
+        value: '0x40b8bec57d7b5ff0dbd9e9acd0a47dfeb0101e1a203766f5ccab00445fbf39e9',
       },
       { type: 'uint256[]', name: 'numbers', value: ['2345675643', '123292'] },
       { type: 'bool', name: 'force', value: true },
@@ -271,8 +261,7 @@ export const methodSelectors: MethodSelect[] = [
       {
         type: 'string',
         name: 'description',
-        value:
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.',
+        value: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.',
       },
     ],
   },

@@ -1,18 +1,9 @@
 import { AbiItem, isAddress as baseIsAddress } from 'web3-utils'
-import {
-  getSelectedNetworkConfig,
-  UP_CONNECTED_ADDRESS,
-  WALLET_CONNECT,
-  WEB3_ONBOARD,
-} from '@/helpers/config'
+import { getSelectedNetworkConfig, UP_CONNECTED_ADDRESS, WALLET_CONNECT, WEB3_ONBOARD } from '@/helpers/config'
 import useWalletConnectV2 from './useWalletConnectV2'
 import useWeb3Onboard from './useWeb3Onboard'
 import { ref } from 'vue'
-import {
-  TransactionConfig,
-  TransactionReceipt,
-  provider as ProviderType,
-} from 'web3-core'
+import { TransactionConfig, TransactionReceipt, provider as ProviderType } from 'web3-core'
 import { resetNetworkConfig, setNetworkConfig } from '@/helpers/config'
 import { getState, useState } from '@/stores'
 import EthereumProvider from '@walletconnect/ethereum-provider/dist/types/EthereumProvider'
@@ -52,10 +43,7 @@ const setupWeb3 = async (provider: EthereumProvider): Promise<void> => {
     })
 }
 
-const setupProvider = async (
-  meansOfConnection: string,
-  userOperation: boolean
-): Promise<ProviderType | undefined> => {
+const setupProvider = async (meansOfConnection: string, userOperation: boolean): Promise<ProviderType | undefined> => {
   try {
     const isWalletConnectUsed = meansOfConnection === WALLET_CONNECT
     const isWeb3OnboardUsed = meansOfConnection === WEB3_ONBOARD
@@ -123,11 +111,7 @@ const getChainId = async (): Promise<number> => {
   return await web3.eth?.getChainId()
 }
 
-const contract = (
-  jsonInterface: AbiItem[],
-  address?: string,
-  options?: ContractOptions
-): Contract => {
+const contract = (jsonInterface: AbiItem[], address?: string, options?: ContractOptions): Contract => {
   return new web3.eth.Contract(jsonInterface, address, options)
 }
 
@@ -149,9 +133,7 @@ const executeCall = (transaction: TransactionConfig): Promise<string> => {
   return web3.eth.call(transaction)
 }
 
-const sendTransaction = (
-  transaction: TransactionConfig
-): Promise<TransactionReceipt> => {
+const sendTransaction = (transaction: TransactionConfig): Promise<TransactionReceipt> => {
   return web3.eth
     .sendTransaction(transaction)
     .on('transactionHash', hash => {
@@ -180,9 +162,7 @@ const accounts = async () => {
 }
 
 const getBaseFee = async (): Promise<number> => {
-  return await web3.eth
-    .getBlock('pending')
-    .then(block => Number(block.baseFeePerGas))
+  return await web3.eth.getBlock('pending').then(block => Number(block.baseFeePerGas))
 }
 
 const defaultMaxPriorityFeePerGas = async (): Promise<number> => {
@@ -202,18 +182,11 @@ const recover = async (message: string, signature: string): Promise<string> => {
   return web3.eth.accounts.recover(message, signature)
 }
 
-const personalSign = async (
-  message: string,
-  address: string,
-  password?: string
-): Promise<string> => {
+const personalSign = async (message: string, address: string, password?: string): Promise<string> => {
   return await web3.eth.personal.sign(message, address, password ?? '')
 }
 
-const signTransaction = async (
-  transaction: TransactionConfig,
-  address: string
-): Promise<string> => {
+const signTransaction = async (transaction: TransactionConfig, address: string): Promise<string> => {
   // Even though `signTransaction` says that RLPEncodedTransaction object is returned
   // we might get just a string that is an encoded transaction. Thus, the "typeof" check.
   const response = await web3.eth.signTransaction(transaction, address)
@@ -223,9 +196,7 @@ const signTransaction = async (
   return response.raw
 }
 
-const recoverRawTransaction = async (
-  encodedTransaction: string
-): Promise<string> => {
+const recoverRawTransaction = async (encodedTransaction: string): Promise<string> => {
   return web3.eth.accounts.recoverTransaction(encodedTransaction)
 }
 

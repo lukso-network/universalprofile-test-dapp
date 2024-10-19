@@ -1,8 +1,4 @@
-export type NetworkType =
-  | 'lukso_testnet'
-  | 'lukso_mainnet'
-  | 'base_mainnet'
-  | 'base_sepolia'
+export type NetworkType = 'lukso_testnet' | 'lukso_mainnet' | 'base_mainnet' | 'base_sepolia'
 
 export type NetworkInfo = {
   id: string

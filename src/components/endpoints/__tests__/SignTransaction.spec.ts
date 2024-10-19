@@ -69,15 +69,10 @@ test('can sign transaction', async () => {
   })
 
   await fireEvent.update(screen.getByTestId('transaction-amount'), '2')
-  await fireEvent.update(
-    screen.getByTestId('transaction-to'),
-    '0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298'
-  )
+  await fireEvent.update(screen.getByTestId('transaction-to'), '0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298')
   await fireEvent.click(screen.getByTestId('sign'))
 
-  expect(screen.getByTestId('notification')).toHaveTextContent(
-    'The transaction was signed'
-  )
+  expect(screen.getByTestId('notification')).toHaveTextContent('The transaction was signed')
   expect(mockSignTransaction).toBeCalledWith(
     {
       from: '0x517216362D594516c6f96Ee34b2c502d65B847E4',
@@ -101,9 +96,7 @@ test('can recover EoA', async () => {
   await fireEvent.click(screen.getByTestId('sign'))
   await fireEvent.click(screen.getByTestId('recover'))
 
-  expect(screen.getByTestId('notification')).toHaveTextContent(
-    'Recover was successful'
-  )
+  expect(screen.getByTestId('notification')).toHaveTextContent('Recover was successful')
   expect(mockRecoverRawTransaction).toBeCalledWith(expect.anything())
   expect(mockRecoverRawTransaction).toReturnWith('0x321')
   expect(screen.getByTestId('recovery-eoa')).toHaveTextContent('0x321')
@@ -115,9 +108,7 @@ test('fail to recover EoA without signing', async () => {
 
   await fireEvent.click(screen.getByTestId('recover'))
 
-  expect(screen.getByTestId('notification')).toHaveTextContent(
-    'Please sign transaction first'
-  )
+  expect(screen.getByTestId('notification')).toHaveTextContent('Please sign transaction first')
 })
 
 test('can validate EoA permissions', async () => {
@@ -131,9 +122,7 @@ test('can validate EoA permissions', async () => {
   await fireEvent.click(screen.getByTestId('recover'))
   await fireEvent.click(screen.getByTestId('validate-permission'))
 
-  expect(screen.getByTestId('notification')).toHaveTextContent(
-    'Recover was successful'
-  )
+  expect(screen.getByTestId('notification')).toHaveTextContent('Recover was successful')
   expect(screen.getByTestId('permissions')).toHaveTextContent('true')
   expect(mockGetDataCall).toBeCalledTimes(1)
   expect(mockGetDataCall).toReturnWith('0xFFFFFF')
@@ -146,9 +135,7 @@ test('fail to validate EoA permissions', async () => {
 
   await fireEvent.click(screen.getByTestId('validate-permission'))
 
-  expect(screen.getByTestId('notification')).toHaveTextContent(
-    'Please, recover address first'
-  )
+  expect(screen.getByTestId('notification')).toHaveTextContent('Please, recover address first')
 })
 
 test('can verify signature', async () => {
@@ -163,14 +150,9 @@ test('can verify signature', async () => {
   await fireEvent.click(screen.getByTestId('sign'))
   await fireEvent.click(screen.getByTestId('validate-signature'))
 
-  expect(screen.getByTestId('notification')).toHaveTextContent(
-    'Signature validated successfully'
-  )
+  expect(screen.getByTestId('notification')).toHaveTextContent('Signature validated successfully')
   expect(mockValidSignatureCall).toBeCalledTimes(1)
-  expect(mockValidSignatureCall).toBeCalledWith(
-    'transaction-hashed-for-signing',
-    'dummy-signature'
-  )
+  expect(mockValidSignatureCall).toBeCalledWith('transaction-hashed-for-signing', 'dummy-signature')
   expect(mockValidSignatureCall).toReturnWith('0x1626ba7e')
   expect(screen.getByTestId('magic-value')).toHaveTextContent('0x1626ba7e')
 })
@@ -181,7 +163,5 @@ test('fail to validate signature without signing', async () => {
 
   await fireEvent.click(screen.getByTestId('validate-signature'))
 
-  expect(screen.getByTestId('notification')).toHaveTextContent(
-    'Please sign transaction first'
-  )
+  expect(screen.getByTestId('notification')).toHaveTextContent('Please sign transaction first')
 })

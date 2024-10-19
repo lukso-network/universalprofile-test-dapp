@@ -10,21 +10,7 @@ const setupWCV2Provider = async () => {
   provider = await EthereumProvider.init({
     projectId: WALLET_CONNECT_PROJECT_ID,
     chains: Object.entries(NETWORKS).map(net => net[1].chainId),
-    methods: [
-      'eth_getAccounts',
-      'eth_getBalance',
-      'eth_getId',
-      'eth_requestAccounts',
-      'eth_sendTransaction',
-      'eth_sign',
-      'eth_signTransaction',
-      'eth_signTypedData',
-      'personal_sign',
-      'up_addTransactionRelayer',
-      'up_import',
-      'wallet_addEthereumChain',
-      'wallet_switchEthereumChain',
-    ],
+    methods: ['eth_getAccounts', 'eth_getBalance', 'eth_getId', 'eth_requestAccounts', 'eth_sendTransaction', 'eth_sign', 'eth_signTransaction', 'eth_signTypedData', 'personal_sign', 'up_addTransactionRelayer', 'up_import', 'wallet_addEthereumChain', 'wallet_switchEthereumChain'],
     metadata: {
       name: 'UP Test DApp',
       description: 'UP Test DApp',
@@ -53,9 +39,7 @@ const resetWCV2Provider = async (): Promise<void> => {
       console.warn(`WalletConnect V2 disconnection error: ${error}`)
     }
   } else {
-    console.warn(
-      'Provider is not set up. Please, call `setupWCV2Provider` first.'
-    )
+    console.warn('Provider is not set up. Please, call `setupWCV2Provider` first.')
   }
 }
 
@@ -70,9 +54,7 @@ const openWCV2Modal = async (): Promise<void> => {
       console.warn(`WalletConnect V2 connection error: ${error}`)
     }
   } else {
-    console.warn(
-      'Provider is not set up. Please, call `setupWCV2Provider` first.'
-    )
+    console.warn('Provider is not set up. Please, call `setupWCV2Provider` first.')
   }
 }
 

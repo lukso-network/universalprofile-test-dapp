@@ -15,24 +15,12 @@ const config = {
 }
 
 const getInstance = (address: string, schema?: ERC725JSONSchema[]) => {
-  const erc725 = new ERC725(
-    schema
-      ? schema
-      : (LSP3ProfileMetadata.concat(
-          LSP4DigitalAsset,
-          LSP9Vault
-        ) as ERC725JSONSchema[]),
-    address,
-    provider,
-    config
-  )
+  const erc725 = new ERC725(schema ? schema : (LSP3ProfileMetadata.concat(LSP4DigitalAsset, LSP9Vault) as ERC725JSONSchema[]), address, provider, config)
 
   return erc725
 }
 
-const fetchProfile = async (
-  address: string
-): Promise<FetchDataOutput['value']> => {
+const fetchProfile = async (address: string): Promise<FetchDataOutput['value']> => {
   const erc725 = getInstance(address)
   const profile = await erc725.fetchData('LSP3Profile')
   return profile.value

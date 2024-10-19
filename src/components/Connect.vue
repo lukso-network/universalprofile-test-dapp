@@ -87,35 +87,18 @@ onUnmounted(() => {
 <template>
   <div v-if="getState('isConnected')" class="field has-addons">
     <p class="control">
-      <button
-        class="button is-static is-small is-rounded"
-        data-testid="balance"
-      >
+      <button class="button is-static is-small is-rounded" data-testid="balance">
         <span>{{ getState('balance') }} LYX</span>
       </button>
     </p>
     <p class="control">
-      <button
-        class="button is-static is-small is-rounded address"
-        data-testid="address"
-      >
-        <div
-          :class="`logo ${
-            getState('channel') === WINDOW_LUKSO ||
-            getState('channel') === WEB3_ONBOARD
-              ? 'browser-extension'
-              : 'wallet-connect'
-          }`"
-        />
+      <button class="button is-static is-small is-rounded address" data-testid="address">
+        <div :class="`logo ${getState('channel') === WINDOW_LUKSO || getState('channel') === WEB3_ONBOARD ? 'browser-extension' : 'wallet-connect'}`" />
         <span>{{ sliceAddress(getState('address')) }}</span>
       </button>
     </p>
     <p class="control">
-      <button
-        class="button is-small is-rounded"
-        data-testid="disconnect"
-        @click="disconnect"
-      >
+      <button class="button is-small is-rounded" data-testid="disconnect" @click="disconnect">
         <span class="icon is-small">
           <i class="fas fa-sign-out-alt"></i>
         </span>
@@ -125,43 +108,21 @@ onUnmounted(() => {
 
   <div v-else ref="dropdown" class="dropdown is-right">
     <div class="dropdown-trigger">
-      <button
-        ref="dropdown"
-        class="button is-primary is-small is-rounded has-text-weight-bold"
-        aria-haspopup="true"
-        aria-controls="dropdown-menu"
-        data-testid="connect"
-        @click="toggle(dropdown)"
-      >
+      <button ref="dropdown" class="button is-primary is-small is-rounded has-text-weight-bold" aria-haspopup="true" aria-controls="dropdown-menu" data-testid="connect" @click="toggle(dropdown)">
         <span>Connect</span>
       </button>
     </div>
     <div id="dropdown-menu" class="dropdown-menu" role="menu">
       <div class="dropdown-content">
-        <button
-          class="dropdown-item has-text-weight-bold button is-text"
-          data-testid="connect-extension"
-          :disabled="getState('isConnected')"
-          @click="connectExtension(WINDOW_LUKSO)"
-        >
+        <button class="dropdown-item has-text-weight-bold button is-text" data-testid="connect-extension" :disabled="getState('isConnected')" @click="connectExtension(WINDOW_LUKSO)">
           <div class="logo browser-extension" />
           Browser Extension
         </button>
-        <button
-          class="dropdown-item has-text-weight-bold button is-text"
-          data-testid="connect-wc-v2"
-          :disabled="getState('isConnected')"
-          @click="connectExtension(WALLET_CONNECT)"
-        >
+        <button class="dropdown-item has-text-weight-bold button is-text" data-testid="connect-wc-v2" :disabled="getState('isConnected')" @click="connectExtension(WALLET_CONNECT)">
           <div class="logo wallet-connect" />
           Wallet Connect V2
         </button>
-        <button
-          class="dropdown-item has-text-weight-bold button is-text"
-          data-testid="connect-web3-onboard"
-          :disabled="getState('isConnected')"
-          @click="connectExtension(WEB3_ONBOARD)"
-        >
+        <button class="dropdown-item has-text-weight-bold button is-text" data-testid="connect-web3-onboard" :disabled="getState('isConnected')" @click="connectExtension(WEB3_ONBOARD)">
           <div class="logo browser-extension" />
           Web3 Onboard
         </button>

@@ -18,25 +18,13 @@ const handleClick = () => {
 </script>
 
 <template>
-  <nav
-    class="navbar is-white is-fixed-top"
-    role="navigation"
-    aria-label="main navigation"
-  >
+  <nav class="navbar is-white is-fixed-top" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
       <a class="navbar-item" href="https://lukso.network">
         <img src="/lukso.png" height="28" />
       </a>
 
-      <a
-        ref="burger"
-        role="button"
-        class="navbar-burger"
-        aria-label="menu"
-        aria-expanded="false"
-        data-target="navbar"
-        @click="handleClick"
-      >
+      <a ref="burger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbar" @click="handleClick">
         <span aria-hidden="true"></span>
         <span aria-hidden="true"></span>
         <span aria-hidden="true"></span>
@@ -46,26 +34,16 @@ const handleClick = () => {
     <div id="navbar" ref="menu" class="navbar-menu">
       <div class="navbar-start">
         <router-link class="navbar-item" to="/">RPC</router-link>
-        <router-link class="navbar-item" to="/iframe"
-          >EIP-5593 IFrame</router-link
-        >
+        <router-link class="navbar-item" to="/iframe">EIP-5593 IFrame</router-link>
         <router-link class="navbar-item" to="/grid">Grid IFrame</router-link>
 
         <div class="navbar-item has-dropdown is-hoverable">
           <router-link class="navbar-item" to="/profiles">Profiles</router-link>
 
           <div class="navbar-dropdown">
-            <router-link class="navbar-item" to="/profiles/upload"
-              >Upload</router-link
-            >
-            <router-link
-              class="navbar-item"
-              to="/profiles/QmaufE68Q6cdnFJk6VQvvkXgqP3x8Hfp8bhqrjijeRHrnh"
-              >Inspect
-            </router-link>
-            <router-link class="navbar-item" to="/profiles/deploy"
-              >Deploy</router-link
-            >
+            <router-link class="navbar-item" to="/profiles/upload">Upload</router-link>
+            <router-link class="navbar-item" to="/profiles/QmaufE68Q6cdnFJk6VQvvkXgqP3x8Hfp8bhqrjijeRHrnh">Inspect </router-link>
+            <router-link class="navbar-item" to="/profiles/deploy">Deploy</router-link>
           </div>
         </div>
       </div>
@@ -73,28 +51,13 @@ const handleClick = () => {
       <div class="navbar-end">
         <div class="navbar-item">
           <div class="buttons">
-            <a
-              class="button is-light"
-              target="_blank"
-              rel="noreferer"
-              href="https://docs.lukso.tech/"
-            >
+            <a class="button is-light" target="_blank" rel="noreferer" href="https://docs.lukso.tech/">
               <strong>LUKSO DOCS</strong>
             </a>
-            <a
-              class="button is-light"
-              target="_blank"
-              rel="noreferer"
-              href="https://erc725-inspect.lukso.tech/"
-            >
+            <a class="button is-light" target="_blank" rel="noreferer" href="https://erc725-inspect.lukso.tech/">
               <strong>ERC725 Inspect</strong>
             </a>
-            <a
-              class="button is-light"
-              target="_blank"
-              rel="noreferer"
-              href="https://github.com/lukso-network/universalprofile-test-dapp"
-            >
+            <a class="button is-light" target="_blank" rel="noreferer" href="https://github.com/lukso-network/universalprofile-test-dapp">
               <strong>GitHub</strong>
             </a>
             <Suspense>

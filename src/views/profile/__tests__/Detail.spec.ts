@@ -77,9 +77,7 @@ test('can call data from ipfs', async () => {
     })),
   })
   const screen = render(Detail)
-  expect(mockFetch).toBeCalledWith(
-    'https://api.universalprofile.cloud/api/v0123'
-  )
+  expect(mockFetch).toBeCalledWith('https://api.universalprofile.cloud/api/v0123')
   expect(screen.getByText('Loading...')).toBeDefined()
   await waitFor(() => {
     expect(screen.getByText('IPFS: 123')).toBeDefined()
@@ -99,9 +97,7 @@ test('can call data from ipfs if url changes', () => {
     },
   })
   render(Detail)
-  expect(mockFetch).toBeCalledWith(
-    'https://api.universalprofile.cloud/api/v01234'
-  )
+  expect(mockFetch).toBeCalledWith('https://api.universalprofile.cloud/api/v01234')
 })
 
 test('cannot call ipfs server if ipfs address/hash is empty', () => {
@@ -139,16 +135,8 @@ test('can display both background image and profile image', async () => {
   mockIsAddress.mockReturnValue(false)
   const screen = render(Detail)
   await waitFor(() => {
-    expect(
-      screen.getAllByAltText(
-        'ipfs://QmZ3zDELDWSzjyLKxLe5ipM1HKPUvgHVV5c22cnKUc4byk'
-      )
-    ).toBeDefined()
-    expect(
-      screen.getAllByAltText(
-        'ipfs://QmT7JiaMBSbVG2hWnS4oM7nFbpuwcKc7zNzs2CcWoGqLBx'
-      )
-    ).toBeDefined()
+    expect(screen.getAllByAltText('ipfs://QmZ3zDELDWSzjyLKxLe5ipM1HKPUvgHVV5c22cnKUc4byk')).toBeDefined()
+    expect(screen.getAllByAltText('ipfs://QmT7JiaMBSbVG2hWnS4oM7nFbpuwcKc7zNzs2CcWoGqLBx')).toBeDefined()
   })
 })
 
@@ -164,10 +152,7 @@ test('can display notification if no address is searched', async () => {
 test('can change route if address is searched', async () => {
   mockIsAddress.mockReturnValue(false)
   const screen = render(Detail)
-  await fireEvent.update(
-    screen.getByTestId('search-address-hash'),
-    '123-searched-address'
-  )
+  await fireEvent.update(screen.getByTestId('search-address-hash'), '123-searched-address')
   await fireEvent.click(screen.getByText('Search'))
   await waitFor(() => {
     expect(mockPush).toBeCalledWith('/profiles/123-searched-address')
@@ -178,10 +163,7 @@ test('can display notification if error is thrown', async () => {
   mockIsAddress.mockReturnValue(true)
   mockFetchProfile.mockRejectedValue(new Error('Fetch profile failed'))
   const screen = render(Detail)
-  await fireEvent.update(
-    screen.getByTestId('search-address-hash'),
-    'throw-error-hash'
-  )
+  await fireEvent.update(screen.getByTestId('search-address-hash'), 'throw-error-hash')
   await fireEvent.click(screen.getByText('Search'))
   expect(screen.getByText('Fetch profile failed')).toBeDefined()
 })

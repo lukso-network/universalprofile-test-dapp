@@ -176,13 +176,10 @@ export const NETWORKS: { [K in NetworkType]: NetworkInfo } = {
   },
 }
 
-export const PRIVATE_KEY =
-  '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
+export const PRIVATE_KEY = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
 
 export function setNetworkConfig(inChainId: number): void {
-  const network = Object.entries(NETWORKS).find(
-    ([, { chainId }]) => chainId === inChainId
-  )
+  const network = Object.entries(NETWORKS).find(([, { chainId }]) => chainId === inChainId)
   let networkKey: string
   if (network) {
     networkKey = network[1].name
@@ -198,9 +195,7 @@ export function resetNetworkConfig(): void {
 }
 
 export function getSelectedNetworkType(): NetworkType {
-  const selectedNetwork = localStorage.getItem(
-    SELECTED_NETWORK_KEY
-  ) as NetworkType
+  const selectedNetwork = localStorage.getItem(SELECTED_NETWORK_KEY) as NetworkType
   if (selectedNetwork && !(selectedNetwork in NETWORKS)) {
     return DEFAULT_NETWORK
   }
@@ -214,7 +209,6 @@ export function getSelectedNetworkConfig(): NetworkInfo {
   return NETWORKS[getSelectedNetworkType()]
 }
 
-export const SIGNATURE_LOOKUP_URL =
-  'https://4bytesdictionary.universalprofile.cloud'
+export const SIGNATURE_LOOKUP_URL = 'https://4bytesdictionary.universalprofile.cloud'
 
 export const WALLET_CONNECT_PROJECT_ID = '4f90c247328c3e3fed9d514f92b2fdce' // We should put this in .env

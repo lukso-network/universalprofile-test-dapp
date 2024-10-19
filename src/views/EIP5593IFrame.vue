@@ -19,12 +19,6 @@ window.addEventListener('load', matchSize)
     <section class="section">
       <h1 class="title is-large">Content within EIP-5593 iframe</h1>
     </section>
-    <iframe
-      ref="frameElement"
-      scrolling="yes"
-      :src="base + '?hideNav=true'"
-      sandbox="allow-same-origin allow-scripts"
-      @load="matchSize"
-    ></iframe>
+    <iframe ref="frameElement" scrolling="yes" :src="base + '?hideNav=true'" sandbox="allow-same-origin allow-scripts" @load="matchSize"></iframe>
   </div>
 </template>

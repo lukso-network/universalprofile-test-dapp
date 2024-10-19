@@ -44,12 +44,7 @@ test('can set data', async () => {
   await fireEvent.click(screen.getByTestId('setData'))
 
   expect(screen.getByTestId('notification')).toHaveTextContent('Set data')
-  expect(mockSend).toBeCalledWith(
-    ['0x5ef83ad9559033e6e941db7d7c495acdce616347d28e90c7ce47cbfcfcad3bc5'],
-    [
-      '0x6f357c6a32f2cf55bde7f2cdf315fe1f2246832b5de988df953c99e4b0c659e3b8525d95697066733a2f2f516d57787a6d37545264466b76767075744239714b336a5975324644436655594a6e344d74374463636f747a3659',
-    ]
-  )
+  expect(mockSend).toBeCalledWith(['0x5ef83ad9559033e6e941db7d7c495acdce616347d28e90c7ce47cbfcfcad3bc5'], ['0x6f357c6a32f2cf55bde7f2cdf315fe1f2246832b5de988df953c99e4b0c659e3b8525d95697066733a2f2f516d57787a6d37545264466b76767075744239714b336a5975324644436655594a6e344d74374463636f747a3659'])
 })
 
 test('can see set data error from send function', async () => {

@@ -39,12 +39,7 @@ type BytesSignatureResponse = {
   ]
 }
 
-const fetcher = async <Response, Request>(config: {
-  url: string
-  method: 'GET' | 'POST'
-  data?: Request
-  headers?: Record<string, never>
-}): Promise<Response> => {
+const fetcher = async <Response, Request>(config: { url: string; method: 'GET' | 'POST'; data?: Request; headers?: Record<string, never> }): Promise<Response> => {
   const fetchConfig: RequestInit = {
     method: config.method,
     headers: config.headers || {
@@ -75,10 +70,7 @@ export function getSelectorLookupURL(selector: string) {
   return `${SIGNATURE_LOOKUP_URL}?hex_signature=${selector}`
 }
 
-export const decodeData = async (
-  eth: Web3['eth'],
-  _data: string
-): Promise<MethodSelect> => {
+export const decodeData = async (eth: Web3['eth'], _data: string): Promise<MethodSelect> => {
   let data = _data
   if (data?.startsWith('0x')) {
     data = data.substring(2)
@@ -110,9 +102,7 @@ export const decodeData = async (
     if (functionSignatures.length > 0) {
       for (const functionSignature of functionSignatures.reverse()) {
         try {
-          const params: string[] = functionSignature
-            .replace(/^[^(]*\(|\)[^)]*$/g, '')
-            .split(',')
+          const params: string[] = functionSignature.replace(/^[^(]*\(|\)[^)]*$/g, '').split(',')
           const args = eth.abi.decodeParameters(params, data.substring(8)) || {}
           const encodeArgs = Array(params.length)
             .fill(null)
@@ -135,8 +125,7 @@ export const decodeData = async (
               }
               return args[`${index}`] ?? '0x'
             })
-          const newData =
-            eth.abi.encodeParameters(params, encodeArgs).substring(2) || '0x'
+          const newData = eth.abi.encodeParameters(params, encodeArgs).substring(2) || '0x'
           if (data.substring(8) === newData) {
             const call = functionSignature.replace(/\(.*$/, '')
             const item = {
@@ -147,9 +136,7 @@ export const decodeData = async (
                 type,
                 name: `arg${index + 1}`,
                 value: args[index],
-                isKey:
-                  /^bytes32/.test(type) &&
-                  call in { setData: true, getData: true },
+                isKey: /^bytes32/.test(type) && call in { setData: true, getData: true },
               })),
             }
             await signatureCache?.put(url, new Response(JSON.stringify(item)))
