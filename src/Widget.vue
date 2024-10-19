@@ -1,32 +1,41 @@
 <script setup lang="ts">
 import { createClientUPProvider } from '@lukso/embedded-provider'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import Web3 from 'web3'
-window.lukso = createClientUPProvider()
 
-const web3 = new Web3(window.lukso)
 const chainId = ref<number | null>(null)
 const accounts = ref<string[]>([])
 const errors = ref<Error[]>([])
-window.web3 = web3
-web3.eth
-  ?.getChainId()
-  .then(_chainId => {
-    chainId.value = _chainId
-  })
-  .catch(error => {
-    // Ignore error
-    errors.value.push(error)
-  })
-web3.eth
-  ?.getAccounts()
-  .then(_accounts => {
+const web3 = ref<Web3>()
+
+onMounted(async () => {
+  window.lukso = await createClientUPProvider()
+
+  web3.value = new Web3(window.lukso)
+  window.web3 = web3.value
+  web3.value.eth
+    ?.getChainId()
+    .then(_chainId => {
+      chainId.value = _chainId
+    })
+    .catch(error => {
+      // Ignore error
+      errors.value.push(error)
+    })
+  web3.value.eth
+    ?.getAccounts()
+    .then(_accounts => {
+      accounts.value = _accounts
+    })
+    .catch(error => {
+      // Ignore error
+      errors.value.push(error)
+    })
+  window.lukso?.on('accountsChanged', (_accounts: (`0x${string}` | '')[]) => {
+    console.log('accountChanged event', _accounts)
     accounts.value = _accounts
   })
-  .catch(error => {
-    // Ignore error
-    errors.value.push(error)
-  })
+})
 </script>
 
 <template>
@@ -37,9 +46,7 @@ web3.eth
     <div class="container">
       <div class="notification is-danger" v-if="errors.length > 0">
         <button class="delete" @click="errors = []"></button>
-        <pre v-for="(error, index) in errors" :key="index">{{
-          error.stack
-        }}</pre>
+        <pre v-for="(error, index) in errors" :key="index">{{ error.stack }}</pre>
       </div>
       <div class="columns">
         <div class="column">

@@ -2,16 +2,11 @@
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
-import {
-  getSelectedNetworkConfig,
-  NETWORKS,
-  setNetworkConfig,
-} from '@/helpers/config'
+import { getSelectedNetworkConfig, NETWORKS, setNetworkConfig } from '@/helpers/config'
 import { NetworkInfo } from '@/interfaces/network'
 import { ref } from 'vue'
 
-const { notification, clearNotification, hasNotification, setNotification } =
-  useNotifications()
+const { notification, clearNotification, hasNotification, setNotification } = useNotifications()
 const web3 = useWeb3Connection()
 
 const defaultNetworkConfig = getSelectedNetworkConfig()
@@ -99,42 +94,20 @@ const addNetwork = async () => {
       <div class="field">
         <div class="select is-fullwidth mb-2">
           <select v-model="activeNetwork" data-testid="preset">
-            <option
-              v-for="network of networks"
-              :key="network.name"
-              :value="network"
-            >
+            <option v-for="network of networks" :key="network.name" :value="network">
               {{ network.name }}
             </option>
           </select>
         </div>
       </div>
       <div>
-        <button
-          class="button is-primary is-rounded mt-4"
-          data-testid="getNetworkId"
-          @click="changeNetwork"
-        >
-          Switch Network to {{ activeNetwork.name }}
-        </button>
+        <button class="button is-primary is-rounded mt-4" data-testid="getNetworkId" @click="changeNetwork">Switch Network to {{ activeNetwork.name }}</button>
       </div>
       <div>
-        <button
-          class="button is-primary is-rounded mt-4"
-          data-testid="getNetworkId"
-          @click="addNetwork"
-        >
-          Add Network
-        </button>
+        <button class="button is-primary is-rounded mt-4" data-testid="getNetworkId" @click="addNetwork">Add Network</button>
       </div>
       <div>
-        <button
-          class="button is-primary is-rounded mt-4"
-          data-testid="changeDappNetworkButton"
-          @click="changeDappNetwork"
-        >
-          Switch Network in DApp to {{ activeNetwork.name }}
-        </button>
+        <button class="button is-primary is-rounded mt-4" data-testid="changeDappNetworkButton" @click="changeDappNetwork">Switch Network in DApp to {{ activeNetwork.name }}</button>
         <div style="padding-top: 8px">
           DApp uses <b>{{ defaultNetworkConfig.name }}</b> network.
         </div>
@@ -145,24 +118,12 @@ const addNetwork = async () => {
       <p class="is-size-5 has-text-weight-bold mb-4 mt-6">Get Network ID</p>
       <div class="field">
         <div class="is-one-third mb-4">
-          <button
-            class="button is-primary is-rounded mt-4"
-            data-testid="getNetworkId"
-            @click="getNetworkId"
-          >
-            Get ID
-          </button>
+          <button class="button is-primary is-rounded mt-4" data-testid="getNetworkId" @click="getNetworkId">Get ID</button>
         </div>
       </div>
       <div>Test <code>eth_getId</code> RPC call.</div>
       <div class="field">
-        <Notifications
-          v-if="hasNotification"
-          :notification="notification"
-          class="notification is-info is-light mt-5"
-          @hide="clearNotification"
-        >
-        </Notifications>
+        <Notifications v-if="hasNotification" :notification="notification" class="notification is-info is-light mt-5" @hide="clearNotification"> </Notifications>
       </div>
     </div>
   </div>

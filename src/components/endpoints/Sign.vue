@@ -8,8 +8,7 @@ import { generateNonce, SiweMessage } from 'siwe'
 import { getDate, getTime } from '@/utils/dateTime'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
 
-const { notification, clearNotification, hasNotification, setNotification } =
-  useNotifications()
+const { notification, clearNotification, hasNotification, setNotification } = useNotifications()
 const { sign, personalSign, recover, getWeb3 } = useWeb3Connection()
 
 enum SignMethod {
@@ -61,11 +60,7 @@ const onSign = async () => {
     if (signingMethodSelected.value === SignMethod.EthSign) {
       signResponse.value = await sign(signMessage.value, erc725AccountAddress)
     } else {
-      signResponse.value = await personalSign(
-        signMessage.value,
-        erc725AccountAddress,
-        password.value
-      )
+      signResponse.value = await personalSign(signMessage.value, erc725AccountAddress, password.value)
     }
     recovery.value = undefined
     magicValue.value = undefined
@@ -90,15 +85,11 @@ const createSiweMessage = () => {
   } as SiweMessage
 
   if (hasExpirationTime.value) {
-    siweParams.expirationTime = new Date(
-      `${siwe.value.expirationDate} ${siwe.value.expirationTime}`
-    ).toISOString()
+    siweParams.expirationTime = new Date(`${siwe.value.expirationDate} ${siwe.value.expirationTime}`).toISOString()
   }
 
   if (hasNotBefore.value) {
-    siweParams.notBefore = new Date(
-      `${siwe.value.notBeforeDate} ${siwe.value.notBeforeTime}`
-    ).toISOString()
+    siweParams.notBefore = new Date(`${siwe.value.notBeforeDate} ${siwe.value.notBeforeTime}`).toISOString()
   }
 
   const resources = siwe.value.resources.filter(resource => resource !== '')
@@ -147,9 +138,7 @@ const onSignatureValidation = async () => {
       // TODO: we should probably set the default gas price to undefined,
       // but it is not yet clear why view functions error on L16 when gasPrice is passed
       window.erc725Account.options.gasPrice = void 0
-      magicValue.value = (await window.erc725Account.methods
-        .isValidSignature(messageHash, signResponse.value)
-        .call()) as string
+      magicValue.value = (await window.erc725Account.methods.isValidSignature(messageHash, signResponse.value).call()) as string
     }
 
     if (magicValue.value === MAGICVALUE) {
@@ -173,84 +162,33 @@ const toggleShow = () => {
       <p class="is-size-5 has-text-weight-bold mb-4">Sign</p>
       <div class="field">
         <label class="label">Select RPC</label>
-        <input
-          id="eth_sign_radio_btn"
-          v-model="signingMethodSelected"
-          type="radio"
-          data-testid="eth_sign_radio_btn"
-          value="eth_sign"
-        />
+        <input id="eth_sign_radio_btn" v-model="signingMethodSelected" type="radio" data-testid="eth_sign_radio_btn" value="eth_sign" />
         <label for="eth_sign_radio_btn" class="ml-1">eth_sign</label>
 
-        <input
-          id="personal_sign_radio_btn"
-          v-model="signingMethodSelected"
-          type="radio"
-          data-testid="personal_sign_radio_btn"
-          value="personal_sign"
-          class="ml-1"
-        />
+        <input id="personal_sign_radio_btn" v-model="signingMethodSelected" type="radio" data-testid="personal_sign_radio_btn" value="personal_sign" class="ml-1" />
         <label for="personal_sign_radio_btn" class="ml-1">personal_sign</label>
       </div>
       <div class="field">
         <label class="label">Message</label>
         <div class="control">
-          <textarea
-            v-if="isSiwe"
-            v-model="siweMessage"
-            class="textarea"
-            rows="3"
-          />
-          <textarea
-            v-if="!isSiwe"
-            v-model="message"
-            class="textarea"
-            rows="3"
-          />
+          <textarea v-if="isSiwe" v-model="siweMessage" class="textarea" rows="3" />
+          <textarea v-if="!isSiwe" v-model="message" class="textarea" rows="3" />
         </div>
-        <div
-          v-if="signingMethodSelected === SignMethod.PersonalSign"
-          class="field has-addons"
-        >
+        <div v-if="signingMethodSelected === SignMethod.PersonalSign" class="field has-addons">
           <div class="control is-expanded">
-            <input
-              v-if="showPassword"
-              v-model="password"
-              type="text"
-              class="input"
-              placeholder="Optional password"
-              data-testid="password"
-            />
-            <input
-              v-else
-              v-model="password"
-              type="password"
-              class="input"
-              placeholder="Optional password"
-              data-testid="password"
-            />
+            <input v-if="showPassword" v-model="password" type="text" class="input" placeholder="Optional password" data-testid="password" />
+            <input v-else v-model="password" type="password" class="input" placeholder="Optional password" data-testid="password" />
           </div>
           <div class="control">
-            <button
-              class="button"
-              data-testid="toggle-password-visibility"
-              @click="toggleShow"
-            >
-              <div
-                :class="`password-visibility ${showPassword ? 'on' : 'off'}`"
-              />
+            <button class="button" data-testid="toggle-password-visibility" @click="toggleShow">
+              <div :class="`password-visibility ${showPassword ? 'on' : 'off'}`" />
             </button>
           </div>
         </div>
       </div>
       <div class="field">
         <label class="checkbox">
-          <input
-            v-model="isSiwe"
-            type="checkbox"
-            :value="isSiwe"
-            data-testid="isSiwe"
-          />
+          <input v-model="isSiwe" type="checkbox" :value="isSiwe" data-testid="isSiwe" />
           Sign in with Ethereum
         </label>
       </div>
@@ -259,199 +197,82 @@ const toggleShow = () => {
         <div class="field">
           <label class="label">Domain</label>
           <div class="control">
-            <input
-              v-model="siwe.domain"
-              class="input"
-              type="text"
-              data-testid="siwe.domain"
-            />
+            <input v-model="siwe.domain" class="input" type="text" data-testid="siwe.domain" />
           </div>
         </div>
         <div class="field">
           <label class="label">Address</label>
           <div class="control">
-            <input
-              v-model="siwe.address"
-              class="input"
-              type="text"
-              data-testid="siwe.address"
-            />
+            <input v-model="siwe.address" class="input" type="text" data-testid="siwe.address" />
           </div>
         </div>
         <div class="field">
           <label class="label">URI</label>
           <div class="control">
-            <input
-              v-model="siwe.uri"
-              class="input"
-              type="text"
-              data-testid="siwe.uri"
-            />
+            <input v-model="siwe.uri" class="input" type="text" data-testid="siwe.uri" />
           </div>
         </div>
         <div class="field">
           <label class="label">Version</label>
           <div class="control">
-            <input
-              v-model="siwe.version"
-              class="input"
-              type="text"
-              data-testid="siwe.version"
-            />
+            <input v-model="siwe.version" class="input" type="text" data-testid="siwe.version" />
           </div>
         </div>
         <div class="field">
           <label class="label">Chain Id</label>
           <div class="control">
-            <input
-              v-model="siwe.chainId"
-              class="input"
-              type="text"
-              data-testid="siwe.chainId"
-            />
+            <input v-model="siwe.chainId" class="input" type="text" data-testid="siwe.chainId" />
           </div>
         </div>
         <div class="field">
           <label class="checkbox has-text-weight-bold">
-            <input
-              v-model="hasExpirationTime"
-              type="checkbox"
-              :value="hasExpirationTime"
-              data-testid="siwe.hasExpirationTime"
-            />
+            <input v-model="hasExpirationTime" type="checkbox" :value="hasExpirationTime" data-testid="siwe.hasExpirationTime" />
             Expiration time (optional)
           </label>
           <div v-if="hasExpirationTime" class="control is-flex">
-            <input
-              v-model="siwe.expirationDate"
-              class="input"
-              type="date"
-              data-testid="siwe.expirationDate"
-            />
-            <input
-              v-model="siwe.expirationTime"
-              class="input ml-2"
-              type="time"
-              data-testid="siwe.expirationTime"
-            />
+            <input v-model="siwe.expirationDate" class="input" type="date" data-testid="siwe.expirationDate" />
+            <input v-model="siwe.expirationTime" class="input ml-2" type="time" data-testid="siwe.expirationTime" />
           </div>
         </div>
         <div class="field">
           <label class="checkbox has-text-weight-bold">
-            <input
-              v-model="hasNotBefore"
-              type="checkbox"
-              :value="hasNotBefore"
-              data-testid="siwe.hasNotBefore"
-            />
+            <input v-model="hasNotBefore" type="checkbox" :value="hasNotBefore" data-testid="siwe.hasNotBefore" />
             Not before (optional)
           </label>
           <div v-if="hasNotBefore" class="control is-flex">
-            <input
-              v-model="siwe.notBeforeDate"
-              class="input"
-              type="date"
-              data-testid="siwe.notBeforeDate"
-            />
-            <input
-              v-model="siwe.notBeforeTime"
-              class="input ml-2"
-              type="time"
-              data-testid="siwe.notBeforeTime"
-            />
+            <input v-model="siwe.notBeforeDate" class="input" type="date" data-testid="siwe.notBeforeDate" />
+            <input v-model="siwe.notBeforeTime" class="input ml-2" type="time" data-testid="siwe.notBeforeTime" />
           </div>
         </div>
         <div class="field">
           <label class="label">Resources (optional)</label>
-          <div
-            v-for="(resource, index) in siwe.resources"
-            :key="index"
-            class="control mb-2 is-flex"
-          >
-            <input
-              :v-model="resource"
-              :value="resource"
-              class="input"
-              type="text"
-              :data-testid="`siwe.resource-${index}`"
-              @keyup="event => handleResourceChange(index, event)"
-            />
-            <button class="button ml-2" @click="removeResource(index)">
-              Remove
-            </button>
+          <div v-for="(resource, index) in siwe.resources" :key="index" class="control mb-2 is-flex">
+            <input :v-model="resource" :value="resource" class="input" type="text" :data-testid="`siwe.resource-${index}`" @keyup="event => handleResourceChange(index, event)" />
+            <button class="button ml-2" @click="removeResource(index)">Remove</button>
           </div>
         </div>
-        <button class="button" data-testid="addResource" @click="addResource">
-          Add resource
-        </button>
+        <button class="button" data-testid="addResource" @click="addResource">Add resource</button>
       </div>
       <div class="field mt-5">
-        <button
-          :class="`button is-primary is-rounded mb-3 ${
-            isPending ? 'is-loading' : ''
-          }`"
-          data-testid="sign"
-          @click="onSign"
-        >
-          Sign
-        </button>
+        <button :class="`button is-primary is-rounded mb-3 ${isPending ? 'is-loading' : ''}`" data-testid="sign" @click="onSign">Sign</button>
       </div>
       <div class="field">
-        <button
-          class="button is-primary is-rounded mb-3"
-          :disabled="signResponse ? undefined : true"
-          data-testid="recover"
-          @click="onRecover"
-        >
-          Recover
-        </button>
+        <button class="button is-primary is-rounded mb-3" :disabled="signResponse ? undefined : true" data-testid="recover" @click="onRecover">Recover</button>
       </div>
       <div class="field">
-        <button
-          class="button is-primary is-rounded mb-3"
-          :disabled="signResponse ? undefined : true"
-          data-testid="validate-signature"
-          @click="onSignatureValidation"
-        >
-          Signature validation
-        </button>
+        <button class="button is-primary is-rounded mb-3" :disabled="signResponse ? undefined : true" data-testid="validate-signature" @click="onSignatureValidation">Signature validation</button>
       </div>
-      <div class="field">
-        Test <code>eth_sign</code> RPC call [<a
-          href="https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_sign"
-          >documentation</a
-        >].
-      </div>
-      <div class="field">
-        Test <code>personal_sign</code> RPC call [<a
-          href="https://docs.constellationnetwork.io/stargazer/apireference/ethereumrpcapi/personal_sign/"
-          >documentation ex. 1</a
-        >,
-        <a href="https://docs.metamask.io/wallet/reference/personal_sign/"
-          >documentation ex. 2</a
-        >].
-      </div>
+      <div class="field">Test <code>eth_sign</code> RPC call [<a href="https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_sign">documentation</a>].</div>
+      <div class="field">Test <code>personal_sign</code> RPC call [<a href="https://docs.constellationnetwork.io/stargazer/apireference/ethereumrpcapi/personal_sign/">documentation ex. 1</a>, <a href="https://docs.metamask.io/wallet/reference/personal_sign/">documentation ex. 2</a>].</div>
       <div class="field">
         How to implement
-        <a
-          href="https://docs.lukso.tech/guides/browser-extension/sign-in-with-ethereum"
-          >Sign In With Ethereum tutorial</a
-        >.
+        <a href="https://docs.lukso.tech/guides/browser-extension/sign-in-with-ethereum">Sign In With Ethereum tutorial</a>.
       </div>
       <div class="field">
-        <Notifications
-          v-if="hasNotification"
-          :notification="notification"
-          class="mt-4"
-          @hide="clearNotification"
-        ></Notifications>
+        <Notifications v-if="hasNotification" :notification="notification" class="mt-4" @hide="clearNotification"></Notifications>
       </div>
       <div class="field">
-        <div
-          v-if="signResponse"
-          class="notification is-info is-light mt-5"
-          data-testid="info"
-        >
+        <div v-if="signResponse" class="notification is-info is-light mt-5" data-testid="info">
           <p class="mb-3">
             Signature:
             <b data-testid="signature">{{ signResponse }}</b>

@@ -13,15 +13,9 @@ import { addTokenToLocalStore, recalculateAssets } from '@/helpers/tokenUtils'
 import { DeployedERC20Token, useERC20 } from '@/compositions/useErc20'
 import { LSP8_TOKEN_ID_FORMAT } from '@lukso/lsp-smart-contracts'
 import { LSP4_TOKEN_TYPES } from '@lukso/lsp4-contracts'
-import {
-  DeployedLSP7DigitalAsset,
-  DeployedLSP8IdentifiableDigitalAsset,
-  LSP7DigitalAssetDeploymentOptions,
-  LSP8IdentifiableDigitalAssetDeploymentOptions,
-} from '@lukso/lsp-factory.js/build/main/src/lib/interfaces/digital-asset-deployment'
+import { DeployedLSP7DigitalAsset, DeployedLSP8IdentifiableDigitalAsset, LSP7DigitalAssetDeploymentOptions, LSP8IdentifiableDigitalAssetDeploymentOptions } from '@lukso/lsp-factory.js/build/main/src/lib/interfaces/digital-asset-deployment'
 
-const { notification, clearNotification, hasNotification, setNotification } =
-  useNotifications()
+const { notification, clearNotification, hasNotification, setNotification } = useNotifications()
 
 const isTokenCreated = ref(false)
 const isTokenPending = ref(false)
@@ -44,10 +38,7 @@ const creators = ref<string[]>()
 const tokenAddress = ref<string>()
 const tokenIdType = ref('0')
 
-const handleNewLsp4Metadata = (
-  metadata: Lsp4Metadata,
-  newCreators: string[]
-) => {
+const handleNewLsp4Metadata = (metadata: Lsp4Metadata, newCreators: string[]) => {
   lsp4Metadata.value = metadata
   creators.value = newCreators
 }
@@ -71,18 +62,11 @@ const create = async () => {
   isTokenPending.value = true
 
   try {
-    const { deployLSP7DigitalAsset, deployLSP8IdentifiableDigitalAsset } =
-      useLspFactory()
+    const { deployLSP7DigitalAsset, deployLSP8IdentifiableDigitalAsset } = useLspFactory()
     const { deployERC20Token } = useERC20()
 
-    let deployedAsset:
-      | DeployedLSP7DigitalAsset
-      | DeployedLSP8IdentifiableDigitalAsset
-      | DeployedERC20Token
-      | { isNFT: boolean }
-    let digitalAssetData:
-      | LSP7DigitalAssetDeploymentOptions
-      | LSP8IdentifiableDigitalAssetDeploymentOptions
+    let deployedAsset: DeployedLSP7DigitalAsset | DeployedLSP8IdentifiableDigitalAsset | DeployedERC20Token | { isNFT: boolean }
+    let digitalAssetData: LSP7DigitalAssetDeploymentOptions | LSP8IdentifiableDigitalAssetDeploymentOptions
     switch (token.value.type) {
       case ContractStandard.LSP7:
         digitalAssetData = {
@@ -119,12 +103,8 @@ const create = async () => {
           tokenIdFormat: tokenIdType.value,
         }
         console.log(digitalAssetData)
-        deployedAsset =
-          await deployLSP8IdentifiableDigitalAsset(digitalAssetData)
-        console.log(
-          'Deployed asset',
-          deployedAsset.LSP8IdentifiableDigitalAsset
-        )
+        deployedAsset = await deployLSP8IdentifiableDigitalAsset(digitalAssetData)
+        console.log('Deployed asset', deployedAsset.LSP8IdentifiableDigitalAsset)
         tokenAddress.value = deployedAsset.LSP8IdentifiableDigitalAsset.address
         addTokenToLocalStore(deployedAsset.LSP8IdentifiableDigitalAsset.address)
         break
@@ -215,63 +195,30 @@ const create = async () => {
           />
         </div>
       </div>
-      <Lsp4MetadataForm
-        v-if="
-          token.type === ContractStandard.LSP7 ||
-          token.type === ContractStandard.LSP8
-        "
-        @new-metadata="handleNewLsp4Metadata"
-      />
+      <Lsp4MetadataForm v-if="token.type === ContractStandard.LSP7 || token.type === ContractStandard.LSP8" @new-metadata="handleNewLsp4Metadata" />
 
       <div v-if="token.type === ContractStandard.LSP7" class="field">
         <label class="checkbox">
-          <input
-            v-model="token.isNonDivisible"
-            type="checkbox"
-            :value="token.isNonDivisible"
-          />
+          <input v-model="token.isNonDivisible" type="checkbox" :value="token.isNonDivisible" />
           is non divisible
         </label>
       </div>
       <div class="field">
-        <button
-          :class="`button is-primary is-rounded mb-3 mr-3 ${
-            isTokenPending ? 'is-loading' : ''
-          }`"
-          data-testid="create"
-          @click="create"
-        >
-          Create token
-        </button>
+        <button :class="`button is-primary is-rounded mb-3 mr-3 ${isTokenPending ? 'is-loading' : ''}`" data-testid="create" @click="create">Create token</button>
       </div>
 
       <div class="field">
-        <div
-          v-if="isTokenCreated"
-          class="notification is-info is-light mt-5"
-          data-testid="info"
-        >
+        <div v-if="isTokenCreated" class="notification is-info is-light mt-5" data-testid="info">
           <p class="">
             Token address:
             <b
-              ><a
-                :href="createBlockScoutLink(tokenAddress ?? '')"
-                target="_blank"
-                data-testid="token-address"
-                >{{ tokenAddress }}</a
-              ></b
+              ><a :href="createBlockScoutLink(tokenAddress ?? '')" target="_blank" data-testid="token-address">{{ tokenAddress }}</a></b
             >
           </p>
         </div>
       </div>
       <div class="field">
-        <Notifications
-          v-if="hasNotification"
-          :notification="notification"
-          class="mt-4"
-          @hide="clearNotification"
-        >
-        </Notifications>
+        <Notifications v-if="hasNotification" :notification="notification" class="mt-4" @hide="clearNotification"> </Notifications>
       </div>
     </div>
   </div>

@@ -4,8 +4,7 @@ import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
 
-const { notification, clearNotification, hasNotification, setNotification } =
-  useNotifications()
+const { notification, clearNotification, hasNotification, setNotification } = useNotifications()
 
 const web3 = useWeb3Connection()
 
@@ -63,81 +62,36 @@ const addCustomRelayer = async () => {
       <div class="field">
         <label class="label">Name</label>
         <div class="control">
-          <input
-            v-model="name"
-            class="input"
-            type="text"
-            data-testid="relayer-name"
-          />
+          <input v-model="name" class="input" type="text" data-testid="relayer-name" />
         </div>
       </div>
       <div class="field">
         <label class="label">API URL</label>
         <div class="control">
-          <input
-            v-model="apiUrl"
-            class="input"
-            type="text"
-            data-testid="relayer-url"
-          />
+          <input v-model="apiUrl" class="input" type="text" data-testid="relayer-url" />
         </div>
       </div>
       <div class="field">
         <label class="label">ChainIDs</label>
         <div class="field is-grouped is-grouped-multiline">
-          <div
-            v-for="(chain_id, index) in chainIds"
-            :key="index"
-            class="control"
-            data-testid="chain-id-list"
-          >
+          <div v-for="(chain_id, index) in chainIds" :key="index" class="control" data-testid="chain-id-list">
             <div class="tags has-addons">
-              <small
-                class="tag is-primary is-light"
-                data-testid="text-content"
-                >{{ chain_id }}</small
-              >
+              <small class="tag is-primary is-light" data-testid="text-content">{{ chain_id }}</small>
               <a class="tag is-delete" @click="removeChainId(index)"></a>
             </div>
           </div>
         </div>
         <div class="control">
-          <input
-            v-model="chainId"
-            class="input"
-            type="text"
-            data-testid="chainIds"
-            @keyup.enter="addChainIds"
-            @focus="onFocus"
-            @blur="onBlur"
-          />
-          <small v-if="showLabel && chainId.length" class="enter-label"
-            >Hit Enter</small
-          >
+          <input v-model="chainId" class="input" type="text" data-testid="chainIds" @keyup.enter="addChainIds" @focus="onFocus" @blur="onBlur" />
+          <small v-if="showLabel && chainId.length" class="enter-label">Hit Enter</small>
         </div>
       </div>
       <div class="field">
-        <button
-          :class="`button is-primary is-rounded mt-4`"
-          data-testid="add-relayer"
-          @click.stop="addCustomRelayer"
-        >
-          Add Custom Relayer
-        </button>
+        <button :class="`button is-primary is-rounded mt-4`" data-testid="add-relayer" @click.stop="addCustomRelayer">Add Custom Relayer</button>
       </div>
-      <div>
-        Test <code>up_addTransactionRelayer</code> RPC call [<a
-          href="https://docs.lukso.tech/standards/rpc-api#up_addtransactionrelayer"
-          >documentation</a
-        >].
-      </div>
+      <div>Test <code>up_addTransactionRelayer</code> RPC call [<a href="https://docs.lukso.tech/standards/rpc-api#up_addtransactionrelayer">documentation</a>].</div>
       <div class="field">
-        <Notifications
-          v-if="hasNotification"
-          :notification="notification"
-          class="mt-4"
-          @hide="clearNotification"
-        ></Notifications>
+        <Notifications v-if="hasNotification" :notification="notification" class="mt-4" @hide="clearNotification"></Notifications>
       </div>
     </div>
   </div>

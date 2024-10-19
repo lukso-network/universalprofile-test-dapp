@@ -47,3 +47,26 @@ graph TD
       classDef dashed stroke-dasharray: 5 5;
     end
 ```
+
+# sample path
+
+```mermaid
+sequenceDiagram
+    participant Client as Client Event (Widget)
+    participant ClientPort as Client Port (Widget)
+    participant ServerPort as Server Port (Page)
+    participant Server as Channel Event (Page)
+    participant Channel as Channel Event Call (Page)
+
+    %% Example Messages Between Lanes
+    Client->>ClientPort: call accounts()
+    ClientPort->>ServerPort: request eth_accounts
+    ServerPort->>Server: request eth_accounts
+    Server->>Channel: emit accountsChanged
+    Server->>ServerPort: respond eth_accounts
+
+    Channel->>Server: request allowAccounts
+    Server->>ServerPort: request allowAccounts
+    ServerPort->>ClientPort: response allowAccounts
+    ClientPort->>Client: emit accountsChanged
+```

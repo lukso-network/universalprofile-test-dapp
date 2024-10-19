@@ -10,18 +10,9 @@ import { BN } from 'bn.js'
 import { ERC725, ERC725JSONSchema } from '@erc725/erc725.js'
 import { Lsp4Metadata } from '@/types'
 import Lsp4MetadataForm from '@/components/shared/Lsp4MetadataForm.vue'
-import {
-  ContractStandard,
-  LSP8TokenIdFormats,
-  LSP8TokenIdFormatsData,
-} from '@/enums'
+import { ContractStandard, LSP8TokenIdFormats, LSP8TokenIdFormatsData } from '@/enums'
 import LSPSelect from '@/components/shared/LSPSelect.vue'
-import {
-  TokenInfo,
-  LSPType,
-  padTokenId,
-  encodeAssetMetadata,
-} from '@/helpers/tokenUtils'
+import { TokenInfo, LSPType, padTokenId, encodeAssetMetadata } from '@/helpers/tokenUtils'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
 import useErc725 from '@/compositions/useErc725'
 import LSP8IdentifiableDigitalAsset from '@erc725/erc725.js/schemas/LSP8IdentifiableDigitalAsset.json'
@@ -30,8 +21,7 @@ import { isAddress } from 'ethers/lib/utils'
 import { LSP8_TOKEN_ID_FORMAT } from '@lukso/lsp-smart-contracts'
 import { uploadAssetData } from '@/utils/uploadAssetData'
 
-const { notification, clearNotification, hasNotification, setNotification } =
-  useNotifications()
+const { notification, clearNotification, hasNotification, setNotification } = useNotifications()
 const { contract } = useWeb3Connection()
 
 const tokenType = ref<ContractStandard>(ContractStandard.LSP7)
@@ -61,28 +51,19 @@ onMounted(() => {
 watchEffect(async () => {
   if (mintTokenAddress.value && tokenType.value === ContractStandard.LSP8) {
     const { getInstance } = useErc725()
-    const erc725 = getInstance(
-      mintTokenAddress.value,
-      LSP8IdentifiableDigitalAsset as ERC725JSONSchema[]
-    )
+    const erc725 = getInstance(mintTokenAddress.value, LSP8IdentifiableDigitalAsset as ERC725JSONSchema[])
     const lsp8DigitalAsset = await erc725.fetchData('LSP8TokenIdFormat')
     tokenIdType.value = Number(lsp8DigitalAsset.value)
   }
 })
 
-const handleNewLsp4Metadata = (
-  metadata: Lsp4Metadata,
-  newCreators: string[]
-) => {
+const handleNewLsp4Metadata = (metadata: Lsp4Metadata, newCreators: string[]) => {
   lsp4Metadata.value = metadata
   creators.value = newCreators
 }
 
 const handleTokenSelected = (info: TokenInfo) => {
-  tokenType.value =
-    info.type === LSPType.LSP7DigitalAsset
-      ? ContractStandard.LSP7
-      : ContractStandard.LSP8
+  tokenType.value = info.type === LSPType.LSP7DigitalAsset ? ContractStandard.LSP7 : ContractStandard.LSP8
   if (info.address) {
     mintTokenAddress.value = info.address
   }
@@ -100,29 +81,38 @@ const handleChangeTokenId = (event: Event) => {
 
   switch (tokenIdType.value) {
     case LSP8_TOKEN_ID_FORMAT.NUMBER:
-      if (isNaN(parseInt(value))) {
-        return (tokenIdTypeError.value = 'Must be a number')
+      if (Number.isNaN(Number.parseInt(value))) {
+        const error = 'Must be a number'
+        tokenIdTypeError.value = error
+        return error
       }
       break
     case LSP8_TOKEN_ID_FORMAT.STRING:
       if (value.length > 32) {
-        return (tokenIdTypeError.value =
-          'Must be a string with less than 32 characters')
+        const error = 'Must be a string with less than 32 characters'
+        tokenIdTypeError.value = error
+        return error
       }
       break
     case LSP8_TOKEN_ID_FORMAT.UNIQUE_ID:
       if (!isHex(value)) {
-        return (tokenIdTypeError.value = 'Must be a byte string')
+        const error = 'Must be a byte string'
+        tokenIdTypeError.value = error
+        return error
       }
       break
     case LSP8_TOKEN_ID_FORMAT.HASH:
       if (value.length !== 66 || !isHex(value)) {
-        return (tokenIdTypeError.value = 'Must be a 32byte hash')
+        const error = 'Must be a 32byte hash'
+        tokenIdTypeError.value = error
+        return error
       }
       break
     case LSP8_TOKEN_ID_FORMAT.ADDRESS:
       if (!isAddress(value)) {
-        return (tokenIdTypeError.value = 'Must be a valid address')
+        const error = 'Must be a valid address'
+        tokenIdTypeError.value = error
+        return error
       }
       break
     default:
@@ -138,29 +128,24 @@ const mint = async () => {
 
   try {
     switch (tokenType.value) {
-      case ContractStandard.LSP7:
-        myToken.value = contract(
-          LSP7Mintable.abi as any,
-          mintTokenAddress.value
-        )
+      case ContractStandard.LSP7: {
+        myToken.value = contract(LSP7Mintable.abi as any, mintTokenAddress.value)
 
         const decimals = await myToken.value.methods.decimals().call()
-        const amount =
-          decimals === 0
-            ? mintAmount.value.toString()
-            : new BN(mintAmount.value).mul(new BN(10).pow(new BN(decimals)))
+        const amount = decimals === 0 ? mintAmount.value.toString() : new BN(mintAmount.value).mul(new BN(10).pow(new BN(decimals)))
 
         await myToken.value.methods
           .mint(mintReceiver.value, amount.toString(), false, '0x')
           .send({ from: erc725AccountAddress })
-          .on('receipt', function (receipt: any) {
+          .on('receipt', (receipt: any) => {
             console.log(receipt)
           })
           .once('sending', (payload: any) => {
             console.log(JSON.stringify(payload, null, 2))
           })
         break
-      case ContractStandard.LSP8:
+      }
+      case ContractStandard.LSP8: {
         if (!tokenId.value) {
           tokenIdTypeError.value = `Can't be blank`
           return
@@ -170,15 +155,12 @@ const mint = async () => {
         const metadataJsonUrl = encodeAssetMetadata(assetMetadata)
 
         // mint asset
-        myToken.value = contract(
-          LSP8Mintable.abi as any,
-          mintTokenAddress.value
-        )
+        myToken.value = contract(LSP8Mintable.abi as any, mintTokenAddress.value)
         const tokenIdPadded = padTokenId(tokenIdType.value, tokenId.value)
         await myToken.value.methods
           .mint(mintReceiver.value, tokenIdPadded, false, '0x')
           .send({ from: erc725AccountAddress })
-          .on('receipt', function (receipt: any) {
+          .on('receipt', (receipt: any) => {
             console.log(receipt)
           })
           .once('sending', (payload: any) => {
@@ -187,20 +169,18 @@ const mint = async () => {
 
         // set asset metadata
         const tokenIdTypeData = LSP8TokenIdFormatsData[tokenIdType.value]
-        const metadataKey = ERC725.encodeKeyName(
-          `LSP8MetadataTokenURI:<${tokenIdTypeData}>`,
-          tokenId.value
-        )
+        const metadataKey = ERC725.encodeKeyName(`LSP8MetadataTokenURI:<${tokenIdTypeData}>`, tokenId.value)
         await myToken.value.methods
           .setData(metadataKey, metadataJsonUrl) // TODO replace fixed metadata with values from the form
           .send({ from: erc725AccountAddress })
-          .on('receipt', function (receipt: any) {
+          .on('receipt', (receipt: any) => {
             console.log(receipt)
           })
           .once('sending', (payload: any) => {
             console.log(JSON.stringify(payload, null, 2))
           })
         break
+      }
       default:
         console.log('Standard not supported')
     }
@@ -218,38 +198,15 @@ const mint = async () => {
       <p class="is-size-5 has-text-weight-bold mb-4">Mint</p>
       <div class="field">
         <label class="label">Token address</label>
-        <LSPSelect
-          :address="mintTokenAddress"
-          :show-types="[
-            LSPType.LSP7DigitalAsset,
-            LSPType.LSP8IdentifiableDigitalAsset,
-          ]"
-          @option-selected="handleTokenSelected"
-        />
+        <LSPSelect :address="mintTokenAddress" :show-types="[LSPType.LSP7DigitalAsset, LSPType.LSP8IdentifiableDigitalAsset]" @option-selected="handleTokenSelected" />
         <div class="control">
-          <input
-            v-model="mintTokenAddress"
-            class="input is-family-code"
-            type="text"
-            data-testid="transfer-address"
-          />
+          <input v-model="mintTokenAddress" class="input is-family-code" type="text" data-testid="transfer-address" />
         </div>
       </div>
       <div v-if="tokenType === ContractStandard.LSP8" class="field">
-        <label class="label"
-          >Token Id ({{ LSP8TokenIdFormats[tokenIdType] }} in
-          {{ LSP8TokenIdFormatsData[tokenIdType] }})</label
-        >
+        <label class="label">Token Id ({{ LSP8TokenIdFormats[tokenIdType] }} in {{ LSP8TokenIdFormatsData[tokenIdType] }})</label>
         <div class="control">
-          <input
-            v-model="tokenId"
-            class="input"
-            :class="{ 'is-danger': tokenIdTypeError }"
-            type="text"
-            data-testid="transfer-address"
-            placeholder="Enter token Id"
-            @keyup="handleChangeTokenId"
-          />
+          <input v-model="tokenId" class="input" :class="{ 'is-danger': tokenIdTypeError }" type="text" data-testid="transfer-address" placeholder="Enter token Id" @keyup="handleChangeTokenId" />
           <p v-if="tokenIdTypeError" class="help is-danger">
             {{ tokenIdTypeError }}
           </p>
@@ -257,30 +214,16 @@ const mint = async () => {
       </div>
       <div class="field">
         <label class="label">Mint address</label>
-        <LSPSelect
-          :show-accounts="true"
-          :address="mintReceiver"
-          @option-selected="handleMintReceiverSelected"
-        />
+        <LSPSelect :show-accounts="true" :address="mintReceiver" @option-selected="handleMintReceiverSelected" />
         <div class="control">
-          <input
-            v-model="mintReceiver"
-            class="input is-family-code"
-            type="text"
-            data-testid="mint-address"
-          />
+          <input v-model="mintReceiver" class="input is-family-code" type="text" data-testid="mint-address" />
         </div>
       </div>
       <div v-if="tokenType === ContractStandard.LSP7" class="field">
         <label class="label">Mint amount</label>
         <div class="control columns">
           <div class="column is-half">
-            <input
-              v-model="mintAmount"
-              class="input"
-              type="number"
-              placeholder="0"
-            />
+            <input v-model="mintAmount" class="input" type="number" placeholder="0" />
           </div>
         </div>
       </div>
@@ -288,22 +231,10 @@ const mint = async () => {
         <Lsp4MetadataForm @new-metadata="handleNewLsp4Metadata" />
       </div>
       <div class="field">
-        <button
-          class="button is-primary is-rounded mb-3 mr-3"
-          data-testid="mint"
-          @click="mint"
-        >
-          Mint
-        </button>
+        <button class="button is-primary is-rounded mb-3 mr-3" data-testid="mint" @click="mint">Mint</button>
       </div>
       <div class="field">
-        <Notifications
-          v-if="hasNotification"
-          :notification="notification"
-          class="mt-4"
-          @hide="clearNotification"
-        >
-        </Notifications>
+        <Notifications v-if="hasNotification" :notification="notification" class="mt-4" @hide="clearNotification"> </Notifications>
       </div>
     </div>
   </div>
