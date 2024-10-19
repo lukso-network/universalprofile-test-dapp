@@ -30,19 +30,19 @@ const frameElement2Ref = { ref: frameElement2 }
       :hide-notification="true"
       class="mb-4"
     ></Notifications>
-    <section class="section">
+    <section class="title">
       <h1 class="title is-large">Content within Grid iframe</h1>
     </section>
     <section class="section">
       <div class="tile is-ancestor">
         <Accounts />
         <GridPanelDialog :channel="frameElementRef" />
-        <iframe ref="frameElement" scrolling="yes" :src="base + 'widget.html'" sandbox="allow-same-origin allow-scripts" width="100%" height="400px"></iframe>
+        <iframe ref="frameElement" scrolling="yes" :src="base + 'widget.html'" sandbox="allow-same-origin allow-scripts" width="100%" height="600px"></iframe>
       </div>
       <div class="tile is-ancestor">
         <div class="tile is-4">&nbsp;</div>
         <GridPanelDialog :channel="frameElement2Ref" />
-        <iframe ref="frameElement2" scrolling="yes" :src="base + 'widget.html'" sandbox="allow-same-origin allow-scripts" width="100%" height="400px"></iframe>
+        <iframe ref="frameElement2" scrolling="yes" :src="base + 'widget.html'" sandbox="allow-same-origin allow-scripts" width="100%" height="600px"></iframe>
       </div>
     </section>
   </div>

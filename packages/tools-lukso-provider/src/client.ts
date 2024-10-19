@@ -27,6 +27,7 @@ type RemoteWalletOptions = {
   accounts: () => (`0x${string}` | '')[]
   window?: Window
   clientChannel?: MessagePort
+  startupPromise: Promise<void>
 }
 
 const pendingRequests = new Map<string, Item>()
@@ -38,6 +39,7 @@ export class RemoteWallet extends EventEmitter3<RemoteWalletEvents> {
     return this.options?.clientChannel || null
   }
   async request(method: string, params: JSONRPCParams, clientParams: any): Promise<any> {
+    await this.options?.startupPromise
     return this.options?.client?.request(method, params, clientParams) || null
   }
   get chainId() {
@@ -154,13 +156,18 @@ async function findDestination(authURL: string | Window | undefined | null, remo
   return up
 }
 
-export async function createClientUPProvider(authURL?: string | Window, search = true): Promise<RemoteWallet> {
+export function createClientUPProvider(authURL?: string | Window, search = true): RemoteWallet {
   let chainId = 0
   let accounts: (`0x${string}` | '')[] = []
   let rpcUrls: string[] = []
+  let startupResolve: () => void
+  const startupPromise = new Promise<void>(resolve => {
+    startupResolve = resolve
+  })
   const options: RemoteWalletOptions = {
     chainId: () => chainId,
     accounts: () => accounts,
+    startupPromise,
   }
   const remote = new RemoteWallet(options)
   let searchPromise: Promise<RemoteWallet> | null
@@ -211,6 +218,8 @@ export async function createClientUPProvider(authURL?: string | Window, search =
         }
       })
       up.clientChannel?.start()
+      options.client = client
+      startupResolve()
       return up
     })
     return searchPromise
