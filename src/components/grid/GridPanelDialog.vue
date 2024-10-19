@@ -10,7 +10,7 @@ type Props = {
 }
 
 const props = defineProps<Props>()
-const pageAddress = ref<string>()
+const pageAddress = ref<string>(getState('address'))
 const enabled = ref<boolean>(false)
 function handlePageAddress(info: TokenInfo) {
   if (info.address) {
@@ -18,15 +18,16 @@ function handlePageAddress(info: TokenInfo) {
   }
 }
 watch(
-  () => [enabled.value, props.channel.ref.value] as [boolean, HTMLIFrameElement | null],
-  ([value, _channel]: [boolean, HTMLIFrameElement | null]) => {
+  () => [enabled.value, props.channel.ref.value, pageAddress.value || ''] as [boolean, HTMLIFrameElement | null, `0x${string}` | ''],
+  ([value, _channel, pageAddress]: [boolean, HTMLIFrameElement | null, `0x${string}` | '']) => {
     const channel = getUPProviderChannel(_channel)
-    console.log(value, channel, channel?.enabled || false)
+    console.log('watch panel', value, channel?.enabled || false, pageAddress)
     if (channel) {
-      channel.allowAccounts([getState('address'), (pageAddress.value || '') as '' | `0x${string}`], getState('chainId'))
+      channel.allowAccounts([getState('address'), pageAddress], getState('chainId'))
       channel.enabled = value
     }
-  }
+  },
+  { immediate: true }
 )
 </script>
 

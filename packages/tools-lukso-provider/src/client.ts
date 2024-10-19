@@ -28,6 +28,7 @@ type RemoteWalletOptions = {
   window?: Window
   clientChannel?: MessagePort
   startupPromise: Promise<void>
+  init?: { chainId: number; accounts: (`0x${string}` | '')[]; rpcUrls: string[] }
 }
 
 const pendingRequests = new Map<string, Item>()
@@ -48,6 +49,13 @@ export class RemoteWallet extends EventEmitter3<RemoteWalletEvents> {
   get accounts() {
     return this.options?.accounts() || []
   }
+  getInit(): { chainId: number; accounts: (`0x${string}` | '')[]; rpcUrls: string[] } | undefined {
+    const init = this.options?.init
+    if (init) {
+      this.options.init = undefined
+    }
+    return init
+  }
 }
 
 let walletWindow: RemoteWallet | null = null
@@ -61,7 +69,9 @@ async function testWindow(_up: Window | undefined | null, remote: RemoteWallet, 
     let timeout: number | NodeJS.Timeout = 0
     const channel = new MessageChannel()
     const testFn = (event: MessageEvent) => {
-      if (event.data === 'upProvider:windowInitialized') {
+      if (event.data?.type === 'upProvider:windowInitialized') {
+        const { chainId, accounts, rpcUrls } = event.data
+
         console.log('client init', event.data, up)
         up.removeEventListener('message', testFn)
         if (timeout) {
@@ -70,6 +80,7 @@ async function testWindow(_up: Window | undefined | null, remote: RemoteWallet, 
         }
         options.clientChannel = channel.port1
         options.window = up
+        options.init = { chainId, accounts, rpcUrls }
         resolve(remote)
       }
     }
@@ -176,6 +187,10 @@ export function createClientUPProvider(authURL?: string | Window, search = true)
       return searchPromise
     }
     searchPromise = findDestination(authURL, remote, options, search).then(up => {
+      const init: { chainId: number; accounts: (`0x${string}` | '')[]; rpcUrls: string[] } | undefined = up.getInit()
+      if (init) {
+        ;({ chainId, accounts, rpcUrls } = init || {})
+      }
       up.clientChannel?.addEventListener('message', event => {
         try {
           const response = event.data

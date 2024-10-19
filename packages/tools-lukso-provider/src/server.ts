@@ -108,6 +108,7 @@ function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]) {
   let primary: `0x${string}` | '' = ''
   let chainId = 0
   let accounts: (`0x${string}` | '')[] = []
+  let promise: Promise<void> = Promise.resolve()
 
   console.log('server listen', window.location.href, window)
 
@@ -253,7 +254,7 @@ function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]) {
       serverChannel.start()
 
       console.log('server accept', serverChannel)
-      serverChannel?.postMessage('upProvider:windowInitialized')
+      serverChannel?.postMessage({ type: 'upProvider:windowInitialized', chainId, accounts, rpcUrls })
     }
   }
   window.addEventListener('message', providerHandler)
@@ -290,40 +291,50 @@ function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]) {
       }
     },
     async setupProvider(_provider: any, _rpcUrls: string | string[]): Promise<void> {
-      provider = _provider
-      const newRpcUrls = Array.isArray(_rpcUrls) ? _rpcUrls : [_rpcUrls]
-      if (newRpcUrls.some((url, index) => url !== rpcUrls[index])) {
-        rpcUrls = newRpcUrls
-        for (const item of channels.values()) {
-          await item.setRpcUrls(rpcUrls)
-        }
-      }
-      const _chainId = await provider.request({
-        method: 'eth_chainId',
-        params: [],
-      })
-      for (const item of channels.values()) {
-        await item.setChainId(chainId)
-      }
-      const accounts = await provider.request({
-        method: 'eth_accounts',
-        params: [],
-      })
-      const _primary = accounts[0] || ''
-      if (primary !== _primary || chainId !== _chainId) {
-        chainId = _chainId
-        primary = _primary
-        for (const item of channels.values()) {
-          await item.allowAccounts([primary, ...accounts.slice(1)], chainId)
-        }
-      }
-      provider.on('accountsChanged', async ([_primary]: [`0x${string}` | '']) => {
-        if (primary !== _primary) {
-          primary = _primary
-          for (const item of channels.values()) {
-            await item.allowAccounts([primary, ...accounts.slice(1)], chainId)
+      promise = new Promise<void>((resolve, reject) => {
+        ;(async () => {
+          try {
+            provider = _provider
+            const newRpcUrls = Array.isArray(_rpcUrls) ? _rpcUrls : [_rpcUrls]
+            if (newRpcUrls.some((url, index) => url !== rpcUrls[index])) {
+              rpcUrls = newRpcUrls
+              for (const item of channels.values()) {
+                await item.setRpcUrls(rpcUrls)
+              }
+            }
+            const _chainId = await provider.request({
+              method: 'eth_chainId',
+              params: [],
+            })
+            for (const item of channels.values()) {
+              await item.setChainId(chainId)
+            }
+            const _accounts = await provider.request({
+              method: 'eth_accounts',
+              params: [],
+            })
+            const _primary = _accounts[0] || ''
+            if (primary !== _primary || chainId !== _chainId) {
+              chainId = _chainId
+              primary = _primary
+              accounts[0] = _primary
+              for (const item of channels.values()) {
+                await item.allowAccounts([primary, ...accounts.slice(1)], chainId)
+              }
+            }
+            provider.on('accountsChanged', async ([_primary]: [`0x${string}` | '']) => {
+              if (primary !== _primary) {
+                primary = _primary
+                for (const item of channels.values()) {
+                  await item.allowAccounts([primary, ...accounts.slice(1)], chainId)
+                }
+              }
+            })
+            resolve()
+          } catch (err) {
+            reject(err)
           }
-        }
+        })()
       })
     },
   })
