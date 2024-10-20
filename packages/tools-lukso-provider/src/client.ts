@@ -33,8 +33,6 @@ type RemoteWalletOptions = {
 
 const pendingRequests = new Map<string, Item>()
 export class RemoteWallet extends EventEmitter3<RemoteWalletEvents> {
-  buffered?: Array<[event: keyof RemoteWalletEvents, args: unknown[]]> = []
-
   constructor(private options: RemoteWalletOptions) {
     super()
   }
@@ -54,27 +52,6 @@ export class RemoteWallet extends EventEmitter3<RemoteWalletEvents> {
 
   get accounts() {
     return this.options?.accounts() || []
-  }
-
-  emit<T extends EventEmitter.EventNames<RemoteWalletEvents>>(event: T, ...args: EventEmitter.EventArgs<RemoteWalletEvents, T>): boolean {
-    if (this.buffered) {
-      this.buffered.push([event, args])
-      return false
-    }
-    return super.emit(event, ...args)
-  }
-
-  resume() {
-    if (!this.buffered) {
-      return
-    }
-    while (this.buffered.length > 0) {
-      const val = this.buffered.shift()
-      if (val) {
-        const [event, args] = val
-        super.emit(event, ...(args as any))
-      }
-    }
   }
 
   getInit(): { chainId: number; accounts: (`0x${string}` | '')[]; rpcUrls: string[] } | undefined {

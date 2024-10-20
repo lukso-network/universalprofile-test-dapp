@@ -15,7 +15,7 @@ class ChannelEntry extends EventEmitter3<ChannelEntryEvents> {
   public readonly accounts: (`0x${string}` | '')[] = []
   private chainId = 0
   private rpcUrls: string[] = []
-  private buffered: Array<[keyof ChannelEntryEvents, unknown[]]> = []
+  private buffered?: Array<[keyof ChannelEntryEvents, unknown[]]> = []
 
   constructor(
     public readonly serverChannel: MessagePort,
@@ -38,11 +38,13 @@ class ChannelEntry extends EventEmitter3<ChannelEntryEvents> {
   }
 
   resume() {
-    if (!this.buffered) {
+    const buffered = this.buffered
+    if (!buffered) {
       return
     }
-    while (this.buffered.length > 0) {
-      const val = this.buffered.shift()
+    this.buffered = undefined
+    while (buffered.length > 0) {
+      const val = buffered.shift()
       if (val) {
         const [event, args] = val
         super.emit(event, ...(args as any))
@@ -389,7 +391,6 @@ function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]): 
       console.log('server accept', serverChannel)
       serverChannel?.postMessage({ type: 'upProvider:windowInitialize', chainId: options.chainId, accounts: options.accounts, rpcUrls: options.rpcUrls })
       channel_.emit('connected')
-      channel_.resume()
     }
   }
   window.addEventListener('message', options.providerHandler)
