@@ -37,19 +37,21 @@ class ChannelEntry extends EventEmitter3<ChannelEntryEvents> {
     return super.emit(event, ...args)
   }
 
-  resume() {
+  resume(delay = 0) {
     const buffered = this.buffered
     if (!buffered) {
       return
     }
     this.buffered = undefined
-    while (buffered.length > 0) {
-      const val = buffered.shift()
-      if (val) {
-        const [event, args] = val
-        super.emit(event, ...(args as any))
+    setTimeout(() => {
+      while (buffered.length > 0) {
+        const val = buffered.shift()
+        if (val) {
+          const [event, args] = val
+          super.emit(event, ...(args as any))
+        }
       }
-    }
+    }, delay)
   }
 
   public async send(method: string, params: unknown[]): Promise<void> {
@@ -108,6 +110,14 @@ class ChannelEntry extends EventEmitter3<ChannelEntryEvents> {
       this.rpcUrls = rpcUrls
       await this.send('rpcUrlsChanged', rpcUrls)
     }
+  }
+
+  public close() {
+    const el: any = this.element || this.window
+    if (el.upChannel === this) {
+      delete el.upChannel
+    }
+    this.serverChannel.close()
   }
 }
 
