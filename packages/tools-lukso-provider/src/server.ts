@@ -358,6 +358,7 @@ function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]): 
       })
       const channelHandler = (event: MessageEvent) => {
         if (event.data.type === 'upProvider:windowInitialized') {
+          console.log('channel created', event.data.type, event.data)
           globalUPProvider?.emit('channelCreated', channel_.element || channel_.window || null, channel_)
           return
         }

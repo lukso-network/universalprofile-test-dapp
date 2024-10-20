@@ -1,6 +1,6 @@
 import { JSONRPCClient, JSONRPCParams } from 'json-rpc-2.0'
 import { v4 as uuidv4 } from 'uuid'
-import EventEmitter3, { EventEmitter } from 'eventemitter3'
+import EventEmitter3 from 'eventemitter3'
 
 type Item = {
   resolve: () => unknown
@@ -87,7 +87,8 @@ async function testWindow(_up: Window | undefined | null, remote: RemoteWallet, 
         options.clientChannel = channel.port1
         options.window = up
         options.init = { chainId, accounts, rpcUrls }
-        up.postMessage('upProvider:windowInitialized')
+        console.log('client connected', event.data.type, event.data)
+        options.clientChannel.postMessage({ type: 'upProvider:windowInitialized', chainId, accounts, rpcUrls })
         resolve(remote)
       }
     }
