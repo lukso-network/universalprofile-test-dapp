@@ -2363,6 +2363,7 @@ __metadata:
     "@types/uuid": ^10.0.0
     eventemitter3: ^5.0.1
     json-rpc-2.0: ^1.7.0
+    pauseable: ^0.3.2
     tsup: ^8.3.0
     typescript: ^5.6.2
     uuid: ^10.0.0
@@ -13959,6 +13960,13 @@ __metadata:
   version: 1.1.2
   resolution: "pathe@npm:1.1.2"
   checksum: ec5f778d9790e7b9ffc3e4c1df39a5bb1ce94657a4e3ad830c1276491ca9d79f189f47609884671db173400256b005f4955f7952f52a2aeb5834ad5fb4faf134
+  languageName: node
+  linkType: hard
+
+"pauseable@npm:^0.3.2":
+  version: 0.3.2
+  resolution: "pauseable@npm:0.3.2"
+  checksum: adb4139f00b1149171206206ee15a6a16a249d26071744f21c9a5e6e5326d14723419a741c2b0eb589ed976559cd57fabc88f0d8650d5deff358f943826ed0ea
   languageName: node
   linkType: hard
 

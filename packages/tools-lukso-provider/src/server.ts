@@ -1,6 +1,6 @@
 import { JSONRPCErrorResponse, JSONRPCServer, JSONRPCSuccessResponse } from 'json-rpc-2.0'
 import { v4 as uuidv4 } from 'uuid'
-import EventEmitter3 from 'eventemitter3'
+import EventEmitter3, { EventEmitter } from 'eventemitter3'
 
 interface ChannelEntryEvents {
   connected: () => void
@@ -15,6 +15,7 @@ class ChannelEntry extends EventEmitter3<ChannelEntryEvents> {
   public readonly accounts: (`0x${string}` | '')[] = []
   private chainId = 0
   private rpcUrls: string[] = []
+  private buffered: Array<[keyof ChannelEntryEvents, unknown[]]> = []
 
   constructor(
     public readonly serverChannel: MessagePort,
@@ -26,6 +27,27 @@ class ChannelEntry extends EventEmitter3<ChannelEntryEvents> {
     private readonly setter: (value: boolean) => void
   ) {
     super()
+  }
+
+  emit<T extends EventEmitter.EventNames<ChannelEntryEvents>>(event: T, ...args: EventEmitter.EventArgs<ChannelEntryEvents, T>): boolean {
+    if (this.buffered) {
+      this.buffered.push([event, args])
+      return false
+    }
+    return super.emit(event, ...args)
+  }
+
+  resume() {
+    if (!this.buffered) {
+      return
+    }
+    while (this.buffered.length > 0) {
+      const val = this.buffered.shift()
+      if (val) {
+        const [event, args] = val
+        super.emit(event, ...(args as any))
+      }
+    }
   }
 
   public async send(method: string, params: unknown[]): Promise<void> {
@@ -366,6 +388,8 @@ function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]): 
 
       console.log('server accept', serverChannel)
       serverChannel?.postMessage({ type: 'upProvider:windowInitialize', chainId: options.chainId, accounts: options.accounts, rpcUrls: options.rpcUrls })
+      channel_.emit('connected')
+      channel_.resume()
     }
   }
   window.addEventListener('message', options.providerHandler)

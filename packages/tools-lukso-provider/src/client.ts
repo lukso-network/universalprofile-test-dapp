@@ -1,6 +1,6 @@
 import { JSONRPCClient, JSONRPCParams } from 'json-rpc-2.0'
 import { v4 as uuidv4 } from 'uuid'
-import EventEmitter3 from 'eventemitter3'
+import EventEmitter3, { EventEmitter } from 'eventemitter3'
 
 type Item = {
   resolve: () => unknown
@@ -33,22 +33,50 @@ type RemoteWalletOptions = {
 
 const pendingRequests = new Map<string, Item>()
 export class RemoteWallet extends EventEmitter3<RemoteWalletEvents> {
+  buffered?: Array<[event: keyof RemoteWalletEvents, args: unknown[]]> = []
+
   constructor(private options: RemoteWalletOptions) {
     super()
   }
+
   get clientChannel(): MessagePort | null {
     return this.options?.clientChannel || null
   }
+
   async request(method: string, params: JSONRPCParams, clientParams: any): Promise<any> {
     await this.options?.startupPromise
     return this.options?.client?.request(method, params, clientParams) || null
   }
+
   get chainId() {
     return this.options?.chainId() || 0
   }
+
   get accounts() {
     return this.options?.accounts() || []
   }
+
+  emit<T extends EventEmitter.EventNames<RemoteWalletEvents>>(event: T, ...args: EventEmitter.EventArgs<RemoteWalletEvents, T>): boolean {
+    if (this.buffered) {
+      this.buffered.push([event, args])
+      return false
+    }
+    return super.emit(event, ...args)
+  }
+
+  resume() {
+    if (!this.buffered) {
+      return
+    }
+    while (this.buffered.length > 0) {
+      const val = this.buffered.shift()
+      if (val) {
+        const [event, args] = val
+        super.emit(event, ...(args as any))
+      }
+    }
+  }
+
   getInit(): { chainId: number; accounts: (`0x${string}` | '')[]; rpcUrls: string[] } | undefined {
     const init = this.options?.init
     if (init) {
@@ -68,6 +96,7 @@ async function testWindow(_up: Window | undefined | null, remote: RemoteWallet, 
   return new Promise<RemoteWallet>((resolve, reject) => {
     let timeout: number | NodeJS.Timeout = 0
     const channel = new MessageChannel()
+
     const testFn = (event: MessageEvent) => {
       if (event.data?.type === 'upProvider:windowInitialize') {
         const { chainId, accounts, rpcUrls } = event.data
@@ -85,6 +114,7 @@ async function testWindow(_up: Window | undefined | null, remote: RemoteWallet, 
         resolve(remote)
       }
     }
+
     channel.port1.addEventListener('message', testFn)
     channel.port1.start()
     window.addEventListener('message', testFn)
@@ -138,6 +168,7 @@ async function findDestination(authURL: string | Window | undefined | null, remo
           throw error
         })
       : await findUP(authURL, remote, options)
+
   if (search && !up) {
     let retry = 3
     while (retry > 0) {
@@ -158,7 +189,9 @@ async function findDestination(authURL: string | Window | undefined | null, remo
       if (up) {
         break
       }
+
       await new Promise(resolve => setTimeout(resolve, 1000))
+
       retry--
     }
   }
@@ -173,16 +206,20 @@ export function createClientUPProvider(authURL?: string | Window, search = true)
   let accounts: (`0x${string}` | '')[] = []
   let rpcUrls: string[] = []
   let startupResolve: () => void
+
   const startupPromise = new Promise<void>(resolve => {
     startupResolve = resolve
   })
+
   const options: RemoteWalletOptions = {
     chainId: () => chainId,
     accounts: () => accounts,
     startupPromise,
   }
+
   const remote = new RemoteWallet(options)
   let searchPromise: Promise<RemoteWallet> | null
+
   const doSearch = async (client: JSONRPCClient): Promise<RemoteWallet> => {
     if (searchPromise) {
       return searchPromise
@@ -235,9 +272,12 @@ export function createClientUPProvider(authURL?: string | Window, search = true)
       })
       up.clientChannel?.start()
       options.client = client
+
       startupResolve()
+
       return up
     })
+
     return searchPromise
   }
 
@@ -246,8 +286,10 @@ export function createClientUPProvider(authURL?: string | Window, search = true)
       options.client = client
       return up
     })
+
     return new Promise((resolve, reject) => {
       const { id, method, params } = jsonRPCRequest
+
       pendingRequests.set(id, {
         resolve,
         reject,
@@ -256,6 +298,7 @@ export function createClientUPProvider(authURL?: string | Window, search = true)
         method,
         params,
       })
+
       up.clientChannel?.postMessage(jsonRPCRequest)
     })
   })
@@ -267,6 +310,7 @@ export function createClientUPProvider(authURL?: string | Window, search = true)
       case 'eth_call':
         if (rpcUrls.length > 0) {
           console.log('client direct rpc', rpcUrls, method, params)
+
           const urls = [...rpcUrls]
           const errors = []
           while (urls.length > 0) {
@@ -275,6 +319,7 @@ export function createClientUPProvider(authURL?: string | Window, search = true)
               if (!url) {
                 throw new Error('No RPC URL found')
               }
+
               const result = fetch(url, {
                 method: 'POST',
                 headers: {
@@ -292,6 +337,7 @@ export function createClientUPProvider(authURL?: string | Window, search = true)
                 }
                 throw new Error('Network response was not ok')
               })
+
               return result
             } catch (error) {
               console.error('error', error)
@@ -308,7 +354,9 @@ export function createClientUPProvider(authURL?: string | Window, search = true)
 
   client.request = async (method, params) => {
     await doSearch(client)
+
     await startupPromise
+
     // make it compatible with old and new type RPC.
     if (typeof method === 'string') {
       return await wrapper(method, params)
@@ -321,5 +369,6 @@ export function createClientUPProvider(authURL?: string | Window, search = true)
   }
 
   doSearch(client)
+
   return remote
 }

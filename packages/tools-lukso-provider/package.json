@@ -10,6 +10,7 @@
     "@types/uuid": "^10.0.0",
     "eventemitter3": "^5.0.1",
     "json-rpc-2.0": "^1.7.0",
+    "pauseable": "^0.3.2",
     "uuid": "^10.0.0"
   },
   "devDependencies": {
