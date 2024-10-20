@@ -69,7 +69,7 @@ async function testWindow(_up: Window | undefined | null, remote: RemoteWallet, 
     let timeout: number | NodeJS.Timeout = 0
     const channel = new MessageChannel()
     const testFn = (event: MessageEvent) => {
-      if (event.data?.type === 'upProvider:windowInitialized') {
+      if (event.data?.type === 'upProvider:windowInitialize') {
         const { chainId, accounts, rpcUrls } = event.data
 
         console.log('client init', event.data, up)
@@ -81,6 +81,7 @@ async function testWindow(_up: Window | undefined | null, remote: RemoteWallet, 
         options.clientChannel = channel.port1
         options.window = up
         options.init = { chainId, accounts, rpcUrls }
+        up.postMessage('upProvider:windowInitialized')
         resolve(remote)
       }
     }
@@ -307,6 +308,7 @@ export function createClientUPProvider(authURL?: string | Window, search = true)
 
   client.request = async (method, params) => {
     await doSearch(client)
+    await startupPromise
     // make it compatible with old and new type RPC.
     if (typeof method === 'string') {
       return await wrapper(method, params)

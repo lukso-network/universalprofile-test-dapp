@@ -96,7 +96,12 @@ type GlobalProviderOptions = {
   rpcUrls: string[]
   chainId: number
 }
-export class GlobalProvider extends EventEmitter3 {
+
+interface GlobalProviderEvents {
+  channelCreated: (id: HTMLIFrameElement | Window | string, channel: ChannelEntry) => void
+}
+
+export class GlobalProvider extends EventEmitter3<GlobalProviderEvents> {
   constructor(
     public readonly channels: Map<string, ChannelEntry>,
     private readonly options: GlobalProviderOptions
@@ -328,6 +333,10 @@ function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]): 
         return await next(request)
       })
       const channelHandler = (event: MessageEvent) => {
+        if (event.data.type === 'upProvider:windowInitialized') {
+          globalUPProvider?.emit('channelCreated', channel_.element || channel_.window || null, channel_)
+          return
+        }
         console.log('server raw', event.data)
         try {
           const request = {
@@ -356,7 +365,7 @@ function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]): 
       serverChannel.start()
 
       console.log('server accept', serverChannel)
-      serverChannel?.postMessage({ type: 'upProvider:windowInitialized', chainId: options.chainId, accounts: options.accounts, rpcUrls: options.rpcUrls })
+      serverChannel?.postMessage({ type: 'upProvider:windowInitialize', chainId: options.chainId, accounts: options.accounts, rpcUrls: options.rpcUrls })
     }
   }
   window.addEventListener('message', options.providerHandler)
