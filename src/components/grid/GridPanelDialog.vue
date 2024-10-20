@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { TokenInfo } from '@/helpers/tokenUtils'
 import { getState } from '@/stores'
-import { getUPProviderChannel } from '@lukso/embedded-provider'
-import { Ref, ref, watch } from 'vue'
+import { createGlobalUPProvider, getUPProviderChannel } from '@lukso/embedded-provider'
+import { ref, watch } from 'vue'
 import LSPSelect from '@/components/shared/LSPSelect.vue'
 
 type Props = {
-  channel: { ref: Ref<HTMLIFrameElement | null> }
+  frame?: HTMLIFrameElement | null
 }
 
+const globalProvider = createGlobalUPProvider()
 const props = defineProps<Props>()
 const pageAddress = ref<string>(getState('address'))
 const enabled = ref<boolean>(false)
@@ -18,16 +19,17 @@ function handlePageAddress(info: TokenInfo) {
   }
 }
 function updateProvider() {
-  const channel = getUPProviderChannel(props.channel.ref.value)
+  const channel = getUPProviderChannel(props.frame || null)
   console.log('watch panel', enabled.value, channel != null, channel?.enabled || false, pageAddress.value)
   if (channel) {
     channel.allowAccounts(enabled.value, [getState('address'), pageAddress.value], getState('chainId'))
   }
 }
-watch(() => () => getState('chainId'), updateProvider)
+globalProvider.on('channelCreated', updateProvider)
+watch(() => () => getState('chainId'), updateProvider, { immediate: true })
 watch(() => enabled.value, updateProvider)
-watch(() => props.channel.ref.value, updateProvider)
-watch(() => pageAddress.value, updateProvider, { immediate: true })
+watch(() => props.frame, updateProvider)
+watch(() => pageAddress.value, updateProvider)
 </script>
 
 <template>
