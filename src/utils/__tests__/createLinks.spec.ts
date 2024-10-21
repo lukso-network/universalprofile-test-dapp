@@ -5,9 +5,7 @@ test('createBlockScoutLink(): returns correct blockscout link', () => {
   expect(link).toBe('https://explorer.execution.testnet.lukso.network/tx/ABC')
 
   const linkAddress = createBlockScoutLink('ABC')
-  expect(linkAddress).toBe(
-    `https://explorer.execution.testnet.lukso.network/address/ABC`
-  )
+  expect(linkAddress).toBe(`https://explorer.execution.testnet.lukso.network/address/ABC`)
 })
 
 test('createIpfsLink(): returns correct ipfs link', () => {

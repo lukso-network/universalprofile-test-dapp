@@ -10,8 +10,7 @@ import useNotifications from '@/compositions/useNotifications'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
 const route = useRoute()
 const { isAddress } = useWeb3Connection()
-const { notification, clearNotification, hasNotification, setNotification } =
-  useNotifications()
+const { notification, clearNotification, hasNotification, setNotification } = useNotifications()
 const router = useRouter()
 
 const routeData = ref<RouteLocationNormalizedLoaded>(route)
@@ -85,49 +84,24 @@ watch(routeData.value, fetchData)
   <section class="section">
     <div class="is-child box">
       <div v-if="hasNotification" class="field">
-        <Notifications
-          :notification="notification"
-          class="mt-4"
-          @hide="clearNotification"
-        ></Notifications>
+        <Notifications :notification="notification" class="mt-4" @hide="clearNotification"></Notifications>
       </div>
       <div class="field">
-        <label for="hash" class="label"
-          >Enter IPFS Address or Hash to view Profile</label
-        >
+        <label for="hash" class="label">Enter IPFS Address or Hash to view Profile</label>
         <div :class="`control has-icons-left ${loading ? 'is-loading' : ''}`">
-          <input
-            v-model="hash"
-            class="input"
-            type="text"
-            data-testid="search-address-hash"
-            placeholder="Enter Address/Hash"
-          />
+          <input v-model="hash" class="input" type="text" data-testid="search-address-hash" placeholder="Enter Address/Hash" />
           <span class="icon is-small is-left">
             <i class="fas fa-search"></i>
           </span>
         </div>
       </div>
       <div class="field">
-        <button
-          :class="`button is-primary is-rounded mb-3 ${
-            loading ? 'is-loading' : ''
-          }`"
-          :disabled="loading ? true : undefined"
-          @click="searchAddress"
-        >
-          Search
-        </button>
+        <button :class="`button is-primary is-rounded mb-3 ${loading ? 'is-loading' : ''}`" :disabled="loading ? true : undefined" @click="searchAddress">Search</button>
       </div>
     </div>
-    <h1 v-if="!loading && profileData" class="title">
-      {{ dataSource ? dataSource : '' }}: {{ route.params.address }}
-    </h1>
+    <h1 v-if="!loading && profileData" class="title">{{ dataSource ? dataSource : '' }}: {{ route.params.address }}</h1>
     <div v-if="loading">Loading...</div>
-    <table
-      v-if="!loading && profileData"
-      class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
-    >
+    <table v-if="!loading && profileData" class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
       <tr>
         <th>Property</th>
         <th>Value</th>
@@ -147,9 +121,7 @@ watch(routeData.value, fetchData)
         <td>
           <ul class="list">
             <li v-for="(link, i) in profileData?.LSP3Profile?.links" :key="i">
-              <a :href="link.url" target="_blank" rel="noopener noreferrer">{{
-                link.title ? link.title : link.url
-              }}</a>
+              <a :href="link.url" target="_blank" rel="noopener noreferrer">{{ link.title ? link.title : link.url }}</a>
             </li>
           </ul>
         </td>
@@ -158,22 +130,14 @@ watch(routeData.value, fetchData)
       <tr>
         <td>Tags</td>
         <td>
-          <span
-            v-for="tag in profileData?.LSP3Profile?.tags"
-            :key="tag"
-            class="tag"
-            >{{ tag }}</span
-          >
+          <span v-for="tag in profileData?.LSP3Profile?.tags" :key="tag" class="tag">{{ tag }}</span>
         </td>
       </tr>
 
       <tr>
         <td>ProfileImage(s)</td>
         <td>
-          <div
-            v-for="(image, i) in profileData?.LSP3Profile?.profileImage"
-            :key="i"
-          >
+          <div v-for="(image, i) in profileData?.LSP3Profile?.profileImage" :key="i">
             <pre
               >{{ image }}
                 </pre
@@ -185,10 +149,7 @@ watch(routeData.value, fetchData)
 
       <tr>
         <td>BackgroundImage(s)</td>
-        <div
-          v-for="(image, i) in profileData?.LSP3Profile?.backgroundImage"
-          :key="i"
-        >
+        <div v-for="(image, i) in profileData?.LSP3Profile?.backgroundImage" :key="i">
           <pre
             >{{ image }}
                 </pre

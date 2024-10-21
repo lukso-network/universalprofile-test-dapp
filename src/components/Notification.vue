@@ -17,10 +17,7 @@ const hide = () => {
 }
 
 const renderMessage = ({ class: className }: { class: any }) => {
-  const text = new DOMParser().parseFromString(
-    props.notification.message as string,
-    'text/html'
-  ).body.innerHTML
+  const text = new DOMParser().parseFromString(props.notification.message as string, 'text/html').body.innerHTML
   return h('div', {
     class: className,
     innerHTML: text,
@@ -33,9 +30,7 @@ const onToggle = () => {
 }
 
 onMounted(() => {
-  const container = document.getElementById(
-    'notification-container'
-  ) as HTMLElement
+  const container = document.getElementById('notification-container') as HTMLElement
   if (container?.offsetHeight > 101) {
     showSpan.value = true
     isShowMore.value = true
@@ -47,27 +42,10 @@ onMounted(() => {
 </script>
 
 <template v-if="notification">
-  <div
-    id="notification-container"
-    class="notification card"
-    :class="'is-' + notification.type"
-    data-testid="notification"
-  >
-    <button
-      v-if="!hideNotification"
-      class="delete"
-      data-testid="hide"
-      @click="hide"
-    ></button>
-    <render-message
-      :class="{ ellipsis: isShowMore, 'no-ellipsis': !isShowMore }"
-    />
-    <span
-      v-if="showSpan"
-      class="span-btn"
-      data-testid="show-more"
-      @click="onToggle"
-    >
+  <div id="notification-container" class="notification card" :class="'is-' + notification.type" data-testid="notification">
+    <button v-if="!hideNotification" class="delete" data-testid="hide" @click="hide"></button>
+    <render-message :class="{ ellipsis: isShowMore, 'no-ellipsis': !isShowMore }" />
+    <span v-if="showSpan" class="span-btn" data-testid="show-more" @click="onToggle">
       <span v-if="isShowMore">show more</span>
       <span v-else>show less</span>
     </span>

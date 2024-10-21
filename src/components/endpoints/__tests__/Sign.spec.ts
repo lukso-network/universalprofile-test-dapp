@@ -14,10 +14,8 @@ jest.mock('@/compositions/useWeb3Connection', () => ({
   __esModule: true,
   default: () => ({
     sign: (message: string, address: string) => mockSign(message, address),
-    personalSign: (message: string, address: string, password: string) =>
-      mockPersonalSign(message, address, password),
-    recover: (message: string, signature: string) =>
-      mockRecover(message, signature),
+    personalSign: (message: string, address: string, password: string) => mockPersonalSign(message, address, password),
+    recover: (message: string, signature: string) => mockRecover(message, signature),
     getWeb3: () => ({
       eth: {
         accounts: {
@@ -51,13 +49,8 @@ test('can sign message using eth_sign', async () => {
   await fireEvent.click(screen.getByTestId('eth_sign_radio_btn'))
   await fireEvent.click(screen.getByTestId('sign'))
 
-  expect(screen.getByTestId('notification')).toHaveTextContent(
-    'Message signed successfully'
-  )
-  expect(mockSign).toBeCalledWith(
-    'sign message',
-    '0x517216362D594516c6f96Ee34b2c502d65B847E4'
-  )
+  expect(screen.getByTestId('notification')).toHaveTextContent('Message signed successfully')
+  expect(mockSign).toBeCalledWith('sign message', '0x517216362D594516c6f96Ee34b2c502d65B847E4')
   expect(mockSign).toReturnWith('0x123')
   expect(screen.getByTestId('signature')).toHaveTextContent('0x123')
 })
@@ -72,14 +65,8 @@ test('can sign message using personal_sign', async () => {
   await fireEvent.click(screen.getByTestId('personal_sign_radio_btn'))
   await fireEvent.click(screen.getByTestId('sign'))
 
-  expect(screen.getByTestId('notification')).toHaveTextContent(
-    'Message signed successfully'
-  )
-  expect(mockPersonalSign).toBeCalledWith(
-    'sign message',
-    '0x517216362D594516c6f96Ee34b2c502d65B847E4',
-    ''
-  )
+  expect(screen.getByTestId('notification')).toHaveTextContent('Message signed successfully')
+  expect(mockPersonalSign).toBeCalledWith('sign message', '0x517216362D594516c6f96Ee34b2c502d65B847E4', '')
   expect(mockPersonalSign).toReturnWith('0x123')
   expect(screen.getByTestId('signature')).toHaveTextContent('0x123')
 })
@@ -93,9 +80,7 @@ test('can recovery message', async () => {
   await fireEvent.click(screen.getByTestId('sign'))
   await fireEvent.click(screen.getByTestId('recover'))
 
-  expect(screen.getByTestId('notification')).toHaveTextContent(
-    'Recover was successful'
-  )
+  expect(screen.getByTestId('notification')).toHaveTextContent('Recover was successful')
   expect(mockRecover).toBeCalledWith('sign message', '0x123')
   expect(mockRecover).toReturnWith('0x321')
   expect(screen.getByTestId('recovery-eoa')).toHaveTextContent('0x321')
@@ -111,9 +96,7 @@ test('can verify signature', async () => {
   await fireEvent.click(screen.getByTestId('sign'))
   await fireEvent.click(screen.getByTestId('validate-signature'))
 
-  expect(screen.getByTestId('notification')).toHaveTextContent(
-    'Signature validated successfully'
-  )
+  expect(screen.getByTestId('notification')).toHaveTextContent('Signature validated successfully')
   expect(mockValidSignatureCall).toBeCalledTimes(1)
   expect(mockValidSignatureCall).toReturnWith('0x1626ba7e')
   expect(screen.getByTestId('magic-value')).toHaveTextContent('0x1626ba7e')
@@ -127,39 +110,25 @@ test('can sign with ethereum', async () => {
   await fireEvent.click(screen.getByTestId('isSiwe'))
   await fireEvent.click(screen.getByTestId('siwe.hasExpirationTime'))
   await fireEvent.click(screen.getByTestId('siwe.hasNotBefore'))
-  await fireEvent.update(
-    screen.getByTestId('siwe.expirationDate'),
-    '2022-09-02'
-  )
+  await fireEvent.update(screen.getByTestId('siwe.expirationDate'), '2022-09-02')
   await fireEvent.update(screen.getByTestId('siwe.nonce'), 'ABCDEFAB1')
   await fireEvent.update(screen.getByTestId('siwe.domain'), 'example.com')
-  await fireEvent.update(
-    screen.getByTestId('siwe.address'),
-    '0x117216362d594516C6f96ee34B2C502D65b847E4'
-  )
-  await fireEvent.update(
-    screen.getByTestId('siwe.uri'),
-    'http://example.com/login'
-  )
+  await fireEvent.update(screen.getByTestId('siwe.address'), '0x117216362d594516C6f96ee34B2C502D65b847E4')
+  await fireEvent.update(screen.getByTestId('siwe.uri'), 'http://example.com/login')
   await fireEvent.update(screen.getByTestId('siwe.version'), '1')
   await fireEvent.update(screen.getByTestId('siwe.chainId'), '2829')
   await fireEvent.update(screen.getByTestId('siwe.expirationTime'), '11:00')
   await fireEvent.update(screen.getByTestId('siwe.notBeforeDate'), '2022-09-01')
   await fireEvent.update(screen.getByTestId('siwe.notBeforeTime'), '10:00')
   await fireEvent.click(screen.getByTestId('addResource'))
-  await userEvent.type(
-    screen.getByTestId('siwe.resource-2'),
-    'http://some-resource2.com'
-  )
+  await userEvent.type(screen.getByTestId('siwe.resource-2'), 'http://some-resource2.com')
 
   jest.useFakeTimers().setSystemTime(new Date('2022-09-01 09:00'))
 
   await fireEvent.click(screen.getByTestId('sign'))
 
   await waitFor(() => {
-    expect(screen.getByTestId('notification')).toHaveTextContent(
-      'Message signed successfully'
-    )
+    expect(screen.getByTestId('notification')).toHaveTextContent('Message signed successfully')
   })
   expect(mockSign).toBeCalledWith(
     `example.com wants you to sign in with your Ethereum account:

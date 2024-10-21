@@ -9,17 +9,13 @@ interface ERC20DeploymentOptions {
   tokenSymbol: string
 }
 
-interface DeployedERC20Token {
+export interface DeployedERC20Token {
   ERC20Token: DeployedContract
 }
 
 const { getProvider, contract } = useWeb3Connection()
 
-async function deployERC20Token({
-  from,
-  tokenName,
-  tokenSymbol,
-}: ERC20DeploymentOptions): Promise<DeployedERC20Token> {
+async function deployERC20Token({ from, tokenName, tokenSymbol }: ERC20DeploymentOptions): Promise<DeployedERC20Token> {
   const erc20contract = contract(erc20AndErc165.abi as any, from)
 
   return new Promise((resolve, reject) => {
@@ -29,7 +25,7 @@ async function deployERC20Token({
         arguments: [tokenName, tokenSymbol],
       })
       .send({ from })
-      .on('receipt', function (receipt: any) {
+      .on('receipt', (receipt: any) => {
         console.log('erc20 receipt', receipt)
         resolve({
           ERC20Token: {
@@ -46,9 +42,7 @@ async function deployERC20Token({
 }
 
 export function useERC20(): {
-  deployERC20Token: (
-    erc20DeploymentOptions: ERC20DeploymentOptions
-  ) => Promise<DeployedERC20Token>
+  deployERC20Token: (erc20DeploymentOptions: ERC20DeploymentOptions) => Promise<DeployedERC20Token>
 } {
   const hasExtension = !!getProvider()
   if (!hasExtension) {

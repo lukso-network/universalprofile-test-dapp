@@ -33,8 +33,7 @@ const emits = defineEmits<Emits>()
 const { getWeb3 } = useWeb3Connection()
 
 const IS_ARRAY_TYPE_REGEXP = /\[\]$/
-const SUPPORTED_TYPES_REGEXP =
-  /^(bytes(3[0-2]|2[0-9]|1[0-9]|[1-9])?|u?int(8|16|32|64|128|256)|string|bool|address)(\[\])?$/
+const SUPPORTED_TYPES_REGEXP = /^(bytes(3[0-2]|2[0-9]|1[0-9]|[1-9])?|u?int(8|16|32|64|128|256)|string|bool|address)(\[\])?$/
 const FUNCTION_REGEXP = /^([a-z_]*)\(([^)]*)\)$/i
 const ONLYARGS_REGEXP = /^()(.*)$/i
 
@@ -121,15 +120,7 @@ function handleIsKey(param: number, isKey?: boolean) {
 }
 
 const computedCall = computed<string>(() => {
-  return props.dataDecoder
-    ? `${reactiveData.items
-        ?.map(({ name, type }) => `${type} ${name}`)
-        .join(', ')}`
-    : reactiveData.call
-      ? `${reactiveData.call}(${reactiveData.items
-          ?.map(({ name, type }) => `${type} ${name}`)
-          .join(', ')})`
-      : ''
+  return props.dataDecoder ? `${reactiveData.items?.map(({ name, type }) => `${type} ${name}`).join(', ')}` : reactiveData.call ? `${reactiveData.call}(${reactiveData.items?.map(({ name, type }) => `${type} ${name}`).join(', ')})` : ''
 })
 
 /**
@@ -139,9 +130,7 @@ const computedCall = computed<string>(() => {
  */
 function handleCall(e: Event) {
   const { value } = e.target as HTMLTextAreaElement
-  const [_all, newCall, newArgs] = props.dataDecoder
-    ? ONLYARGS_REGEXP.exec(value || '') || []
-    : FUNCTION_REGEXP.exec(value || '') || []
+  const [_all, newCall, newArgs] = props.dataDecoder ? ONLYARGS_REGEXP.exec(value || '') || [] : FUNCTION_REGEXP.exec(value || '') || []
   if (!_all) {
     return
   }
@@ -224,17 +213,10 @@ const output = computed<{ error: undefined | string; value: string }>(() => {
       return { value: '0x', error: undefined }
     }
     const { eth } = getWeb3()
-    const callSig = props.dataDecoder
-      ? `${reactiveData.items.map(({ type }) => type).join(',')}`
-      : `${reactiveData.call}(${reactiveData.items
-          .map(({ type }) => type)
-          .join(',')})`
+    const callSig = props.dataDecoder ? `${reactiveData.items.map(({ type }) => type).join(',')}` : `${reactiveData.call}(${reactiveData.items.map(({ type }) => type).join(',')})`
     const types = reactiveData.items.map(({ type }) => type)
     const args = reactiveData.items.map(({ value, type, isWei }) => {
-      const makeItem = (value: any) =>
-        /^bytes32/.test(type)
-          ? (makeBytes32(value, type) ?? '0x')
-          : makeValue(value, isWei) || ''
+      const makeItem = (value: any) => (/^bytes32/.test(type) ? (makeBytes32(value, type) ?? '0x') : makeValue(value, isWei) || '')
       if (/\[\]$/.test(type)) {
         return value.map(makeItem)
       }
@@ -246,9 +228,7 @@ const output = computed<{ error: undefined | string; value: string }>(() => {
         value: props.data || '0x',
       }
     }
-    const output = `${eth.abi.encodeFunctionSignature(callSig)}${eth.abi
-      .encodeParameters(types, args)
-      ?.substring(2)}`
+    const output = `${eth.abi.encodeFunctionSignature(callSig)}${eth.abi.encodeParameters(types, args)?.substring(2)}`
     return {
       error: undefined,
       value: output,
@@ -316,44 +296,15 @@ onMounted(() => {
 <template>
   <div :class="{ box: !props.onlyParams, 'mb-5': true }">
     <div v-if="!props.onlyParams">
-      <label class="label">{{
-        props.dataDecoder
-          ? 'Decode Types'
-          : !props.custom
-            ? `Function ${computedCall}`
-            : 'Function'
-      }}</label>
+      <label class="label">{{ props.dataDecoder ? 'Decode Types' : !props.custom ? `Function ${computedCall}` : 'Function' }}</label>
       <div v-if="props.custom" class="field">
-        <input
-          class="input"
-          data-testid="function-call"
-          :value="computedCall"
-          @input="handleCall"
-        />
+        <input class="input" data-testid="function-call" :value="computedCall" @input="handleCall" />
       </div>
     </div>
-    <div
-      v-for="(item, index) of reactiveData.items"
-      :key="index"
-      :class="{ field: true, box: true, 'is-error': item.error }"
-    >
-      <ParamField
-        :model-value="item.value"
-        :info="item"
-        :custom="props.custom"
-        :data-decoder="props.dataDecoder"
-        :testid-prefix="props.testidPrefix"
-        @update:is-key="e => handleIsKey(index, e)"
-        @update:error="e => handleError(index, e)"
-        @update:model-value="e => handleValue(index, e)"
-        @update:is-wei="e => handleUnit(index, e)"
-      />
+    <div v-for="(item, index) of reactiveData.items" :key="index" :class="{ field: true, box: true, 'is-error': item.error }">
+      <ParamField :model-value="item.value" :info="item" :custom="props.custom" :data-decoder="props.dataDecoder" :testid-prefix="props.testidPrefix" @update:is-key="e => handleIsKey(index, e)" @update:error="e => handleError(index, e)" @update:model-value="e => handleValue(index, e)" @update:is-wei="e => handleUnit(index, e)" />
     </div>
-    <div
-      v-if="!props.onlyParams && !props.hideData"
-      style="overflow-wrap: anywhere"
-      :class="{ box: true, 'is-danger': output.error }"
-    >
+    <div v-if="!props.onlyParams && !props.hideData" style="overflow-wrap: anywhere" :class="{ box: true, 'is-danger': output.error }">
       <div style="overflow-wrap: anywhere">{{ output.value }}</div>
     </div>
     <p v-if="output.error" class="help is-danger">{{ output.error }}</p>

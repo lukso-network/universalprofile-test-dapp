@@ -67,10 +67,7 @@ test('can disconnect from wallet connect V2', async () => {
   })
   mockGetBalance.mockReturnValue('2')
   const { setConnected } = useState()
-  await setConnected(
-    '0x9967b05ac840324F8BB6F729eD74530866679B11',
-    WALLET_CONNECT
-  )
+  await setConnected('0x9967b05ac840324F8BB6F729eD74530866679B11', WALLET_CONNECT)
 
   render(Connect)
 
@@ -101,12 +98,9 @@ test('can connect to browser extension when authorized', async () => {
   expect(mockSetupWeb3).toBeCalledTimes(2)
   await setConnected('0x9967b05ac840324F8BB6F729eD74530866679B11', WINDOW_LUKSO)
   await waitFor(() => {
-    expect(screen.getByTestId('address')).toHaveTextContent(
-      /.*0x9967b0\.\.\..*/,
-      {
-        normalizeWhitespace: true,
-      }
-    )
+    expect(screen.getByTestId('address')).toHaveTextContent(/.*0x9967b0\.\.\..*/, {
+      normalizeWhitespace: true,
+    })
   })
   await waitFor(() => {
     expect(screen.getByTestId('balance')).toHaveTextContent('2 LYX')
@@ -115,9 +109,7 @@ test('can connect to browser extension when authorized', async () => {
 
 test('can connect to browser extension when not authorized', async () => {
   mockAccounts.mockResolvedValue(undefined)
-  mockRequestAccounts.mockReturnValue([
-    '0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298',
-  ])
+  mockRequestAccounts.mockReturnValue(['0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298'])
   mockGetProvider.mockReturnValue({
     wc: {
       connected: false,
@@ -139,10 +131,7 @@ test('can connect to browser extension when not authorized', async () => {
   await setConnected('0x9967b05ac840324F8BB6F729eD74530866679B11', WINDOW_LUKSO)
 
   await waitFor(() => {
-    expect(screen.getByTestId('address')).toHaveTextContent(
-      /.*0x9967b0\.\.\..*/,
-      { normalizeWhitespace: true }
-    )
+    expect(screen.getByTestId('address')).toHaveTextContent(/.*0x9967b0\.\.\..*/, { normalizeWhitespace: true })
     expect(screen.getByTestId('balance')).toHaveTextContent('3 LYX')
   })
 }, 5000)

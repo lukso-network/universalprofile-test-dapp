@@ -34,11 +34,7 @@ onMounted(() => {
   <div class="field">
     <label class="select">
       <select v-model="selected" name="custom-select" @change="handleChange">
-        <option
-          v-for="option in props.options"
-          :key="option.value"
-          :value="option.value"
-        >
+        <option v-for="option in props.options" :key="option.value" :value="option.value">
           {{ option.display }}
         </option>
       </select>

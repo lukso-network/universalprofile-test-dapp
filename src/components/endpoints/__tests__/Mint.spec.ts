@@ -34,12 +34,7 @@ jest.mock('@/helpers/env', () => ({
 
 test('can mint token', async () => {
   render(Mint)
-  await fireEvent.update(
-    screen.getByTestId('mint-address'),
-    '0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298'
-  )
+  await fireEvent.update(screen.getByTestId('mint-address'), '0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298')
   await fireEvent.click(screen.getByTestId('mint'))
-  expect(await screen.findByTestId('notification')).toHaveTextContent(
-    'Token minted'
-  )
+  expect(await screen.findByTestId('notification')).toHaveTextContent('Token minted')
 })

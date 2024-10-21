@@ -24,10 +24,7 @@ export const getState: (key: keyof Store) => any = key => {
   return store[key]
 }
 
-export async function setState(
-  key: keyof Store,
-  newState: unknown
-): Promise<void> {
+export async function setState(key: keyof Store, newState: unknown): Promise<void> {
   ;(store[key] as any) = newState
 }
 
@@ -54,9 +51,7 @@ export function useState() {
       setState('balance', await getBalance(address))
 
       try {
-        const { assets, lsp7, lsp8 } = JSON.parse(
-          localStorage?.getItem('up:tokens') || 'null'
-        )
+        const { assets, lsp7, lsp8 } = JSON.parse(localStorage?.getItem('up:tokens') || 'null')
         setState('assets', assets)
         setState('lsp7', lsp7)
         setState('lsp8', lsp8)

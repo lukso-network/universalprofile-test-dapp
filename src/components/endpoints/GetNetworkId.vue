@@ -2,101 +2,23 @@
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
-import { getSelectedNetworkConfig, setNetworkConfig } from '@/helpers/config'
+import { getSelectedNetworkConfig, NETWORKS, setNetworkConfig } from '@/helpers/config'
+import { NetworkInfo } from '@/interfaces/network'
 import { ref } from 'vue'
-import { hexToNumber, numberToHex } from 'web3-utils'
 
-export type NetworkInfo = {
-  id: string
-  name: string
-  isCustom: boolean
-  http: { url: string }
-  ws: { url: string }
-  chainId: string
-  relayer?: { url?: string }
-  explorer?: { url?: string }
-}
-
-const { notification, clearNotification, hasNotification, setNotification } =
-  useNotifications()
+const { notification, clearNotification, hasNotification, setNotification } = useNotifications()
 const web3 = useWeb3Connection()
 
 const defaultNetworkConfig = getSelectedNetworkConfig()
 const defaultNetwork: NetworkInfo = {
-  name: defaultNetworkConfig.name,
-  http: defaultNetworkConfig.rpc,
-  ws: {
-    url: 'wss://ws-rpc.testnet.lukso.network',
-  },
-  relayer: {
-    url: 'https://relayer.testnet.lukso.network/api',
-  },
-  explorer: defaultNetworkConfig.blockscout,
-  isCustom: false,
-  id: defaultNetworkConfig.name,
-  chainId: numberToHex(defaultNetworkConfig.chainId),
+  ...defaultNetworkConfig,
 }
 
 const networkId = ref('')
 const err = ref('')
 const activeNetwork = ref<NetworkInfo>(defaultNetwork)
 
-const networks = [
-  {
-    name: 'Lukso Testnet',
-    http: {
-      url: 'https://rpc.testnet.lukso.network/',
-    },
-    ws: {
-      url: 'wss://ws-rpc.testnet.lukso.network',
-    },
-    relayer: {
-      url: 'https://relayer.testnet.lukso.network/api',
-    },
-    explorer: {
-      url: 'https://explorer.execution.testnet.lukso.network/tx/{transactionId}/internal-transactions',
-    },
-    isCustom: false,
-    id: 'testnet',
-    chainId: '0x1069',
-  },
-  {
-    name: 'Lukso Mainnet',
-    http: {
-      url: 'https://rpc.mainnet.lukso.network/',
-    },
-    ws: {
-      url: 'wss://ws-rpc.mainnet.lukso.network',
-    },
-    relayer: {
-      url: 'https://relayer.mainnet.lukso.network/api',
-    },
-    explorer: {
-      url: 'https://explorer.execution.mainnet.lukso.network/tx/{transactionId}/internal-transactions',
-    },
-    isCustom: false,
-    id: 'mainnet',
-    chainId: '0x2a',
-  },
-  {
-    name: 'Base Sepolia',
-    http: {
-      url: 'https://base-sepolia-rpc.publicnode.com/',
-    },
-    ws: {
-      url: 'wss://base-sepolia-rpc.publicnode.com',
-    },
-    relayer: {
-      url: undefined,
-    },
-    explorer: {
-      url: 'https://sepolia.basescan.org/tx/{transactionId}',
-    },
-    isCustom: false,
-    id: 'base-sepolia',
-    chainId: '0x14a34',
-  },
-]
+const networks = Object.values(NETWORKS)
 
 const getNetworkId = async () => {
   clearNotification()
@@ -129,8 +51,8 @@ const changeNetwork = async () => {
 const changeDappNetwork = async () => {
   try {
     let currentChainId = getSelectedNetworkConfig().chainId
-    if (numberToHex(currentChainId) !== activeNetwork.value.chainId) {
-      setNetworkConfig(hexToNumber(activeNetwork.value.chainId) as number)
+    if (currentChainId !== activeNetwork.value.chainId) {
+      setNetworkConfig(activeNetwork.value.chainId)
       currentChainId = getSelectedNetworkConfig().chainId
     }
     location.reload()
@@ -172,42 +94,20 @@ const addNetwork = async () => {
       <div class="field">
         <div class="select is-fullwidth mb-2">
           <select v-model="activeNetwork" data-testid="preset">
-            <option
-              v-for="network of networks"
-              :key="network.name"
-              :value="network"
-            >
+            <option v-for="network of networks" :key="network.name" :value="network">
               {{ network.name }}
             </option>
           </select>
         </div>
       </div>
       <div>
-        <button
-          class="button is-primary is-rounded mt-4"
-          data-testid="getNetworkId"
-          @click="changeNetwork"
-        >
-          Switch Network to {{ activeNetwork.name }}
-        </button>
+        <button class="button is-primary is-rounded mt-4" data-testid="getNetworkId" @click="changeNetwork">Switch Network to {{ activeNetwork.name }}</button>
       </div>
       <div>
-        <button
-          class="button is-primary is-rounded mt-4"
-          data-testid="getNetworkId"
-          @click="addNetwork"
-        >
-          Add Network
-        </button>
+        <button class="button is-primary is-rounded mt-4" data-testid="getNetworkId" @click="addNetwork">Add Network</button>
       </div>
       <div>
-        <button
-          class="button is-primary is-rounded mt-4"
-          data-testid="changeDappNetworkButton"
-          @click="changeDappNetwork"
-        >
-          Switch Network in DApp to {{ activeNetwork.name }}
-        </button>
+        <button class="button is-primary is-rounded mt-4" data-testid="changeDappNetworkButton" @click="changeDappNetwork">Switch Network in DApp to {{ activeNetwork.name }}</button>
         <div style="padding-top: 8px">
           DApp uses <b>{{ defaultNetworkConfig.name }}</b> network.
         </div>
@@ -218,24 +118,12 @@ const addNetwork = async () => {
       <p class="is-size-5 has-text-weight-bold mb-4 mt-6">Get Network ID</p>
       <div class="field">
         <div class="is-one-third mb-4">
-          <button
-            class="button is-primary is-rounded mt-4"
-            data-testid="getNetworkId"
-            @click="getNetworkId"
-          >
-            Get ID
-          </button>
+          <button class="button is-primary is-rounded mt-4" data-testid="getNetworkId" @click="getNetworkId">Get ID</button>
         </div>
       </div>
       <div>Test <code>eth_getId</code> RPC call.</div>
       <div class="field">
-        <Notifications
-          v-if="hasNotification"
-          :notification="notification"
-          class="notification is-info is-light mt-5"
-          @hide="clearNotification"
-        >
-        </Notifications>
+        <Notifications v-if="hasNotification" :notification="notification" class="notification is-info is-light mt-5" @hide="clearNotification"> </Notifications>
       </div>
     </div>
   </div>
