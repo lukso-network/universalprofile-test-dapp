@@ -36,33 +36,27 @@ type UPClientProviderOptions = {
 
 const pendingRequests = new Map<string, RequestQueueItem>()
 export class UPClientProvider extends EventEmitter3<UPClientProviderEvents> {
-  constructor(private options: UPClientProviderOptions) {
+  readonly #options: UPClientProviderOptions
+  constructor(options: any) {
     super()
+    this.#options = options as UPClientProviderOptions
   }
 
   get clientChannel(): MessagePort | null {
-    return this.options?.clientChannel || null
+    return this.#options?.clientChannel || null
   }
 
   async request(method: string, params: JSONRPCParams, clientParams: any): Promise<any> {
-    await this.options?.startupPromise
-    return this.options?.client?.request(method, params, clientParams) || null
+    await this.#options?.startupPromise
+    return this.#options?.client?.request(method, params, clientParams) || null
   }
 
   get chainId() {
-    return this.options?.chainId() || 0
+    return this.#options?.chainId() || 0
   }
 
   get accounts() {
-    return this.options?.accounts() || []
-  }
-
-  getInit(): { chainId: number; accounts: (`0x${string}` | '')[]; rpcUrls: string[] } | undefined {
-    const init = this.options?.init
-    if (init) {
-      this.options.init = undefined
-    }
-    return init
+    return this.#options?.accounts() || []
   }
 }
 
@@ -214,7 +208,7 @@ export function createClientUPProvider(authURL?: string | Window, search = true)
       return searchPromise
     }
     searchPromise = findDestination(authURL, remote, options, search).then(up => {
-      const init: { chainId: number; accounts: (`0x${string}` | '')[]; rpcUrls: string[] } | undefined = up.getInit()
+      const init: { chainId: number; accounts: (`0x${string}` | '')[]; rpcUrls: string[] } | undefined = options.init
       if (init) {
         ;({ chainId, accounts, rpcUrls } = init || {})
       }

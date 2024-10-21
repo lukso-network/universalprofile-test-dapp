@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { TokenInfo } from '@/helpers/tokenUtils'
 import { getState } from '@/stores'
-import { createGlobalUPProvider, UPClientChannel } from '@lukso/embedded-provider'
-import { ref, watch } from 'vue'
+import { createGlobalUPProvider, getUPProviderChannel, UPClientChannel } from '@lukso/embedded-provider'
+import { ref, toRaw, watch } from 'vue'
 import LSPSelect from '@/components/shared/LSPSelect.vue'
 
 type Props = {
@@ -19,9 +19,11 @@ function handlePageAddress(info: TokenInfo) {
   }
 }
 function updateProvider() {
-  const channel = props.channel || null
+  // You can either use the proxy object as a search argument
+  const channel = getUPProviderChannel(props.channel || null)
   if (channel) {
-    channel.allowAccounts(enabled.value, [getState('address'), pageAddress.value], getState('chainId'))
+    // or always call toRaw on the proxy object. Either or both will work, but the raw proxy methods will throw errors
+    toRaw(channel).allowAccounts(enabled.value, [getState('address'), pageAddress.value], getState('chainId'))
   }
 }
 globalProvider.on('channelCreated', updateProvider)

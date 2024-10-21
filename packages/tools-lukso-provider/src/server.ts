@@ -14,10 +14,12 @@ interface UPClientChannelEvents {
 }
 
 class UPClientChannel extends EventEmitter3<UPClientChannelEvents> {
-  public readonly accounts: (`0x${string}` | '')[] = []
-  private chainId = 0
-  private rpcUrls: string[] = []
-  private buffered?: Array<[keyof UPClientChannelEvents, unknown[]]> = []
+  #accounts: (`0x${string}` | '')[] = []
+  #chainId = 0
+  #rpcUrls: string[] = []
+  #buffered?: Array<[keyof UPClientChannelEvents, unknown[]]> = []
+  readonly #getter: () => boolean
+  readonly #setter: (value: boolean) => void
 
   constructor(
     public readonly serverChannel: MessagePort,
@@ -25,26 +27,33 @@ class UPClientChannel extends EventEmitter3<UPClientChannelEvents> {
     public readonly element: HTMLIFrameElement | null,
     public readonly id: string,
     public readonly server: JSONRPCServer,
-    private readonly getter: () => boolean,
-    private readonly setter: (value: boolean) => void
+    getter: () => boolean,
+    setter: (value: boolean) => void
   ) {
     super()
+    this.#getter = getter
+    this.#setter = setter
+  }
+
+  get accounts(): (`0x${string}` | '')[] {
+    const value = this.#accounts
+    return [...value]
   }
 
   emit<T extends EventEmitter.EventNames<UPClientChannelEvents>>(event: T, ...args: EventEmitter.EventArgs<UPClientChannelEvents, T>): boolean {
-    if (this.buffered) {
-      this.buffered.push([event, args])
+    if (this.#buffered) {
+      this.#buffered.push([event, args])
       return false
     }
     return super.emit(event, ...args)
   }
 
   resume(delay = 0) {
-    const buffered = this.buffered
+    const buffered = this.#buffered
     if (!buffered) {
       return
     }
-    this.buffered = undefined
+    this.#buffered = undefined
     setTimeout(() => {
       while (buffered.length > 0) {
         const val = buffered.shift()
@@ -67,18 +76,18 @@ class UPClientChannel extends EventEmitter3<UPClientChannelEvents> {
 
   public async allowAccounts(enabled: boolean, [primary, ..._page]: (`0x${string}` | '')[], chainId: number): Promise<void> {
     serverLog('allowAccounts', primary, _page)
-    const primaryChanged = this.accounts[0] !== primary || this.getter() !== enabled
-    const pageChanged = this.accounts.slice(1).some((value, index) => value !== _page[index])
-    this.setter(enabled)
+    const primaryChanged = this.#accounts[0] !== primary || this.#getter() !== enabled
+    const pageChanged = this.#accounts.slice(1).some((value, index) => value !== _page[index])
+    this.#setter(enabled)
     if (primaryChanged || pageChanged) {
-      this.accounts[0] = primary
-      this.accounts.length = 1 + (_page.length || 0)
+      this.#accounts[0] = primary
+      this.#accounts.length = 1 + (_page.length || 0)
       for (let i = 0; i < (_page?.length || 0); i++) {
-        this.accounts[i + 1] = _page[i]
+        this.#accounts[i + 1] = _page[i]
       }
-      await this.send('accountsChanged', [this.getter() ? primary : '', ...this.accounts.slice(1)])
+      await this.send('accountsChanged', [this.#getter() ? primary : '', ...this.#accounts.slice(1)])
       if (primaryChanged) {
-        this.emit(this.getter() && this.accounts[0] ? 'connected' : 'disconnected')
+        this.emit(this.#getter() && this.#accounts[0] ? 'connected' : 'disconnected')
       }
       if (pageChanged) {
         this.emit('injected', [..._page])
@@ -88,28 +97,28 @@ class UPClientChannel extends EventEmitter3<UPClientChannelEvents> {
   }
 
   public get enabled(): boolean {
-    return this.getter()
+    return this.#getter()
   }
 
   public set enabled(value: boolean) {
     if (value !== this.enabled) {
-      this.setter(value)
-      this.send('accountsChanged', [this.getter() ? this.accounts[0] : '', ...this.accounts.slice(1)])
-      this.emit(this.getter() && this.accounts[0] ? 'connected' : 'disconnected')
+      this.#setter(value)
+      this.send('accountsChanged', [this.#getter() ? this.accounts[0] : '', ...this.accounts.slice(1)])
+      this.emit(this.#getter() && this.accounts[0] ? 'connected' : 'disconnected')
     }
   }
 
   public async setChainId(chainId: number): Promise<void> {
-    if (this.chainId !== chainId) {
-      this.chainId = chainId
+    if (this.#chainId !== chainId) {
+      this.#chainId = chainId
       await this.send('chainChanged', [chainId])
       this.emit('chainChanged', chainId)
     }
   }
 
   public async setRpcUrls(rpcUrls: string[]): Promise<void> {
-    if (rpcUrls.length !== this.rpcUrls.length || rpcUrls.some((url, index) => url !== this.rpcUrls[index])) {
-      this.rpcUrls = rpcUrls
+    if (rpcUrls.length !== this.#rpcUrls.length || rpcUrls.some((url, index) => url !== this.#rpcUrls[index])) {
+      this.#rpcUrls = rpcUrls
       await this.send('rpcUrlsChanged', rpcUrls)
     }
   }
@@ -138,81 +147,120 @@ interface GlobalProviderEvents {
 }
 
 export class GlobalProvider extends EventEmitter3<GlobalProviderEvents> {
-  constructor(
-    public readonly channels: Map<string, UPClientChannel>,
-    private readonly options: GlobalProviderOptions
-  ) {
+  #options: GlobalProviderOptions
+  #channels: Map<string, UPClientChannel>
+
+  constructor(channels: Map<string, UPClientChannel>, options: GlobalProviderOptions) {
     super()
+    this.#channels = channels
+    this.#options = options
   }
+
   close() {
-    if (this.options.providerHandler) {
-      window.removeEventListener('message', this.options.providerHandler)
+    if (this.#options.providerHandler) {
+      window.removeEventListener('message', this.#options.providerHandler)
     }
   }
+
   get provider(): any {
-    return this.options.provider
+    return this.#options.provider
   }
+
   get accounts(): (`0x${string}` | '')[] {
-    return [this.options.primary || '', ...this.options.accounts.slice(1)]
+    return [this.#options.primary || '', ...this.#options.accounts.slice(1)]
   }
-  getChannel(id: string | Window | HTMLIFrameElement | null): UPClientChannel | null {
+
+  /**
+   * Get a map of all clients by their ID.
+   */
+  get channels(): Map<string, UPClientChannel> {
+    return new Map(this.#channels)
+  }
+
+  /**
+   * Find the client for the element, window or proxy object of the client.
+   * @param _id
+   * @returns actual UPClientChannel
+   */
+  getChannel(_id: string | Window | HTMLIFrameElement | UPClientChannel | null): UPClientChannel | null {
+    let id = _id
     if (typeof id === 'string') {
-      return this.channels.get(id) || null
+      return this.#channels.get(id) || null
     }
-    for (const item of this.channels.values()) {
+    if ('element' in (id as any) || 'window' in (id as any)) {
+      id = (id as UPClientChannel).element || (id as UPClientChannel).window
+    }
+    for (const item of this.#channels.values()) {
       if (item.window === id || item.element === id) {
         return item
       }
     }
     return null
   }
+
+  /**
+   * Inject additional addresses into the client's accountsChanged event.
+   * Account[0] will be linked to the signed when making transactions.
+   * Starting at Account[1] is where additional addresses are injected.
+   * This routine injects on all connections. You can also inject using
+   * the channel's allowAccounts method.
+   * @param page list of addresses
+   */
   async injectAddresses(...page: (`0x${string}` | '')[]) {
-    const changed = this.options.accounts.slice(1).some((value, index) => page?.[index] !== value)
+    const changed = this.#options.accounts.slice(1).some((value, index) => page?.[index] !== value)
     if (changed) {
-      this.options.accounts = [this.options.primary, ...page]
+      this.#options.accounts = [this.#options.primary, ...page]
       for (const item of this.channels.values()) {
-        await item.allowAccounts(item.enabled, [this.options.primary, ...this.options.accounts.slice(1)], this.options.chainId)
+        await item.allowAccounts(item.enabled, [this.#options.primary, ...this.#options.accounts.slice(1)], this.#options.chainId)
       }
     }
   }
+
+  /**
+   * Connect this provider externally. This will be called during initial construction
+   * but can be called at a later time if desired to re-initialize or tear down
+   * the connection.
+   * @param _provider
+   * @param _rpcUrls
+   */
   async setupProvider(_provider: any, _rpcUrls: string | string[]): Promise<void> {
-    this.options.promise = new Promise<void>((resolve, reject) => {
+    this.#options.promise = new Promise<void>((resolve, reject) => {
       ;(async () => {
         try {
-          this.options.provider = _provider
+          this.#options.provider = _provider
           const newRpcUrls = Array.isArray(_rpcUrls) ? _rpcUrls : [_rpcUrls]
-          if (newRpcUrls.some((url, index) => url !== this.options.rpcUrls[index])) {
-            this.options.rpcUrls = newRpcUrls
+          if (newRpcUrls.some((url, index) => url !== this.#options.rpcUrls[index])) {
+            this.#options.rpcUrls = newRpcUrls
             for (const item of this.channels.values()) {
-              await item.setRpcUrls(this.options.rpcUrls)
+              await item.setRpcUrls(this.#options.rpcUrls)
             }
           }
-          const _chainId = await this.options.provider.request({
+          const _chainId = await this.#options.provider.request({
             method: 'eth_chainId',
             params: [],
           })
           for (const item of this.channels.values()) {
-            await item.setChainId(this.options.chainId)
+            await item.setChainId(this.#options.chainId)
           }
-          const _accounts = await this.options.provider.request({
+          const _accounts = await this.#options.provider.request({
             method: 'eth_accounts',
             params: [],
           })
           const _primary = _accounts[0] || ''
-          if (this.options.primary !== _primary || this.options.chainId !== _chainId) {
-            this.options.chainId = _chainId
-            this.options.primary = _primary
-            this.options.accounts[0] = _primary
+          if (this.#options.primary !== _primary || this.#options.chainId !== _chainId) {
+            this.#options.chainId = _chainId
+            this.#options.primary = _primary
+            this.#options.accounts[0] = _primary
             for (const item of this.channels.values()) {
-              await item.allowAccounts(item.enabled, [this.options.primary, ...this.options.accounts.slice(1)], this.options.chainId)
+              await item.allowAccounts(item.enabled, [this.#options.primary, ...this.#options.accounts.slice(1)], this.#options.chainId)
             }
           }
-          this.options.provider.on('accountsChanged', async ([_primary]: [`0x${string}` | '']) => {
-            if (this.options.primary !== _primary) {
-              this.options.primary = _primary
-              this.options.accounts[0] = _primary
+          this.#options.provider.on('accountsChanged', async ([_primary]: [`0x${string}` | '']) => {
+            if (this.#options.primary !== _primary) {
+              this.#options.primary = _primary
+              this.#options.accounts[0] = _primary
               for (const item of this.channels.values()) {
-                await item.allowAccounts(item.enabled, [this.options.primary, ...this.options.accounts.slice(1)], this.options.chainId)
+                await item.allowAccounts(item.enabled, [this.#options.primary, ...this.#options.accounts.slice(1)], this.#options.chainId)
               }
             }
           })
@@ -233,7 +281,7 @@ let globalUPProvider: GlobalProvider | null = null
  * @param id how to find the UPClientChannel instance (this can be the id, frame (not the frame's element id) or window)
  * @returns UPClientChannel
  */
-function getUPProviderChannel(id: string | Window | HTMLIFrameElement | null): UPClientChannel | null {
+function getUPProviderChannel(id: string | Window | HTMLIFrameElement | UPClientChannel | null): UPClientChannel | null {
   if (id == null) {
     return null
   }
