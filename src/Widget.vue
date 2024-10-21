@@ -72,40 +72,48 @@ function donate() {
 <template>
   <div style="width: 100%; max-width: 100vw">
     <section class="section">
-      <h1 class="is-size-10 title">Content within Widget</h1>
+      <h1 class="is-size-4 title">Content within Widget</h1>
     </section>
+
     <div class="container">
       <div class="notification is-danger" v-if="errors.length > 0">
         <button class="delete" @click="errors = []"></button>
         <pre v-for="(error, index) in errors" :key="index">{{ error.stack }}</pre>
       </div>
-      <div class="box" style="width: 100%; max-width: 100vw">
-        <!-- Chain Field -->
-        <div class="field">
-          <label class="label">Chain</label>
-          <div class="control">
-            <input class="input is-static" type="text" :value="chainId" readonly />
-          </div>
+    </div>
+
+    <div class="box" style="width: 100%; max-width: 100vw">
+      <!-- Chain Field -->
+      <div class="field">
+        <label class="label">Chain</label>
+        <div class="control">
+          <input class="input is-static" type="text" :value="chainId" readonly />
         </div>
-        <!-- Account0 Field -->
-        <div v-for="(address, index) in accounts || []" :key="address" class="field">
-          <label class="label">Account[{{ index }}]</label>
-          <div class="control">
-            <input class="input is-static" type="text" :value="address" readonly />
-          </div>
+      </div>
+
+      <!-- Account Fields -->
+      <div v-for="(address, index) in accounts || []" :key="address" class="field">
+        <label class="label">Account[{{ index }}]</label>
+        <div class="control">
+          <!-- Ensure long addresses wrap correctly on narrow screens -->
+          <input class="input is-static" type="text" :value="address" readonly style="white-space: nowrap; overflow-x: auto; word-wrap: break-word" />
         </div>
-        <div class="field is-grouped is-grouped-right">
-          <p class="control">
-            <input v-model="amountText" class="input" type="text" placeholder="Enter amount" />
-          </p>
-          <p class="control">
-            <button class="button is-primary is-rounded" type="submit" :class="{ 'is-loading': false }" :disabled="false" data-testid="upload-button" @click.stop="donate">Donate</button>
-          </p>
-        </div>
-        <p class="help is-danger has-background-white" v-if="error">
-          {{ error }}
+      </div>
+
+      <!-- Amount Input and Button -->
+      <div class="field is-grouped is-grouped-right is-flex-wrap-wrap">
+        <p class="control is-expanded">
+          <input v-model="amountText" class="input" type="text" placeholder="Enter amount" />
+        </p>
+        <p class="control">
+          <!-- Ensure button takes full width on small screens -->
+          <button class="button is-primary is-rounded is-fullwidth" type="submit" :class="{ 'is-loading': false }" :disabled="false" data-testid="upload-button" @click.stop="donate">Donate</button>
         </p>
       </div>
+
+      <p class="help is-danger has-background-white" v-if="error">
+        {{ error }}
+      </p>
     </div>
   </div>
 </template>
