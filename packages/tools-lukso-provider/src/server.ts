@@ -60,6 +60,7 @@ interface UPClientChannel {
    * Remove all listeners, or those of the specified event.
    */
   removeAllListeners(event?: EventEmitter.EventNames<UPClientChannelEvents>): this
+
   get accounts(): (`0x${string}` | '')[]
   resume(delay: number): void
   send(method: string, params: unknown[]): Promise<void>
@@ -566,7 +567,7 @@ function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]): 
             result: response,
           } as JSONRPCSuccessResponse
         } catch (error) {
-          if (/method (.*?) not supported./.test((error as { message: string }).message || '')) {
+          if (!/method (.*?) not supported./.test((error as { message: string }).message || '')) {
             console.error(error)
             const response = {
               id,
