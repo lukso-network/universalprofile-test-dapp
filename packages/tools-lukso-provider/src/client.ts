@@ -182,6 +182,14 @@ async function findDestination(authURL: string | Window | undefined | null, remo
   return up
 }
 
+/**
+ * Create clientUPProvider. This can be used like a normal window.ethereum or window.lukso provider.
+ * It will on initialization look for a connection to a global provider.
+ *
+ * @param authURL Optionally put a URL to a authentication provider to provide the global provider.
+ * @param search If false then don't search but take the passed in value as is.
+ * @returns the client UPProvider
+ */
 export function createClientUPProvider(authURL?: string | Window, search = true): UPClientProvider {
   let chainId = 0
   let accounts: (`0x${string}` | '')[] = []

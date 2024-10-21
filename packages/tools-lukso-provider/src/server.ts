@@ -227,6 +227,12 @@ export class GlobalProvider extends EventEmitter3<GlobalProviderEvents> {
 
 let globalUPProvider: GlobalProvider | null = null
 
+/**
+ * Global method to find channel in case `up-channel-connected` event was missed.
+ *
+ * @param id how to find the UPClientChannel instance (this can be the id, frame (not the frame's element id) or window)
+ * @returns UPClientChannel
+ */
 function getUPProviderChannel(id: string | Window | HTMLIFrameElement | null): UPClientChannel | null {
   if (id == null) {
     return null
@@ -237,11 +243,22 @@ function getUPProviderChannel(id: string | Window | HTMLIFrameElement | null): U
   return globalUPProvider.getChannel(id)
 }
 
+/**
+ * Install a global UPProvider inside of the particular window which will listen for client
+ * connections and establish them. It will fire `up-channel-connected` on the particular iframe if it's reachable.
+ * It will fire a local `channelCreated` event as well.
+ *
+ * @param _provider the initial provider to proxy
+ * @param _rpcUrls rpc urls to give to the clients to locally connect for non eth_sendTransaction and so on.
+ * @returns The global provider and event sing for `channelCreated` events.
+ */
 function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]): GlobalProvider {
   if (globalUPProvider) {
     return globalUPProvider
   }
   const channels = new Map<string, UPClientChannel>()
+
+  // Allow for late initialization of class properties.
   const options: GlobalProviderOptions = {
     provider: _provider ?? null,
     rpcUrls: Array.isArray(_rpcUrls) ? _rpcUrls : _rpcUrls != null ? [_rpcUrls] : [],
@@ -270,12 +287,15 @@ function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]): 
       const serverChannel = event.ports[0]
       const server = new JSONRPCServer()
       let enabled = false
+
       // Server handler to forward requests to the provider
       if (previous) {
         channelId = previous.id
       } else {
         channelId = uuidv4()
       }
+
+      // Wrapper for representation of client connection inside of global provider space.
       const channel_ = new UPClientChannel(
         serverChannel,
         event.source as Window,
@@ -287,6 +307,7 @@ function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]): 
           enabled = value
         }
       )
+
       server.applyMiddleware(async (next, request) => {
         await options.promise
         const { method: _method, params: _params, id, jsonrpc } = request
@@ -368,6 +389,7 @@ function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]): 
         serverLog('request', request)
         return await next(request)
       })
+
       const channelHandler = (event: MessageEvent) => {
         if (event.data.type === 'upProvider:windowInitialized') {
           serverLog('channel created', event.data.type, event.data)
@@ -410,6 +432,7 @@ function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]): 
           console.error('Error parsing JSON RPC request', error, event)
         }
       }
+
       channels.set(channelId, channel_)
       serverLog('server hasProvider', event.data, event.ports)
       serverChannel.addEventListener('message', channelHandler)
