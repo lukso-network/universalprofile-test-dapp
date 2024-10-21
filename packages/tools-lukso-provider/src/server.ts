@@ -13,7 +13,65 @@ interface UPClientChannelEvents {
   injected: (accounts: (`0x${string}` | '')[]) => void
 }
 
-class UPClientChannel extends EventEmitter3<UPClientChannelEvents> {
+interface UPClientChannel {
+  readonly window: Window
+  readonly element: HTMLIFrameElement | null
+  readonly id: string
+
+  /**
+   * Return an array listing the events for which the emitter has registered
+   * listeners.
+   */
+  eventNames(): Array<EventEmitter.EventNames<UPClientChannelEvents>>
+
+  /**
+   * Return the listeners registered for a given event.
+   */
+  listeners<T extends EventEmitter.EventNames<UPClientChannelEvents>>(event: T): Array<EventEmitter.EventListener<UPClientChannelEvents, T>>
+
+  /**
+   * Return the number of listeners listening to a given event.
+   */
+  listenerCount(event: EventEmitter.EventNames<UPClientChannelEvents>): number
+
+  /**
+   * Calls each of the listeners registered for a given event.
+   */
+  emit<T extends EventEmitter.EventNames<UPClientChannelEvents>>(event: T, ...args: EventEmitter.EventArgs<UPClientChannelEvents, T>): boolean
+
+  /**
+   * Add a listener for a given event.
+   */
+  on<T extends EventEmitter.EventNames<UPClientChannelEvents>>(event: T, fn: EventEmitter.EventListener<UPClientChannelEvents, T>, context?: any): this
+  addListener<T extends EventEmitter.EventNames<UPClientChannelEvents>>(event: T, fn: EventEmitter.EventListener<UPClientChannelEvents, T>, context?: any): this
+
+  /**
+   * Add a one-time listener for a given event.
+   */
+  once<T extends EventEmitter.EventNames<UPClientChannelEvents>>(event: T, fn: EventEmitter.EventListener<UPClientChannelEvents, T>, context?: any): this
+
+  /**
+   * Remove the listeners of a given event.
+   */
+  removeListener<T extends EventEmitter.EventNames<UPClientChannelEvents>>(event: T, fn?: EventEmitter.EventListener<UPClientChannelEvents, T>, context?: any, once?: boolean): this
+  off<T extends EventEmitter.EventNames<UPClientChannelEvents>>(event: T, fn?: EventEmitter.EventListener<UPClientChannelEvents, T>, context?: any, once?: boolean): this
+
+  /**
+   * Remove all listeners, or those of the specified event.
+   */
+  removeAllListeners(event?: EventEmitter.EventNames<UPClientChannelEvents>): this
+  get accounts(): (`0x${string}` | '')[]
+  resume(delay: number): void
+  send(method: string, params: unknown[]): Promise<void>
+  allowAccounts(enabled: boolean, [primary, ..._page]: (`0x${string}` | '')[], chainId: number): Promise<void>
+  get enabled(): boolean
+  set enabled(value: boolean)
+  setChainId(chainId: number): Promise<void>
+  setRpcUrls(rpcUrls: string[]): Promise<void>
+  close(): void
+}
+
+class _UPClientChannel extends EventEmitter3<UPClientChannelEvents> implements UPClientChannel {
   #accounts: (`0x${string}` | '')[] = []
   #chainId = 0
   #rpcUrls: string[] = []
@@ -150,7 +208,88 @@ interface GlobalProviderEvents {
   channelCreated: (id: HTMLIFrameElement | Window | string, channel: UPClientChannel) => void
 }
 
-export class GlobalProvider extends EventEmitter3<GlobalProviderEvents> {
+interface GlobalProvider {
+  /**
+   * Return an array listing the events for which the emitter has registered
+   * listeners.
+   */
+  eventNames(): Array<EventEmitter.EventNames<GlobalProviderEvents>>
+
+  /**
+   * Return the listeners registered for a given event.
+   */
+  listeners<T extends EventEmitter.EventNames<GlobalProviderEvents>>(event: T): Array<EventEmitter.EventListener<GlobalProviderEvents, T>>
+
+  /**
+   * Return the number of listeners listening to a given event.
+   */
+  listenerCount(event: EventEmitter.EventNames<GlobalProviderEvents>): number
+
+  /**
+   * Calls each of the listeners registered for a given event.
+   */
+  emit<T extends EventEmitter.EventNames<GlobalProviderEvents>>(event: T, ...args: EventEmitter.EventArgs<GlobalProviderEvents, T>): boolean
+
+  /**
+   * Add a listener for a given event.
+   */
+  on<T extends EventEmitter.EventNames<GlobalProviderEvents>>(event: T, fn: EventEmitter.EventListener<GlobalProviderEvents, T>, context?: any): this
+  addListener<T extends EventEmitter.EventNames<GlobalProviderEvents>>(event: T, fn: EventEmitter.EventListener<GlobalProviderEvents, T>, context?: any): this
+
+  /**
+   * Add a one-time listener for a given event.
+   */
+  once<T extends EventEmitter.EventNames<GlobalProviderEvents>>(event: T, fn: EventEmitter.EventListener<GlobalProviderEvents, T>, context?: any): this
+
+  /**
+   * Remove the listeners of a given event.
+   */
+  removeListener<T extends EventEmitter.EventNames<GlobalProviderEvents>>(event: T, fn?: EventEmitter.EventListener<GlobalProviderEvents, T>, context?: any, once?: boolean): this
+  off<T extends EventEmitter.EventNames<GlobalProviderEvents>>(event: T, fn?: EventEmitter.EventListener<GlobalProviderEvents, T>, context?: any, once?: boolean): this
+
+  /**
+   * Remove all listeners, or those of the specified event.
+   */
+  removeAllListeners(event?: EventEmitter.EventNames<GlobalProviderEvents>): this
+
+  close(): void
+
+  get provider(): any
+  get accounts(): (`0x${string}` | '')[]
+
+  /**
+   * Get a map of all clients by their ID.
+   */
+  get channels(): Map<string, UPClientChannel>
+
+  /**
+   * Find the client for the element, window or proxy object of the client.
+   * @param _id
+   * @returns actual UPClientChannel
+   */
+  getChannel(_id: string | Window | HTMLIFrameElement | UPClientChannel | null): UPClientChannel | null
+
+  /**
+   * Inject additional addresses into the client's accountsChanged event.
+   * Account[0] will be linked to the signed when making transactions.
+   * Starting at Account[1] is where additional addresses are injected.
+   * This routine injects on all connections. You can also inject using
+   * the channel's allowAccounts method.
+   * @param page list of addresses
+   */
+  injectAddresses(...page: (`0x${string}` | '')[]): Promise<void>
+
+  /**
+   * Connect this provider externally. This will be called during initial construction
+   * but can be called at a later time if desired to re-initialize or tear down
+   * the connection.
+   * @param _provider
+   * @param _rpcUrls
+   */
+  setupProvider(_provider: any, _rpcUrls: string | string[]): Promise<void>
+}
+
+class _GlobalProvider extends EventEmitter3<GlobalProviderEvents> {
   #options: GlobalProviderOptions
   #channels: Map<string, UPClientChannel>
 
@@ -319,7 +458,7 @@ function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]): 
     accounts: [],
     promise: Promise.resolve(),
   }
-  globalUPProvider = new GlobalProvider(channels, options)
+  globalUPProvider = new _GlobalProvider(channels, options)
 
   serverLog('server listen', window.location.href, window)
 
@@ -348,7 +487,7 @@ function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]): 
       }
 
       // Wrapper for representation of client connection inside of global provider space.
-      const channel_ = new UPClientChannel(
+      const channel_ = new _UPClientChannel(
         serverChannel,
         event.source as Window,
         iframe,
@@ -499,4 +638,4 @@ function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]): 
   return globalUPProvider
 }
 
-export { UPClientChannel, getUPProviderChannel, createGlobalUPProvider }
+export { type UPClientChannel, getUPProviderChannel, createGlobalUPProvider }

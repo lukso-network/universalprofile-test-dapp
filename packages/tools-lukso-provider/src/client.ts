@@ -1,6 +1,6 @@
 import { JSONRPCClient, JSONRPCParams } from 'json-rpc-2.0'
 import { v4 as uuidv4 } from 'uuid'
-import EventEmitter3 from 'eventemitter3'
+import EventEmitter3, { EventEmitter } from 'eventemitter3'
 import debug from 'debug'
 
 const clientLog = debug('upProvider:client')
@@ -35,7 +35,58 @@ type UPClientProviderOptions = {
 }
 
 const pendingRequests = new Map<string, RequestQueueItem>()
-export class UPClientProvider extends EventEmitter3<UPClientProviderEvents> {
+
+interface UPClientProvider {
+  /**
+   * Return an array listing the events for which the emitter has registered
+   * listeners.
+   */
+  eventNames(): Array<EventEmitter.EventNames<UPClientProviderEvents>>
+
+  /**
+   * Return the listeners registered for a given event.
+   */
+  listeners<T extends EventEmitter.EventNames<UPClientProviderEvents>>(event: T): Array<EventEmitter.EventListener<UPClientProviderEvents, T>>
+
+  /**
+   * Return the number of listeners listening to a given event.
+   */
+  listenerCount(event: EventEmitter.EventNames<UPClientProviderEvents>): number
+
+  /**
+   * Calls each of the listeners registered for a given event.
+   */
+  emit<T extends EventEmitter.EventNames<UPClientProviderEvents>>(event: T, ...args: EventEmitter.EventArgs<UPClientProviderEvents, T>): boolean
+
+  /**
+   * Add a listener for a given event.
+   */
+  on<T extends EventEmitter.EventNames<UPClientProviderEvents>>(event: T, fn: EventEmitter.EventListener<UPClientProviderEvents, T>, context?: any): this
+  addListener<T extends EventEmitter.EventNames<UPClientProviderEvents>>(event: T, fn: EventEmitter.EventListener<UPClientProviderEvents, T>, context?: any): this
+
+  /**
+   * Add a one-time listener for a given event.
+   */
+  once<T extends EventEmitter.EventNames<UPClientProviderEvents>>(event: T, fn: EventEmitter.EventListener<UPClientProviderEvents, T>, context?: any): this
+
+  /**
+   * Remove the listeners of a given event.
+   */
+  removeListener<T extends EventEmitter.EventNames<UPClientProviderEvents>>(event: T, fn?: EventEmitter.EventListener<UPClientProviderEvents, T>, context?: any, once?: boolean): this
+  off<T extends EventEmitter.EventNames<UPClientProviderEvents>>(event: T, fn?: EventEmitter.EventListener<UPClientProviderEvents, T>, context?: any, once?: boolean): this
+
+  /**
+   * Remove all listeners, or those of the specified event.
+   */
+  removeAllListeners(event?: EventEmitter.EventNames<UPClientProviderEvents>): this
+
+  request(method: string, params: JSONRPCParams, clientParams: any): Promise<any>
+
+  get chainId(): number
+
+  get accounts(): (`0x${string}` | '')[]
+}
+class _UPClientProvider extends EventEmitter3<UPClientProviderEvents> {
   readonly #options: UPClientProviderOptions
   constructor(options: any) {
     super()
@@ -180,7 +231,7 @@ async function findDestination(authURL: string | Window | undefined | null, remo
  * @param search If false then don't search but take the passed in value as is.
  * @returns the client UPProvider
  */
-export function createClientUPProvider(authURL?: string | Window, search = true): UPClientProvider {
+function createClientUPProvider(authURL?: string | Window, search = true): UPClientProvider {
   let chainId = 0
   let accounts: (`0x${string}` | '')[] = []
   let rpcUrls: string[] = []
@@ -196,7 +247,7 @@ export function createClientUPProvider(authURL?: string | Window, search = true)
     startupPromise,
   }
 
-  const remote = new UPClientProvider(options)
+  const remote = new _UPClientProvider(options)
   let searchPromise: Promise<UPClientProvider> | null
 
   const doSearch = async (client: JSONRPCClient): Promise<UPClientProvider> => {
@@ -354,3 +405,5 @@ export function createClientUPProvider(authURL?: string | Window, search = true)
 
   return remote
 }
+
+export { type UPClientProvider, createClientUPProvider }
