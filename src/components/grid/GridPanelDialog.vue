@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { TokenInfo } from '@/helpers/tokenUtils'
 import { getState } from '@/stores'
-import { createGlobalUPProvider, UpClientChannel } from '@lukso/embedded-provider'
+import { createGlobalUPProvider, UPClientChannel } from '@lukso/embedded-provider'
 import { ref, watch } from 'vue'
 import LSPSelect from '@/components/shared/LSPSelect.vue'
 
 type Props = {
-  channel?: UpClientChannel | null
+  channel?: UPClientChannel | null
 }
 
 const globalProvider = createGlobalUPProvider()
@@ -20,7 +20,6 @@ function handlePageAddress(info: TokenInfo) {
 }
 function updateProvider() {
   const channel = props.channel || null
-  console.log('watch panel', enabled.value, channel != null, channel?.enabled || false, pageAddress.value)
   if (channel) {
     channel.allowAccounts(enabled.value, [getState('address'), pageAddress.value], getState('chainId'))
   }

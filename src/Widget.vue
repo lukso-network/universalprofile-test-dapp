@@ -31,7 +31,6 @@ web3.value.eth
     errors.value.push(error)
   })
 window.lukso?.on('accountsChanged', (_accounts: (`0x${string}` | '')[]) => {
-  console.log('accountChanged event', _accounts)
   accounts.value = _accounts
 })
 </script>

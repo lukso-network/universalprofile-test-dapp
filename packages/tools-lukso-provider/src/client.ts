@@ -1,8 +1,11 @@
 import { JSONRPCClient, JSONRPCParams } from 'json-rpc-2.0'
 import { v4 as uuidv4 } from 'uuid'
 import EventEmitter3 from 'eventemitter3'
+import debug from 'debug'
 
-type Item = {
+const clientLog = debug('upProvider:client')
+
+type RequestQueueItem = {
   resolve: () => unknown
   reject: (reason: unknown) => unknown
   sent: boolean
@@ -11,7 +14,7 @@ type Item = {
   params: unknown[]
 }
 
-interface RemoteWalletEvents {
+interface UPClientProviderEvents {
   connected: () => void
   disconnected: () => void
   accountsChanged: (accounts: (`0x${string}` | '')[]) => void
@@ -21,7 +24,7 @@ interface RemoteWalletEvents {
   rpcUrls: (rpcUrls: string[]) => void
 }
 
-type RemoteWalletOptions = {
+type UPClientProviderOptions = {
   client?: JSONRPCClient
   chainId: () => number
   accounts: () => (`0x${string}` | '')[]
@@ -31,9 +34,9 @@ type RemoteWalletOptions = {
   init?: { chainId: number; accounts: (`0x${string}` | '')[]; rpcUrls: string[] }
 }
 
-const pendingRequests = new Map<string, Item>()
-export class RemoteWallet extends EventEmitter3<RemoteWalletEvents> {
-  constructor(private options: RemoteWalletOptions) {
+const pendingRequests = new Map<string, RequestQueueItem>()
+export class UPClientProvider extends EventEmitter3<UPClientProviderEvents> {
+  constructor(private options: UPClientProviderOptions) {
     super()
   }
 
@@ -63,14 +66,14 @@ export class RemoteWallet extends EventEmitter3<RemoteWalletEvents> {
   }
 }
 
-let walletWindow: RemoteWallet | null = null
+let singletonUPClientProvider: UPClientProvider | null = null
 
-async function testWindow(_up: Window | undefined | null, remote: RemoteWallet, options: RemoteWalletOptions): Promise<RemoteWallet> {
+async function testWindow(_up: Window | undefined | null, remote: UPClientProvider, options: UPClientProviderOptions): Promise<UPClientProvider> {
   const up = _up || (typeof window !== 'undefined' ? window : undefined)
   if (!up) {
     throw new Error('No UP found')
   }
-  return new Promise<RemoteWallet>((resolve, reject) => {
+  return new Promise<UPClientProvider>((resolve, reject) => {
     let timeout: number | NodeJS.Timeout = 0
     const channel = new MessageChannel()
 
@@ -78,7 +81,7 @@ async function testWindow(_up: Window | undefined | null, remote: RemoteWallet, 
       if (event.data?.type === 'upProvider:windowInitialize') {
         const { chainId, accounts, rpcUrls } = event.data
 
-        console.log('client init', event.data, up)
+        clientLog('client init', event.data, up)
         up.removeEventListener('message', testFn)
         if (timeout) {
           clearTimeout(timeout)
@@ -87,7 +90,7 @@ async function testWindow(_up: Window | undefined | null, remote: RemoteWallet, 
         options.clientChannel = channel.port1
         options.window = up
         options.init = { chainId, accounts, rpcUrls }
-        console.log('client connected', event.data.type, event.data)
+        clientLog('client connected', event.data.type, event.data)
         options.clientChannel.postMessage({ type: 'upProvider:windowInitialized', chainId, accounts, rpcUrls })
         resolve(remote)
       }
@@ -96,7 +99,7 @@ async function testWindow(_up: Window | undefined | null, remote: RemoteWallet, 
     channel.port1.addEventListener('message', testFn)
     channel.port1.start()
     window.addEventListener('message', testFn)
-    console.log('client', 'send find wallet', up.location.href, up)
+    clientLog('client', 'send find wallet', up.location.href, up)
     up.postMessage('upProvider:hasProvider', '*', [channel.port2])
 
     timeout = setTimeout(() => {
@@ -104,18 +107,18 @@ async function testWindow(_up: Window | undefined | null, remote: RemoteWallet, 
       window.removeEventListener('message', testFn)
       channel.port1.removeEventListener('message', testFn)
 
-      console.log('client', 'No UP found', up.location.href, up)
+      clientLog('client', 'No UP found', up.location.href, up)
       reject(new Error('No UP found'))
     }, 1000)
   })
 }
 
-async function findUP(authURL: string | Window | undefined | null, remote: RemoteWallet, options: RemoteWalletOptions): Promise<RemoteWallet> {
-  let current = window.opener || window.parent || walletWindow
+async function findUP(authURL: string | Window | undefined | null, remote: UPClientProvider, options: UPClientProviderOptions): Promise<UPClientProvider> {
+  let current = window.opener || window.parent || singletonUPClientProvider
   if (current) {
     const up = await testWindow(current, remote, options)
     if (up) {
-      walletWindow = up
+      singletonUPClientProvider = up
       return up
     }
   }
@@ -128,16 +131,16 @@ async function findUP(authURL: string | Window | undefined | null, remote: Remot
   current = window.open(authURL, 'UE Wallet', 'width=400,height=600')
   if (current) {
     const up = await testWindow(current, remote, options)
-    if (walletWindow) {
-      walletWindow = up
+    if (singletonUPClientProvider) {
+      singletonUPClientProvider = up
       return up
     }
   }
   throw new Error('No UP found')
 }
 
-async function findDestination(authURL: string | Window | undefined | null, remote: RemoteWallet, options: RemoteWalletOptions, search = false): Promise<RemoteWallet> {
-  let up: RemoteWallet | undefined =
+async function findDestination(authURL: string | Window | undefined | null, remote: UPClientProvider, options: UPClientProviderOptions, search = false): Promise<UPClientProvider> {
+  let up: UPClientProvider | undefined =
     (typeof authURL === 'object' && authURL instanceof Window) || authURL == null
       ? await testWindow(authURL, remote, options).catch(error => {
           if (search) {
@@ -151,7 +154,7 @@ async function findDestination(authURL: string | Window | undefined | null, remo
     let retry = 3
     while (retry > 0) {
       let current: Window | undefined = window.opener && window.opener !== window ? window.opener : window.parent && window.parent !== window ? window.parent : undefined
-      console.log('search', current?.location.href)
+      clientLog('search', current?.location.href)
       while (current) {
         up = await testWindow(current, remote, options).catch(() => undefined)
         if (up) {
@@ -160,9 +163,9 @@ async function findDestination(authURL: string | Window | undefined | null, remo
         if (current === window.top) {
           break
         }
-        console.log('current', current.location.href)
+        clientLog('current', current.location.href)
         current = current.opener && current.opener !== current ? current.opener : current.parent && current.parent !== current ? current.parent : null
-        console.log('next', current?.location.href)
+        clientLog('next', current?.location.href)
       }
       if (up) {
         break
@@ -179,7 +182,7 @@ async function findDestination(authURL: string | Window | undefined | null, remo
   return up
 }
 
-export function createClientUPProvider(authURL?: string | Window, search = true): RemoteWallet {
+export function createClientUPProvider(authURL?: string | Window, search = true): UPClientProvider {
   let chainId = 0
   let accounts: (`0x${string}` | '')[] = []
   let rpcUrls: string[] = []
@@ -189,16 +192,16 @@ export function createClientUPProvider(authURL?: string | Window, search = true)
     startupResolve = resolve
   })
 
-  const options: RemoteWalletOptions = {
+  const options: UPClientProviderOptions = {
     chainId: () => chainId,
     accounts: () => accounts,
     startupPromise,
   }
 
-  const remote = new RemoteWallet(options)
-  let searchPromise: Promise<RemoteWallet> | null
+  const remote = new UPClientProvider(options)
+  let searchPromise: Promise<UPClientProvider> | null
 
-  const doSearch = async (client: JSONRPCClient): Promise<RemoteWallet> => {
+  const doSearch = async (client: JSONRPCClient): Promise<UPClientProvider> => {
     if (searchPromise) {
       return searchPromise
     }
@@ -210,7 +213,7 @@ export function createClientUPProvider(authURL?: string | Window, search = true)
       up.clientChannel?.addEventListener('message', event => {
         try {
           const response = event.data
-          console.log('client', response)
+          clientLog('client', response)
           switch (response.method) {
             case 'chainChanged':
               chainId = response.params[0]
@@ -238,6 +241,7 @@ export function createClientUPProvider(authURL?: string | Window, search = true)
                 ..._error,
                 message: `${_error.message} ${JSON.stringify(method)}(${JSON.stringify(params)})`,
               }
+              // This is a real error log (maybe goes to sentry)
               console.error('error', { error, method, params, id, jsonrpc })
               client.receive({ ...response, id: item.id })
               reject(error) // Reject in case of error
@@ -245,6 +249,7 @@ export function createClientUPProvider(authURL?: string | Window, search = true)
             pendingRequests.delete(response.id) // Clean up the request
           }
         } catch (error) {
+          // This is a real error log (maybe goes to sentry)
           console.error('Error parsing JSON RPC response', error, event)
         }
       })
@@ -281,13 +286,13 @@ export function createClientUPProvider(authURL?: string | Window, search = true)
     })
   })
 
-  const oldRequest = client.request.bind(client)
+  const request_ = client.request.bind(client)
 
   const wrapper = async (method: string, params: unknown[]) => {
     switch (method) {
       case 'eth_call':
         if (rpcUrls.length > 0) {
-          console.log('client direct rpc', rpcUrls, method, params)
+          clientLog('client direct rpc', rpcUrls, method, params)
 
           const urls = [...rpcUrls]
           const errors = []
@@ -318,6 +323,7 @@ export function createClientUPProvider(authURL?: string | Window, search = true)
 
               return result
             } catch (error) {
+              // This is a real error log (maybe goes to sentry)
               console.error('error', error)
               errors.push(error)
             }
@@ -327,7 +333,7 @@ export function createClientUPProvider(authURL?: string | Window, search = true)
           throw err
         }
     }
-    return oldRequest(method, params)
+    return request_(method, params)
   }
 
   client.request = async (method, params) => {

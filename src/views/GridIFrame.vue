@@ -3,16 +3,15 @@ import Accounts from '@/components/endpoints/Accounts.vue'
 import GridPanelDialog from '@/components/grid/GridPanelDialog.vue'
 import { computed, ref } from 'vue'
 import Notifications from '@/components/Notification.vue'
-import { UpClientChannel, createGlobalUPProvider } from '@lukso/embedded-provider'
+import { UPClientChannel, createGlobalUPProvider } from '@lukso/embedded-provider'
 
 const globalProvider = createGlobalUPProvider()
 globalProvider.on('channelCreated', () => {})
 
 const base = ref<string>(import.meta.env.BASE_URL || '/')
-console.log(base, import.meta.env)
 
-const frame1Channel = ref<UpClientChannel | null>(null)
-const frame2Channel = ref<UpClientChannel | null>(null)
+const frame1Channel = ref<UPClientChannel | null>(null)
+const frame2Channel = ref<UPClientChannel | null>(null)
 
 const hasExtension = computed(() => !!window.lukso)
 

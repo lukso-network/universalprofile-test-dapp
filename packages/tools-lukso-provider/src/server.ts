@@ -1,8 +1,10 @@
 import { JSONRPCErrorResponse, JSONRPCServer, JSONRPCSuccessResponse } from 'json-rpc-2.0'
 import { v4 as uuidv4 } from 'uuid'
 import EventEmitter3, { EventEmitter } from 'eventemitter3'
+import debug from 'debug'
 
-interface UpClientChannelEvents {
+const serverLog = debug('upProvider:server')
+interface UPClientChannelEvents {
   connected: () => void
   disconnected: () => void
   accountsChanged: (accounts: (`0x${string}` | '')[]) => void
@@ -11,11 +13,11 @@ interface UpClientChannelEvents {
   injected: (accounts: (`0x${string}` | '')[]) => void
 }
 
-class UpClientChannel extends EventEmitter3<UpClientChannelEvents> {
+class UPClientChannel extends EventEmitter3<UPClientChannelEvents> {
   public readonly accounts: (`0x${string}` | '')[] = []
   private chainId = 0
   private rpcUrls: string[] = []
-  private buffered?: Array<[keyof UpClientChannelEvents, unknown[]]> = []
+  private buffered?: Array<[keyof UPClientChannelEvents, unknown[]]> = []
 
   constructor(
     public readonly serverChannel: MessagePort,
@@ -29,7 +31,7 @@ class UpClientChannel extends EventEmitter3<UpClientChannelEvents> {
     super()
   }
 
-  emit<T extends EventEmitter.EventNames<UpClientChannelEvents>>(event: T, ...args: EventEmitter.EventArgs<UpClientChannelEvents, T>): boolean {
+  emit<T extends EventEmitter.EventNames<UPClientChannelEvents>>(event: T, ...args: EventEmitter.EventArgs<UPClientChannelEvents, T>): boolean {
     if (this.buffered) {
       this.buffered.push([event, args])
       return false
@@ -64,7 +66,7 @@ class UpClientChannel extends EventEmitter3<UpClientChannelEvents> {
   }
 
   public async allowAccounts(enabled: boolean, [primary, ..._page]: (`0x${string}` | '')[], chainId: number): Promise<void> {
-    console.log('allowAccounts', primary, _page)
+    serverLog('allowAccounts', primary, _page)
     const primaryChanged = this.accounts[0] !== primary || this.getter() !== enabled
     const pageChanged = this.accounts.slice(1).some((value, index) => value !== _page[index])
     this.setter(enabled)
@@ -132,12 +134,12 @@ type GlobalProviderOptions = {
 }
 
 interface GlobalProviderEvents {
-  channelCreated: (id: HTMLIFrameElement | Window | string, channel: UpClientChannel) => void
+  channelCreated: (id: HTMLIFrameElement | Window | string, channel: UPClientChannel) => void
 }
 
 export class GlobalProvider extends EventEmitter3<GlobalProviderEvents> {
   constructor(
-    public readonly channels: Map<string, UpClientChannel>,
+    public readonly channels: Map<string, UPClientChannel>,
     private readonly options: GlobalProviderOptions
   ) {
     super()
@@ -153,7 +155,7 @@ export class GlobalProvider extends EventEmitter3<GlobalProviderEvents> {
   get accounts(): (`0x${string}` | '')[] {
     return [this.options.primary || '', ...this.options.accounts.slice(1)]
   }
-  getChannel(id: string | Window | HTMLIFrameElement | null): UpClientChannel | null {
+  getChannel(id: string | Window | HTMLIFrameElement | null): UPClientChannel | null {
     if (typeof id === 'string') {
       return this.channels.get(id) || null
     }
@@ -225,7 +227,7 @@ export class GlobalProvider extends EventEmitter3<GlobalProviderEvents> {
 
 let globalUPProvider: GlobalProvider | null = null
 
-function getUPProviderChannel(id: string | Window | HTMLIFrameElement | null): UpClientChannel | null {
+function getUPProviderChannel(id: string | Window | HTMLIFrameElement | null): UPClientChannel | null {
   if (id == null) {
     return null
   }
@@ -239,7 +241,7 @@ function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]): 
   if (globalUPProvider) {
     return globalUPProvider
   }
-  const channels = new Map<string, UpClientChannel>()
+  const channels = new Map<string, UPClientChannel>()
   const options: GlobalProviderOptions = {
     provider: _provider ?? null,
     rpcUrls: Array.isArray(_rpcUrls) ? _rpcUrls : _rpcUrls != null ? [_rpcUrls] : [],
@@ -250,7 +252,7 @@ function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]): 
   }
   globalUPProvider = new GlobalProvider(channels, options)
 
-  console.log('server listen', window.location.href, window)
+  serverLog('server listen', window.location.href, window)
 
   // Server handler to accept new client provider connections
   options.providerHandler = (event: MessageEvent) => {
@@ -258,7 +260,7 @@ function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]): 
       let iframe: HTMLIFrameElement | null = null
       for (const element of document.querySelectorAll('iframe')) {
         if (element.contentWindow === event.source) {
-          console.log('server hasProvider', element)
+          serverLog('server hasProvider', element)
           iframe = element
           break
         }
@@ -274,7 +276,7 @@ function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]): 
       } else {
         channelId = uuidv4()
       }
-      const channel_ = new UpClientChannel(
+      const channel_ = new UPClientChannel(
         serverChannel,
         event.source as Window,
         iframe,
@@ -308,21 +310,21 @@ function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]): 
               ).params
         switch (method) {
           case 'chainChanged':
-            console.log('short circuit response', request, [options.chainId])
+            serverLog('short circuit response', request, [options.chainId])
             channel_.emit('chainChanged', options.chainId)
             return {
               ...request,
               result: [options.chainId],
             } as JSONRPCSuccessResponse
           case 'accounts':
-            console.log('short circuit response', request, [options.primary, ...channel_.accounts.slice(1)])
+            serverLog('short circuit response', request, [options.primary, ...channel_.accounts.slice(1)])
             channel_.emit('requestAccounts', [enabled ? options.primary : '', ...channel_.accounts.slice(1)])
             return {
               ...request,
               result: [enabled ? options.primary : '', ...channel_.accounts.slice(1)],
             } as JSONRPCSuccessResponse
           case 'eth_requestAccounts':
-            console.log('short circuit response', request, [options.primary, ...channel_.accounts.slice(1)])
+            serverLog('short circuit response', request, [options.primary, ...channel_.accounts.slice(1)])
             channel_.emit('requestAccounts', [enabled ? options.primary : '', ...channel_.accounts.slice(1)])
             return {
               ...request,
@@ -345,7 +347,7 @@ function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]): 
             throw new Error('Global Provider not connected')
           }
           const response = await options.provider.request({ method, params })
-          console.log('response', request, response)
+          serverLog('response', request, response)
           return {
             id,
             jsonrpc,
@@ -359,16 +361,16 @@ function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]): 
               jsonrpc,
               error,
             } as JSONRPCErrorResponse
-            console.log('response error', request, response)
+            serverLog('response error', request, response)
             return response
           }
         }
-        console.log('request', request)
+        serverLog('request', request)
         return await next(request)
       })
       const channelHandler = (event: MessageEvent) => {
         if (event.data.type === 'upProvider:windowInitialized') {
-          console.log('channel created', event.data.type, event.data)
+          serverLog('channel created', event.data.type, event.data)
           globalUPProvider?.emit('channelCreated', channel_.element || channel_.window || null, channel_)
           const destination = channel_.element || channel_.window || null
           if (destination != null) {
@@ -386,7 +388,7 @@ function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]): 
           }
           return
         }
-        console.log('server raw', event.data)
+        serverLog('server raw', event.data)
         try {
           const request = {
             ...event.data,
@@ -409,11 +411,11 @@ function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]): 
         }
       }
       channels.set(channelId, channel_)
-      console.log('server hasProvider', event.data, event.ports)
+      serverLog('server hasProvider', event.data, event.ports)
       serverChannel.addEventListener('message', channelHandler)
       serverChannel.start()
 
-      console.log('server accept', serverChannel)
+      serverLog('server accept', serverChannel)
       serverChannel?.postMessage({ type: 'upProvider:windowInitialize', chainId: options.chainId, accounts: options.accounts, rpcUrls: options.rpcUrls })
       channel_.emit('connected')
     }
@@ -422,4 +424,4 @@ function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]): 
   return globalUPProvider
 }
 
-export { UpClientChannel, getUPProviderChannel, createGlobalUPProvider }
+export { UPClientChannel, getUPProviderChannel, createGlobalUPProvider }
