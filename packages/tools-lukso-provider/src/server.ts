@@ -2,7 +2,7 @@ import { JSONRPCErrorResponse, JSONRPCServer, JSONRPCSuccessResponse } from 'jso
 import { v4 as uuidv4 } from 'uuid'
 import EventEmitter3, { EventEmitter } from 'eventemitter3'
 
-interface ChannelEntryEvents {
+interface UpClientChannelEvents {
   connected: () => void
   disconnected: () => void
   accountsChanged: (accounts: (`0x${string}` | '')[]) => void
@@ -11,11 +11,11 @@ interface ChannelEntryEvents {
   injected: (accounts: (`0x${string}` | '')[]) => void
 }
 
-class ChannelEntry extends EventEmitter3<ChannelEntryEvents> {
+class UpClientChannel extends EventEmitter3<UpClientChannelEvents> {
   public readonly accounts: (`0x${string}` | '')[] = []
   private chainId = 0
   private rpcUrls: string[] = []
-  private buffered?: Array<[keyof ChannelEntryEvents, unknown[]]> = []
+  private buffered?: Array<[keyof UpClientChannelEvents, unknown[]]> = []
 
   constructor(
     public readonly serverChannel: MessagePort,
@@ -29,7 +29,7 @@ class ChannelEntry extends EventEmitter3<ChannelEntryEvents> {
     super()
   }
 
-  emit<T extends EventEmitter.EventNames<ChannelEntryEvents>>(event: T, ...args: EventEmitter.EventArgs<ChannelEntryEvents, T>): boolean {
+  emit<T extends EventEmitter.EventNames<UpClientChannelEvents>>(event: T, ...args: EventEmitter.EventArgs<UpClientChannelEvents, T>): boolean {
     if (this.buffered) {
       this.buffered.push([event, args])
       return false
@@ -132,12 +132,12 @@ type GlobalProviderOptions = {
 }
 
 interface GlobalProviderEvents {
-  channelCreated: (id: HTMLIFrameElement | Window | string, channel: ChannelEntry) => void
+  channelCreated: (id: HTMLIFrameElement | Window | string, channel: UpClientChannel) => void
 }
 
 export class GlobalProvider extends EventEmitter3<GlobalProviderEvents> {
   constructor(
-    public readonly channels: Map<string, ChannelEntry>,
+    public readonly channels: Map<string, UpClientChannel>,
     private readonly options: GlobalProviderOptions
   ) {
     super()
@@ -153,7 +153,7 @@ export class GlobalProvider extends EventEmitter3<GlobalProviderEvents> {
   get accounts(): (`0x${string}` | '')[] {
     return [this.options.primary || '', ...this.options.accounts.slice(1)]
   }
-  getChannel(id: string | Window | HTMLIFrameElement | null): ChannelEntry | null {
+  getChannel(id: string | Window | HTMLIFrameElement | null): UpClientChannel | null {
     if (typeof id === 'string') {
       return this.channels.get(id) || null
     }
@@ -225,7 +225,7 @@ export class GlobalProvider extends EventEmitter3<GlobalProviderEvents> {
 
 let globalUPProvider: GlobalProvider | null = null
 
-function getUPProviderChannel(id: string | Window | HTMLIFrameElement | null): ChannelEntry | null {
+function getUPProviderChannel(id: string | Window | HTMLIFrameElement | null): UpClientChannel | null {
   if (id == null) {
     return null
   }
@@ -239,7 +239,7 @@ function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]): 
   if (globalUPProvider) {
     return globalUPProvider
   }
-  const channels = new Map<string, ChannelEntry>()
+  const channels = new Map<string, UpClientChannel>()
   const options: GlobalProviderOptions = {
     provider: _provider ?? null,
     rpcUrls: Array.isArray(_rpcUrls) ? _rpcUrls : _rpcUrls != null ? [_rpcUrls] : [],
@@ -274,7 +274,7 @@ function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]): 
       } else {
         channelId = uuidv4()
       }
-      const channel_ = new ChannelEntry(
+      const channel_ = new UpClientChannel(
         serverChannel,
         event.source as Window,
         iframe,
@@ -370,6 +370,20 @@ function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]): 
         if (event.data.type === 'upProvider:windowInitialized') {
           console.log('channel created', event.data.type, event.data)
           globalUPProvider?.emit('channelCreated', channel_.element || channel_.window || null, channel_)
+          const destination = channel_.element || channel_.window || null
+          if (destination != null) {
+            ;(destination as any).upChannel = channel_
+            const event = new CustomEvent('up-channel-connected', {
+              detail: {
+                channel: channel_,
+                chainId: options.chainId,
+                accounts: options.accounts,
+                rpcUrls: options.rpcUrls,
+                enabled: channel_.enabled,
+              },
+            })
+            destination.dispatchEvent(event)
+          }
           return
         }
         console.log('server raw', event.data)
@@ -408,4 +422,4 @@ function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]): 
   return globalUPProvider
 }
 
-export { ChannelEntry, getUPProviderChannel, createGlobalUPProvider }
+export { UpClientChannel, getUPProviderChannel, createGlobalUPProvider }
