@@ -35,6 +35,9 @@ web3.value.eth
 window.lukso?.on('accountsChanged', (_accounts: (`0x${string}` | '')[]) => {
   accounts.value = _accounts
 })
+window.lukso?.on('chainChanged', (_chainId: number) => {
+  chainId.value = _chainId
+})
 const amountText = ref<string>()
 const amount = ref<BigNumber>()
 const error = ref<string | null>(null)
