@@ -42,10 +42,6 @@ export class UPClientProvider extends EventEmitter3<UPClientProviderEvents> {
     this.#options = options as UPClientProviderOptions
   }
 
-  get clientChannel(): MessagePort | null {
-    return this.#options?.clientChannel || null
-  }
-
   async request(method: string, params: JSONRPCParams, clientParams: any): Promise<any> {
     await this.#options?.startupPromise
     return this.#options?.client?.request(method, params, clientParams) || null
@@ -212,7 +208,7 @@ export function createClientUPProvider(authURL?: string | Window, search = true)
       if (init) {
         ;({ chainId, accounts, rpcUrls } = init || {})
       }
-      up.clientChannel?.addEventListener('message', event => {
+      options.clientChannel?.addEventListener('message', event => {
         try {
           const response = event.data
           clientLog('client', response)
@@ -255,7 +251,7 @@ export function createClientUPProvider(authURL?: string | Window, search = true)
           console.error('Error parsing JSON RPC response', error, event)
         }
       })
-      up.clientChannel?.start()
+      options.clientChannel?.start()
       options.client = client
 
       startupResolve()
@@ -267,7 +263,7 @@ export function createClientUPProvider(authURL?: string | Window, search = true)
   }
 
   const client = new JSONRPCClient(async (jsonRPCRequest: any) => {
-    const up = await doSearch(client).then(up => {
+    await doSearch(client).then(up => {
       options.client = client
       return up
     })
@@ -284,7 +280,7 @@ export function createClientUPProvider(authURL?: string | Window, search = true)
         params,
       })
 
-      up.clientChannel?.postMessage(jsonRPCRequest)
+      options.clientChannel?.postMessage(jsonRPCRequest)
     })
   })
 

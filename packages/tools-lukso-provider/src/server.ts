@@ -18,21 +18,25 @@ class UPClientChannel extends EventEmitter3<UPClientChannelEvents> {
   #chainId = 0
   #rpcUrls: string[] = []
   #buffered?: Array<[keyof UPClientChannelEvents, unknown[]]> = []
+  #serverChannel: MessagePort
+  #server: JSONRPCServer
   readonly #getter: () => boolean
   readonly #setter: (value: boolean) => void
 
   constructor(
-    public readonly serverChannel: MessagePort,
+    serverChannel: MessagePort,
     public readonly window: Window,
     public readonly element: HTMLIFrameElement | null,
     public readonly id: string,
-    public readonly server: JSONRPCServer,
+    server: JSONRPCServer,
     getter: () => boolean,
     setter: (value: boolean) => void
   ) {
     super()
     this.#getter = getter
     this.#setter = setter
+    this.#serverChannel = serverChannel
+    this.#server = server
   }
 
   get accounts(): (`0x${string}` | '')[] {
@@ -66,7 +70,7 @@ class UPClientChannel extends EventEmitter3<UPClientChannelEvents> {
   }
 
   public async send(method: string, params: unknown[]): Promise<void> {
-    this.serverChannel.postMessage({
+    this.#serverChannel.postMessage({
       jsonrpc: '2.0',
       id: uuidv4(),
       method,
@@ -128,7 +132,7 @@ class UPClientChannel extends EventEmitter3<UPClientChannelEvents> {
     if (el.upChannel === this) {
       delete el.upChannel
     }
-    this.serverChannel.close()
+    this.#serverChannel.close()
   }
 }
 
@@ -150,10 +154,10 @@ export class GlobalProvider extends EventEmitter3<GlobalProviderEvents> {
   #options: GlobalProviderOptions
   #channels: Map<string, UPClientChannel>
 
-  constructor(channels: Map<string, UPClientChannel>, options: GlobalProviderOptions) {
+  constructor(channels: Map<string, UPClientChannel>, options: any) {
     super()
     this.#channels = channels
-    this.#options = options
+    this.#options = options as GlobalProviderOptions
   }
 
   close() {
