@@ -2,6 +2,7 @@ import { JSONRPCClient, JSONRPCParams } from 'json-rpc-2.0'
 import { v4 as uuidv4 } from 'uuid'
 import EventEmitter3, { EventEmitter } from 'eventemitter3'
 import debug from 'debug'
+import image from './UniversalProfiles_Apps_Logo_96px.svg'
 
 const clientLog = debug('upProvider:client')
 
@@ -37,6 +38,7 @@ type UPClientProviderOptions = {
 const pendingRequests = new Map<string, RequestQueueItem>()
 
 interface UPClientProvider {
+  get isUPClientProvider(): boolean
   /**
    * Return an array listing the events for which the emitter has registered
    * listeners.
@@ -91,6 +93,10 @@ class _UPClientProvider extends EventEmitter3<UPClientProviderEvents> {
   constructor(options: any) {
     super()
     this.#options = options as UPClientProviderOptions
+  }
+
+  get isUPClientProvider(): boolean {
+    return true
   }
 
   async request(method: string, params: JSONRPCParams, clientParams: any): Promise<any> {
@@ -249,6 +255,27 @@ function createClientUPProvider(authURL?: string | Window, search = true): UPCli
 
   const remote = new _UPClientProvider(options)
   let searchPromise: Promise<UPClientProvider> | null
+
+  const providerInfo = {
+    uuid: uuidv4(),
+    name: 'UE Universal Profile',
+    icon: `data:image/svg+xml,${encodeURIComponent(image)}`,
+    rdns: 'dev.lukso.auth',
+  }
+
+  const announceEvent = new CustomEvent('eip6963:announceProvider', {
+    detail: Object.freeze({ info: providerInfo, provider: remote }),
+  })
+
+  // The Wallet dispatches an announce event which is heard by
+  // the DApp code that had run earlier
+  window.dispatchEvent(announceEvent)
+
+  // The Wallet listens to the request events which may be
+  // dispatched later and re-dispatches the `EIP6963AnnounceProviderEvent`
+  window.addEventListener('eip6963:requestProvider', () => {
+    window.dispatchEvent(announceEvent)
+  })
 
   const doSearch = async (client: JSONRPCClient): Promise<UPClientProvider> => {
     if (searchPromise) {
