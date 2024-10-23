@@ -76,9 +76,9 @@ function donate() {
     </section>
 
     <div class="container">
-      <div class="notification is-danger" v-if="errors.length > 0">
+      <div v-if="errors.length > 0" class="notification is-danger">
         <button class="delete" @click="errors = []"></button>
-        <pre v-for="(error, index) in errors" :key="index">{{ error.stack }}</pre>
+        <pre v-for="(_error, index) in errors" :key="index">{{ _error.stack }}</pre>
       </div>
     </div>
 
@@ -111,7 +111,7 @@ function donate() {
         </p>
       </div>
 
-      <p class="help is-danger has-background-white" v-if="error">
+      <p v-if="error" class="help is-danger has-background-white">
         {{ error }}
       </p>
     </div>
