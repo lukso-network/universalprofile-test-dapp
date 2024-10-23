@@ -3,9 +3,9 @@ import Accounts from '@/components/endpoints/Accounts.vue'
 import GridPanelDialog from '@/components/grid/GridPanelDialog.vue'
 import { computed, ref } from 'vue'
 import Notifications from '@/components/Notification.vue'
-import { UPClientChannel, createGlobalUPProvider } from '@lukso/embedded-provider'
+import { UPClientChannel, createUPProviderConnector } from '@lukso/embedded-provider'
 
-const globalProvider = createGlobalUPProvider()
+const globalProvider = createUPProviderConnector()
 globalProvider.on('channelCreated', () => {})
 
 const base = ref<string>(import.meta.env.BASE_URL || '/')

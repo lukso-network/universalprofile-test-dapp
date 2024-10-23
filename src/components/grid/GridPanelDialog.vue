@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { TokenInfo } from '@/helpers/tokenUtils'
 import { getState } from '@/stores'
-import { createGlobalUPProvider, getUPProviderChannel, UPClientChannel } from '@lukso/embedded-provider'
+import { createUPProviderConnector, getUPProviderChannel, UPClientChannel } from '@lukso/embedded-provider'
 import { ref, toRaw, watch } from 'vue'
 import LSPSelect from '@/components/shared/LSPSelect.vue'
 
@@ -9,7 +9,7 @@ type Props = {
   channel?: UPClientChannel | null
 }
 
-const globalProvider = createGlobalUPProvider()
+const globalProvider = createUPProviderConnector()
 const props = defineProps<Props>()
 const pageAddress = ref<string>(getState('address'))
 const enabled = ref<boolean>(false)
