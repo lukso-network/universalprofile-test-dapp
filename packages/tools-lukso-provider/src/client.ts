@@ -115,9 +115,9 @@ class _UPClientProvider extends EventEmitter3<UPClientProviderEvents> {
 
 let singletonUPClientProvider: UPClientProvider | null = null
 
-async function testWindow(_up: Window | undefined | null, remote: UPClientProvider, options: UPClientProviderOptions): Promise<UPClientProvider> {
-  const up = _up || (typeof window !== 'undefined' ? window : undefined)
-  if (!up) {
+async function testWindow(up: Window | undefined | null, remote: UPClientProvider, options: UPClientProviderOptions): Promise<UPClientProvider> {
+  const _up = up || (typeof window !== 'undefined' ? window : undefined)
+  if (!_up) {
     throw new Error('No UP found')
   }
   return new Promise<UPClientProvider>((resolve, reject) => {
@@ -128,14 +128,14 @@ async function testWindow(_up: Window | undefined | null, remote: UPClientProvid
       if (event.data?.type === 'upProvider:windowInitialize') {
         const { chainId, accounts, rpcUrls } = event.data
 
-        clientLog('client init', event.data, up)
-        up.removeEventListener('message', testFn)
+        clientLog('client init', event.data, _up)
+        _up.removeEventListener('message', testFn)
         if (timeout) {
           clearTimeout(timeout)
           timeout = 0
         }
         options.clientChannel = channel.port1
-        options.window = up
+        options.window = _up
         options.init = { chainId, accounts, rpcUrls }
         clientLog('client connected', event.data.type, event.data)
         options.clientChannel.postMessage({ type: 'upProvider:windowInitialized', chainId, accounts, rpcUrls })
@@ -146,15 +146,15 @@ async function testWindow(_up: Window | undefined | null, remote: UPClientProvid
     channel.port1.addEventListener('message', testFn)
     channel.port1.start()
     window.addEventListener('message', testFn)
-    clientLog('client', 'send find wallet', up.location.href, up)
-    up.postMessage('upProvider:hasProvider', '*', [channel.port2])
+    clientLog('client', 'send find wallet', _up.location.href, _up)
+    _up.postMessage('upProvider:hasProvider', '*', [channel.port2])
 
     timeout = setTimeout(() => {
       timeout = 0
       window.removeEventListener('message', testFn)
       channel.port1.removeEventListener('message', testFn)
 
-      clientLog('client', 'No UP found', up.location.href, up)
+      clientLog('client', 'No UP found', _up.location.href, _up)
       reject(new Error('No UP found'))
     }, 1000)
   })

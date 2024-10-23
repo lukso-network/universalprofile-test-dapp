@@ -64,7 +64,7 @@ interface UPClientChannel {
   get accounts(): (`0x${string}` | '')[]
   resume(delay: number): void
   send(method: string, params: unknown[]): Promise<void>
-  allowAccounts(enabled: boolean, [primary, ..._page]: (`0x${string}` | '')[], chainId: number): Promise<void>
+  allowAccounts(enabled: boolean, [primary, ...page]: (`0x${string}` | '')[], chainId: number): Promise<void>
   get enabled(): boolean
   set enabled(value: boolean)
   setChainId(chainId: number): Promise<void>
@@ -137,23 +137,23 @@ class _UPClientChannel extends EventEmitter3<UPClientChannelEvents> implements U
     })
   }
 
-  public async allowAccounts(enabled: boolean, [primary, ..._page]: (`0x${string}` | '')[], chainId: number): Promise<void> {
-    serverLog('allowAccounts', primary, _page)
+  public async allowAccounts(enabled: boolean, [primary, ...page]: (`0x${string}` | '')[], chainId: number): Promise<void> {
+    serverLog('allowAccounts', primary, page)
     const primaryChanged = this.#accounts[0] !== primary || this.#getter() !== enabled
-    const pageChanged = this.#accounts.slice(1).some((value, index) => value !== _page[index])
+    const pageChanged = this.#accounts.slice(1).some((value, index) => value !== page[index])
     this.#setter(enabled)
     if (primaryChanged || pageChanged) {
       this.#accounts[0] = primary
-      this.#accounts.length = 1 + (_page.length || 0)
-      for (let i = 0; i < (_page?.length || 0); i++) {
-        this.#accounts[i + 1] = _page[i]
+      this.#accounts.length = 1 + (page.length || 0)
+      for (let i = 0; i < (page?.length || 0); i++) {
+        this.#accounts[i + 1] = page[i]
       }
       await this.send('accountsChanged', [this.#getter() ? primary : '', ...this.#accounts.slice(1)])
       if (primaryChanged) {
         this.emit(this.#getter() && this.#accounts[0] ? 'connected' : 'disconnected')
       }
       if (pageChanged) {
-        this.emit('injected', [..._page])
+        this.emit('injected', [...page])
       }
     }
     await this.setChainId(chainId)
@@ -265,10 +265,10 @@ interface GlobalProvider {
 
   /**
    * Find the client for the element, window or proxy object of the client.
-   * @param _id
+   * @param id
    * @returns actual UPClientChannel
    */
-  getChannel(_id: string | Window | HTMLIFrameElement | UPClientChannel | null): UPClientChannel | null
+  getChannel(id: string | Window | HTMLIFrameElement | UPClientChannel | null): UPClientChannel | null
 
   /**
    * Inject additional addresses into the client's accountsChanged event.
@@ -284,10 +284,10 @@ interface GlobalProvider {
    * Connect this provider externally. This will be called during initial construction
    * but can be called at a later time if desired to re-initialize or tear down
    * the connection.
-   * @param _provider
-   * @param _rpcUrls
+   * @param provider
+   * @param rpcUrls
    */
-  setupProvider(_provider: any, _rpcUrls: string | string[]): Promise<void>
+  setupProvider(provider: any, rpcUrls: string | string[]): Promise<void>
 }
 
 class _GlobalProvider extends EventEmitter3<GlobalProviderEvents> {
@@ -323,19 +323,19 @@ class _GlobalProvider extends EventEmitter3<GlobalProviderEvents> {
 
   /**
    * Find the client for the element, window or proxy object of the client.
-   * @param _id
+   * @param id
    * @returns actual UPClientChannel
    */
-  getChannel(_id: string | Window | HTMLIFrameElement | UPClientChannel | null): UPClientChannel | null {
-    let id = _id
-    if (typeof id === 'string') {
-      return this.#channels.get(id) || null
+  getChannel(id: string | Window | HTMLIFrameElement | UPClientChannel | null): UPClientChannel | null {
+    let _id = id
+    if (typeof _id === 'string') {
+      return this.#channels.get(_id) || null
     }
-    if ('element' in (id as any) || 'window' in (id as any)) {
-      id = (id as UPClientChannel).element || (id as UPClientChannel).window
+    if ('element' in (_id as any) || 'window' in (_id as any)) {
+      _id = (_id as UPClientChannel).element || (_id as UPClientChannel).window
     }
     for (const item of this.#channels.values()) {
-      if (item.window === id || item.element === id) {
+      if (item.window === _id || item.element === _id) {
         return item
       }
     }
@@ -364,15 +364,15 @@ class _GlobalProvider extends EventEmitter3<GlobalProviderEvents> {
    * Connect this provider externally. This will be called during initial construction
    * but can be called at a later time if desired to re-initialize or tear down
    * the connection.
-   * @param _provider
-   * @param _rpcUrls
+   * @param provider
+   * @param rpcUrls
    */
-  async setupProvider(_provider: any, _rpcUrls: string | string[]): Promise<void> {
+  async setupProvider(provider: any, rpcUrls: string | string[]): Promise<void> {
     this.#options.promise = new Promise<void>((resolve, reject) => {
       ;(async () => {
         try {
-          this.#options.provider = _provider
-          const newRpcUrls = Array.isArray(_rpcUrls) ? _rpcUrls : [_rpcUrls]
+          this.#options.provider = provider
+          const newRpcUrls = Array.isArray(rpcUrls) ? rpcUrls : [rpcUrls]
           if (newRpcUrls.some((url, index) => url !== this.#options.rpcUrls[index])) {
             this.#options.rpcUrls = newRpcUrls
             for (const item of this.channels.values()) {
@@ -440,11 +440,11 @@ function getUPProviderChannel(id: string | Window | HTMLIFrameElement | UPClient
  * connections and establish them. It will fire `up-channel-connected` on the particular iframe if it's reachable.
  * It will fire a local `channelCreated` event as well.
  *
- * @param _provider the initial provider to proxy
- * @param _rpcUrls rpc urls to give to the clients to locally connect for non eth_sendTransaction and so on.
+ * @param provider the initial provider to proxy
+ * @param rpcUrls rpc urls to give to the clients to locally connect for non eth_sendTransaction and so on.
  * @returns The global provider and event sing for `channelCreated` events.
  */
-function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]): GlobalProvider {
+function createGlobalUPProvider(provider?: any, rpcUrls?: string | string[]): GlobalProvider {
   if (globalUPProvider) {
     return globalUPProvider
   }
@@ -452,8 +452,8 @@ function createGlobalUPProvider(_provider?: any, _rpcUrls?: string | string[]): 
 
   // Allow for late initialization of class properties.
   const options: GlobalProviderOptions = {
-    provider: _provider ?? null,
-    rpcUrls: Array.isArray(_rpcUrls) ? _rpcUrls : _rpcUrls != null ? [_rpcUrls] : [],
+    provider: provider ?? null,
+    rpcUrls: Array.isArray(rpcUrls) ? rpcUrls : rpcUrls != null ? [rpcUrls] : [],
     primary: '',
     chainId: 0,
     accounts: [],
