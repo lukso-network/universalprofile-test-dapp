@@ -10,3 +10,5 @@
 !.*
 .eslintcache
 /.vscode
+
+/packages/tools-lukso-provider/docs/**/*.md

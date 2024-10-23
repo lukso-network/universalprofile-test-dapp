@@ -18,7 +18,7 @@
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/client.ts:126](https://github.com/lukso-network/universalprofile-test-dapp/blob/f28ff9e0e073bc0e12dc398bea7a2ae17e2fb2f3/packages/tools-lukso-provider/src/client.ts#L126)
+[packages/tools-lukso-provider/src/client.ts:93](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/client.ts#L93)
 
 ***
 
@@ -32,7 +32,7 @@
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/client.ts:124](https://github.com/lukso-network/universalprofile-test-dapp/blob/f28ff9e0e073bc0e12dc398bea7a2ae17e2fb2f3/packages/tools-lukso-provider/src/client.ts#L124)
+[packages/tools-lukso-provider/src/client.ts:91](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/client.ts#L91)
 
 ***
 
@@ -46,7 +46,7 @@
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/client.ts:45](https://github.com/lukso-network/universalprofile-test-dapp/blob/f28ff9e0e073bc0e12dc398bea7a2ae17e2fb2f3/packages/tools-lukso-provider/src/client.ts#L45)
+[packages/tools-lukso-provider/src/client.ts:45](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/client.ts#L45)
 
 ## Methods
 
@@ -72,7 +72,7 @@
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/client.ts:80](https://github.com/lukso-network/universalprofile-test-dapp/blob/f28ff9e0e073bc0e12dc398bea7a2ae17e2fb2f3/packages/tools-lukso-provider/src/client.ts#L80)
+[packages/tools-lukso-provider/src/client.ts:71](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/client.ts#L71)
 
 ***
 
@@ -98,7 +98,7 @@ Calls each of the listeners registered for a given event.
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/client.ts:67](https://github.com/lukso-network/universalprofile-test-dapp/blob/f28ff9e0e073bc0e12dc398bea7a2ae17e2fb2f3/packages/tools-lukso-provider/src/client.ts#L67)
+[packages/tools-lukso-provider/src/client.ts:65](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/client.ts#L65)
 
 ***
 
@@ -115,7 +115,7 @@ keyof [`UPClientProviderEvents`](UPClientProviderEvents.md)[]
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/client.ts:50](https://github.com/lukso-network/universalprofile-test-dapp/blob/f28ff9e0e073bc0e12dc398bea7a2ae17e2fb2f3/packages/tools-lukso-provider/src/client.ts#L50)
+[packages/tools-lukso-provider/src/client.ts:50](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/client.ts#L50)
 
 ***
 
@@ -135,7 +135,7 @@ Return the number of listeners listening to a given event.
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/client.ts:62](https://github.com/lukso-network/universalprofile-test-dapp/blob/f28ff9e0e073bc0e12dc398bea7a2ae17e2fb2f3/packages/tools-lukso-provider/src/client.ts#L62)
+[packages/tools-lukso-provider/src/client.ts:60](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/client.ts#L60)
 
 ***
 
@@ -159,7 +159,7 @@ Return the listeners registered for a given event.
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/client.ts:55](https://github.com/lukso-network/universalprofile-test-dapp/blob/f28ff9e0e073bc0e12dc398bea7a2ae17e2fb2f3/packages/tools-lukso-provider/src/client.ts#L55)
+[packages/tools-lukso-provider/src/client.ts:55](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/client.ts#L55)
 
 ***
 
@@ -187,7 +187,7 @@ Return the listeners registered for a given event.
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/client.ts:104](https://github.com/lukso-network/universalprofile-test-dapp/blob/f28ff9e0e073bc0e12dc398bea7a2ae17e2fb2f3/packages/tools-lukso-provider/src/client.ts#L104)
+[packages/tools-lukso-provider/src/client.ts:82](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/client.ts#L82)
 
 ***
 
@@ -215,7 +215,7 @@ Add a listener for a given event.
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/client.ts:75](https://github.com/lukso-network/universalprofile-test-dapp/blob/f28ff9e0e073bc0e12dc398bea7a2ae17e2fb2f3/packages/tools-lukso-provider/src/client.ts#L75)
+[packages/tools-lukso-provider/src/client.ts:70](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/client.ts#L70)
 
 ***
 
@@ -243,7 +243,7 @@ Add a one-time listener for a given event.
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/client.ts:89](https://github.com/lukso-network/universalprofile-test-dapp/blob/f28ff9e0e073bc0e12dc398bea7a2ae17e2fb2f3/packages/tools-lukso-provider/src/client.ts#L89)
+[packages/tools-lukso-provider/src/client.ts:76](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/client.ts#L76)
 
 ***
 
@@ -263,7 +263,7 @@ Remove all listeners, or those of the specified event.
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/client.ts:114](https://github.com/lukso-network/universalprofile-test-dapp/blob/f28ff9e0e073bc0e12dc398bea7a2ae17e2fb2f3/packages/tools-lukso-provider/src/client.ts#L114)
+[packages/tools-lukso-provider/src/client.ts:87](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/client.ts#L87)
 
 ***
 
@@ -293,7 +293,7 @@ Remove the listeners of a given event.
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/client.ts:98](https://github.com/lukso-network/universalprofile-test-dapp/blob/f28ff9e0e073bc0e12dc398bea7a2ae17e2fb2f3/packages/tools-lukso-provider/src/client.ts#L98)
+[packages/tools-lukso-provider/src/client.ts:81](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/client.ts#L81)
 
 ***
 
@@ -315,4 +315,4 @@ Remove the listeners of a given event.
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/client.ts:118](https://github.com/lukso-network/universalprofile-test-dapp/blob/f28ff9e0e073bc0e12dc398bea7a2ae17e2fb2f3/packages/tools-lukso-provider/src/client.ts#L118)
+[packages/tools-lukso-provider/src/client.ts:89](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/client.ts#L89)

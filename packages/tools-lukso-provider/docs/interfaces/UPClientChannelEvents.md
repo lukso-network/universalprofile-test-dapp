@@ -22,7 +22,7 @@
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/server.ts:14](https://github.com/lukso-network/universalprofile-test-dapp/blob/f28ff9e0e073bc0e12dc398bea7a2ae17e2fb2f3/packages/tools-lukso-provider/src/server.ts#L14)
+[packages/tools-lukso-provider/src/server.ts:10](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/server.ts#L10)
 
 ***
 
@@ -40,7 +40,7 @@
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/server.ts:16](https://github.com/lukso-network/universalprofile-test-dapp/blob/f28ff9e0e073bc0e12dc398bea7a2ae17e2fb2f3/packages/tools-lukso-provider/src/server.ts#L16)
+[packages/tools-lukso-provider/src/server.ts:12](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/server.ts#L12)
 
 ***
 
@@ -54,7 +54,7 @@
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/server.ts:12](https://github.com/lukso-network/universalprofile-test-dapp/blob/f28ff9e0e073bc0e12dc398bea7a2ae17e2fb2f3/packages/tools-lukso-provider/src/server.ts#L12)
+[packages/tools-lukso-provider/src/server.ts:8](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/server.ts#L8)
 
 ***
 
@@ -68,7 +68,7 @@
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/server.ts:13](https://github.com/lukso-network/universalprofile-test-dapp/blob/f28ff9e0e073bc0e12dc398bea7a2ae17e2fb2f3/packages/tools-lukso-provider/src/server.ts#L13)
+[packages/tools-lukso-provider/src/server.ts:9](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/server.ts#L9)
 
 ***
 
@@ -86,7 +86,7 @@
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/server.ts:17](https://github.com/lukso-network/universalprofile-test-dapp/blob/f28ff9e0e073bc0e12dc398bea7a2ae17e2fb2f3/packages/tools-lukso-provider/src/server.ts#L17)
+[packages/tools-lukso-provider/src/server.ts:13](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/server.ts#L13)
 
 ***
 
@@ -104,4 +104,4 @@
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/server.ts:15](https://github.com/lukso-network/universalprofile-test-dapp/blob/f28ff9e0e073bc0e12dc398bea7a2ae17e2fb2f3/packages/tools-lukso-provider/src/server.ts#L15)
+[packages/tools-lukso-provider/src/server.ts:11](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/server.ts#L11)

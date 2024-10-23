@@ -24,4 +24,4 @@
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/server.ts:272](https://github.com/lukso-network/universalprofile-test-dapp/blob/f28ff9e0e073bc0e12dc398bea7a2ae17e2fb2f3/packages/tools-lukso-provider/src/server.ts#L272)
+[packages/tools-lukso-provider/src/server.ts:209](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/server.ts#L209)
