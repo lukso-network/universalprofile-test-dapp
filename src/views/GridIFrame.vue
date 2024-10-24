@@ -47,12 +47,20 @@ function upChannelConnected(e: CustomEvent) {
       <div class="tile is-ancestor">
         <Accounts />
         <GridPanelDialog :channel="frame1Channel" />
-        <iframe id="frame1" scrolling="yes" :src="base + 'widget.html'" sandbox="allow-same-origin allow-scripts" width="100%" height="600px" @up-channel-connected="upChannelConnected" />
+        <div class="tile is-parent">
+          <div class="tile is-child box">
+            <iframe id="frame1" :src="base + 'widget.html'" sandbox="allow-same-origin allow-scripts" width="100%" height="600px" @up-channel-connected="upChannelConnected" />
+          </div>
+        </div>
       </div>
       <div class="tile is-ancestor">
         <div class="tile is-4">&nbsp;</div>
         <GridPanelDialog :channel="frame2Channel" />
-        <iframe id="frame2" scrolling="yes" :src="base + 'widget.html'" sandbox="allow-same-origin allow-scripts" width="100%" height="600px" @up-channel-connected="upChannelConnected" />
+        <div class="tile is-parent">
+          <div class="tile is-child box">
+            <iframe id="frame2" :src="base + 'widget.html'" sandbox="allow-same-origin allow-scripts" width="100%" height="600px" @up-channel-connected="upChannelConnected" />
+          </div>
+        </div>
       </div>
     </section>
   </div>

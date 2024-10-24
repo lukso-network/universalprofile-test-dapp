@@ -38,7 +38,7 @@ watch(() => pageAddress.value, updateProvider)
     <div class="tile is-child box">
       <p class="is-size-5 has-text-weight-bold mb-4">Grid Control</p>
       <div class="field">
-        <label class="label">Token address</label>
+        <label class="label">Page address</label>
         <LSPSelect :address="pageAddress" :show-accounts="true" @option-selected="handlePageAddress" />
         <div class="control">
           <input v-model="pageAddress" class="input is-family-code" type="text" data-testid="transfer-address" />
