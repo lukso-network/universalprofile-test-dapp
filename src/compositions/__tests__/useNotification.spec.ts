@@ -12,8 +12,7 @@ test('can set notification', () => {
 })
 
 test('can clear notification', () => {
-  const { notification, setNotification, clearNotification } =
-    useNotifications()
+  const { notification, setNotification, clearNotification } = useNotifications()
 
   setNotification('some notification', 'primary')
   clearNotification()

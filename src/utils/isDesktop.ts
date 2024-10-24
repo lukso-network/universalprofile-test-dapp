@@ -1,16 +1,6 @@
 export const isDesktop = () => {
   const userAgent = navigator.userAgent.toLowerCase()
-  const mobileKeywords = [
-    'android',
-    'iphone',
-    'ipad',
-    'ipod',
-    'blackberry',
-    'windows phone',
-    'iemobile',
-    'opera mini',
-    'mobile',
-  ]
+  const mobileKeywords = ['android', 'iphone', 'ipad', 'ipod', 'blackberry', 'windows phone', 'iemobile', 'opera mini', 'mobile']
 
   // Check for common keywords used in mobile user agents
   for (const keyword of mobileKeywords) {

@@ -14,15 +14,10 @@ export class AuthenticatedFormDataUploader extends CustomHeaderFormDataUploader 
     return `ipfs://${result.IpfsHash}`
   }
   async getToken(): Promise<string> {
-    const sign = await import('@tsndr/cloudflare-worker-jwt').then(
-      m => m.sign || m.default?.sign
-    )
+    const sign = await import('@tsndr/cloudflare-worker-jwt').then(m => m.sign || m.default?.sign)
 
     const now = Date.now()
     const secret = PUBLIC_API_SHARED_SECRET
-    return await sign(
-      { iss: 'extension', iat: now / 1000, exp: (now + 120_000) / 1000 },
-      secret || ''
-    )
+    return await sign({ iss: 'extension', iat: now / 1000, exp: (now + 120_000) / 1000 }, secret || '')
   }
 }

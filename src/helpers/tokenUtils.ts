@@ -54,27 +54,18 @@ interface LspTypeOption {
   decimals?: string
 }
 
-export const lspTypeOptions: Record<
-  Exclude<LSPType, LSPType.Unknown>,
-  LspTypeOption
-> = {
+export const lspTypeOptions: Record<Exclude<LSPType, LSPType.Unknown>, LspTypeOption> = {
   [LSPType.LSP3ProfileMetadata]: {
     interfaceId: INTERFACE_IDS.LSP0ERC725Account,
-    lsp2Schema: getSupportedStandardObject(
-      LSP3ProfileMetadata as ERC725JSONSchema[]
-    ),
+    lsp2Schema: getSupportedStandardObject(LSP3ProfileMetadata as ERC725JSONSchema[]),
   },
   [LSPType.LSP7DigitalAsset]: {
     interfaceId: INTERFACE_IDS.LSP7DigitalAsset,
-    lsp2Schema: getSupportedStandardObject(
-      LSP4DigitalAsset as ERC725JSONSchema[]
-    ),
+    lsp2Schema: getSupportedStandardObject(LSP4DigitalAsset as ERC725JSONSchema[]),
   },
   [LSPType.LSP8IdentifiableDigitalAsset]: {
     interfaceId: INTERFACE_IDS.LSP8IdentifiableDigitalAsset,
-    lsp2Schema: getSupportedStandardObject(
-      LSP4DigitalAsset as ERC725JSONSchema[]
-    ),
+    lsp2Schema: getSupportedStandardObject(LSP4DigitalAsset as ERC725JSONSchema[]),
   },
   [LSPType.LSP9Vault]: {
     interfaceId: INTERFACE_IDS.LSP9Vault,
@@ -120,11 +111,7 @@ export type TokenInfo = {
   label?: string
 }
 
-export const detectLSP = async (
-  contractAddress: string,
-  lspType: Exclude<LSPType, LSPType.Unknown>,
-  owned = false
-): Promise<TokenInfo | undefined> => {
+export const detectLSP = async (contractAddress: string, lspType: Exclude<LSPType, LSPType.Unknown>, owned = false): Promise<TokenInfo | undefined> => {
   if (
     lspType in
     {
@@ -144,9 +131,7 @@ export const detectLSP = async (
   // Check if the contract implements the LSP interface ID
   let doesSupportInterface: boolean
   try {
-    doesSupportInterface = await contract.methods
-      .supportsInterface(lspTypeOptions[lspType].interfaceId)
-      .call()
+    doesSupportInterface = await contract.methods.supportsInterface(lspTypeOptions[lspType].interfaceId).call()
   } catch (error) {
     doesSupportInterface = false
   }
@@ -165,11 +150,7 @@ export const detectLSP = async (
           .balanceOf(store.address)
           .call()
           .catch(() => undefined)
-        balance = _balance
-          ? new BN(_balance, 10)
-              .div(new BN(10).pow(new BN(currentDecimals || '0', 10)))
-              .toNumber()
-          : 0
+        balance = _balance ? new BN(_balance, 10).div(new BN(10).pow(new BN(currentDecimals || '0', 10))).toNumber() : 0
       }
     } catch (err) {
       console.error(contractAddress, lspType, err, 'no balance')
@@ -178,10 +159,7 @@ export const detectLSP = async (
     const { getInstance } = useErc725()
 
     const erc725 = await getInstance(contractAddress)
-    let [{ value: name }, { value: symbol }] = await erc725.fetchData([
-      'LSP4TokenName',
-      'LSP4TokenSymbol',
-    ])
+    let [{ value: name }, { value: symbol }] = await erc725.fetchData(['LSP4TokenName', 'LSP4TokenSymbol'])
     if (typeof name !== 'string') {
       try {
         name = (await contract.methods.name().call()) as string
@@ -219,10 +197,7 @@ export const detectLSP = async (
       address: contractAddress,
       balance,
       decimals: currentDecimals,
-      label: `${shortType} ${name} (${symbol}) ${contractAddress.substring(
-        0,
-        10
-      )}...`,
+      label: `${shortType} ${name} (${symbol}) ${contractAddress.substring(0, 10)}...`,
     }
   } catch (err) {
     console.error(contractAddress, lspType, err)
@@ -264,9 +239,7 @@ export async function recalculateAssets() {
   try {
     const result = await getInstance(address).fetchData('LSP5ReceivedAssets[]')
     const rawOwned = result.value as string[] //returns array of addresses
-    const mapAssets: Record<string, boolean> = rawOwned.reduce<
-      Record<string, boolean>
-    >((all, address) => {
+    const mapAssets: Record<string, boolean> = rawOwned.reduce<Record<string, boolean>>((all, address) => {
       all[address] = true
       return all
     }, {})
@@ -293,11 +266,7 @@ export async function recalculateAssets() {
       if (isLSP7) {
         lsp7Tokens.push(isLSP7)
       }
-      const isLSP8 = await detectLSP(
-        address,
-        LSPType.LSP8IdentifiableDigitalAsset,
-        owned
-      )
+      const isLSP8 = await detectLSP(address, LSPType.LSP8IdentifiableDigitalAsset, owned)
       if (isLSP8) {
         lsp8Tokens.push(isLSP8)
       }
@@ -347,13 +316,8 @@ export const padTokenId = (tokenIdType: number, tokenId: string) => {
   }
 }
 
-export const encodeAssetMetadata = (
-  assetMetadata: LSP4MetadataUrlForEncoding
-) => {
-  const encodedMetadata = ERC725.encodeData(
-    [{ value: assetMetadata, keyName: 'LSP4Metadata' }],
-    LSP4DigitalAsset as ERC725JSONSchema[]
-  )
+export const encodeAssetMetadata = (assetMetadata: LSP4MetadataUrlForEncoding) => {
+  const encodedMetadata = ERC725.encodeData([{ value: assetMetadata, keyName: 'LSP4Metadata' }], LSP4DigitalAsset as ERC725JSONSchema[])
   const [metadataJsonUrl] = encodedMetadata.values
   console.log('metadataJsonUrl', metadataJsonUrl)
 

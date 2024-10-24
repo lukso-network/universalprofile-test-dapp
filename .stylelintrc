@@ -1,9 +1,5 @@
 {
-  "extends": [
-    "stylelint-config-standard-scss",
-    "stylelint-config-recommended-vue",
-    "stylelint-config-prettier"
-  ],
+  "extends": ["stylelint-config-standard-scss", "stylelint-config-recommended-vue", "stylelint-config-prettier"],
   "plugins": ["stylelint-scss"],
   "rules": {
     "import-notation": "string",

@@ -7,25 +7,13 @@ import { getState, setState } from '@/stores'
 import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
-import {
-  DEFAULT_GAS,
-  DEFAULT_GAS_PRICE,
-  DEFAULT_MAX_FEE_PER_GAS,
-  DEFAULT_MAX_PRIORITY_FEE_PER_GAS,
-} from '@/helpers/config'
+import { DEFAULT_GAS, DEFAULT_GAS_PRICE, DEFAULT_MAX_FEE_PER_GAS, DEFAULT_MAX_PRIORITY_FEE_PER_GAS } from '@/helpers/config'
 import ContractFunction from '@/components/shared/ContractFunction.vue'
 import { MethodSelect, MethodType } from '@/helpers/functionUtils'
 import { methodSelectors as methods } from '@/utils/methodSelectors'
 
-const { notification, clearNotification, hasNotification, setNotification } =
-  useNotifications()
-const {
-  sendTransaction,
-  getBalance,
-  estimateGas,
-  defaultMaxPriorityFeePerGas,
-  executeCall,
-} = useWeb3Connection()
+const { notification, clearNotification, hasNotification, setNotification } = useNotifications()
+const { sendTransaction, getBalance, estimateGas, defaultMaxPriorityFeePerGas, executeCall } = useWeb3Connection()
 
 const data = ref<string>('')
 const hasData = ref(false)
@@ -45,8 +33,7 @@ watch(
 function makeValue(param: MethodType) {
   const { value: _value, isWei } = param
   if (isWei) {
-    const value =
-      typeof _value !== 'string' ? toNumber(_value).toString() : _value
+    const value = typeof _value !== 'string' ? toNumber(_value).toString() : _value
     return toWei(value, isWei)
   }
   return _value
@@ -174,19 +161,13 @@ const params = reactive<{ items: MethodType[] }>({
 
 const selectMethod = (e: Event) => {
   const value = Number.parseInt((e.target as HTMLInputElement).value, 10)
-  const { to, amount, ...item } =
-    value >= methods.length
-      ? items.items[value - methods.length]
-      : methods[value]
+  const { to, amount, ...item } = value >= methods.length ? items.items[value - methods.length] : methods[value]
   for (const [key, val] of Object.entries(item)) {
     ;(method.item as any)[key] = val
   }
   params.items = params.items.map((param, index) => {
     if (index === 1) {
-      if (
-        param.hasSpecs?.length !== item.hasSpecs?.length ||
-        param.hasSpecs?.some((v: string, i: number) => item.hasSpecs?.[i] !== v)
-      ) {
+      if (param.hasSpecs?.length !== item.hasSpecs?.length || param.hasSpecs?.some((v: string, i: number) => item.hasSpecs?.[i] !== v)) {
         param.hasSpecs = item.hasSpecs
         param.value = undefined
       }
@@ -241,9 +222,7 @@ const handleAdd = (e: Event) => {
 
 const handleRemove = (e: Event) => {
   e.stopPropagation()
-  const index = items.items.findIndex(
-    ({ label }) => label === method.item.label
-  )
+  const index = items.items.findIndex(({ label }) => label === method.item.label)
   if (index !== -1) {
     items.items.splice(index, 1)
     saveItems()
@@ -267,20 +246,12 @@ const hasRemove = computed<boolean>(() => {
         <div class="select is-fullwidth mb-2">
           <select data-testid="preset" @change="selectMethod">
             <optgroup label="Standard">
-              <option
-                v-for="({ label }, index) of methods"
-                :key="index"
-                :value="index"
-              >
+              <option v-for="({ label }, index) of methods" :key="index" :value="index">
                 {{ label }}
               </option>
             </optgroup>
             <optgroup v-if="items.items.length > 0" label="Custom">
-              <option
-                v-for="({ label }, index) of items.items"
-                :key="index + methods.length"
-                :value="index + methods.length"
-              >
+              <option v-for="({ label }, index) of items.items" :key="index + methods.length" :value="index + methods.length">
                 {{ label }}
               </option>
             </optgroup>
@@ -288,12 +259,7 @@ const hasRemove = computed<boolean>(() => {
         </div>
       </div>
 
-      <ContractFunction
-        v-model="params.items"
-        :only-params="true"
-        testid-prefix="transaction-"
-        :custom="true"
-      />
+      <ContractFunction v-model="params.items" :only-params="true" testid-prefix="transaction-" :custom="true" />
 
       <div class="field">
         <label class="checkbox">
@@ -302,101 +268,35 @@ const hasRemove = computed<boolean>(() => {
         </label>
       </div>
 
-      <ContractFunction
-        v-if="hasData"
-        v-model="method.item.inputs"
-        :call="method.item.call"
-        custom
-        :data="data"
-        testid-prefix="params-"
-        :hide-data="true"
-        @update:data="handleData"
-      />
+      <ContractFunction v-if="hasData" v-model="method.item.inputs" :call="method.item.call" custom :data="data" testid-prefix="params-" :hide-data="true" @update:data="handleData" />
 
       <div v-if="hasData" class="field">
         <label class="label">Data (optional)</label>
-        <textarea
-          v-model="data"
-          class="textarea"
-          placeholder="0x..."
-          data-testid="data"
-        ></textarea>
+        <textarea v-model="data" class="textarea" placeholder="0x..." data-testid="data"></textarea>
       </div>
       <div class="field mt-2">
-        <button
-          :class="`button is-small is-rounded ${isPending ? 'is-loading' : ''}`"
-          data-testid="add"
-          @click="handleAdd"
-        >
-          Add Transaction to Menu
-        </button>
-        <button
-          v-if="hasRemove"
-          :class="`button is-small is-rounded ml-2 ${
-            isPending ? 'is-loading' : ''
-          }`"
-          data-testid="remove"
-          @click="handleRemove"
-        >
-          Remove "{{ method.item.label }}" from Menu
-        </button>
+        <button :class="`button is-small is-rounded ${isPending ? 'is-loading' : ''}`" data-testid="add" @click="handleAdd">Add Transaction to Menu</button>
+        <button v-if="hasRemove" :class="`button is-small is-rounded ml-2 ${isPending ? 'is-loading' : ''}`" data-testid="remove" @click="handleRemove">Remove "{{ method.item.label }}" from Menu</button>
       </div>
       <div class="field">
-        <button
-          :class="`button is-primary is-rounded mt-4 ${
-            isPending ? 'is-loading' : ''
-          }`"
-          data-testid="estimate"
-          @click="estimate"
-        >
-          Estimate Gas
-        </button>
-        <button
-          :class="`button is-primary is-rounded mt-4 ${
-            isPending ? 'is-loading' : ''
-          }`"
-          data-testid="send"
-          @click="send"
-        >
-          Send Transaction
-        </button>
-        <button
-          :class="`button is-primary is-rounded mt-4 ${
-            isPending ? 'is-loading' : ''
-          }`"
-          data-testid="rawCall"
-          @click="rawCall"
-        >
-          Call
-        </button>
+        <button :class="`button is-primary is-rounded mt-4 ${isPending ? 'is-loading' : ''}`" data-testid="estimate" @click="estimate">Estimate Gas</button>
+        <button :class="`button is-primary is-rounded mt-4 ${isPending ? 'is-loading' : ''}`" data-testid="send" @click="send">Send Transaction</button>
+        <button :class="`button is-primary is-rounded mt-4 ${isPending ? 'is-loading' : ''}`" data-testid="rawCall" @click="rawCall">Call</button>
       </div>
 
       <div class="field">
         How to
-        <a href="https://docs.lukso.tech/guides/universal-profile/transfer-lyx"
-          >transfer LYX tutorial</a
-        >.
+        <a href="https://docs.lukso.tech/guides/universal-profile/transfer-lyx">transfer LYX tutorial</a>.
       </div>
 
       <div v-if="callResults">
         <label class="label">Call result</label>
-        <ContractFunction
-          v-model="resultFormat.item.inputs"
-          custom
-          :data="callResults"
-          :data-decoder="true"
-          :hide-data="true"
-        />
+        <ContractFunction v-model="resultFormat.item.inputs" custom :data="callResults" :data-decoder="true" :hide-data="true" />
         <div class="box" style="overflow-wrap: anywhere">{{ callResults }}</div>
       </div>
 
       <div class="field">
-        <Notifications
-          v-if="hasNotification"
-          :notification="notification"
-          class="mt-4"
-          @hide="clearNotification"
-        ></Notifications>
+        <Notifications v-if="hasNotification" :notification="notification" class="mt-4" @hide="clearNotification"></Notifications>
       </div>
     </div>
   </div>

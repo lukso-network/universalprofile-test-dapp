@@ -48,15 +48,11 @@ test('can connect to wallet connect V2', async () => {
   await fireEvent.click(screen.getByTestId('connect-wc-v2'))
 
   expect(mockSetupProvider).toBeCalledTimes(1)
-  expect(await screen.findByTestId('notification')).toHaveTextContent(
-    'Connected to address'
-  )
+  expect(await screen.findByTestId('notification')).toHaveTextContent('Connected to address')
 })
 
 test('can connect to browser extension when authorized', async () => {
-  mockRequestAccounts.mockReturnValue([
-    '0x83b21Ba5Cb73f4C17E82f2f7E37787b13d924306',
-  ])
+  mockRequestAccounts.mockReturnValue(['0x83b21Ba5Cb73f4C17E82f2f7E37787b13d924306'])
   mockGetProvider.mockReturnValue({
     wc: {
       connected: false,
@@ -70,9 +66,7 @@ test('can connect to browser extension when authorized', async () => {
   await setConnected('0x9967b05ac840324F8BB6F729eD74530866679B11', WINDOW_LUKSO)
 
   await waitFor(() => {
-    expect(screen.getByTestId('info')).toHaveTextContent(
-      'Connected to address:'
-    )
+    expect(screen.getByTestId('info')).toHaveTextContent('Connected to address:')
   })
   expect(screen.getByTestId('chain')).toHaveTextContent('22 (0x16)')
 })

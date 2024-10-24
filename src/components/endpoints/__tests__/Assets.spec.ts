@@ -39,11 +39,7 @@ test('can create token', async () => {
 
   await fireEvent.click(screen.getByTestId('create'))
   await waitFor(() => {
-    expect(screen.getByTestId('notification')).toHaveTextContent(
-      'Token created'
-    )
-    expect(screen.getByTestId('token-address')).toHaveTextContent(
-      '0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298'
-    )
+    expect(screen.getByTestId('notification')).toHaveTextContent('Token created')
+    expect(screen.getByTestId('token-address')).toHaveTextContent('0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298')
   })
 })

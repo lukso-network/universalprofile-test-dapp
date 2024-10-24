@@ -1,10 +1,6 @@
 import FormData from 'form-data'
 
-import {
-  BaseFormDataUploader,
-  FormDataPostHeaders,
-  FormDataRequestOptions,
-} from '@/services/ipfs/formdata-base-client'
+import { BaseFormDataUploader, FormDataPostHeaders, FormDataRequestOptions } from '@/services/ipfs/formdata-base-client'
 
 export class CustomHeaderFormDataUploader extends BaseFormDataUploader {
   constructor(
@@ -13,10 +9,7 @@ export class CustomHeaderFormDataUploader extends BaseFormDataUploader {
   ) {
     super()
   }
-  async getRequestOptions(
-    _dataContent: FormData,
-    meta?: FormDataPostHeaders
-  ): Promise<FormDataRequestOptions> {
+  async getRequestOptions(_dataContent: FormData, meta?: FormDataPostHeaders): Promise<FormDataRequestOptions> {
     const rest = await super.getRequestOptions(_dataContent, meta)
     const headers = await this.getHeaders(_dataContent, meta)
     return { ...rest, headers: { ...headers } }

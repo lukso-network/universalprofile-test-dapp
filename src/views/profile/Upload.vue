@@ -7,8 +7,7 @@ import Notifications from '@/components/Notification.vue'
 import useNotifications from '@/compositions/useNotifications'
 import { useLspFactory } from '@/compositions/useLspFactory'
 
-const { notification, clearNotification, hasNotification, setNotification } =
-  useNotifications()
+const { notification, clearNotification, hasNotification, setNotification } = useNotifications()
 
 type ProfileLinks = {
   title: string
@@ -48,20 +47,12 @@ const upload = async () => {
     isUploading.value = false
     name.value = ''
     description.value = ''
-    localStorage.setItem(
-      uploadResult.value?.url,
-      JSON.stringify(uploadResult.value)
-    )
+    localStorage.setItem(uploadResult.value?.url, JSON.stringify(uploadResult.value))
     uploadedProfiles.value = getAndPrepareAllIpfsItems()
 
     const href = uploadResult.value?.url.replace('ipfs://', '')
     const url = `${uploadResult.value?.url}`
-    setNotification(
-      `Profile uploaded successfully<br/><a href=${
-        '/profiles/' + href
-      } target="_blank">${url}</a>`,
-      'primary'
-    )
+    setNotification(`Profile uploaded successfully<br/><a href=${`/profiles/${href}`} target="_blank">${url}</a>`, 'primary')
   } catch (error) {
     showError.value = true
     isUploading.value = false
@@ -118,17 +109,15 @@ const getFileSize = (file: File) => {
 const profileImageSize = computed(() => {
   if (profileImage.value) {
     return getFileSize(profileImage.value)
-  } else {
-    return ''
   }
+  return ''
 })
 
 const backgroundImageSize = computed(() => {
   if (backgroundImage.value) {
     return getFileSize(backgroundImage.value)
-  } else {
-    return ''
   }
+  return ''
 })
 
 const removeProfileImage = () => {
@@ -153,32 +142,19 @@ const removeBackgroundImage = () => {
         <div class="content">
           <p>
             This page allows you to generate and upload your
-            <strong>LSP3Profile</strong> data including the profile- and
-            background-image, as per
-            <a
-              href="https://github.com/lukso-network/LIPs/blob/master/LSPs/LSP-3-UniversalProfile.md"
-            >
-              LSP-3-UniversalProfile
-            </a>
+            <strong>LSP3Profile</strong> data including the profile- and background-image, as per
+            <a href="https://github.com/lukso-network/LIPs/blob/master/LSPs/LSP-3-UniversalProfile.md"> LSP-3-UniversalProfile </a>
             standard.
           </p>
           <p>
             Each image will be compressed and resized into five variants with a
-            <code>max-width</code> of <code>1800px</code>, <code>1024px</code>,
-            <code>640px</code>, <code>320px</code> and <code>180px</code>.
+            <code>max-width</code> of <code>1800px</code>, <code>1024px</code>, <code>640px</code>, <code>320px</code> and <code>180px</code>.
           </p>
-          <p class="has-text-weight-bold">
-            This will not perform any operation on the blockchain.
-          </p>
+          <p class="has-text-weight-bold">This will not perform any operation on the blockchain.</p>
         </div>
       </div>
     </article>
-    <Notifications
-      v-if="hasNotification"
-      :notification="notification"
-      class="mt-4"
-      @hide="clearNotification"
-    ></Notifications>
+    <Notifications v-if="hasNotification" :notification="notification" class="mt-4" @hide="clearNotification"></Notifications>
 
     <article v-if="showError" class="message is-danger">
       <div class="message-header">
@@ -196,12 +172,7 @@ const removeBackgroundImage = () => {
         <section class="upload-form card">
           <div class="file is-boxed has-name mb-5">
             <label v-if="!profileImageUrl" class="file-label">
-              <input
-                class="file-input"
-                type="file"
-                name="profileImage"
-                @change="handleProfileImage"
-              />
+              <input class="file-input" type="file" name="profileImage" @change="handleProfileImage" />
               <span class="file-cta">
                 <span class="file-label"> Browse... </span>
               </span>
@@ -212,29 +183,18 @@ const removeBackgroundImage = () => {
               <div class="column">
                 <p class="has-text-weight-bold">Profile Image</p>
 
-                <img
-                  :src="profileImageUrl"
-                  :alt="profileImage?.name"
-                  class="image-profile"
-                />
+                <img :src="profileImageUrl" :alt="profileImage?.name" class="image-profile" />
               </div>
               <div class="column">
                 <p>{{ profileImageSize }}</p>
-                <button class="button is-danger" @click="removeProfileImage">
-                  Delete
-                </button>
+                <button class="button is-danger" @click="removeProfileImage">Delete</button>
               </div>
             </div>
           </div>
 
           <div class="file is-boxed has-name mb-5">
             <label v-if="!backgroundImageUrl" class="file-label">
-              <input
-                class="file-input"
-                type="file"
-                name="backgroundImage"
-                @change="handleBackgroundImage"
-              />
+              <input class="file-input" type="file" name="backgroundImage" @change="handleBackgroundImage" />
               <span class="file-cta">
                 <span class="file-label"> Browse... </span>
               </span>
@@ -245,17 +205,11 @@ const removeBackgroundImage = () => {
               <div class="column">
                 <p class="has-text-weight-bold">Background Image</p>
 
-                <img
-                  :src="backgroundImageUrl"
-                  :alt="backgroundImage?.name"
-                  class="image-profile"
-                />
+                <img :src="backgroundImageUrl" :alt="backgroundImage?.name" class="image-profile" />
               </div>
               <div class="column">
                 <p>{{ backgroundImageSize }}</p>
-                <button class="button is-danger" @click="removeBackgroundImage">
-                  Delete
-                </button>
+                <button class="button is-danger" @click="removeBackgroundImage">Delete</button>
               </div>
             </div>
           </div>
@@ -263,27 +217,14 @@ const removeBackgroundImage = () => {
           <div class="field">
             <label class="label" for="name">Name</label>
             <div class="control">
-              <input
-                id="name"
-                v-model="name"
-                class="input"
-                type="text"
-                placeholder="Knock knock who's there?"
-                data-testid="name"
-              />
+              <input id="name" v-model="name" class="input" type="text" placeholder="Knock knock who's there?" data-testid="name" />
             </div>
           </div>
 
           <div class="field">
             <label class="label" for="description">Description</label>
             <div class="control">
-              <textarea
-                id="description"
-                v-model="description"
-                class="textarea"
-                placeholder="Once upon a time..."
-                data-testid="description"
-              ></textarea>
+              <textarea id="description" v-model="description" class="textarea" placeholder="Once upon a time..." data-testid="description"></textarea>
             </div>
           </div>
 
@@ -293,12 +234,7 @@ const removeBackgroundImage = () => {
               <div class="field-body">
                 <div class="field">
                   <p class="control is-expanded">
-                    <input
-                      v-model="links[index].title"
-                      class="input"
-                      type="text"
-                      placeholder="Title"
-                    />
+                    <input v-model="links[index].title" class="input" type="text" placeholder="Title" />
                   </p>
                 </div>
                 <div class="field has-addons">
@@ -306,25 +242,16 @@ const removeBackgroundImage = () => {
                     <a class="button is-static"> https:// </a>
                   </p>
                   <p class="control">
-                    <input
-                      v-model="link.url"
-                      class="input"
-                      type="text"
-                      placeholder="example.com"
-                    />
+                    <input v-model="link.url" class="input" type="text" placeholder="example.com" />
                   </p>
                 </div>
                 <div class="block">
-                  <button class="button is-danger" @click="removeLink(index)">
-                    Delete
-                  </button>
+                  <button class="button is-danger" @click="removeLink(index)">Delete</button>
                 </div>
               </div>
             </div>
 
-            <button class="button is-primary is-rounded" @click="addNewLink">
-              Add Link
-            </button>
+            <button class="button is-primary is-rounded" @click="addNewLink">Add Link</button>
           </div>
 
           <div class="field">
@@ -333,41 +260,20 @@ const removeBackgroundImage = () => {
               <div class="field-body">
                 <div class="field">
                   <p class="control is-expanded">
-                    <input
-                      v-model="tags[index]"
-                      class="input"
-                      type="text"
-                      placeholder="Tagname"
-                    />
+                    <input v-model="tags[index]" class="input" type="text" placeholder="Tagname" />
                   </p>
                 </div>
                 <div class="block">
-                  <button
-                    class="button is-danger is-rounded"
-                    @click="removeTag(index)"
-                  >
-                    Delete
-                  </button>
+                  <button class="button is-danger is-rounded" @click="removeTag(index)">Delete</button>
                 </div>
               </div>
             </div>
 
-            <button class="button is-primary is-rounded" @click="addNewTag">
-              Add Tag
-            </button>
+            <button class="button is-primary is-rounded" @click="addNewTag">Add Tag</button>
           </div>
           <div class="field is-grouped is-grouped-right">
             <p class="control">
-              <button
-                class="button is-primary is-rounded"
-                type="submit"
-                :class="{ 'is-loading': isUploading }"
-                :disabled="isUploading"
-                data-testid="upload-button"
-                @click.stop="upload"
-              >
-                Upload Profile
-              </button>
+              <button class="button is-primary is-rounded" type="submit" :class="{ 'is-loading': isUploading }" :disabled="isUploading" data-testid="upload-button" @click.stop="upload">Upload Profile</button>
             </p>
           </div>
         </section>
@@ -382,25 +288,15 @@ const removeBackgroundImage = () => {
         <section v-if="uploadedProfiles.length > 0" class="p-5 card">
           <h2 class="title is-size-4">Previously Uploaded Profiles</h2>
           <div class="table-container">
-            <table
-              class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
-            >
+            <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
               <tr>
                 <th>Identifier</th>
                 <th>Code</th>
                 <th>Delete</th>
               </tr>
-              <tr
-                v-for="(uploadedProfile, index) in uploadedProfiles"
-                :key="index"
-              >
+              <tr v-for="(uploadedProfile, index) in uploadedProfiles" :key="index">
                 <td>
-                  <router-link
-                    :to="`/profiles/${uploadedProfile.url.replace(
-                      uploadTarget,
-                      ''
-                    )}`"
-                  >
+                  <router-link :to="`/profiles/${uploadedProfile.url.replace(uploadTarget, '')}`">
                     {{ uploadedProfile.url.replace(uploadTarget, '') }}
                   </router-link>
                 </td>
@@ -408,12 +304,7 @@ const removeBackgroundImage = () => {
                   <pre class="pre">{{ uploadedProfile.profile }}</pre>
                 </td>
                 <td>
-                  <button
-                    class="button is-danger is-rounded mt-3"
-                    @click="deleteUploadedProfile(uploadedProfile.url)"
-                  >
-                    Delete
-                  </button>
+                  <button class="button is-danger is-rounded mt-3" @click="deleteUploadedProfile(uploadedProfile.url)">Delete</button>
                 </td>
               </tr>
             </table>

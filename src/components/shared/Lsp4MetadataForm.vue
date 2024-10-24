@@ -99,110 +99,36 @@ const emitMetadata = () => {
   <div class="field">
     <label class="label">Token Icon</label>
     <div class="control">
-      <input
-        class="input"
-        type="file"
-        :disabled="props.disabled"
-        @change="handleTokenIcon"
-      />
+      <input class="input" type="file" :disabled="props.disabled" @change="handleTokenIcon" />
     </div>
   </div>
   <div class="field">
     <label class="label">Token Images</label>
     <div class="control">
-      <input
-        class="input"
-        type="file"
-        multiple
-        :disabled="props.disabled"
-        @change="handleTokenImages"
-      />
+      <input class="input" type="file" multiple :disabled="props.disabled" @change="handleTokenImages" />
     </div>
   </div>
   <div class="field">
     <label class="label">Token Description</label>
     <div class="control">
-      <textarea
-        v-model="metadata.description"
-        class="input"
-        :disabled="props.disabled"
-        @keyup="emitMetadata"
-      />
+      <textarea v-model="metadata.description" class="input" :disabled="props.disabled" @keyup="emitMetadata" />
     </div>
   </div>
   <div class="field">
     <label class="label">Token Links</label>
-    <div
-      v-for="(link, index) in metadata.links"
-      :key="index"
-      class="control mb-2 is-flex"
-    >
-      <input
-        :v-model="link.title"
-        :value="link.title"
-        class="input mr-2"
-        type="text"
-        placeholder="Title"
-        :disabled="props.disabled"
-        @keyup="event => handleLinkTitleChange(index, event)"
-      />
-      <input
-        :v-model="link.url"
-        :value="link.url"
-        class="input"
-        type="text"
-        placeholder="URL"
-        :disabled="props.disabled"
-        @keyup="event => handleLinkUrlChange(index, event)"
-      />
-      <button
-        class="button ml-2"
-        :disabled="props.disabled"
-        @click="removeLink(index)"
-      >
-        Remove
-      </button>
+    <div v-for="(link, index) in metadata.links" :key="index" class="control mb-2 is-flex">
+      <input :v-model="link.title" :value="link.title" class="input mr-2" type="text" placeholder="Title" :disabled="props.disabled" @keyup="event => handleLinkTitleChange(index, event)" />
+      <input :v-model="link.url" :value="link.url" class="input" type="text" placeholder="URL" :disabled="props.disabled" @keyup="event => handleLinkUrlChange(index, event)" />
+      <button class="button ml-2" :disabled="props.disabled" @click="removeLink(index)">Remove</button>
     </div>
-    <button
-      class="button"
-      data-testid="addLink"
-      :disabled="props.disabled"
-      @click="addLink"
-    >
-      Add link
-    </button>
+    <button class="button" data-testid="addLink" :disabled="props.disabled" @click="addLink">Add link</button>
   </div>
   <div class="field mb-3">
     <label class="label">Token Creators</label>
-    <div
-      v-for="(creator, index) in creators"
-      :key="index"
-      class="control mb-2 is-flex"
-    >
-      <input
-        :v-model="creator"
-        :value="creator"
-        class="input"
-        type="text"
-        placeholder="Title"
-        :disabled="props.disabled"
-        @keyup="event => handleCreatorChange(index, event)"
-      />
-      <button
-        class="button ml-2"
-        :disabled="props.disabled"
-        @click="removeCreator(index)"
-      >
-        Remove
-      </button>
+    <div v-for="(creator, index) in creators" :key="index" class="control mb-2 is-flex">
+      <input :v-model="creator" :value="creator" class="input" type="text" placeholder="Title" :disabled="props.disabled" @keyup="event => handleCreatorChange(index, event)" />
+      <button class="button ml-2" :disabled="props.disabled" @click="removeCreator(index)">Remove</button>
     </div>
-    <button
-      class="button"
-      data-testid="addCreator"
-      :disabled="props.disabled"
-      @click="addCreator"
-    >
-      Add Creator
-    </button>
+    <button class="button" data-testid="addCreator" :disabled="props.disabled" @click="addCreator">Add Creator</button>
   </div>
 </template>

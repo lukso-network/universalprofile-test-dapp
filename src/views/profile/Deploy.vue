@@ -9,16 +9,11 @@ import { useLspFactory } from '@/compositions/useLspFactory'
 import ProfileModal from '@/components/modals/ProfileModal.vue'
 import { createBlockScoutLink } from '@/utils/createLinks'
 import { formatNumber } from '@/helpers/formatNumber'
-import {
-  DeploymentEvent,
-  DeploymentStatus,
-  DeploymentType,
-} from '@lukso/lsp-factory.js'
+import { DeploymentEvent, DeploymentStatus, DeploymentType } from '@lukso/lsp-factory.js'
 import { getAndPrepareAllIpfsItems } from '@/helpers/localstorage'
 import { LSP3ProfileMetadataJSON } from '@lukso/lsp-smart-contracts'
 
-const { notification, clearNotification, hasNotification, setNotification } =
-  useNotifications()
+const { notification, clearNotification, hasNotification, setNotification } = useNotifications()
 const isModalOpen = ref(false)
 const controllerKey = ref('')
 const selectedProfile = ref({ profile: {} as LSP3ProfileMetadataJSON, url: '' })
@@ -46,23 +41,10 @@ const deploy = async (controllerKey: string) => {
           next: deploymentEvent => {
             isLoading.value = false
             profileDeploymentEvents.value.push(deploymentEvent)
-            localStorage.setItem(
-              'profileDeploymentEvents',
-              JSON.stringify(profileDeploymentEvents.value)
-            )
-            const hash = deploymentEvent?.transaction
-              ? deploymentEvent?.transaction?.hash.substring(0, 16)
-              : deploymentEvent?.receipt?.transactionHash?.substring(0, 16)
-            const href = deploymentEvent?.receipt
-              ? createBlockScoutLink(
-                  deploymentEvent?.receipt?.transactionHash,
-                  true
-                )
-              : createBlockScoutLink(deploymentEvent?.transaction?.hash, true)
-            setNotification(
-              `Profile deployed successfully <br/> <a href="${href}" target="_blank">${hash}</a>`,
-              'primary'
-            )
+            localStorage.setItem('profileDeploymentEvents', JSON.stringify(profileDeploymentEvents.value))
+            const hash = deploymentEvent?.transaction ? deploymentEvent?.transaction?.hash.substring(0, 16) : deploymentEvent?.receipt?.transactionHash?.substring(0, 16)
+            const href = deploymentEvent?.receipt ? createBlockScoutLink(deploymentEvent?.receipt?.transactionHash, true) : createBlockScoutLink(deploymentEvent?.transaction?.hash, true)
+            setNotification(`Profile deployed successfully <br/> <a href="${href}" target="_blank">${hash}</a>`, 'primary')
             return deploymentEvent
           },
           error: err => {
@@ -88,10 +70,7 @@ const deploy = async (controllerKey: string) => {
   return
 }
 
-const openModal = (selectedProfileData: {
-  profile: LSP3ProfileMetadataJSON
-  url: string
-}) => {
+const openModal = (selectedProfileData: { profile: LSP3ProfileMetadataJSON; url: string }) => {
   isModalOpen.value = true
   selectedProfile.value = selectedProfileData
 }
@@ -122,10 +101,7 @@ const deleteUploadedProfile = (url: string) => {
   setNotification('Profile deleted successfully', 'primary')
 }
 
-const getIdFromProfileUrl = (uploadedProfile: {
-  profile: string
-  url: string
-}) => {
+const getIdFromProfileUrl = (uploadedProfile: { profile: string; url: string }) => {
   return uploadedProfile.url.replace(uploadTarget.value, '')
 }
 </script>
@@ -133,30 +109,15 @@ const getIdFromProfileUrl = (uploadedProfile: {
 <template>
   <section class="section">
     <div class="mb-3">
-      <Notifications
-        v-if="hasNotification"
-        :notification="notification"
-        class="mt-4"
-        @hide="clearNotification"
-      />
+      <Notifications v-if="hasNotification" :notification="notification" class="mt-4" @hide="clearNotification" />
     </div>
     <div class="tile is-ancestor">
       <div class="tile is-vertical is-parent is-12">
-        <profile-list-ipfs
-          :loading="isLoading"
-          :uploaded-profiles="uploadedProfiles"
-          :get-id-from-profile-url="getIdFromProfileUrl"
-          class="tile is-child box"
-          @create-profile-on-chain="openModal"
-          @set-notification="setNotification($event)"
-          @delete-uploaded-profile="deleteUploadedProfile"
-        />
+        <profile-list-ipfs :loading="isLoading" :uploaded-profiles="uploadedProfiles" :get-id-from-profile-url="getIdFromProfileUrl" class="tile is-child box" @create-profile-on-chain="openModal" @set-notification="setNotification($event)" @delete-uploaded-profile="deleteUploadedProfile" />
         <div class="tile is-child box">
           <h2 class="title">Deployment Events</h2>
           <div class="table-container">
-            <table
-              class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
-            >
+            <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
               <tr>
                 <th>Type</th>
                 <th>Status</th>
@@ -166,21 +127,14 @@ const getIdFromProfileUrl = (uploadedProfile: {
                 <th class="has-text-right pr-4">Gas</th>
                 <th>TransactionHash</th>
               </tr>
-              <tr
-                v-for="deploymentEvent in profileDeploymentEvents"
-                :key="deploymentEvent.status"
-                :class="deploymentEvent.status"
-              >
+              <tr v-for="deploymentEvent in profileDeploymentEvents" :key="deploymentEvent.status" :class="deploymentEvent.status">
                 <td>
                   <span class="tag" :class="getTypeClass(deploymentEvent.type)">
                     {{ deploymentEvent.type }}
                   </span>
                 </td>
                 <td>
-                  <span
-                    class="tag"
-                    :class="getStatusClass(deploymentEvent.status)"
-                  >
+                  <span class="tag" :class="getStatusClass(deploymentEvent.status)">
                     {{ deploymentEvent.status }}
                   </span>
                 </td>
@@ -193,46 +147,11 @@ const getIdFromProfileUrl = (uploadedProfile: {
                 </td>
 
                 <td class="has-text-right">
-                  {{
-                    deploymentEvent.receipt
-                      ? deploymentEvent.receipt.gasUsed?.hex
-                        ? formatNumber(+deploymentEvent.receipt.gasUsed?.hex)
-                        : formatNumber(+deploymentEvent.receipt.gasUsed)
-                      : ''
-                  }}
+                  {{ deploymentEvent.receipt ? (deploymentEvent.receipt.gasUsed?.hex ? formatNumber(+deploymentEvent.receipt.gasUsed?.hex) : formatNumber(+deploymentEvent.receipt.gasUsed)) : '' }}
                 </td>
                 <td>
-                  <a
-                    v-if="deploymentEvent?.receipt"
-                    :href="
-                      createBlockScoutLink(
-                        deploymentEvent?.receipt?.transactionHash,
-                        true
-                      )
-                    "
-                    target="_blank"
-                    class="button is-small mb-1"
-                  >
-                    {{
-                      deploymentEvent?.receipt?.transactionHash.substring(
-                        0,
-                        16
-                      )
-                    }}...
-                  </a>
-                  <a
-                    v-if="deploymentEvent?.transaction"
-                    :href="
-                      createBlockScoutLink(
-                        deploymentEvent?.transaction?.hash,
-                        true
-                      )
-                    "
-                    target="_blank"
-                    class="button is-small mb-1"
-                  >
-                    {{ deploymentEvent?.transaction?.hash.substring(0, 16) }}...
-                  </a>
+                  <a v-if="deploymentEvent?.receipt" :href="createBlockScoutLink(deploymentEvent?.receipt?.transactionHash, true)" target="_blank" class="button is-small mb-1"> {{ deploymentEvent?.receipt?.transactionHash.substring(0, 16) }}... </a>
+                  <a v-if="deploymentEvent?.transaction" :href="createBlockScoutLink(deploymentEvent?.transaction?.hash, true)" target="_blank" class="button is-small mb-1"> {{ deploymentEvent?.transaction?.hash.substring(0, 16) }}... </a>
                 </td>
               </tr>
             </table>
@@ -240,13 +159,6 @@ const getIdFromProfileUrl = (uploadedProfile: {
         </div>
       </div>
     </div>
-    <ProfileModal
-      :is-modal-open="isModalOpen"
-      :selected-profile="selectedProfile"
-      :controller-key="controllerKey"
-      @close-modal="closeModal"
-      @deploy="deploy"
-      @update:model-value="value => (controllerKey = value)"
-    />
+    <ProfileModal :is-modal-open="isModalOpen" :selected-profile="selectedProfile" :controller-key="controllerKey" @close-modal="closeModal" @deploy="deploy" @update:model-value="value => (controllerKey = value)" />
   </section>
 </template>

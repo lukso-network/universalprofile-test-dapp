@@ -41,22 +41,12 @@ const props = defineProps<Props>()
 const emits = defineEmits<Emits>()
 
 const methodInfo = computed<MethodType>(() => props.info || {})
-const isArray = computed<boolean>(
-  () => methodInfo.value.type?.match(/\[\]$/) != null
-)
+const isArray = computed<boolean>(() => methodInfo.value.type?.match(/\[\]$/) != null)
 
 function makeWei(_value: string, hex = false) {
   try {
-    const value =
-      typeof _value === 'string' && _value.startsWith('0x')
-        ? _value
-        : numberToHex(_value)
-    const val = methodInfo.value.isWei
-      ? toWei(
-          hexToNumber(value, true).toString(),
-          methodInfo.value.isWei as Unit
-        )
-      : value
+    const value = typeof _value === 'string' && _value.startsWith('0x') ? _value : numberToHex(_value)
+    const val = methodInfo.value.isWei ? toWei(hexToNumber(value, true).toString(), methodInfo.value.isWei as Unit) : value
     if (hex) {
       return padLeft(val, 64)
     }
@@ -127,13 +117,7 @@ function validate(value: any): { value: any; error?: string } {
         }
         const val = new BN(value) // Validate parsing so no numberToHex
         if (val.toString() !== value) {
-          console.log(
-            'not parsed',
-            val.toString(),
-            value,
-            typeof val.toString(),
-            typeof value
-          )
+          console.log('not parsed', val.toString(), value, typeof val.toString(), typeof value)
           throw new Error('Number did not fully parse')
         }
         if (val.isNeg()) {
@@ -285,10 +269,7 @@ const handleChange = (index: number, e: Event) => {
     item.error = newError
     emits('update:error', true)
   } else {
-    emits(
-      'update:modelValue',
-      isArray.value ? data.items.map(({ value }) => value) : item.value
-    )
+    emits('update:modelValue', isArray.value ? data.items.map(({ value }) => value) : item.value)
     if (item.error) {
       item.error = undefined
       const hasError = data.items.some(({ error }) => error != null)
@@ -305,13 +286,8 @@ const handleLSP = (index: number, e: Event) => {
     const [keyName] = value.split(',')
     item.decodedError = undefined
 
-    const output = ERC725.decodeData(
-      [{ keyName, value: item.value }],
-      schemas as ERC725JSONSchema[]
-    )
-    const decoded = (output as any[]).find(
-      ({ name }) => name === keyName
-    )?.value
+    const output = ERC725.decodeData([{ keyName, value: item.value }], schemas as ERC725JSONSchema[])
+    const decoded = (output as any[]).find(({ name }) => name === keyName)?.value
     if (decoded) {
       if (typeof decoded === 'object') {
         item.decoded = JSON.stringify(decoded, null, 2)
@@ -332,10 +308,7 @@ const handleSelected = (index: number, info: TokenInfo) => {
     item.error = error
     emits('update:error', true)
   } else {
-    emits(
-      'update:modelValue',
-      isArray.value ? data.items.map(({ value }) => value) : item.value
-    )
+    emits('update:modelValue', isArray.value ? data.items.map(({ value }) => value) : item.value)
     if (item.error) {
       item.error = undefined
       const hasError = data.items.some(({ error }) => error != null)
@@ -352,10 +325,7 @@ const shouldWei = (index: number) => {
 const shouldBytes32 = (index: number) => {
   const item = data.items[index]
   if (/^bytes32/.test(methodInfo.value.type)) {
-    if (
-      /^[0-9]+$/.test(item.value) ||
-      (methodInfo.value.isKey && !item.value?.startsWith('0x'))
-    ) {
+    if (/^[0-9]+$/.test(item.value) || (methodInfo.value.isKey && !item.value?.startsWith('0x'))) {
       return true
     }
   }
@@ -365,11 +335,7 @@ const shouldBytes32 = (index: number) => {
 const makeBytes32 = (index: number, force = false) => {
   const item = data.items[index]
   if (/^bytes32/.test(methodInfo.value.type)) {
-    if (
-      (force || methodInfo.value.isKey) &&
-      !item.value?.startsWith('0x') &&
-      /^[a-z0-9]+$/i.test(item.value)
-    ) {
+    if ((force || methodInfo.value.isKey) && !item.value?.startsWith('0x') && /^[a-z0-9]+$/i.test(item.value)) {
       const items = (item.value || '').split(',')
       try {
         return ERC725.encodeKeyName(items[0], items.slice(1))
@@ -394,28 +360,10 @@ const hasError = (index: number) => {
 </script>
 
 <template>
-  <div
-    v-for="(item, index) of data.items"
-    :key="index"
-    class="field"
-    style="max-width: 100%"
-  >
+  <div v-for="(item, index) of data.items" :key="index" class="field" style="max-width: 100%">
     <label v-if="methodInfo.type !== 'bool'" class="label"
-      >{{
-        methodInfo.label
-          ? methodInfo.label
-          : isArray
-            ? `${methodInfo.name}[${index + 1}]`
-            : methodInfo.name
-      }}
-      ({{ methodInfo.type.replace(/\[\]$/, '')
-      }}<select
-        v-if="props.custom && methodInfo.type.match(/^u?int256/)"
-        :value="methodInfo.isWei"
-        :readonly="props.dataDecoder"
-        class="ml-1"
-        @change="handleUnits"
-      >
+      >{{ methodInfo.label ? methodInfo.label : isArray ? `${methodInfo.name}[${index + 1}]` : methodInfo.name }} ({{ methodInfo.type.replace(/\[\]$/, '')
+      }}<select v-if="props.custom && methodInfo.type.match(/^u?int256/)" :value="methodInfo.isWei" :readonly="props.dataDecoder" class="ml-1" @change="handleUnits">
         <option value="">- number -</option>
         <option value="noether">noether</option>
         <option value="wei">wei</option>
@@ -444,102 +392,31 @@ const hasError = (index: number) => {
         <option value="mether">mether</option>
         <option value="gether">gether</option>
         <option value="tether">tether</option></select
-      >{{ !props.custom && methodInfo.isWei ? methodInfo.isWei : ''
-      }}<label v-if="/^bytes32/.test(methodInfo.type)" class="ml-2"
-        ><input
-          type="checkbox"
-          :readonly="props.dataDecoder"
-          :checked="methodInfo.isKey"
-          :data-testid="props.testidPrefix + methodInfo.name + '_isKey'"
-          @input="handleIsKey"
-        />&nbsp;Encode LSP DataKey</label
-      >)
+      >{{ !props.custom && methodInfo.isWei ? methodInfo.isWei : '' }}<label v-if="/^bytes32/.test(methodInfo.type)" class="ml-2"><input type="checkbox" :readonly="props.dataDecoder" :checked="methodInfo.isKey" :data-testid="props.testidPrefix + methodInfo.name + '_isKey'" @input="handleIsKey" />&nbsp;Encode LSP DataKey</label>)
     </label>
-    <LSPSelect
-      v-if="methodInfo.type.match(/^address/)"
-      :show-types="methodInfo.hasSpecs"
-      :readonly="props.dataDecoder"
-      :address="item.value"
-      @option-selected="(e: TokenInfo) => handleSelected(index, e)"
-    />
+    <LSPSelect v-if="methodInfo.type.match(/^address/)" :show-types="methodInfo.hasSpecs" :readonly="props.dataDecoder" :address="item.value" @option-selected="(e: TokenInfo) => handleSelected(index, e)" />
     <div :class="{ control: true, 'has-icons-right': methodInfo.isWei }">
-      <input
-        v-if="methodInfo.type !== 'bool'"
-        :value="item.value"
-        :readonly="props.dataDecoder"
-        class="input is-family-code"
-        type="text"
-        :data-testid="props.testidPrefix + methodInfo.name"
-        @input="e => handleChange(index, e)"
-      />
-      <label v-else class="label"
-        ><input
-          type="checkbox"
-          :checked="item.value"
-          :readonly="props.dataDecoder"
-          :data-testid="props.testidPrefix + methodInfo.name"
-          @input="e => handleChange(index, e)"
-        />&nbsp;{{
-          methodInfo.label
-            ? methodInfo.label
-            : isArray
-              ? `${methodInfo.name}[${index + 1}]`
-              : methodInfo.name
-        }}
-        ({{ methodInfo.type.replace(/\[\]$/, '') }})</label
-      >
-      <span
-        v-if="methodInfo.isWei"
-        class="icon is-small is-right"
-        style="width: 5em"
-      >
+      <input v-if="methodInfo.type !== 'bool'" :value="item.value" :readonly="props.dataDecoder" class="input is-family-code" type="text" :data-testid="props.testidPrefix + methodInfo.name" @input="e => handleChange(index, e)" />
+      <label v-else class="label"><input type="checkbox" :checked="item.value" :readonly="props.dataDecoder" :data-testid="props.testidPrefix + methodInfo.name" @input="e => handleChange(index, e)" />&nbsp;{{ methodInfo.label ? methodInfo.label : isArray ? `${methodInfo.name}[${index + 1}]` : methodInfo.name }} ({{ methodInfo.type.replace(/\[\]$/, '') }})</label>
+      <span v-if="methodInfo.isWei" class="icon is-small is-right" style="width: 5em">
         <i class="fas fa-envelope"> {{ methodInfo.isWei || '' }}</i>
       </span>
     </div>
 
-    <p v-if="shouldBytes32(index)" class="help" style="overflow-wrap: anywhere">
-      actual value {{ makeBytes32(index) }}
-    </p>
-    <p v-if="shouldWei(index)" class="help" style="overflow-wrap: anywhere">
-      actual value {{ makeWei(item.value) }} ({{ makeWei(item.value, true) }})
-    </p>
+    <p v-if="shouldBytes32(index)" class="help" style="overflow-wrap: anywhere">actual value {{ makeBytes32(index) }}</p>
+    <p v-if="shouldWei(index)" class="help" style="overflow-wrap: anywhere">actual value {{ makeWei(item.value) }} ({{ makeWei(item.value, true) }})</p>
     <div v-if="props.dataDecoder" class="w-100">
-      <div>
-        <label>LSP Decoder</label
-        ><input
-          :value="item.decoder"
-          class="input is-family-code"
-          type="text"
-          @input="e => handleLSP(index, e)"
-        />
-      </div>
-      <pre v-if="item.decoded" class="help" style="overflow-x: scroll">{{
-        item.decoded
-      }}</pre>
-      <p
-        v-if="item.decodedError"
-        class="help is-danger"
-        style="overflow-wrap: anywhere"
-      >
+      <div><label>LSP Decoder</label><input :value="item.decoder" class="input is-family-code" type="text" @input="e => handleLSP(index, e)" /></div>
+      <pre v-if="item.decoded" class="help" style="overflow-x: scroll">{{ item.decoded }}</pre>
+      <p v-if="item.decodedError" class="help is-danger" style="overflow-wrap: anywhere">
         {{ item.decodedError }}
       </p>
     </div>
     <p v-if="hasError(index)" class="help is-danger">{{ hasError(index) }}</p>
-    <div v-if="!props.dataDecoder && isArray" class="mt-1">
-      <button @click="handleAdd(index)">Add</button
-      ><button v-if="data?.items?.length > 0" @click="handleRemove(index)">
-        Remove
-      </button>
-    </div>
+    <div v-if="!props.dataDecoder && isArray" class="mt-1"><button @click="handleAdd(index)">Add</button><button v-if="data?.items?.length > 0" @click="handleRemove(index)">Remove</button></div>
   </div>
   <div v-if="!props.dataDecoder && isArray && data?.items?.length === 0">
-    <label class="label">{{
-      methodInfo.label
-        ? methodInfo.label
-        : isArray
-          ? `${methodInfo.name}`
-          : methodInfo.name
-    }}</label>
+    <label class="label">{{ methodInfo.label ? methodInfo.label : isArray ? `${methodInfo.name}` : methodInfo.name }}</label>
     <button @click="handleAdd(0)">Add</button>
   </div>
 </template>

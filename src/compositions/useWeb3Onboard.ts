@@ -65,8 +65,7 @@ const appMetadata = {
 }
 
 const connect: ConnectModalOptions = {
-  iDontHaveAWalletLink:
-    'https://chrome.google.com/webstore/detail/universal-profiles/abpickdkkbnbcoepogfhkhennhfhehfn?hl=en',
+  iDontHaveAWalletLink: 'https://chrome.google.com/webstore/detail/universal-profiles/abpickdkkbnbcoepogfhkhennhfhehfn?hl=en',
   removeWhereIsMyWalletWarning: true,
 }
 

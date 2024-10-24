@@ -26,12 +26,7 @@ const handleInput = (event: Event) => {
 </script>
 
 <template>
-  <div
-    id="modal"
-    class="modal modal-container"
-    :class="isModalOpen ? 'is-active' : ''"
-    data-testid="modal"
-  >
+  <div id="modal" class="modal modal-container" :class="isModalOpen ? 'is-active' : ''" data-testid="modal">
     <div class="modal-background" />
     <div class="modal-card">
       <header class="modal-card-head">
@@ -43,31 +38,14 @@ const handleInput = (event: Event) => {
           <div class="field">
             <label class="label" for="controller-key">Controller Key</label>
             <p class="control">
-              <input
-                id="controller-key"
-                :value="controllerKey"
-                class="input"
-                type="text"
-                placeholder="Address (0x...)"
-                data-testid="controller-key"
-                required
-                @input="handleInput"
-              />
+              <input id="controller-key" :value="controllerKey" class="input" type="text" placeholder="Address (0x...)" data-testid="controller-key" required @input="handleInput" />
             </p>
           </div>
-          <p class="help">
-            Enter the address which will be managing the profile.
-          </p>
+          <p class="help">Enter the address which will be managing the profile.</p>
         </form>
       </section>
       <footer class="modal-card-foot">
-        <button
-          class="button is-success"
-          data-testid="deploy-profile"
-          @click="handleDeploy"
-        >
-          Deploy
-        </button>
+        <button class="button is-success" data-testid="deploy-profile" @click="handleDeploy">Deploy</button>
         <button class="button" @click="handleCloseModal">Cancel</button>
       </footer>
     </div>

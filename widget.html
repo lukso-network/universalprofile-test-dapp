@@ -1,0 +1,50 @@
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      html,
+      body {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        min-width: 100% !important;
+        min-height: 100% !important;
+        box-sizing: border-box !important; /* Ensure padding and borders are accounted for */
+        overflow: hidden !important;
+      }
+      .section-fullheight {
+        height: 100% !important;
+        min-height: 100% !important;
+      }
+    </style>
+    <link rel="icon" type="image/svg+xml" href="/lukso.png" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Universal Widget</title>
+    <script>
+      window.global = window
+    </script>
+
+    <script type="module">
+      import process from 'process'
+      import { Buffer } from 'buffer'
+      import EventEmitter from 'events'
+
+      window.Buffer = Buffer
+      window.process = process
+      window.EventEmitter = EventEmitter
+    </script>
+  </head>
+
+  <body>
+    <section class="section-fullheight has-background-grey">
+      <div class="box has-background-grey" id="app" />
+    </section>
+
+    <script type="module" src="/src/widget.ts"></script>
+  </body>
+</html>

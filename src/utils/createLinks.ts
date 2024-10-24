@@ -5,7 +5,5 @@ export function createIpfsLink(url: string): string {
 }
 
 export function createBlockScoutLink(hash: string, isTx = false): string {
-  return `${getSelectedNetworkConfig().blockscout.url}/${
-    isTx ? 'tx' : 'address'
-  }/${hash}`
+  return `${getSelectedNetworkConfig().explorer?.url}/${isTx ? 'tx' : 'address'}/${hash}`
 }

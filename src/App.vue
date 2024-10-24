@@ -3,7 +3,10 @@ import Navbar from '@/components/Navbar.vue'
 import { ref } from 'vue'
 const uri = window.location.search.substring(1)
 const params = new URLSearchParams(uri)
-const showNav = ref<boolean>(params.get('hideNav') == undefined)
+const showNav = ref<boolean>(params.get('hideNav') == null)
+if (!showNav.value) {
+  document.body.classList.remove('has-navbar-fixed-top')
+}
 </script>
 
 <template>

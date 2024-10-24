@@ -1,9 +1,6 @@
 import { create, IPFSHTTPClient, Options } from 'ipfs-http-client'
 
-import {
-  BaseFormDataUploader,
-  FormDataPostHeaders,
-} from '@/services/ipfs/formdata-base-client'
+import { BaseFormDataUploader, FormDataPostHeaders } from '@/services/ipfs/formdata-base-client'
 
 export class HttpIPFSClientUploader extends BaseFormDataUploader {
   private ipfs: IPFSHTTPClient

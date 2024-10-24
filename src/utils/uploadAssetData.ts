@@ -8,17 +8,12 @@ let uploadProvider: BaseFormDataUploader | undefined
 
 function getUploadProvider() {
   if (!uploadProvider) {
-    uploadProvider = new AuthenticatedFormDataUploader(
-      getSelectedNetworkConfig().ipfs.url,
-      {}
-    )
+    uploadProvider = new AuthenticatedFormDataUploader(getSelectedNetworkConfig().ipfs.url, {})
   }
   return uploadProvider
 }
 
-export const uploadAssetData = async (
-  metadata: LSP4MetadataContentBeforeUpload
-) => {
+export const uploadAssetData = async (metadata: LSP4MetadataContentBeforeUpload) => {
   const uploadProvider = getUploadProvider()
   const uploadOptions = {
     ipfsGateway: {

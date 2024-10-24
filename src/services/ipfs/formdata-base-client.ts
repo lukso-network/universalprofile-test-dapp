@@ -18,13 +18,7 @@ export type FormDataRequestOptions = {
 }
 
 export const handleError = (error: any) => {
-  if (
-    error &&
-    error.response &&
-    error.response &&
-    error.response.data &&
-    error.response.data.error
-  ) {
+  if (error && error.response && error.response && error.response.data && error.response.data.error) {
     return error.response.data.error
   } else if (error.data && error.data.error) {
     return error.data.error
@@ -37,11 +31,7 @@ export const handleError = (error: any) => {
 export class BaseFormDataUploader {
   // Already refactored several times, but still too complex since it needs
   // to handle both node and browser types.
-  private populate(
-    dataContent: FormData,
-    data: any,
-    meta?: FormDataPostHeaders
-  ): FormDataPostHeaders | undefined {
+  private populate(dataContent: FormData, data: any, meta?: FormDataPostHeaders): FormDataPostHeaders | undefined {
     if (!('on' in data) && typeof data !== 'string') {
       if ('size' in data && 'type' in data) {
         const blob = data
@@ -53,10 +43,7 @@ export class BaseFormDataUploader {
       } else if ('buffer' in data && 'mimeType' in data) {
         const assetBuffer = data as AssetBuffer
         meta = { 'content-type': assetBuffer.mimeType }
-        dataContent.append(
-          'file',
-          new (global.Blob || Blob)([assetBuffer.buffer])
-        )
+        dataContent.append('file', new (global.Blob || Blob)([assetBuffer.buffer]))
       } else if (Buffer.isBuffer(data)) {
         dataContent.append('file', new (global.Blob || Blob)([data]))
       } else if ('on' in data && 'pipe' in data) {
@@ -76,9 +63,7 @@ export class BaseFormDataUploader {
     const options = await this.getRequestOptions(dataContent as FormData, meta)
     // This needs to be in a different files for testing with jest to work
     // property. Internal access to internal methods in a file cannot be patched.
-    return this.resolveUrl(
-      await this.uploadFormData(options, dataContent as FormData)
-    )
+    return this.resolveUrl(await this.uploadFormData(options, dataContent as FormData))
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async addMetadata(dataContent: FormData, meta?: FormDataPostHeaders) {
@@ -103,10 +88,7 @@ export class BaseFormDataUploader {
   resolveUrl(result: any): string {
     throw new Error(NOT_IMPLEMENTED)
   }
-  uploadFormData(
-    requestOptions: FormDataRequestOptions,
-    dataContent: FormData
-  ): Promise<any> {
+  uploadFormData(requestOptions: FormDataRequestOptions, dataContent: FormData): Promise<any> {
     const input = {
       method: 'POST',
       ...requestOptions,
@@ -126,11 +108,7 @@ export class BaseFormDataUploader {
               // Ignore
             }
             error = (error as any).error || error
-            throw new Error(
-              `unknown server response while pinning File to IPFS: ${
-                error || response.status
-              }`
-            )
+            throw new Error(`unknown server response while pinning File to IPFS: ${error || response.status}`)
           })
         }
         return response.json() as Promise<PinataPinResponse>
