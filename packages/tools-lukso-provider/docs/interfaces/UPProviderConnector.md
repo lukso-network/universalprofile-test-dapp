@@ -20,7 +20,7 @@ API for provider connector
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/server.ts:262](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/server.ts#L262)
+[packages/tools-lukso-provider/src/server.ts:274](https://github.com/lukso-network/universalprofile-test-dapp/blob/76390a481233271abc57cda0cbb2b69afd9acb37/packages/tools-lukso-provider/src/server.ts#L274)
 
 ***
 
@@ -36,21 +36,21 @@ Get a map of all clients by their ID.
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/server.ts:267](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/server.ts#L267)
+[packages/tools-lukso-provider/src/server.ts:279](https://github.com/lukso-network/universalprofile-test-dapp/blob/76390a481233271abc57cda0cbb2b69afd9acb37/packages/tools-lukso-provider/src/server.ts#L279)
 
 ***
 
 ### provider
 
-> `get` **provider**(): `any`
+> `get` **provider**(): [`UPProviderEndpoint`](UPProviderEndpoint.md)
 
 #### Returns
 
-`any`
+[`UPProviderEndpoint`](UPProviderEndpoint.md)
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/server.ts:261](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/server.ts#L261)
+[packages/tools-lukso-provider/src/server.ts:273](https://github.com/lukso-network/universalprofile-test-dapp/blob/76390a481233271abc57cda0cbb2b69afd9acb37/packages/tools-lukso-provider/src/server.ts#L273)
 
 ## Methods
 
@@ -76,7 +76,7 @@ Get a map of all clients by their ID.
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/server.ts:241](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/server.ts#L241)
+[packages/tools-lukso-provider/src/server.ts:253](https://github.com/lukso-network/universalprofile-test-dapp/blob/76390a481233271abc57cda0cbb2b69afd9acb37/packages/tools-lukso-provider/src/server.ts#L253)
 
 ***
 
@@ -90,7 +90,7 @@ Get a map of all clients by their ID.
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/server.ts:259](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/server.ts#L259)
+[packages/tools-lukso-provider/src/server.ts:271](https://github.com/lukso-network/universalprofile-test-dapp/blob/76390a481233271abc57cda0cbb2b69afd9acb37/packages/tools-lukso-provider/src/server.ts#L271)
 
 ***
 
@@ -116,7 +116,7 @@ Calls each of the listeners registered for a given event.
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/server.ts:235](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/server.ts#L235)
+[packages/tools-lukso-provider/src/server.ts:247](https://github.com/lukso-network/universalprofile-test-dapp/blob/76390a481233271abc57cda0cbb2b69afd9acb37/packages/tools-lukso-provider/src/server.ts#L247)
 
 ***
 
@@ -133,7 +133,7 @@ listeners.
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/server.ts:220](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/server.ts#L220)
+[packages/tools-lukso-provider/src/server.ts:232](https://github.com/lukso-network/universalprofile-test-dapp/blob/76390a481233271abc57cda0cbb2b69afd9acb37/packages/tools-lukso-provider/src/server.ts#L232)
 
 ***
 
@@ -155,7 +155,7 @@ actual UPClientChannel
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/server.ts:274](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/server.ts#L274)
+[packages/tools-lukso-provider/src/server.ts:286](https://github.com/lukso-network/universalprofile-test-dapp/blob/76390a481233271abc57cda0cbb2b69afd9acb37/packages/tools-lukso-provider/src/server.ts#L286)
 
 ***
 
@@ -181,7 +181,7 @@ list of addresses
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/server.ts:284](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/server.ts#L284)
+[packages/tools-lukso-provider/src/server.ts:296](https://github.com/lukso-network/universalprofile-test-dapp/blob/76390a481233271abc57cda0cbb2b69afd9acb37/packages/tools-lukso-provider/src/server.ts#L296)
 
 ***
 
@@ -201,7 +201,7 @@ Return the number of listeners listening to a given event.
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/server.ts:230](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/server.ts#L230)
+[packages/tools-lukso-provider/src/server.ts:242](https://github.com/lukso-network/universalprofile-test-dapp/blob/76390a481233271abc57cda0cbb2b69afd9acb37/packages/tools-lukso-provider/src/server.ts#L242)
 
 ***
 
@@ -225,7 +225,7 @@ Return the listeners registered for a given event.
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/server.ts:225](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/server.ts#L225)
+[packages/tools-lukso-provider/src/server.ts:237](https://github.com/lukso-network/universalprofile-test-dapp/blob/76390a481233271abc57cda0cbb2b69afd9acb37/packages/tools-lukso-provider/src/server.ts#L237)
 
 ***
 
@@ -253,7 +253,7 @@ Return the listeners registered for a given event.
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/server.ts:252](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/server.ts#L252)
+[packages/tools-lukso-provider/src/server.ts:264](https://github.com/lukso-network/universalprofile-test-dapp/blob/76390a481233271abc57cda0cbb2b69afd9acb37/packages/tools-lukso-provider/src/server.ts#L264)
 
 ***
 
@@ -281,7 +281,7 @@ Add a listener for a given event.
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/server.ts:240](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/server.ts#L240)
+[packages/tools-lukso-provider/src/server.ts:252](https://github.com/lukso-network/universalprofile-test-dapp/blob/76390a481233271abc57cda0cbb2b69afd9acb37/packages/tools-lukso-provider/src/server.ts#L252)
 
 ***
 
@@ -309,7 +309,7 @@ Add a one-time listener for a given event.
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/server.ts:246](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/server.ts#L246)
+[packages/tools-lukso-provider/src/server.ts:258](https://github.com/lukso-network/universalprofile-test-dapp/blob/76390a481233271abc57cda0cbb2b69afd9acb37/packages/tools-lukso-provider/src/server.ts#L258)
 
 ***
 
@@ -329,7 +329,7 @@ Remove all listeners, or those of the specified event.
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/server.ts:257](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/server.ts#L257)
+[packages/tools-lukso-provider/src/server.ts:269](https://github.com/lukso-network/universalprofile-test-dapp/blob/76390a481233271abc57cda0cbb2b69afd9acb37/packages/tools-lukso-provider/src/server.ts#L269)
 
 ***
 
@@ -359,7 +359,7 @@ Remove the listeners of a given event.
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/server.ts:251](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/server.ts#L251)
+[packages/tools-lukso-provider/src/server.ts:263](https://github.com/lukso-network/universalprofile-test-dapp/blob/76390a481233271abc57cda0cbb2b69afd9acb37/packages/tools-lukso-provider/src/server.ts#L263)
 
 ***
 
@@ -373,7 +373,7 @@ the connection.
 
 #### Parameters
 
-• **provider**: `any`
+• **provider**: [`UPProviderEndpoint`](UPProviderEndpoint.md)
 
 • **rpcUrls**: `string` \| `string`[]
 
@@ -383,4 +383,4 @@ the connection.
 
 #### Defined in
 
-[packages/tools-lukso-provider/src/server.ts:293](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/server.ts#L293)
+[packages/tools-lukso-provider/src/server.ts:305](https://github.com/lukso-network/universalprofile-test-dapp/blob/76390a481233271abc57cda0cbb2b69afd9acb37/packages/tools-lukso-provider/src/server.ts#L305)

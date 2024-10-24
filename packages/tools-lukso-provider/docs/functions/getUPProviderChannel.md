@@ -24,4 +24,4 @@ UPClientChannel
 
 ## Defined in
 
-[packages/tools-lukso-provider/src/server.ts:431](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/server.ts#L431)
+[packages/tools-lukso-provider/src/server.ts:443](https://github.com/lukso-network/universalprofile-test-dapp/blob/76390a481233271abc57cda0cbb2b69afd9acb37/packages/tools-lukso-provider/src/server.ts#L443)

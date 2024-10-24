@@ -12,6 +12,8 @@
 - [UPClientProviderEvents](interfaces/UPClientProviderEvents.md)
 - [UPProviderConnector](interfaces/UPProviderConnector.md)
 - [UPProviderConnectorEvents](interfaces/UPProviderConnectorEvents.md)
+- [UPProviderEndpoint](interfaces/UPProviderEndpoint.md)
+- [UPProviderEndpointEvents](interfaces/UPProviderEndpointEvents.md)
 
 ## Functions
 

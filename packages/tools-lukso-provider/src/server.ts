@@ -1,4 +1,4 @@
-import { JSONRPCErrorResponse, JSONRPCServer, JSONRPCSuccessResponse } from 'json-rpc-2.0'
+import { JSONRPCErrorResponse, JSONRPCParams, JSONRPCServer, JSONRPCSuccessResponse } from 'json-rpc-2.0'
 import { v4 as uuidv4 } from 'uuid'
 import EventEmitter3, { EventEmitter } from 'eventemitter3'
 import debug from 'debug'
@@ -195,10 +195,22 @@ class _UPClientChannel extends EventEmitter3<UPClientChannelEvents> implements U
   }
 }
 
+interface UPProviderEndpointEvents {
+  accountsChanged: (accounts: (`0x${string}` | '')[]) => void
+  chainChanged: (chainId: number) => void
+  connect: ({ chainId }: { chainId: number }) => void
+  disconnect: (error: Error) => void
+}
+interface UPProviderEndpoint {
+  on<T extends EventEmitter.EventNames<UPProviderEndpointEvents>>(event: T, fn: EventEmitter.EventListener<UPProviderEndpointEvents, T>, context?: any): this
+  request(message: { method: string; params: JSONRPCParams }, clientParams?: any): Promise<any>
+  request(method: string | { method: string; params: JSONRPCParams }, params?: JSONRPCParams, clientParams?: any): Promise<any>
+}
+
 type UPProviderConnectorOptions = {
   providerHandler?: (e: MessageEvent) => void
   accounts: (`0x${string}` | '')[]
-  provider: any
+  provider: UPProviderEndpoint
   primary: `0x${string}` | ''
   promise: Promise<void>
   rpcUrls: string[]
@@ -258,7 +270,7 @@ interface UPProviderConnector {
 
   close(): void
 
-  get provider(): any
+  get provider(): UPProviderEndpoint
   get accounts(): (`0x${string}` | '')[]
 
   /**
@@ -290,7 +302,7 @@ interface UPProviderConnector {
    * @param provider
    * @param rpcUrls
    */
-  setupProvider(provider: any, rpcUrls: string | string[]): Promise<void>
+  setupProvider(provider: UPProviderEndpoint, rpcUrls: string | string[]): Promise<void>
 }
 
 class _UPProviderConnector extends EventEmitter3<UPProviderConnectorEvents> {
@@ -309,7 +321,7 @@ class _UPProviderConnector extends EventEmitter3<UPProviderConnectorEvents> {
     }
   }
 
-  get provider(): any {
+  get provider(): UPProviderEndpoint {
     return this.#options.provider
   }
 
@@ -402,7 +414,7 @@ class _UPProviderConnector extends EventEmitter3<UPProviderConnectorEvents> {
               await item.allowAccounts(item.enabled, [this.#options.primary, ...this.#options.accounts.slice(1)], this.#options.chainId)
             }
           }
-          this.#options.provider.on('accountsChanged', async ([_primary]: [`0x${string}` | '']) => {
+          this.#options.provider.on('accountsChanged', async ([_primary]: (`0x${string}` | '')[]) => {
             if (this.#options.primary !== _primary) {
               this.#options.primary = _primary
               this.#options.accounts[0] = _primary
@@ -647,4 +659,4 @@ function createUPProviderConnector(provider?: any, rpcUrls?: string | string[]):
   return globalUPProvider
 }
 
-export { type UPClientChannel, type UPClientChannelEvents, type UPProviderConnector, type UPProviderConnectorEvents, getUPProviderChannel, createUPProviderConnector }
+export { type UPClientChannel, type UPClientChannelEvents, type UPProviderConnector, type UPProviderConnectorEvents, type UPProviderEndpoint, type UPProviderEndpointEvents, getUPProviderChannel, createUPProviderConnector }

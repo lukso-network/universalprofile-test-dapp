@@ -87,10 +87,13 @@ interface UPClientProvider {
   removeAllListeners(event?: EventEmitter.EventNames<UPClientProviderEvents>): this
 
   request(method: string, params: JSONRPCParams, clientParams: any): Promise<any>
+  request(method: { method: string; params: JSONRPCParams }, clientParams: any): Promise<any>
 
   get chainId(): number
 
   get accounts(): (`0x${string}` | '')[]
+
+  get isConnected(): boolean
 }
 class _UPClientProvider extends EventEmitter3<UPClientProviderEvents> {
   readonly #options: UPClientProviderOptions
@@ -103,9 +106,15 @@ class _UPClientProvider extends EventEmitter3<UPClientProviderEvents> {
     return true
   }
 
-  async request(method: string, params: JSONRPCParams, clientParams: any): Promise<any> {
+  get isConnected(): boolean {
+    return !!(this.#options.accounts() || [])[0]
+  }
+
+  async request(method: string | { method: string; params: JSONRPCParams }, params?: JSONRPCParams, clientParams?: any): Promise<any> {
     await this.#options?.startupPromise
-    return this.#options?.client?.request(method, params, clientParams) || null
+    // Internally this will decode method.method and method.params if it was sent.
+    // i.e. this method is patched.
+    return (this.#options?.client?.request as (method: string | { method: string; params: JSONRPCParams }, params?: JSONRPCParams, clientParams?: any) => Promise<any>)(method, params, clientParams) || null
   }
 
   get chainId() {
@@ -375,7 +384,7 @@ function createClientUPProvider(authURL?: string | Window, search = true): UPCli
 
   const request_ = client.request.bind(client)
 
-  const wrapper = async (method: string, params: unknown[]) => {
+  const wrapper = async (method: string, params?: unknown[]) => {
     switch (method) {
       case 'eth_call':
         if (rpcUrls.length > 0) {
@@ -423,7 +432,7 @@ function createClientUPProvider(authURL?: string | Window, search = true): UPCli
     return request_(method, params)
   }
 
-  client.request = async (method, params) => {
+  client.request = async (method: string | { method: string; params: unknown[] }, params?: unknown[]) => {
     await doSearch(client)
 
     await startupPromise
@@ -432,10 +441,7 @@ function createClientUPProvider(authURL?: string | Window, search = true): UPCli
     if (typeof method === 'string') {
       return await wrapper(method, params)
     }
-    const { method: _method, params: _params } = method as {
-      method: string
-      params: unknown[]
-    }
+    const { method: _method, params: _params } = method
     return await wrapper(_method, _params)
   }
 

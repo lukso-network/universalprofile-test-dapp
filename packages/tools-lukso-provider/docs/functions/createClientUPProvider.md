@@ -29,4 +29,4 @@ the client UPProvider
 
 ## Defined in
 
-[packages/tools-lukso-provider/src/client.ts:245](https://github.com/lukso-network/universalprofile-test-dapp/blob/aca91b0b45c39879daeb5b9f9b46717028f73a74/packages/tools-lukso-provider/src/client.ts#L245)
+[packages/tools-lukso-provider/src/client.ts:254](https://github.com/lukso-network/universalprofile-test-dapp/blob/76390a481233271abc57cda0cbb2b69afd9acb37/packages/tools-lukso-provider/src/client.ts#L254)
