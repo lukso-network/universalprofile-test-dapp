@@ -40,10 +40,8 @@ function upChannelConnected(e: CustomEvent) {
       :hide-notification="true"
       class="mb-4"
     ></Notifications>
-    <section class="title">
-      <h1 class="title is-large">Content within Grid iframe</h1>
-    </section>
     <section class="section">
+      <h1 class="title is-large">Content within Grid iframe</h1>
       <div class="tile is-ancestor">
         <Accounts />
         <GridPanelDialog :channel="frame1Channel" />
