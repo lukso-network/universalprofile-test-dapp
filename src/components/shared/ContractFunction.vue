@@ -122,13 +122,9 @@ function handleIsKey(param: number, isKey?: boolean) {
 
 const computedCall = computed<string>(() => {
   return props.dataDecoder
-    ? `${reactiveData.items
-        ?.map(({ name, type }) => `${type} ${name}`)
-        .join(', ')}`
+    ? `${reactiveData.items?.map(({ name, type }) => `${type} ${name}`).join(', ')}`
     : reactiveData.call
-      ? `${reactiveData.call}(${reactiveData.items
-          ?.map(({ name, type }) => `${type} ${name}`)
-          .join(', ')})`
+      ? `${reactiveData.call}(${reactiveData.items?.map(({ name, type }) => `${type} ${name}`).join(', ')})`
       : ''
 })
 
@@ -226,9 +222,7 @@ const output = computed<{ error: undefined | string; value: string }>(() => {
     const { eth } = getWeb3()
     const callSig = props.dataDecoder
       ? `${reactiveData.items.map(({ type }) => type).join(',')}`
-      : `${reactiveData.call}(${reactiveData.items
-          .map(({ type }) => type)
-          .join(',')})`
+      : `${reactiveData.call}(${reactiveData.items.map(({ type }) => type).join(',')})`
     const types = reactiveData.items.map(({ type }) => type)
     const args = reactiveData.items.map(({ value, type, isWei }) => {
       const makeItem = (value: any) =>
@@ -246,9 +240,7 @@ const output = computed<{ error: undefined | string; value: string }>(() => {
         value: props.data || '0x',
       }
     }
-    const output = `${eth.abi.encodeFunctionSignature(callSig)}${eth.abi
-      .encodeParameters(types, args)
-      ?.substring(2)}`
+    const output = `${eth.abi.encodeFunctionSignature(callSig)}${eth.abi.encodeParameters(types, args)?.substring(2)}`
     return {
       error: undefined,
       value: output,

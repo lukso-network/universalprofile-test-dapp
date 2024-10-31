@@ -100,29 +100,38 @@ const handleChangeTokenId = (event: Event) => {
 
   switch (tokenIdType.value) {
     case LSP8_TOKEN_ID_FORMAT.NUMBER:
-      if (isNaN(parseInt(value))) {
-        return (tokenIdTypeError.value = 'Must be a number')
+      if (Number.isNaN(Number.parseInt(value))) {
+        const error = 'Must be a number'
+        tokenIdTypeError.value = error
+        return error
       }
       break
     case LSP8_TOKEN_ID_FORMAT.STRING:
       if (value.length > 32) {
-        return (tokenIdTypeError.value =
-          'Must be a string with less than 32 characters')
+        const error = 'Must be a string with less than 32 characters'
+        tokenIdTypeError.value = error
+        return error
       }
       break
     case LSP8_TOKEN_ID_FORMAT.UNIQUE_ID:
       if (!isHex(value)) {
-        return (tokenIdTypeError.value = 'Must be a byte string')
+        const error = 'Must be a byte string'
+        tokenIdTypeError.value = error
+        return error
       }
       break
     case LSP8_TOKEN_ID_FORMAT.HASH:
       if (value.length !== 66 || !isHex(value)) {
-        return (tokenIdTypeError.value = 'Must be a 32byte hash')
+        const error = 'Must be a 32byte hash'
+        tokenIdTypeError.value = error
+        return error
       }
       break
     case LSP8_TOKEN_ID_FORMAT.ADDRESS:
       if (!isAddress(value)) {
-        return (tokenIdTypeError.value = 'Must be a valid address')
+        const error = 'Must be a valid address'
+        tokenIdTypeError.value = error
+        return error
       }
       break
     default:
@@ -138,7 +147,7 @@ const mint = async () => {
 
   try {
     switch (tokenType.value) {
-      case ContractStandard.LSP7:
+      case ContractStandard.LSP7: {
         myToken.value = contract(
           LSP7Mintable.abi as any,
           mintTokenAddress.value
@@ -153,14 +162,15 @@ const mint = async () => {
         await myToken.value.methods
           .mint(mintReceiver.value, amount.toString(), false, '0x')
           .send({ from: erc725AccountAddress })
-          .on('receipt', function (receipt: any) {
+          .on('receipt', (receipt: any) => {
             console.log(receipt)
           })
           .once('sending', (payload: any) => {
             console.log(JSON.stringify(payload, null, 2))
           })
         break
-      case ContractStandard.LSP8:
+      }
+      case ContractStandard.LSP8: {
         if (!tokenId.value) {
           tokenIdTypeError.value = `Can't be blank`
           return
@@ -178,7 +188,7 @@ const mint = async () => {
         await myToken.value.methods
           .mint(mintReceiver.value, tokenIdPadded, false, '0x')
           .send({ from: erc725AccountAddress })
-          .on('receipt', function (receipt: any) {
+          .on('receipt', (receipt: any) => {
             console.log(receipt)
           })
           .once('sending', (payload: any) => {
@@ -194,13 +204,14 @@ const mint = async () => {
         await myToken.value.methods
           .setData(metadataKey, metadataJsonUrl) // TODO replace fixed metadata with values from the form
           .send({ from: erc725AccountAddress })
-          .on('receipt', function (receipt: any) {
+          .on('receipt', (receipt: any) => {
             console.log(receipt)
           })
           .once('sending', (payload: any) => {
             console.log(JSON.stringify(payload, null, 2))
           })
         break
+      }
       default:
         console.log('Standard not supported')
     }

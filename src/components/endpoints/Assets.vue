@@ -10,9 +10,15 @@ import { ContractStandard } from '@/enums'
 import CustomSelect from '@/components/shared/CustomSelect.vue'
 import { useLspFactory } from '@/compositions/useLspFactory'
 import { addTokenToLocalStore, recalculateAssets } from '@/helpers/tokenUtils'
-import { useERC20 } from '@/compositions/useErc20'
+import { DeployedERC20Token, useERC20 } from '@/compositions/useErc20'
 import { LSP8_TOKEN_ID_FORMAT } from '@lukso/lsp-smart-contracts'
 import { LSP4_TOKEN_TYPES } from '@lukso/lsp4-contracts'
+import {
+  DeployedLSP7DigitalAsset,
+  DeployedLSP8IdentifiableDigitalAsset,
+  LSP7DigitalAssetDeploymentOptions,
+  LSP8IdentifiableDigitalAssetDeploymentOptions,
+} from '@lukso/lsp-factory.js/build/main/src/lib/interfaces/digital-asset-deployment'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
@@ -69,8 +75,14 @@ const create = async () => {
       useLspFactory()
     const { deployERC20Token } = useERC20()
 
-    let deployedAsset
-    let digitalAssetData
+    let deployedAsset:
+      | DeployedLSP7DigitalAsset
+      | DeployedLSP8IdentifiableDigitalAsset
+      | DeployedERC20Token
+      | { isNFT: boolean }
+    let digitalAssetData:
+      | LSP7DigitalAssetDeploymentOptions
+      | LSP8IdentifiableDigitalAssetDeploymentOptions
     switch (token.value.type) {
       case ContractStandard.LSP7:
         digitalAssetData = {
@@ -89,9 +101,8 @@ const create = async () => {
         console.log(digitalAssetData)
         deployedAsset = await deployLSP7DigitalAsset(digitalAssetData)
         console.log('Deployed asset', deployedAsset.LSP7DigitalAsset)
-        addTokenToLocalStore(
-          (tokenAddress.value = deployedAsset.LSP7DigitalAsset.address)
-        )
+        tokenAddress.value = deployedAsset.LSP7DigitalAsset.address
+        addTokenToLocalStore(deployedAsset.LSP7DigitalAsset.address)
         break
       case ContractStandard.LSP8:
         digitalAssetData = {
@@ -115,10 +126,7 @@ const create = async () => {
           deployedAsset.LSP8IdentifiableDigitalAsset
         )
         tokenAddress.value = deployedAsset.LSP8IdentifiableDigitalAsset.address
-        addTokenToLocalStore(
-          (tokenAddress.value =
-            deployedAsset.LSP8IdentifiableDigitalAsset.address)
-        )
+        addTokenToLocalStore(deployedAsset.LSP8IdentifiableDigitalAsset.address)
         break
       case ContractStandard.ERC20:
         deployedAsset = await deployERC20Token({
@@ -227,9 +235,7 @@ const create = async () => {
       </div>
       <div class="field">
         <button
-          :class="`button is-primary is-rounded mb-3 mr-3 ${
-            isTokenPending ? 'is-loading' : ''
-          }`"
+          :class="`button is-primary is-rounded mb-3 mr-3 ${isTokenPending ? 'is-loading' : ''}`"
           data-testid="create"
           @click="create"
         >

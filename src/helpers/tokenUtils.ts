@@ -219,10 +219,7 @@ export const detectLSP = async (
       address: contractAddress,
       balance,
       decimals: currentDecimals,
-      label: `${shortType} ${name} (${symbol}) ${contractAddress.substring(
-        0,
-        10
-      )}...`,
+      label: `${shortType} ${name} (${symbol}) ${contractAddress.substring(0, 10)}...`,
     }
   } catch (err) {
     console.error(contractAddress, lspType, err)

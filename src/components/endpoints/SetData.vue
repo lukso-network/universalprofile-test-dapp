@@ -26,14 +26,14 @@ const setData = async () => {
         .send({
           from: erc725AccountAddress,
         })
-        .on('receipt', function (receipt: any) {
+        .on('receipt', (receipt: any) => {
           console.log(receipt)
         })
         .once('sending', (payload: any) => {
           console.log(JSON.stringify(payload, null, 2))
         }))
 
-    setNotification(`Set data`, 'info')
+    setNotification('Set data', 'info')
   } catch (error) {
     setNotification((error as unknown as Error).message, 'danger')
   } finally {
@@ -60,9 +60,7 @@ const setData = async () => {
       </div>
       <div class="field">
         <button
-          :class="`button is-primary is-rounded mb-3 ${
-            isPending ? 'is-loading' : ''
-          }`"
+          :class="`button is-primary is-rounded mb-3 ${isPending ? 'is-loading' : ''}`"
           data-testid="setData"
           @click="setData"
         >

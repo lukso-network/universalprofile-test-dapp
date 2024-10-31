@@ -332,9 +332,7 @@ const hasRemove = computed<boolean>(() => {
         </button>
         <button
           v-if="hasRemove"
-          :class="`button is-small is-rounded ml-2 ${
-            isPending ? 'is-loading' : ''
-          }`"
+          :class="`button is-small is-rounded ml-2 ${isPending ? 'is-loading' : ''}`"
           data-testid="remove"
           @click="handleRemove"
         >
@@ -343,27 +341,21 @@ const hasRemove = computed<boolean>(() => {
       </div>
       <div class="field">
         <button
-          :class="`button is-primary is-rounded mt-4 ${
-            isPending ? 'is-loading' : ''
-          }`"
+          :class="`button is-primary is-rounded mt-4 ${isPending ? 'is-loading' : ''}`"
           data-testid="estimate"
           @click="estimate"
         >
           Estimate Gas
         </button>
         <button
-          :class="`button is-primary is-rounded mt-4 ${
-            isPending ? 'is-loading' : ''
-          }`"
+          :class="`button is-primary is-rounded mt-4 ${isPending ? 'is-loading' : ''}`"
           data-testid="send"
           @click="send"
         >
           Send Transaction
         </button>
         <button
-          :class="`button is-primary is-rounded mt-4 ${
-            isPending ? 'is-loading' : ''
-          }`"
+          :class="`button is-primary is-rounded mt-4 ${isPending ? 'is-loading' : ''}`"
           data-testid="rawCall"
           @click="rawCall"
         >

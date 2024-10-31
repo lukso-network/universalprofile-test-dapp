@@ -110,7 +110,7 @@ const onPermissionsValidation = async () => {
 
   const permissionsResponse = await erc725Account.methods
     .getData(
-      ERC725YDataKeys['LSP6']['AddressPermissions:Permissions'] +
+      ERC725YDataKeys.LSP6['AddressPermissions:Permissions'] +
         stripHexPrefix(signerAddress)
     )
     .call()
@@ -153,8 +153,7 @@ const onSignatureValidation = async () => {
     const decodedTransaction = RLP.decode(signResponse.value) as string[]
     if (!decodedTransaction || decodedTransaction.length < 3) {
       throw new Error(
-        'Failed to decode transaction. RLP.decode response is: ' +
-          JSON.stringify(decodedTransaction)
+        `Failed to decode transaction. RLP.decode response is: ${JSON.stringify(decodedTransaction)}`
       )
     }
     const vrs = decodedTransaction.slice(-3)
@@ -168,7 +167,7 @@ const onSignatureValidation = async () => {
       }
     )
     const signature = joinSignature({
-      v: parseInt(vrs[0], 16),
+      v: Number.parseInt(vrs[0], 16),
       r: vrs[1],
       s: vrs[2],
     })
@@ -178,7 +177,7 @@ const onSignatureValidation = async () => {
       .call()) as string
 
     if (magicValue.value === MAGICVALUE) {
-      setNotification(`Signature validated successfully`, 'info')
+      setNotification('Signature validated successfully', 'info')
     } else {
       setNotification("Response doesn't match magic value", 'danger')
     }
@@ -203,14 +202,14 @@ function makeValue(param: MethodType) {
 }
 
 const selectMethod = (e: Event) => {
-  const value = parseInt((e.target as HTMLInputElement).value, 10)
+  const value = Number.parseInt((e.target as HTMLInputElement).value, 10)
   const item: MethodSelect =
     value >= methods.length
       ? items.items[value - methods.length]
       : methods[value]
-  Object.entries(item).forEach(([key, val]) => {
+  for (const [key, val] of Object.entries(item)) {
     ;(method.item as any)[key] = val
-  })
+  }
   params.items = params.items.map((param, index) => {
     if (index === 1) {
       if (
@@ -354,9 +353,7 @@ const hasRemove = computed<boolean>(() => {
         </button>
         <button
           v-if="hasRemove"
-          :class="`button is-small is-rounded ml-2 ${
-            isPending ? 'is-loading' : ''
-          }`"
+          :class="`button is-small is-rounded ml-2 ${isPending ? 'is-loading' : ''}`"
           data-testid="remove"
           @click="handleRemove"
         >
@@ -366,9 +363,7 @@ const hasRemove = computed<boolean>(() => {
 
       <div class="field mt-5">
         <button
-          :class="`button is-primary is-rounded mb-3 ${
-            isPending ? 'is-loading' : ''
-          }`"
+          :class="`button is-primary is-rounded mb-3 ${isPending ? 'is-loading' : ''}`"
           data-testid="sign"
           @click="onSign"
         >

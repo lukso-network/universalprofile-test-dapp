@@ -35,7 +35,7 @@ const disconnectWallet = async () => {
 const connectExtension = async (meansOfConnection: string) => {
   clearNotification()
   try {
-    provider.value = await setupProvider(meansOfConnection)
+    provider.value = await setupProvider(meansOfConnection, true)
     setNotification(`Connected to address: ${getState('address')}`, 'info')
   } catch (error) {
     setNotification((error as unknown as Error).message, 'danger')

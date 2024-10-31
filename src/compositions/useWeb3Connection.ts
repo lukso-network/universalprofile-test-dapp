@@ -1,5 +1,6 @@
 import { AbiItem, isAddress as baseIsAddress } from 'web3-utils'
 import {
+  getSelectedNetworkConfig,
   UP_CONNECTED_ADDRESS,
   WALLET_CONNECT,
   WEB3_ONBOARD,
@@ -18,6 +19,17 @@ import EthereumProvider from '@walletconnect/ethereum-provider/dist/types/Ethere
 import Web3 from 'web3'
 import { ContractOptions, Contract } from 'web3-eth-contract'
 import { EthereumProviderError } from 'eth-rpc-errors'
+import {
+  createUPProviderConnector,
+  // createClientUPProvider,
+} from '@lukso/up-provider'
+const oldProvider = window.lukso
+if (oldProvider) {
+  const server = createUPProviderConnector()
+  server.setupProvider(oldProvider, ['https://rpc.mainnet.lukso.network'])
+}
+// const client = createClientUPProvider()
+// window.lukso = client
 
 const web3Onboard = useWeb3Onboard()
 const web3WalletConnectV2 = useWalletConnectV2()
@@ -41,7 +53,8 @@ const setupWeb3 = async (provider: EthereumProvider): Promise<void> => {
 }
 
 const setupProvider = async (
-  meansOfConnection: string
+  meansOfConnection: string,
+  userOperation: boolean
 ): Promise<ProviderType | undefined> => {
   try {
     const isWalletConnectUsed = meansOfConnection === WALLET_CONNECT
@@ -63,7 +76,7 @@ const setupProvider = async (
       let accounts = await web3.eth.getAccounts()
 
       address = accounts[0]
-      if (!address) {
+      if (!address && userOperation) {
         accounts = await requestAccounts()
         address = accounts[0]
       }
@@ -76,7 +89,7 @@ const setupProvider = async (
   } catch (error) {
     const epError = error as EthereumProviderError<Error>
 
-    if (epError.code === 4100) {
+    if (epError.code === 4100 && userOperation) {
       const address = (await requestAccounts())[0]
       setConnected(address, meansOfConnection)
       localStorage.setItem(UP_CONNECTED_ADDRESS, address)
@@ -128,6 +141,11 @@ const estimateGas = async (transaction: TransactionConfig) => {
 }
 
 const executeCall = (transaction: TransactionConfig): Promise<string> => {
+  const { url } = getSelectedNetworkConfig().http || {}
+  if (!url) {
+    throw new Error('No RPC URL provided for the network')
+  }
+  const web3 = new Web3(url)
   return web3.eth.call(transaction)
 }
 
