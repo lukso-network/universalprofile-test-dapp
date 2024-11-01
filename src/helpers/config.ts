@@ -67,10 +67,10 @@ export const NETWORKS: { [K in NetworkType]: NetworkInfo } = {
     erc721TokenWithEip165: '0x57b8e4f3C96180088652dc361473bB91266bb080',
   },
   lukso_mainnet: {
-    id: 'lukso',
+    id: 'lukso-mainnet',
     name: 'lukso-mainnet',
     http: {
-      url: 'https://rpc.mainnet.lukso.network',
+      url: 'https://rpc.mainnet.lukso.network/',
     },
     cache: {
       url: 'https://erc725cache.mainnet.lukso.network/graphql',
@@ -156,39 +156,6 @@ export const NETWORKS: { [K in NetworkType]: NetworkInfo } = {
     },
     id: 'base',
     chainId: 8453,
-
-    // The sample values are currently just junk.
-    sampleEoA: '0xD634fc59DE7fCb60677322B2B114Ab70756e70be',
-    sampleUP: '0x21CFF5BCe6F7845734fCC3915FEeaC7C7D89588D',
-    sampleSC: '0xb4c93158DDC3043D4Cd8270d6fDC3232ba21eD32',
-    errorContract: '0xFDb952E4dC30A1C55F76cdC2Ca14c13cFb69E62c',
-    // ERC20
-    erc20TokenWithEip165: '0xb4c93158DDC3043D4Cd8270d6fDC3232ba21eD32',
-    erc20TokenWithoutEip165: '0xB29c50a9F3D90FA3aDF394f2960BD6D8e0Ff5E9D',
-    // ERC777
-    erc777TokenWithEip165: '0xC719f454C8F9a0C7eEC4203B21766B88d8a5B073',
-    erc777TokenWithoutEip165: '0xD7549C70A6122cA01043831f0f0c65152C4877d6',
-    // LSP7
-    lsp7TokenDivisible: '0x28682Ff854Cb885eB690780f794CD632D94289B8',
-    lsp7TokenNonDivisible: '0x085E969a80e374E9627CceC9630e030b1EDdC42b',
-    // ERC721
-    erc721TokenWithEip165: '0x57b8e4f3C96180088652dc361473bB91266bb080',
-  },
-  mainnet: {
-    name: 'mainnet',
-    rpc: {
-      url: 'https://rpc.mainnet.lukso.network/',
-    },
-    cache: {
-      url: 'https://erc725cache.mainnet.lukso.network/graphql',
-    },
-    ipfs: {
-      url: 'https://api.universalprofile.cloud/api/v0',
-    },
-    blockscout: {
-      url: 'https://explorer.execution.mainnet.lukso.network',
-    },
-    chainId: 42,
 
     // The sample values are currently just junk.
     sampleEoA: '0xD634fc59DE7fCb60677322B2B114Ab70756e70be',
