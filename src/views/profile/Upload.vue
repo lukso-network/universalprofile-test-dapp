@@ -57,9 +57,7 @@ const upload = async () => {
     const href = uploadResult.value?.url.replace('ipfs://', '')
     const url = `${uploadResult.value?.url}`
     setNotification(
-      `Profile uploaded successfully<br/><a href=${
-        '/profiles/' + href
-      } target="_blank">${url}</a>`,
+      `Profile uploaded successfully<br/><a href=${`/profiles/${href}`} target="_blank">${url}</a>`,
       'primary'
     )
   } catch (error) {
@@ -118,17 +116,15 @@ const getFileSize = (file: File) => {
 const profileImageSize = computed(() => {
   if (profileImage.value) {
     return getFileSize(profileImage.value)
-  } else {
-    return ''
   }
+  return ''
 })
 
 const backgroundImageSize = computed(() => {
   if (backgroundImage.value) {
     return getFileSize(backgroundImage.value)
-  } else {
-    return ''
   }
+  return ''
 })
 
 const removeProfileImage = () => {
@@ -396,10 +392,7 @@ const removeBackgroundImage = () => {
               >
                 <td>
                   <router-link
-                    :to="`/profiles/${uploadedProfile.url.replace(
-                      uploadTarget,
-                      ''
-                    )}`"
+                    :to="`/profiles/${uploadedProfile.url.replace(uploadTarget, '')}`"
                   >
                     {{ uploadedProfile.url.replace(uploadTarget, '') }}
                   </router-link>

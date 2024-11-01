@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import path from 'path'
+import path from 'node:path'
 
 console.log(process.cwd())
 
@@ -21,11 +21,18 @@ export default defineConfig({
       stream: resolveModule('stream-browserify'),
       buffer: resolveModule('buffer/'),
     },
+    extensions: ['.ts', '.js', '.json', '.vue'],
   },
   esbuild: process.env.NODE_ENV === 'production' ? {} : undefined,
   build: {
     commonjsOptions: {
       transformMixedEsModules: true,
+    },
+    rollupOptions: {
+      input: {
+        main: 'index.html',
+        widget: 'widget.html',
+      },
     },
   },
   base: process.env.PUBLIC_PATH || '/',

@@ -110,9 +110,7 @@ watch(routeData.value, fetchData)
       </div>
       <div class="field">
         <button
-          :class="`button is-primary is-rounded mb-3 ${
-            loading ? 'is-loading' : ''
-          }`"
+          :class="`button is-primary is-rounded mb-3 ${loading ? 'is-loading' : ''}`"
           :disabled="loading ? true : undefined"
           @click="searchAddress"
         >

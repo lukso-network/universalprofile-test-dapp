@@ -15,12 +15,14 @@ const provider = ref<any>()
 
 watch(
   () => !!window.lukso,
-  value => (hasExtension.value = value)
+  value => {
+    hasExtension.value = value
+  }
 )
 
 const connectExtension = async (meansOfConnection: string) => {
   close(dropdown.value)
-  provider.value = await setupProvider(meansOfConnection)
+  provider.value = await setupProvider(meansOfConnection, true)
 }
 
 const handleAccountsChanged = async (accounts: string[]) => {
@@ -47,7 +49,7 @@ const handleConnect = async (error: any) => {
     throw error
   }
   const meansOfConnection = getState('channel')
-  await setupProvider(meansOfConnection)
+  await setupProvider(meansOfConnection, true)
   setState('isConnected', true)
 }
 
@@ -73,7 +75,7 @@ const removeEventListeners = () => {
 
 onMounted(async () => {
   const meansOfConnection = getState('channel')
-  await setupProvider(meansOfConnection)
+  await setupProvider(meansOfConnection, false)
   addEventListeners()
 })
 
@@ -98,12 +100,7 @@ onUnmounted(() => {
         data-testid="address"
       >
         <div
-          :class="`logo ${
-            getState('channel') === WINDOW_LUKSO ||
-            getState('channel') === WEB3_ONBOARD
-              ? 'browser-extension'
-              : 'wallet-connect'
-          }`"
+          :class="`logo ${getState('channel') === WINDOW_LUKSO || getState('channel') === WEB3_ONBOARD ? 'browser-extension' : 'wallet-connect'}`"
         />
         <span>{{ sliceAddress(getState('address')) }}</span>
       </button>

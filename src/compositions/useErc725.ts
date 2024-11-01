@@ -9,7 +9,7 @@ import { getSelectedNetworkConfig } from '@/helpers/config'
 window.ERC725 = ERC725
 
 const defaultNetworkConfig = getSelectedNetworkConfig()
-const provider = defaultNetworkConfig.rpc.url
+const provider = defaultNetworkConfig.http.url
 const config = {
   ipfsGateway: defaultNetworkConfig.ipfs.url,
 }

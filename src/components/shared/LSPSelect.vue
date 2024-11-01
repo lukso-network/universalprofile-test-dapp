@@ -183,18 +183,12 @@ watch(
       items.push({
         type: LSPType.ERC20,
         address: erc20TokenWithEip165,
-        label: `Sample ERC20+Eip165 ${erc20TokenWithEip165.substring(
-          0,
-          10
-        )}...`,
+        label: `Sample ERC20+Eip165 ${erc20TokenWithEip165.substring(0, 10)}...`,
       })
       items.push({
         type: LSPType.ERC20,
         address: erc20TokenWithoutEip165,
-        label: `Sample ERC20-Eip165 ${erc20TokenWithoutEip165.substring(
-          0,
-          10
-        )}...`,
+        label: `Sample ERC20-Eip165 ${erc20TokenWithoutEip165.substring(0, 10)}...`,
       })
     }
     if (
@@ -206,18 +200,12 @@ watch(
       items.push({
         type: LSPType.ERC777,
         address: erc777TokenWithEip165,
-        label: `Sample ERC777+Eip165 ${erc777TokenWithEip165.substring(
-          0,
-          10
-        )}...`,
+        label: `Sample ERC777+Eip165 ${erc777TokenWithEip165.substring(0, 10)}...`,
       })
       items.push({
         type: LSPType.ERC777,
         address: erc777TokenWithoutEip165,
-        label: `Sample ERC777-Eip165 ${erc777TokenWithoutEip165.substring(
-          0,
-          10
-        )}...`,
+        label: `Sample ERC777-Eip165 ${erc777TokenWithoutEip165.substring(0, 10)}...`,
       })
     }
     if (
@@ -229,10 +217,7 @@ watch(
       items.push({
         type: LSPType.ERC721,
         address: erc721TokenWithEip165,
-        label: `Sample ERC721+Eip165 ${erc721TokenWithEip165.substring(
-          0,
-          10
-        )}...`,
+        label: `Sample ERC721+Eip165 ${erc721TokenWithEip165.substring(0, 10)}...`,
       })
     }
     if (
@@ -244,11 +229,11 @@ watch(
       items.push({
         type: LSPType.ERROR_TEST,
         address: errorContract,
-        label: `ErrorTesting Contract...`,
+        label: 'ErrorTesting Contract...',
       })
     }
 
-    let children
+    let children: Array<{ type: LSPType; label: string }>
     if (
       props.showTypes
         ? props.showTypes.includes(LSPType.LSP7DigitalAsset)

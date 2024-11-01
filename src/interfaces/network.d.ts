@@ -1,11 +1,18 @@
-export type NetworkType = 'testnet'
+export type NetworkType =
+  | 'lukso_testnet'
+  | 'lukso_mainnet'
+  | 'base_mainnet'
+  | 'base_sepolia'
 
 export type NetworkInfo = {
+  id: string
   name: string
-  rpc: { url: string }
-  cache: { url: string }
+  http: { url: string }
+  ws: { url: string }
+  cache?: { url: string }
   ipfs: { url: string }
-  blockscout: { url: string }
+  relayer?: { url: string }
+  explorer?: { url: string }
   chainId: number
   sampleEoA: string
   sampleUP: string

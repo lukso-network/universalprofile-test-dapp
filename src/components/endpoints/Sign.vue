@@ -153,7 +153,7 @@ const onSignatureValidation = async () => {
     }
 
     if (magicValue.value === MAGICVALUE) {
-      setNotification(`Signature validated successfully`, 'info')
+      setNotification('Signature validated successfully', 'info')
     } else {
       setNotification("Response doesn't match magic value", 'danger')
     }
@@ -174,20 +174,20 @@ const toggleShow = () => {
       <div class="field">
         <label class="label">Select RPC</label>
         <input
-          type="radio"
           id="eth_sign_radio_btn"
+          v-model="signingMethodSelected"
+          type="radio"
           data-testid="eth_sign_radio_btn"
           value="eth_sign"
-          v-model="signingMethodSelected"
         />
         <label for="eth_sign_radio_btn" class="ml-1">eth_sign</label>
 
         <input
-          type="radio"
           id="personal_sign_radio_btn"
+          v-model="signingMethodSelected"
+          type="radio"
           data-testid="personal_sign_radio_btn"
           value="personal_sign"
-          v-model="signingMethodSelected"
           class="ml-1"
         />
         <label for="personal_sign_radio_btn" class="ml-1">personal_sign</label>
@@ -209,8 +209,8 @@ const toggleShow = () => {
           />
         </div>
         <div
-          class="field has-addons"
           v-if="signingMethodSelected === SignMethod.PersonalSign"
+          class="field has-addons"
         >
           <div class="control is-expanded">
             <input
@@ -387,9 +387,7 @@ const toggleShow = () => {
       </div>
       <div class="field mt-5">
         <button
-          :class="`button is-primary is-rounded mb-3 ${
-            isPending ? 'is-loading' : ''
-          }`"
+          :class="`button is-primary is-rounded mb-3 ${isPending ? 'is-loading' : ''}`"
           data-testid="sign"
           @click="onSign"
         >

@@ -62,12 +62,12 @@ const setPermissions = async () => {
   clearNotification()
   const erc725AccountAddress = getState('address')
 
-  let dataKeysToSet = [
+  const dataKeysToSet = [
     ERC725YDataKeys.LSP6['AddressPermissions:Permissions'] +
       grantPermissionAddress.value.slice(2),
   ]
 
-  let dataValuesToSet = [encodePermissions(selectedPermissions.value)]
+  const dataValuesToSet = [encodePermissions(selectedPermissions.value)]
 
   const erc725js = getInstance(erc725AccountAddress, LSP6Schema)
 
@@ -85,7 +85,7 @@ const setPermissions = async () => {
   // if we are setting permissions for a new controller, add it in the list of controller
   // and increment the `AddressPermissions[]` Array.
   if (
-    currentPermissions == '0x' ||
+    currentPermissions === '0x' ||
     currentPermissions == null ||
     // we also add the controller in the list if it was not present before
     !(controllerList as string[]).includes(grantPermissionAddress.value)
@@ -113,7 +113,7 @@ const setPermissions = async () => {
         .send({
           from: erc725AccountAddress,
         })
-        .on('receipt', function (receipt: any) {
+        .on('receipt', (receipt: any) => {
           console.log(receipt)
         })
         .once('sending', (payload: any) => {
@@ -212,9 +212,7 @@ const allPermissionsSelected = computed(() => {
       </div>
       <div class="field">
         <button
-          :class="`button is-primary is-rounded mb-3 ${
-            isPending ? 'is-loading' : ''
-          }`"
+          :class="`button is-primary is-rounded mb-3 ${isPending ? 'is-loading' : ''}`"
           data-testid="setPermissions"
           @click="setPermissions"
         >
