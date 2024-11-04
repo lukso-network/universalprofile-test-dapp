@@ -45,7 +45,7 @@ async function sign(data: any, key: string) {
     })
 }
 
-/** local implementation of createToken to create a signd JWT token */
+/** local implementation of createToken to create a signed JWT token */
 async function createToken(payload: any, key: string): Promise<string> {
   const header = { typ: 'JWT', alg: 'HS256' }
 
