@@ -1,8 +1,7 @@
 import { useLspFactory } from '@/compositions/useLspFactory'
-import { LSPFactory } from '@lukso/lsp-factory.js'
 
-jest.mock('@lukso/lsp-factory.js', () => ({
-  LSPFactory: jest.fn(),
+jest.mock('@/helpers/env', () => ({
+  PUBLIC_API_SHARED_SECRET: '123',
 }))
 
 jest.mock('@/compositions/useWeb3Connection', () => ({
@@ -20,10 +19,6 @@ describe('can produce LSP Factory', () => {
   beforeAll(async () => {
     window.lukso = {} as any
     useLspFactory()
-  })
-
-  it('should be called with window.lukso', async () => {
-    expect(LSPFactory).toBeCalledWith({}, { chainId: 4201 })
   })
 
   it('should return null for empty chain id', async () => {

@@ -15,6 +15,10 @@ jest.mock('@/compositions/useErc20', () => ({
   }),
 }))
 
+jest.mock('@/helpers/env', () => ({
+  PUBLIC_API_SHARED_SECRET: '123',
+}))
+
 jest.mock('@/compositions/useWeb3Connection', () => ({
   __esModule: true,
   default: () => ({
