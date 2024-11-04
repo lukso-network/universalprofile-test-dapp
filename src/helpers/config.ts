@@ -180,17 +180,15 @@ export const PRIVATE_KEY =
   '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
 
 export function setNetworkConfig(inChainId: number): void {
-  const network = Object.entries(NETWORKS).find(
-    ([, { chainId }]) => chainId === inChainId
-  )
-  let networkKey: string
-  if (network) {
-    networkKey = network[1].name
-  } else {
+  let [networkKey] =
+    Object.entries(NETWORKS).find(
+      ([, { chainId }]) => Number(chainId) === inChainId
+    ) || []
+  if (!networkKey) {
     console.warn(`Unknown network. Defaulting to '${DEFAULT_NETWORK}'.`)
     networkKey = DEFAULT_NETWORK
   }
-  localStorage.setItem(SELECTED_NETWORK_KEY, networkKey)
+  localStorage.setItem(SELECTED_NETWORK_KEY, networkKey || DEFAULT_NETWORK)
 }
 
 export function resetNetworkConfig(): void {

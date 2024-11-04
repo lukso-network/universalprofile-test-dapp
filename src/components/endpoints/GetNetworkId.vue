@@ -8,7 +8,8 @@ import {
   setNetworkConfig,
 } from '@/helpers/config'
 import { NetworkInfo } from '@/interfaces/network'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+import { numberToHex } from 'web3-utils'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
@@ -22,7 +23,12 @@ const defaultNetwork: NetworkInfo = {
 const networkId = ref('')
 const err = ref('')
 const activeNetwork = ref<NetworkInfo>(defaultNetwork)
-
+watch(
+  () => getSelectedNetworkConfig(),
+  () => {
+    activeNetwork.value = getSelectedNetworkConfig()
+  }
+)
 const networks = Object.values(NETWORKS)
 
 const getNetworkId = async () => {
@@ -43,10 +49,13 @@ const changeNetwork = async () => {
       method: 'wallet_switchEthereumChain',
       params: [
         {
-          chainId: activeNetwork.value.chainId,
+          chainId: numberToHex(activeNetwork.value.chainId),
         },
       ],
     })
+    const chainId = await web3.getChainId()
+    activeNetwork.value.chainId = chainId
+    setNetworkConfig(chainId)
   } catch (error) {
     console.error(error)
     setNotification((error as unknown as Error).message, 'danger')

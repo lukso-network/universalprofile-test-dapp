@@ -11,8 +11,9 @@ import {
 } from '@/helpers/config'
 import { createBlockScoutLink } from '@/utils/createLinks'
 import Web3Utils from 'web3-utils'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { provider as Provider } from 'web3-core'
+import { NetworkInfo } from '@/interfaces/network'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
 
 const { notification, clearNotification, hasNotification, setNotification } =
@@ -20,7 +21,14 @@ const { notification, clearNotification, hasNotification, setNotification } =
 const { recalculateAssets } = useState()
 const provider = ref<Provider>()
 const { setupProvider, disconnect } = useWeb3Connection()
-const selectedNetworkConfig = getSelectedNetworkConfig()
+const selectedNetworkConfig = ref<NetworkInfo>(getSelectedNetworkConfig())
+
+watch(
+  () => getSelectedNetworkConfig(),
+  value => {
+    selectedNetworkConfig.value = value
+  }
+)
 
 const hexChainId = computed(() => {
   return Web3Utils.numberToHex(getState('chainId'))
