@@ -7,8 +7,9 @@ import {
   NETWORKS,
   setNetworkConfig,
 } from '@/helpers/config'
+import { hexToNumber } from 'web3-utils'
 import { NetworkInfo } from '@/interfaces/network'
-import { ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { numberToHex } from 'web3-utils'
 
 const { notification, clearNotification, hasNotification, setNotification } =
@@ -100,7 +101,8 @@ const addNetwork = async () => {
 onMounted(() => {
   const selectedNetworkChainId = getSelectedNetworkConfig()
   const networkInfo = networks.find(
-    element => hexToNumber(element.chainId) === selectedNetworkChainId.chainId
+    (element: NetworkInfo) =>
+      hexToNumber(element.chainId) === selectedNetworkChainId.chainId
   )
   if (networkInfo) {
     activeNetwork.value = networkInfo
