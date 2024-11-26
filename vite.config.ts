@@ -24,6 +24,13 @@ export default defineConfig({
     extensions: ['.ts', '.js', '.json', '.vue'],
   },
   esbuild: process.env.NODE_ENV === 'production' ? {} : undefined,
+  define: {
+    'import.meta.env.GRID_WIDGET_URL': JSON.stringify(
+      process.env.NODE_ENV === 'production'
+        ? 'https://grid-widget.lukso.network'
+        : 'http://localhost:4321'
+    ),
+  },
   build: {
     commonjsOptions: {
       transformMixedEsModules: true,
