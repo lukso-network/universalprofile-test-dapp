@@ -7,6 +7,11 @@ module.exports = {
     '^.+\\.vue$': '@vue/vue3-jest',
     '^.+\\.tsx?$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.json' }],
   },
+  globals: {
+    'ts-jest': {
+      tsconfig: '<rootDir>/tsconfig.json', // Use your tsconfig.json
+    },
+  },
   setupFilesAfterEnv: ['<rootDir>/tests/setup-env.ts'],
   transformIgnorePatterns: [`/node_modules/(?!${esModules})`],
   testEnvironment: 'jsdom',
