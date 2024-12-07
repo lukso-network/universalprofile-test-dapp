@@ -103,7 +103,6 @@
   },
   "packageManager": "yarn@3.3.0",
   "resolutions": {
-    "wagmi": "~1.2.0",
-    "@lukso/up-provider": "portal:/Users/andy/Development/tools-up-provider/packages/up-provider"
+    "wagmi": "~1.2.0"
   }
 }
