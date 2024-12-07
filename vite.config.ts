@@ -27,7 +27,7 @@ export default defineConfig({
   define: {
     'import.meta.env.GRID_WIDGET_URL': JSON.stringify(
       process.env.NODE_ENV === 'production'
-        ? 'https://grid-widget.lukso.network'
+        ? 'https://widget-example.lukso.dev/'
         : 'http://localhost:4321'
     ),
   },
