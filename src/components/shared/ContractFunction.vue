@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { decodeData, MethodType } from '@/helpers/functionUtils'
 import { reactive, computed, watch, onMounted } from 'vue'
-import { toWei, Unit, padLeft, numberToHex } from 'web3-utils'
+import { toWei, Unit, padLeft, padRight, numberToHex } from 'web3-utils'
 import ParamField from './ParamField.vue'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
 import ERC725 from '@erc725/erc725.js'
@@ -124,7 +124,9 @@ const computedCall = computed<string>(() => {
   return props.dataDecoder
     ? `${reactiveData.items?.map(({ name, type }) => `${type} ${name}`).join(', ')}`
     : reactiveData.call
-      ? `${reactiveData.call}(${reactiveData.items?.map(({ name, type }) => `${type} ${name}`).join(', ')})`
+      ? `${reactiveData.call}(${reactiveData.items
+          ?.map(({ name, type }) => `${type} ${name}`)
+          .join(', ')})`
       : ''
 })
 
@@ -166,14 +168,19 @@ function handleCall(e: Event) {
   }
 }
 
-const makeBytes32 = (value: string, type: string) => {
-  if (/^bytes32/.test(type)) {
+const makeBytes = (value: string, type: string) => {
+  if (/^bytes/.test(type)) {
+    const _bytesCount = type.match(/\d+/) ?? []
+    const bytesCount = _bytesCount.length > 0 ? Number(_bytesCount[0]) : 0
     if (/^[0-9]+$/.test(value)) {
       const hex = numberToHex(value)
-      return padLeft(hex, 64)
+      return padLeft(hex, bytesCount * 2)
     }
     if (/^0x[0-9a-f]*$/i.test(value)) {
-      return padLeft(value, 64)
+      if (/^bytes/.test(type)) {
+        return padRight(value, bytesCount * 2)
+      }
+      return padLeft(value, bytesCount * 2)
     }
     if (/^\w*(:.*,.*)?$/.test(value)) {
       const items = (value || '').split(',')
@@ -184,7 +191,7 @@ const makeBytes32 = (value: string, type: string) => {
       }
     }
   }
-  return value
+  return value ? value : '0x'
 }
 
 if (props.dataDecoder) {
@@ -226,9 +233,9 @@ const output = computed<{ error: undefined | string; value: string }>(() => {
     const types = reactiveData.items.map(({ type }) => type)
     const args = reactiveData.items.map(({ value, type, isWei }) => {
       const makeItem = (value: any) =>
-        /^bytes32/.test(type)
-          ? (makeBytes32(value, type) ?? '0x')
-          : makeValue(value, isWei) || ''
+        /^bytes/.test(type)
+          ? (makeBytes(value, type) ?? '0x')
+          : (makeValue(value, isWei) ?? '')
       if (/\[\]$/.test(type)) {
         return value.map(makeItem)
       }
@@ -293,6 +300,9 @@ watch(
           console.error(err)
         }
       }
+    } else if (!value) {
+      reactiveData.items = []
+      reactiveData.call = undefined
     }
   }
 )
