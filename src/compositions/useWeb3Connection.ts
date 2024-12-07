@@ -19,17 +19,6 @@ import EthereumProvider from '@walletconnect/ethereum-provider/dist/types/Ethere
 import Web3 from 'web3'
 import { ContractOptions, Contract } from 'web3-eth-contract'
 import { EthereumProviderError } from 'eth-rpc-errors'
-import {
-  createUPProviderConnector,
-  // createClientUPProvider,
-} from '@lukso/up-provider'
-const oldProvider = window.lukso
-if (oldProvider) {
-  const server = createUPProviderConnector()
-  server.setupProvider(oldProvider, ['https://rpc.mainnet.lukso.network'])
-}
-// const client = createClientUPProvider()
-// window.lukso = client
 
 const web3Onboard = useWeb3Onboard()
 const web3WalletConnectV2 = useWalletConnectV2()

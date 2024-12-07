@@ -29,6 +29,8 @@ function upChannelConnected(e: CustomEvent) {
       break
   }
 }
+const url = import.meta.env.GRID_WIDGET_URL
+console.log(url)
 </script>
 
 <template>
@@ -69,7 +71,7 @@ function upChannelConnected(e: CustomEvent) {
             <iframe
               id="frame2"
               ref="frame2Ref"
-              src="https://widget-example.lukso.dev"
+              :src="url"
               sandbox="allow-same-origin allow-scripts"
               width="100%"
               height="600px"
