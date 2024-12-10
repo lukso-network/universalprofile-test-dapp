@@ -7,6 +7,7 @@ import Web3 from 'web3'
 
 const chainId = ref<number | null>(null)
 const accounts = ref<string[]>([])
+const contextAccounts = ref<string[]>([])
 const errors = ref<Error[]>([])
 const web3 = ref<Web3>()
 
@@ -35,6 +36,12 @@ web3.value.eth
 window.lukso?.on('accountsChanged', (_accounts: (`0x${string}` | '')[]) => {
   accounts.value = _accounts
 })
+window.lukso?.on(
+  'contextAccountsChanged',
+  (_accounts: (`0x${string}` | '')[]) => {
+    contextAccounts.value = _accounts
+  }
+)
 window.lukso?.on('chainChanged', (_chainId: number) => {
   chainId.value = _chainId
 })
@@ -105,6 +112,23 @@ function donate() {
         class="field"
       >
         <label class="label">Account[{{ index }}]</label>
+        <div class="control">
+          <!-- Ensure long addresses wrap correctly on narrow screens -->
+          <input
+            class="input is-static"
+            type="text"
+            :value="address"
+            readonly
+            style="white-space: nowrap; overflow-x: auto; word-wrap: break-word"
+          />
+        </div>
+      </div>
+      <div
+        v-for="(address, index) in contextAccounts || []"
+        :key="address"
+        class="field"
+      >
+        <label class="label">ContextAccount[{{ index }}]</label>
         <div class="control">
           <!-- Ensure long addresses wrap correctly on narrow screens -->
           <input

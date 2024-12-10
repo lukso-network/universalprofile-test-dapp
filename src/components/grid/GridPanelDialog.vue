@@ -37,9 +37,10 @@ function updateProvider() {
   const channel = getUPProviderChannel(props.channel || null)
   if (channel) {
     // or always call toRaw on the proxy object. Either or both will work, but the raw proxy methods will throw errors
-    toRaw(channel).allowAccounts(
+    toRaw(channel).setupChannel(
       enabled.value,
-      [getState('address'), pageAddress.value],
+      [getState('address')],
+      pageAddress.value ? [pageAddress.value as `0x${string}`] : [],
       getState('chainId')
     )
   }
