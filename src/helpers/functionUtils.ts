@@ -90,7 +90,9 @@ export const decodeData = async (
       signatureCache = await caches.open(SIGNATURE_CACHE)
     } catch {}
     const url = getSelectorLookupURL(selector)
-    const functionSignatureResponse = await signatureCache?.match(url)
+    // Use a different cache key instead to fix problem with wrong response.
+    const functionKey = `${url}/decoded`
+    const functionSignatureResponse = await signatureCache?.match(functionKey)
 
     let functionSignatures: string[] = []
     if (functionSignatureResponse) {
@@ -152,7 +154,10 @@ export const decodeData = async (
                   call in { setData: true, getData: true },
               })),
             }
-            await signatureCache?.put(url, new Response(JSON.stringify(item)))
+            await signatureCache?.put(
+              functionKey,
+              new Response(JSON.stringify(item))
+            )
             return item
           }
         } catch (err) {
