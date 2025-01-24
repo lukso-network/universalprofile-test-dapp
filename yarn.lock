@@ -2503,9 +2503,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lukso/up-provider@npm:^0.2.2":
-  version: 0.2.2
-  resolution: "@lukso/up-provider@npm:0.2.2"
+"@lukso/up-provider@npm:^0.3.1":
+  version: 0.3.1
+  resolution: "@lukso/up-provider@npm:0.3.1"
   dependencies:
     "@mixer/postmessage-rpc": ^1.1.4
     "@types/debug": ^4.1.12
@@ -2516,7 +2516,7 @@ __metadata:
     lit: ^3.2.1
     pauseable: ^0.3.2
     uuid: ^11.0.3
-  checksum: fc7e3dbbca312b55e30e5746a874a7316bff62063011166844c11a251c9dd3c252357811236532acdea13d028c5653fc7fc7881a14cc5c1187265a6df8883487
+  checksum: 162e11e3fa2b13ce459dc36cca94c208668c2eb66800aeba973b1d56f2ba9128a94a5bba71fa182798fac3e60b5799142f8af444625490ea001053c2d8d12dba
   languageName: node
   linkType: hard
 
@@ -16250,7 +16250,7 @@ __metadata:
     "@erc725/erc725.js": 0.24.2
     "@lukso/lsp-factory.js": ^3.3.1
     "@lukso/lsp-smart-contracts": ^0.15.0
-    "@lukso/up-provider": ^0.2.2
+    "@lukso/up-provider": ^0.3.1
     "@lukso/web3-onboard-config": 1.1.2
     "@pinata/sdk": ^2.1.0
     "@testing-library/jest-dom": 6.4.2
