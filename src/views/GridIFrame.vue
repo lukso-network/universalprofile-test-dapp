@@ -1,12 +1,66 @@
 <script setup lang="ts">
 import Accounts from '@/components/endpoints/Accounts.vue'
 import GridPanelDialog from '@/components/grid/GridPanelDialog.vue'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import Notifications from '@/components/Notification.vue'
-import { UPClientChannel, createUPProviderConnector } from '@lukso/up-provider'
+import {
+  UPClientChannel,
+  UPProviderEndpoint,
+  createUPProviderConnector,
+} from '@lukso/up-provider'
+import useWeb3Connection from '@/compositions/useWeb3Connection'
+import type EthereumProvider from '@walletconnect/ethereum-provider/dist/types/EthereumProvider'
+import { NETWORKS } from '@/helpers/config'
 
 const globalProvider = createUPProviderConnector()
 globalProvider.on('channelCreated', () => {})
+
+const { getProvider } = useWeb3Connection()
+
+const chainChanged = (chainId_: string) => {
+  console.log('Chain changed:', chainId_)
+  if (!providerRef.value) {
+    return
+  }
+  const chainId = Number.parseInt(chainId_)
+  const network = Object.values(NETWORKS).find(
+    value => value.chainId === chainId
+  )
+  globalProvider.setupProvider(
+    providerRef.value as UPProviderEndpoint,
+    network?.http?.url ? [network.http.url] : []
+  )
+}
+
+const providerRef = ref<EthereumProvider | null>(null)
+
+watch(
+  () => getProvider(),
+  async (provider, oldProvider) => {
+    if (provider === oldProvider) {
+      return
+    }
+    if (providerRef.value) {
+      providerRef.value.off('chainChanged', chainChanged)
+    }
+    providerRef.value = provider
+    if (provider) {
+      const chainId = Number.parseInt(
+        await provider.request({ method: 'eth_chainId' })
+      )
+      const network = Object.values(NETWORKS).find(
+        value => value.chainId === chainId
+      )
+      providerRef.value = provider
+      globalProvider.setupProvider(
+        provider as UPProviderEndpoint,
+        network?.http?.url ? [network.http.url] : []
+      )
+      providerRef.value.on('chainChanged', chainChanged)
+    }
+  },
+  { immediate: true }
+)
 
 const base = ref<string>(import.meta.env.BASE_URL || '/')
 
