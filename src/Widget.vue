@@ -33,6 +33,8 @@ web3.value.eth
     // Ignore error
     errors.value.push(error)
   })
+contextAccounts.value = window.lukso?.contextAccounts || []
+console.log('Context accounts:', contextAccounts.value)
 window.lukso?.on('accountsChanged', (_accounts: (`0x${string}` | '')[]) => {
   accounts.value = _accounts
 })
@@ -68,11 +70,13 @@ watch(
   }
 )
 function donate() {
-  web3.value?.eth.sendTransaction({
+  const obj = {
     from: accounts.value[0],
-    to: accounts.value[1],
+    to: contextAccounts.value[0],
     value: amount.value?.toString() || '0',
-  })
+  }
+  console.log('Donating', obj)
+  web3.value?.eth.sendTransaction(obj)
 }
 </script>
 
