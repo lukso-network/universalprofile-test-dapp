@@ -22,7 +22,7 @@
     "@erc725/erc725.js": "0.24.2",
     "@lukso/lsp-factory.js": "^3.3.1",
     "@lukso/lsp-smart-contracts": "^0.15.0",
-    "@lukso/up-provider": "^0.3.1",
+    "@lukso/up-provider": "^0.3.2",
     "@lukso/web3-onboard-config": "1.1.2",
     "@pinata/sdk": "^2.1.0",
     "@types/isomorphic-fetch": "^0.0.39",
