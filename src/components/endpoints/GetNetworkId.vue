@@ -7,22 +7,22 @@ import {
   NETWORKS,
   setNetworkConfig,
 } from '@/helpers/config'
+import { hexToNumber } from 'web3-utils'
 import { NetworkInfo } from '@/interfaces/network'
-import { ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { numberToHex } from 'web3-utils'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
 const web3 = useWeb3Connection()
-
 const defaultNetworkConfig = getSelectedNetworkConfig()
-const defaultNetwork: NetworkInfo = {
-  ...defaultNetworkConfig,
-}
+// const defaultNetwork: NetworkInfo = {
+//   ...defaultNetworkConfig,
+// }
 
 const networkId = ref('')
 const err = ref('')
-const activeNetwork = ref<NetworkInfo>(defaultNetwork)
+const activeNetwork = ref<NetworkInfo>(defaultNetworkConfig)
 watch(
   () => getSelectedNetworkConfig(),
   () => {
@@ -44,6 +44,7 @@ const getNetworkId = async () => {
 }
 
 const changeNetwork = async () => {
+  if (!activeNetwork.value) return
   try {
     await web3.sendRequest({
       method: 'wallet_switchEthereumChain',
@@ -63,13 +64,14 @@ const changeNetwork = async () => {
 }
 
 const changeDappNetwork = async () => {
+  if (!activeNetwork.value) return
   try {
     let currentChainId = getSelectedNetworkConfig().chainId
     if (currentChainId !== activeNetwork.value.chainId) {
       setNetworkConfig(activeNetwork.value.chainId)
       currentChainId = getSelectedNetworkConfig().chainId
+      location.reload()
     }
-    location.reload()
   } catch (error) {
     console.error(error)
     setNotification((error as unknown as Error).message, 'danger')
@@ -77,6 +79,7 @@ const changeDappNetwork = async () => {
 }
 
 const addNetwork = async () => {
+  if (!activeNetwork.value) return
   try {
     await web3.sendRequest({
       method: 'wallet_addEthereumChain',
@@ -94,6 +97,17 @@ const addNetwork = async () => {
     setNotification((addError as unknown as Error).message, 'danger')
   }
 }
+
+onMounted(() => {
+  const selectedNetworkChainId = getSelectedNetworkConfig()
+  const networkInfo = networks.find(
+    (element: NetworkInfo) =>
+      hexToNumber(element.chainId) === selectedNetworkChainId.chainId
+  )
+  if (networkInfo) {
+    activeNetwork.value = networkInfo
+  }
+})
 </script>
 
 <template>
@@ -124,7 +138,7 @@ const addNetwork = async () => {
           data-testid="getNetworkId"
           @click="changeNetwork"
         >
-          Switch Network to {{ activeNetwork.name }}
+          Switch Network to {{ activeNetwork?.name }}
         </button>
       </div>
       <div>
@@ -142,7 +156,7 @@ const addNetwork = async () => {
           data-testid="changeDappNetworkButton"
           @click="changeDappNetwork"
         >
-          Switch Network in DApp to {{ activeNetwork.name }}
+          Switch Network in DApp to {{ activeNetwork?.name }}
         </button>
         <div style="padding-top: 8px">
           DApp uses <b>{{ defaultNetworkConfig.name }}</b> network.

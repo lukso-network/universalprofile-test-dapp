@@ -67,10 +67,10 @@ export const NETWORKS: { [K in NetworkType]: NetworkInfo } = {
     erc721TokenWithEip165: '0x57b8e4f3C96180088652dc361473bB91266bb080',
   },
   lukso_mainnet: {
-    id: 'lukso',
+    id: 'lukso-mainnet',
     name: 'lukso-mainnet',
     http: {
-      url: 'https://rpc.mainnet.lukso.network',
+      url: 'https://rpc.mainnet.lukso.network/',
     },
     cache: {
       url: 'https://erc725cache.mainnet.lukso.network/graphql',
