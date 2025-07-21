@@ -1,5 +1,6 @@
 import { AbiItem, isAddress as baseIsAddress } from 'web3-utils'
 import {
+  EMBEDDED_WALLET,
   getSelectedNetworkConfig,
   UP_CONNECTED_ADDRESS,
   WALLET_CONNECT,
@@ -7,7 +8,7 @@ import {
 } from '@/helpers/config'
 import useWalletConnectV2 from './useWalletConnectV2'
 import useWeb3Onboard from './useWeb3Onboard'
-import { ref } from 'vue'
+import { ref, toRaw } from 'vue'
 import {
   TransactionConfig,
   TransactionReceipt,
@@ -18,17 +19,23 @@ import { getState, useState } from '@/stores'
 import EthereumProvider from '@walletconnect/ethereum-provider/dist/types/EthereumProvider'
 import Web3 from 'web3'
 import { ContractOptions, Contract } from 'web3-eth-contract'
+import {
+  createClientUPProvider,
+  type UPClientProvider,
+} from '@lukso/up-provider'
 import { EthereumProviderError } from 'eth-rpc-errors'
 
 const web3Onboard = useWeb3Onboard()
 const web3WalletConnectV2 = useWalletConnectV2()
 const { setConnected, setDisconnected } = useState()
 
-const provider = ref<EthereumProvider>()
+const provider = ref<EthereumProvider | UPClientProvider>()
 let web3: Web3
 
-const setupWeb3 = async (provider: EthereumProvider): Promise<void> => {
-  web3 = new Web3(provider as ProviderType)
+const setupWeb3 = async (
+  provider: EthereumProvider | UPClientProvider
+): Promise<void> => {
+  web3 = new Web3(toRaw(provider) as ProviderType)
   window.web3 = web3
   web3.eth
     ?.getChainId()
@@ -48,9 +55,33 @@ const setupProvider = async (
   try {
     const isWalletConnectUsed = meansOfConnection === WALLET_CONNECT
     const isWeb3OnboardUsed = meansOfConnection === WEB3_ONBOARD
-
+    const isEmbeddedWalletUsed = meansOfConnection === EMBEDDED_WALLET
     let address = ''
-    if (isWalletConnectUsed) {
+    if (isEmbeddedWalletUsed) {
+      const local = 'up-provider'
+      provider.value = createClientUPProvider({
+        // up-embedded.universalprofile.cloud
+        url: new URL(
+          '/keys',
+          'http://localhost:9100' ||
+            'https://up-embedded.universalprofile.cloud'
+        ).toString(),
+        mode: 'iframe',
+        get: async () => JSON.parse(localStorage.getItem(local) || '{}'),
+        set: async (value: Record<string, unknown>) =>
+          localStorage.setItem(local, JSON.stringify(value)),
+        name: 'UE Embedded Wallet',
+      })
+      await setupWeb3(provider.value)
+      toRaw(provider.value).resume()
+      let accounts = await web3.eth.getAccounts()
+
+      address = accounts[0]
+      if (!address) {
+        accounts = await requestAccounts()
+        address = accounts[0]
+      }
+    } else if (isWalletConnectUsed) {
       provider.value = await web3WalletConnectV2.setupWCV2Provider()
       address = await provider.value.accounts[0]
       await setupWeb3(provider.value)
@@ -88,7 +119,9 @@ const setupProvider = async (
 
 const disconnect = async () => {
   if (getState('channel') === WALLET_CONNECT) {
-    await provider.value?.disconnect()
+    // Use the wrapper instead, because disconnect() is not in the other
+    // provider types.
+    await web3WalletConnectV2?.resetWCV2Provider()
   } else if (getState('channel') === WEB3_ONBOARD) {
     await web3Onboard.disconnect()
   } else {

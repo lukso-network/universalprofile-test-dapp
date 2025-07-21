@@ -3,7 +3,12 @@ import { getState, useState, setState } from '@/stores'
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import useDropdown from '@/compositions/useDropdown'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
-import { WALLET_CONNECT, WEB3_ONBOARD, WINDOW_LUKSO } from '@/helpers/config'
+import {
+  WALLET_CONNECT,
+  WEB3_ONBOARD,
+  WINDOW_LUKSO,
+  EMBEDDED_WALLET,
+} from '@/helpers/config'
 import { sliceAddress } from '@/utils/sliceAddress'
 
 const { setupProvider, disconnect } = useWeb3Connection()
@@ -159,6 +164,15 @@ onUnmounted(() => {
         >
           <div class="logo browser-extension" />
           Web3 Onboard
+        </button>
+        <button
+          class="dropdown-item has-text-weight-bold button is-text"
+          data-testid="connect-web3-onboard"
+          :disabled="getState('isConnected')"
+          @click="connectExtension(EMBEDDED_WALLET)"
+        >
+          <div class="logo browser-extension" />
+          Embedded Wallet
         </button>
       </div>
     </div>

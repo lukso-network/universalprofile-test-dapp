@@ -8,6 +8,7 @@ import {
   WALLET_CONNECT,
   WINDOW_LUKSO,
   WEB3_ONBOARD,
+  EMBEDDED_WALLET,
 } from '@/helpers/config'
 import { createBlockScoutLink } from '@/utils/createLinks'
 import Web3Utils from 'web3-utils'
@@ -105,6 +106,16 @@ const handleRefresh = (e: Event) => {
           @click="connectExtension(WEB3_ONBOARD)"
         >
           Web3-Onboard
+        </button>
+      </div>
+      <div class="field">
+        <button
+          class="button is-primary is-rounded mb-1"
+          data-testid="connect-w3onboard"
+          :disabled="getState('isConnected')"
+          @click="connectExtension(EMBEDDED_WALLET)"
+        >
+          Embedded Wallet
         </button>
       </div>
       <div class="field">
