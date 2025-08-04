@@ -32,11 +32,19 @@ const { setConnected, setDisconnected } = useState()
 const provider = ref<EthereumProvider | UPClientProvider>()
 let web3: Web3
 
+// Provider change callbacks
+type ProviderCallback = (provider: EthereumProvider | UPClientProvider | undefined) => void
+const providerCallbacks: ProviderCallback[] = []
+
 const setupWeb3 = async (
-  provider: EthereumProvider | UPClientProvider
+  newProvider: EthereumProvider | UPClientProvider
 ): Promise<void> => {
-  web3 = new Web3(toRaw(provider) as ProviderType)
+  provider.value = newProvider
+  web3 = new Web3(toRaw(newProvider) as ProviderType)
   window.web3 = web3
+  
+  // Notify all callbacks of the new provider
+  providerCallbacks.forEach(callback => callback(newProvider))
   web3.eth
     ?.getChainId()
     .then(chainId => {
@@ -255,6 +263,23 @@ const isAddress = (address: string): boolean => {
   return baseIsAddress(address)
 }
 
+const onProvider = (callback: ProviderCallback): (() => void) => {
+  providerCallbacks.push(callback)
+  
+  // If provider is already connected, call the callback immediately
+  if (provider.value) {
+    callback(provider.value)
+  }
+  
+  // Return unsubscribe function
+  return () => {
+    const index = providerCallbacks.indexOf(callback)
+    if (index > -1) {
+      providerCallbacks.splice(index, 1)
+    }
+  }
+}
+
 export default function useWeb3Connection() {
   return {
     setupProvider,
@@ -278,5 +303,6 @@ export default function useWeb3Connection() {
     recoverRawTransaction,
     isAddress,
     sendRequest,
+    onProvider,
   }
 }
