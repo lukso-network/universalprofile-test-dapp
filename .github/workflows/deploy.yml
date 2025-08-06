@@ -43,11 +43,10 @@ jobs:
       - name: 🛎️ Checkout
         uses: actions/checkout@v4
       
-      - uses: jdx/mise-action@v2
-        with:
-          version: latest # Or specify a particular mise version
-          install: true   # Run `mise install`
-          cache: true     # Cache mise and tools
+      - run: |
+          curl https://mise.run | sh
+          mise install
+          mise activate bash >> $GITHUB_ENV
 
       - name: ⚙️ Install
         run: yarn
