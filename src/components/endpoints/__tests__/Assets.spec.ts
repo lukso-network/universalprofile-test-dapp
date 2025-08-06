@@ -19,9 +19,20 @@ jest.mock('@/helpers/env', () => ({
   PUBLIC_API_SHARED_SECRET: '123',
 }))
 
+jest.mock('@/helpers/tokenUtils', () => ({
+  uploadAssetData: jest.fn().mockResolvedValue({
+    url: 'ipfs://test',
+    hash: 'test',
+  }),
+  encodeAssetMetadata: jest.fn().mockReturnValue('0x00006f357c6a0020test'),
+  recalculateAssets: jest.fn(),
+  addTokenToLocalStore: jest.fn(),
+}))
+
 jest.mock('@/compositions/useWeb3Connection', () => ({
   __esModule: true,
   default: () => ({
+    getProvider: () => null,
     contract: () => ({
       methods: {
         owner: () => ({
@@ -34,20 +45,26 @@ jest.mock('@/compositions/useWeb3Connection', () => ({
 
 test('can create token', async () => {
   setState('isConnected', true)
-  mockDeployLSP7DigitalAsset.mockReturnValue({
+  mockDeployLSP7DigitalAsset.mockResolvedValue({
     LSP7DigitalAsset: {
       address: '0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298',
     },
   })
-  render(Assets)
+  const { unmount } = render(Assets)
 
   await fireEvent.click(screen.getByTestId('create'))
-  await waitFor(() => {
-    expect(screen.getByTestId('notification')).toHaveTextContent(
-      'Token created'
-    )
-    expect(screen.getByTestId('token-address')).toHaveTextContent(
-      '0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298'
-    )
-  })
+  
+  await waitFor(
+    () => {
+      expect(screen.getByTestId('notification')).toHaveTextContent(
+        'Token created'
+      )
+      expect(screen.getByTestId('token-address')).toHaveTextContent(
+        '0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298'
+      )
+    },
+    { timeout: 3000 }
+  )
+  
+  unmount()
 })

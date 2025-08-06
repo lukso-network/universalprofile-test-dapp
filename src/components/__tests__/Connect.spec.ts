@@ -20,6 +20,7 @@ const mockDisconnect = jest.fn()
 jest.mock('@/compositions/useWeb3Connection', () => ({
   __esModule: true,
   default: () => ({
+    getProvider: () => null,
     disconnect: () => mockDisconnect(),
     setupProvider: (arg: string) => mockSetupWeb3(arg),
     getChainId: () => 22,

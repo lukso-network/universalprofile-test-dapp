@@ -69,12 +69,11 @@ const setupProvider = async (
     let address = ''
     if (isEmbeddedWalletUsed) {
       const local = 'up-provider'
-      // Use environment variable or default to localhost:9100
-      const baseUrl =
-        import.meta.env.VITE_EMBEDDED_WALLET_URL || 'http://localhost:9100'
+      // Import from env helper to make it testable
+      const { EMBEDDED_WALLET_URL } = await import('@/helpers/env')
 
       provider.value = createClientUPProvider({
-        url: new URL('/keys', baseUrl).toString(),
+        url: new URL('/keys', EMBEDDED_WALLET_URL).toString(),
         mode: 'iframe',
         get: async () => JSON.parse(localStorage.getItem(local) || '{}'),
         set: async (value: Record<string, unknown>) =>

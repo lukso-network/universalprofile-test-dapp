@@ -5,6 +5,13 @@ const esModules = [
   'nanoid',
   '@lukso/web3-onboard-config',
   '@tsndr/cloudflare-worker-jwt',
+  'lit',
+  '@lit',
+  'lit-element',
+  'lit-html',
+  'readable-stream',
+  'keccak',
+  'ethereum-cryptography',
 ].join('|')
 
 module.exports = {
@@ -31,4 +38,6 @@ module.exports = {
   },
   globalSetup: './jest.setup.cjs',
   testTimeout: 10000,
+  maxWorkers: 1,
+  forceExit: true,
 }

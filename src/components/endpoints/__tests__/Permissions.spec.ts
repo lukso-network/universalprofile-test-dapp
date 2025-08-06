@@ -8,6 +8,7 @@ const mockSend = jest.fn()
 jest.mock('@/compositions/useWeb3Connection', () => ({
   __esModule: true,
   default: () => ({
+    getProvider: () => null,
     contract: () => ({
       methods: {
         owner: () => ({

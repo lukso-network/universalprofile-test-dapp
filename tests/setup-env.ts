@@ -1,5 +1,10 @@
 import '@testing-library/jest-dom'
 import { TextEncoder, TextDecoder } from 'util'
+import { Duplex, Transform } from 'stream'
+
+// Polyfill for stream classes
+;(global as any).Duplex = Duplex
+;(global as any).Transform = Transform
 
 jest.mock('@lukso/lsp-smart-contracts', () => ({
   INTERFACE_IDS: {
@@ -91,3 +96,17 @@ jest.mock('@lukso/lsp-smart-contracts', () => ({
 
 global.TextEncoder = TextEncoder
 ;(global as any).TextDecoder = TextDecoder
+
+// Mock import.meta for Jest
+;(global as any).import = {
+  meta: {
+    env: {
+      VITE_APP_NAME: 'test',
+      VITE_IPFS_GATEWAY: 'https://api.universalprofile.cloud/ipfs',
+      MODE: 'test',
+      DEV: false,
+      PROD: false,
+      SSR: false,
+    },
+  },
+}
