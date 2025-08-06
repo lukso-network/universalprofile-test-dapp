@@ -92,7 +92,7 @@ const onImportProfile = async () => {
 
       <div>
         Test <code>up_import</code> RPC call [<a
-          href="https://docs.lukso.tech/standards/rpc-api#up_import"
+          href="https://docs.lukso.tech/tools/apis/up-rpc-api/#up_import"
           >documentation</a
         >].
       </div>
