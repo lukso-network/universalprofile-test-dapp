@@ -13,14 +13,14 @@ const getInstance = (address: string, schema?: ERC725JSONSchema[]) => {
   const { getProvider } = useWeb3Connection()
   const connectedProvider = getProvider()
   const defaultNetworkConfig = getSelectedNetworkConfig()
-  
+
   // Use connected provider if available, otherwise fall back to HTTP provider
   const provider = connectedProvider || defaultNetworkConfig.http.url
-  
+
   const config = {
     ipfsGateway: defaultNetworkConfig.ipfs.url,
   }
-  
+
   const erc725 = new ERC725(
     schema
       ? schema

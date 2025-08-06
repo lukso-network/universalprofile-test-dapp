@@ -42,7 +42,7 @@ jobs:
 
       - name: 🛎️ Checkout
         uses: actions/checkout@v4
-      
+
       - run: |
           curl https://mise.run | sh
           mise install
@@ -85,7 +85,7 @@ jobs:
           mise x -- yarn wrangler pages deploy --project-name "${CF_PROJECT_NAME}" dist --branch "${{ steps.extract_branch.outputs.branch_name }}" | tee output.log
           sed < output.log -n 's#.*Take a peek over at \(.*\)$#specific_url=\1#p' >> $GITHUB_OUTPUT
         id: deploy
-      
+
       - name: Create commit comment
         uses: mshick/add-pr-comment@v2
         if: ${{ github.event.number != '' }}

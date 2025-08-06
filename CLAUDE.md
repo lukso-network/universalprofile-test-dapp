@@ -5,12 +5,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Essential Commands
 
 ### Development
+
 ```bash
 yarn dev                    # Start development server (Vite)
 yarn preview                # Preview production build
 ```
 
 ### Build & Quality Checks
+
 ```bash
 yarn build                  # Build for production (runs TypeScript checks + Vite build)
 yarn lint                   # Run all linters (JS, CSS, format, types)
@@ -22,6 +24,7 @@ yarn test                   # Run Jest unit tests
 ```
 
 ### Code Formatting
+
 ```bash
 yarn lint:format:fix        # Auto-fix formatting with Prettier
 ```
@@ -31,6 +34,7 @@ yarn lint:format:fix        # Auto-fix formatting with Prettier
 This is a Vue 3 + Vite application for interacting with LUKSO Universal Profiles. The codebase follows a modular architecture:
 
 ### Core Technologies
+
 - **Vue 3** with Composition API
 - **Vite** for bundling and dev server
 - **Vue Router** for routing
@@ -39,6 +43,7 @@ This is a Vue 3 + Vite application for interacting with LUKSO Universal Profiles
 - **@erc725/erc725.js** for ERC725 data handling
 
 ### Project Structure
+
 - `/src/components/` - Vue components organized by feature
   - `/endpoints/` - Components for different web3 operations (accounts, assets, transactions, etc.)
   - `/modals/` - Modal dialog components
@@ -55,25 +60,31 @@ This is a Vue 3 + Vite application for interacting with LUKSO Universal Profiles
 - `/src/services/` - External service integrations (IPFS)
 
 ### Connection Methods
+
 The app supports multiple wallet connection methods:
+
 1. **window.lukso** - Browser extension injection
 2. **WalletConnect V2** - Mobile and desktop wallet connections
 3. **Web3-Onboard** - Multi-wallet support
 4. **Embedded Wallet** - Iframe-based UP provider (experimental)
 
 ### Network Support
+
 Configured networks in `src/helpers/config.ts`:
+
 - LUKSO Testnet (chainId: 4201)
 - LUKSO Mainnet (chainId: 42)
 - Base Sepolia (chainId: 84532)
 - Base Mainnet (chainId: 8453)
 
 ### Testing
+
 - Jest with Vue Test Utils for unit tests
 - Tests located alongside components in `__tests__` directories
 - Test environment configured with jsdom
 
 ### Code Style
+
 - ESLint with TypeScript and Vue 3 rules
 - Prettier for formatting (no semicolons, single quotes, 80 char width)
 - Stylelint for CSS/SCSS

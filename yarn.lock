@@ -2947,7 +2947,7 @@ __metadata:
 
 "@lukso/up-provider@file:./lukso-up-provider-0.3.5.tgz::locator=universalprofile-test-dapp%40workspace%3A.":
   version: 0.3.5
-  resolution: "@lukso/up-provider@file:./lukso-up-provider-0.3.5.tgz#./lukso-up-provider-0.3.5.tgz::hash=47fad9&locator=universalprofile-test-dapp%40workspace%3A."
+  resolution: "@lukso/up-provider@file:./lukso-up-provider-0.3.5.tgz#./lukso-up-provider-0.3.5.tgz::hash=22cc70&locator=universalprofile-test-dapp%40workspace%3A."
   dependencies:
     "@mixer/postmessage-rpc": "npm:^1.1.4"
     "@types/debug": "npm:^4.1.12"
@@ -2958,7 +2958,7 @@ __metadata:
     lit: "npm:^3.2.1"
     pauseable: "npm:^0.3.2"
     uuid: "npm:^11.0.3"
-  checksum: 10/2adedb42a58a3e7425e5fe065fa5f2d8d1cd4781bcbc7a62da0be6bae7d894f0d1b52ca49d3257819713ff96f32777f8a75424c6188c9e7d569d2f68de8a50f8
+  checksum: 10/2f98d4705cdd5412a7e6ec0f02ad2b66a5de462b03d487e5c5b9ca623927f874b33fccf0e5f964eb3777efd8981882f9c0cc71aa1fa39f6bb17729301e5e644b
   languageName: node
   linkType: hard
 
