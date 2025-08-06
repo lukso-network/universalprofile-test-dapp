@@ -53,7 +53,7 @@ test('can create token', async () => {
   const { unmount } = render(Assets)
 
   await fireEvent.click(screen.getByTestId('create'))
-  
+
   await waitFor(
     () => {
       expect(screen.getByTestId('notification')).toHaveTextContent(
@@ -65,6 +65,6 @@ test('can create token', async () => {
     },
     { timeout: 3000 }
   )
-  
+
   unmount()
 })
