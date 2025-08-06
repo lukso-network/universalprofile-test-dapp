@@ -2945,9 +2945,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lukso/up-provider@file:./lukso-up-provider-0.3.5.tgz::locator=universalprofile-test-dapp%40workspace%3A.":
-  version: 0.3.5
-  resolution: "@lukso/up-provider@file:./lukso-up-provider-0.3.5.tgz#./lukso-up-provider-0.3.5.tgz::hash=22cc70&locator=universalprofile-test-dapp%40workspace%3A."
+"@lukso/up-provider@file:./lukso-up-provider-0.3.5-test1.tgz::locator=universalprofile-test-dapp%40workspace%3A.":
+  version: 0.3.5-test1
+  resolution: "@lukso/up-provider@file:./lukso-up-provider-0.3.5-test1.tgz#./lukso-up-provider-0.3.5-test1.tgz::hash=bf530c&locator=universalprofile-test-dapp%40workspace%3A."
   dependencies:
     "@mixer/postmessage-rpc": "npm:^1.1.4"
     "@types/debug": "npm:^4.1.12"
@@ -2958,7 +2958,7 @@ __metadata:
     lit: "npm:^3.2.1"
     pauseable: "npm:^0.3.2"
     uuid: "npm:^11.0.3"
-  checksum: 10/2f98d4705cdd5412a7e6ec0f02ad2b66a5de462b03d487e5c5b9ca623927f874b33fccf0e5f964eb3777efd8981882f9c0cc71aa1fa39f6bb17729301e5e644b
+  checksum: 10/31adc0e48592f46e96f64b12ff4da40c9089a3e9d60efce335a6303ab65ef4ab6297c27ab763275f96c257908e9178d57a3f48c23229f21a5ca960ca5aa5d711
   languageName: node
   linkType: hard
 
@@ -17368,7 +17368,7 @@ __metadata:
     "@erc725/erc725.js": "npm:0.24.2"
     "@lukso/lsp-factory.js": "npm:^3.3.1"
     "@lukso/lsp-smart-contracts": "npm:^0.15.0"
-    "@lukso/up-provider": ./lukso-up-provider-0.3.5.tgz
+    "@lukso/up-provider": ./lukso-up-provider-0.3.5-test1.tgz
     "@lukso/web3-onboard-config": "npm:1.1.2"
     "@pinata/sdk": "npm:^2.1.0"
     "@testing-library/jest-dom": "npm:6.4.2"
