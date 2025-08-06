@@ -5,16 +5,22 @@ import LSP9Vault from '@erc725/erc725.js/schemas/LSP9Vault.json'
 import { Permissions } from '@erc725/erc725.js/build/main/src/types/Method'
 import { FetchDataOutput } from '@erc725/erc725.js/build/main/src/types/decodeData'
 import { getSelectedNetworkConfig } from '@/helpers/config'
+import useWeb3Connection from './useWeb3Connection'
 
 window.ERC725 = ERC725
 
-const defaultNetworkConfig = getSelectedNetworkConfig()
-const provider = defaultNetworkConfig.http.url
-const config = {
-  ipfsGateway: defaultNetworkConfig.ipfs.url,
-}
-
 const getInstance = (address: string, schema?: ERC725JSONSchema[]) => {
+  const { getProvider } = useWeb3Connection()
+  const connectedProvider = getProvider()
+  const defaultNetworkConfig = getSelectedNetworkConfig()
+  
+  // Use connected provider if available, otherwise fall back to HTTP provider
+  const provider = connectedProvider || defaultNetworkConfig.http.url
+  
+  const config = {
+    ipfsGateway: defaultNetworkConfig.ipfs.url,
+  }
+  
   const erc725 = new ERC725(
     schema
       ? schema

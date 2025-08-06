@@ -33,7 +33,9 @@ const provider = ref<EthereumProvider | UPClientProvider>()
 let web3: Web3
 
 // Provider change callbacks
-type ProviderCallback = (provider: EthereumProvider | UPClientProvider | undefined) => void
+type ProviderCallback = (
+  provider: EthereumProvider | UPClientProvider | undefined
+) => void
 const providerCallbacks: ProviderCallback[] = []
 
 const setupWeb3 = async (
@@ -42,7 +44,7 @@ const setupWeb3 = async (
   provider.value = newProvider
   web3 = new Web3(toRaw(newProvider) as ProviderType)
   window.web3 = web3
-  
+
   // Notify all callbacks of the new provider
   providerCallbacks.forEach(callback => callback(newProvider))
   web3.eth
@@ -67,13 +69,12 @@ const setupProvider = async (
     let address = ''
     if (isEmbeddedWalletUsed) {
       const local = 'up-provider'
+      // Use environment variable or default to localhost:9100
+      const baseUrl =
+        import.meta.env.VITE_EMBEDDED_WALLET_URL || 'http://localhost:9100'
+
       provider.value = createClientUPProvider({
-        // up-embedded.universalprofile.cloud
-        url: new URL(
-          '/keys',
-          'http://localhost:9100' ||
-            'https://up-embedded.universalprofile.cloud'
-        ).toString(),
+        url: new URL('/keys', baseUrl).toString(),
         mode: 'iframe',
         get: async () => JSON.parse(localStorage.getItem(local) || '{}'),
         set: async (value: Record<string, unknown>) =>
@@ -81,7 +82,11 @@ const setupProvider = async (
         name: 'UE Embedded Wallet',
       })
       await setupWeb3(provider.value)
-      toRaw(provider.value).resume()
+      try {
+        toRaw(provider.value).resume()
+      } catch {
+        // Ignore
+      }
       let accounts = await web3.eth.getAccounts()
 
       address = accounts[0]
@@ -265,12 +270,12 @@ const isAddress = (address: string): boolean => {
 
 const onProvider = (callback: ProviderCallback): (() => void) => {
   providerCallbacks.push(callback)
-  
+
   // If provider is already connected, call the callback immediately
   if (provider.value) {
     callback(provider.value)
   }
-  
+
   // Return unsubscribe function
   return () => {
     const index = providerCallbacks.indexOf(callback)

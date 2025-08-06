@@ -5,6 +5,8 @@
 	"type": "module",
 	"scripts": {
 		"dev": "NODE_OPTIONS='--preserve-symlinks' vite --mode development",
+		"dev:link": "yarn link ../tools-up-provider/packages/up-provider",
+		"dev:unlink": "yarn unlink @lukso/up-provider && yarn install --check-cache",
 		"build": "vue-tsc --noEmit && vite build",
 		"docs": "cd packages/tools-lukso-provider && yarn docs",
 		"build:cloudflare": "yarn lint:js && yarn lint:css && yarn lint:format && yarn lint:types && yarn test && yarn build",

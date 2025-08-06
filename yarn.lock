@@ -2503,9 +2503,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lukso/up-provider@portal:../tools-up-provider/packages/up-provider::locator=universalprofile-test-dapp%40workspace%3A.":
-  version: 0.0.0-use.local
-  resolution: "@lukso/up-provider@portal:../tools-up-provider/packages/up-provider::locator=universalprofile-test-dapp%40workspace%3A."
+"@lukso/up-provider@file:./lukso-up-provider-0.3.5.tgz::locator=universalprofile-test-dapp%40workspace%3A.":
+  version: 0.3.5
+  resolution: "@lukso/up-provider@file:./lukso-up-provider-0.3.5.tgz#./lukso-up-provider-0.3.5.tgz::hash=47fad9&locator=universalprofile-test-dapp%40workspace%3A."
   dependencies:
     "@mixer/postmessage-rpc": "npm:^1.1.4"
     "@types/debug": "npm:^4.1.12"
@@ -2516,8 +2516,9 @@ __metadata:
     lit: "npm:^3.2.1"
     pauseable: "npm:^0.3.2"
     uuid: "npm:^11.0.3"
+  checksum: 10/2adedb42a58a3e7425e5fe065fa5f2d8d1cd4781bcbc7a62da0be6bae7d894f0d1b52ca49d3257819713ff96f32777f8a75424c6188c9e7d569d2f68de8a50f8
   languageName: node
-  linkType: soft
+  linkType: hard
 
 "@lukso/web3-onboard-config@npm:1.1.2":
   version: 1.1.2
