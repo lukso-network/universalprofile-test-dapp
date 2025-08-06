@@ -46,40 +46,46 @@ jobs:
       - run: |
           curl https://mise.run | sh
           mise install
-          echo "eval \"\$(/home/runner/.local/bin/mise activate bash)\"" >> ~/.bashrc
-          corepack enable
+          mise x -- corepack enable
 
       - name: ⚙️ Install
-        run: yarn
+        run: mise x -- yarn
 
       - name: 🎨 Lint JS
-        run: yarn lint:js
+        run: mise x -- yarn lint:js
 
       - name: 🎨 Lint CSS
-        run: yarn lint:css
+        run: mise x -- yarn lint:css
 
       - name: 🎨 Lint Format
-        run: yarn lint:format
+        run: mise x -- yarn lint:format
 
       - name: 🎨 Lint Types
-        run: yarn lint:types
+        run: mise x -- yarn lint:types
 
       - name: 🛠 Build
-        run: yarn build
+        run: mise x -- yarn build
 
       - name: 🎯 Test
-        run: yarn test
+        run: mise x -- yarn test
+      - name: 🚀 Deploy release
+        if: ${{ steps.extract_branch.outputs.branch_name == '' }}
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          mise x -- yarn wrangler pages deploy --project-name "${CF_PROJECT_NAME}" dist
 
-      - name: Deploy
-        uses: cloudflare/wrangler-action@2.0.0
-        with:
-          apiToken: ${{ secrets.CF_API_TOKEN }}
-          accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          command: pages deploy --project-name "${CF_PROJECT_NAME}" dist ${{ steps.extract_branch.outputs.branch }} | tee output.log
-          postCommands: |
-            sed < output.log -n 's#.*Take a peek over at \(.*\)$#specific_url=\1#p' >> $GITHUB_OUTPUT
+      - name: 🚀 Deploy ${{ steps.extract_branch.outputs.branch_name }} (PR)
+        if: ${{ steps.extract_branch.outputs.branch_name != '' }}
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          mise x -- yarn wrangler pages deploy --project-name "${CF_PROJECT_NAME}" dist --branch "${{ steps.extract_branch.outputs.branch_name }}" | tee output.log
+          sed < output.log -n 's#.*Take a peek over at \(.*\)$#specific_url=\1#p' >> $GITHUB_OUTPUT
         id: deploy
-
+      
       - name: Create commit comment
         uses: mshick/add-pr-comment@v2
         if: ${{ github.event.number != '' }}
