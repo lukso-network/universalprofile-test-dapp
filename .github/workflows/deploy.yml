@@ -33,7 +33,7 @@ jobs:
             then
               BRANCH="${BRANCH::-1}"
             fi
-            echo "branch=--branch=${BRANCH}" >> $GITHUB_OUTPUT
+            echo "branch=${BRANCH}" >> $GITHUB_OUTPUT
             echo "url=https://${BRANCH}.${{ env.CF_PROJECT_NAME }}.pages.dev" >> $GITHUB_OUTPUT
           else
             echo "url=${PUBLIC_URL}" >> $GITHUB_OUTPUT
@@ -69,20 +69,20 @@ jobs:
       - name: 🎯 Test
         run: mise x -- yarn test
       - name: 🚀 Deploy release
-        if: ${{ steps.extract_branch.outputs.branch_name == '' }}
+        if: ${{ steps.extract_branch.outputs.branch == '' }}
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
         run: |
-          mise x -- yarn wrangler pages deploy --project-name "${CF_PROJECT_NAME}" dist
+          mise x -- yarn wrangler pages deploy --project-name "${CF_PROJECT_NAME}" dist --branch "main"
 
-      - name: 🚀 Deploy ${{ steps.extract_branch.outputs.branch_name }} (PR)
-        if: ${{ steps.extract_branch.outputs.branch_name != '' }}
+      - name: 🚀 Deploy ${{ steps.extract_branch.outputs.branch }} (PR)
+        if: ${{ steps.extract_branch.outputs.branch != '' }}
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
         run: |
-          mise x -- yarn wrangler pages deploy --project-name "${CF_PROJECT_NAME}" dist --branch "${{ steps.extract_branch.outputs.branch_name }}" | tee output.log
+          mise x -- yarn wrangler pages deploy --project-name "${CF_PROJECT_NAME}" dist --branch "${{ steps.extract_branch.outputs.branch }}" | tee output.log
           sed < output.log -n 's#.*Take a peek over at \(.*\)$#specific_url=\1#p' >> $GITHUB_OUTPUT
         id: deploy
 
