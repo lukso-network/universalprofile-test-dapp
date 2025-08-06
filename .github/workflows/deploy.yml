@@ -46,7 +46,7 @@ jobs:
       - run: |
           curl https://mise.run | sh
           mise install
-          mise activate bash >> $GITHUB_ENV
+          echo "eval \"\$(/home/runner/.local/bin/mise activate bash)\"" >> ~/.bashrc
 
       - name: ⚙️ Install
         run: yarn
