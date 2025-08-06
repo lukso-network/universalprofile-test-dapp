@@ -47,6 +47,7 @@ jobs:
           curl https://mise.run | sh
           mise install
           echo "eval \"\$(/home/runner/.local/bin/mise activate bash)\"" >> ~/.bashrc
+          corepack enable
 
       - name: ⚙️ Install
         run: yarn
