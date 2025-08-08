@@ -41,6 +41,11 @@ const providerCallbacks: ProviderCallback[] = []
 const setupWeb3 = async (
   newProvider: EthereumProvider | UPClientProvider
 ): Promise<void> => {
+  if (!newProvider) {
+    provider.value = newProvider
+    resetNetworkConfig()
+    return
+  }
   provider.value = newProvider
   web3 = new Web3(toRaw(newProvider) as ProviderType)
   window.web3 = web3
@@ -130,7 +135,12 @@ const setupProvider = async (
 }
 
 const disconnect = async () => {
-  if (getState('channel') === WALLET_CONNECT) {
+  if (getState('channel') === EMBEDDED_WALLET) {
+    await toRaw(provider.value)?.request({
+      method: 'wallet_revokePermissions',
+      params: [],
+    })
+  } else if (getState('channel') === WALLET_CONNECT) {
     // Use the wrapper instead, because disconnect() is not in the other
     // provider types.
     await web3WalletConnectV2?.resetWCV2Provider()

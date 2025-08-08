@@ -2945,9 +2945,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lukso/up-provider@portal:/home/andy/Develop/tools-up-provider/packages/up-provider::locator=universalprofile-test-dapp%40workspace%3A.":
-  version: 0.0.0-use.local
-  resolution: "@lukso/up-provider@portal:/home/andy/Develop/tools-up-provider/packages/up-provider::locator=universalprofile-test-dapp%40workspace%3A."
+"@lukso/up-provider@file:./lukso-up-provider-0.3.5-test2.tgz::locator=universalprofile-test-dapp%40workspace%3A.":
+  version: 0.3.5-test2
+  resolution: "@lukso/up-provider@file:./lukso-up-provider-0.3.5-test2.tgz#./lukso-up-provider-0.3.5-test2.tgz::hash=83ed42&locator=universalprofile-test-dapp%40workspace%3A."
   dependencies:
     "@mixer/postmessage-rpc": "npm:^1.1.4"
     "@types/debug": "npm:^4.1.12"
@@ -2958,8 +2958,9 @@ __metadata:
     lit: "npm:^3.2.1"
     pauseable: "npm:^0.3.2"
     uuid: "npm:^11.0.3"
+  checksum: 10/26cd970aa9428ffd93ac1600b5d0e1f61ed8c60f370244a7b624a15fd929b276e8f5421ca28f1c531b7e4adf4dbfc6cf30192671cff7dfdf13d2f0caa0d78593
   languageName: node
-  linkType: soft
+  linkType: hard
 
 "@lukso/web3-onboard-config@npm:1.1.2":
   version: 1.1.2
@@ -17367,7 +17368,7 @@ __metadata:
     "@erc725/erc725.js": "npm:0.24.2"
     "@lukso/lsp-factory.js": "npm:^3.3.1"
     "@lukso/lsp-smart-contracts": "npm:^0.15.0"
-    "@lukso/up-provider": ./lukso-up-provider-0.3.5-test1.tgz
+    "@lukso/up-provider": ./lukso-up-provider-0.3.5-test2.tgz
     "@lukso/web3-onboard-config": "npm:1.1.2"
     "@pinata/sdk": "npm:^2.1.0"
     "@testing-library/jest-dom": "npm:6.4.2"
