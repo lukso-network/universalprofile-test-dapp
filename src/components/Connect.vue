@@ -31,8 +31,6 @@ const connectExtension = async (meansOfConnection: string) => {
 }
 
 const handleAccountsChanged = async (accounts: string[]) => {
-  console.log('Account changed', accounts)
-
   if (accounts.length === 0 && getState('isConnected')) {
     await disconnect()
   }
@@ -43,13 +41,11 @@ const handleAccountsChanged = async (accounts: string[]) => {
 }
 
 const handleChainChanged = async (chainId: string) => {
-  console.log('Chain changed', chainId)
   await disconnect()
   window.location.reload()
 }
 
 const handleConnect = async (error: any) => {
-  console.log('Connected')
   if (error) {
     throw error
   }
@@ -59,7 +55,6 @@ const handleConnect = async (error: any) => {
 }
 
 const handleDisconnect = async () => {
-  console.log('Disconnected')
   await disconnect()
   setState('isConnected', false)
 }

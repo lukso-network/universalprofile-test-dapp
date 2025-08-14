@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Navbar from '@/components/Navbar.vue'
+import PwaInstallPrompt from '@/components/PwaInstallPrompt.vue'
 import { ref } from 'vue'
 const uri = window.location.search.substring(1)
 const params = new URLSearchParams(uri)
@@ -15,6 +16,8 @@ if (!showNav.value) {
   <Suspense>
     <router-view></router-view>
   </Suspense>
+
+  <PwaInstallPrompt />
 </template>
 
 <style lang="scss">

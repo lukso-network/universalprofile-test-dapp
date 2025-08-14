@@ -92,11 +92,26 @@ const setupProvider = async (
         // Ignore
       }
       let accounts = await web3.eth.getAccounts()
-
-      address = accounts[0]
-      if (!address) {
-        accounts = await requestAccounts()
+      if (userOperation) {
+        const info = (await provider.value.request({
+          method: 'wallet_requestPermissions',
+          params: [{ eth_accounts: {} }],
+        })) as [
+          {
+            id: string
+            parentCapability: string
+            invoker: string
+            caveats: [{ type: string; value: string[] }]
+          },
+        ]
+        accounts = info[0]?.caveats?.[0]?.value || []
         address = accounts[0]
+      } else {
+        address = accounts[0]
+        if (!address) {
+          accounts = await requestAccounts()
+          address = accounts[0]
+        }
       }
     } else if (isWalletConnectUsed) {
       provider.value = await web3WalletConnectV2.setupWCV2Provider()
