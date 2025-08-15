@@ -1,5 +1,5 @@
 module.exports = async () => {
-	process.env.TZ = "UTC";
+  process.env.TZ = 'UTC'
 
-	global.crypto = require("isomorphic-webcrypto");
-};
+  global.crypto = require('isomorphic-webcrypto')
+}

@@ -40,7 +40,7 @@ const handleAccountsChanged = async (accounts: string[]) => {
   setConnected(address, meansOfConnection)
 }
 
-const handleChainChanged = async (chainId: string) => {
+const handleChainChanged = async (/* chainId: string */) => {
   await disconnect()
   window.location.reload()
 }

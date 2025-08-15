@@ -12,9 +12,7 @@ async function generateIcons() {
   ]
 
   for (const { size, name } of sizes) {
-    await sharp(inputFile)
-      .resize(size, size)
-      .toFile(path.join(publicDir, name))
+    await sharp(inputFile).resize(size, size).toFile(path.join(publicDir, name))
     console.log(`Generated ${name}`)
   }
 
