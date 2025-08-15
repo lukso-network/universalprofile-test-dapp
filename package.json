@@ -63,6 +63,7 @@
 		"@vitejs/plugin-vue": "^5.0.4",
 		"@vue/compiler-sfc": "3.4.21",
 		"@vue/vue3-jest": "28.1.0",
+		"babel-jest": "^30.0.5",
 		"eslint": "8.49.0",
 		"eslint-config-prettier": "9.0.0",
 		"eslint-plugin-prettier": "^5.2.1",
