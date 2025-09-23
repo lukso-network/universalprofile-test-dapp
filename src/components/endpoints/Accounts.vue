@@ -45,7 +45,6 @@ const connectExtension = async (meansOfConnection: string) => {
   clearNotification()
   try {
     provider.value = await setupProvider(meansOfConnection, true)
-    setNotification(`Connected to address: ${getState('address')}`, 'info')
   } catch (error) {
     setNotification((error as unknown as Error).message, 'danger')
   }
@@ -55,6 +54,15 @@ const handleRefresh = (e: Event) => {
   e.stopPropagation()
   recalculateAssets()
 }
+
+watch(
+  () => [getState('isConnected'), getState('address')],
+  ([isConnected, address]) => {
+    if (isConnected) {
+      setNotification(`Connected to address: ${address}`, 'info')
+    }
+  }
+)
 </script>
 
 <template>

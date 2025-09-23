@@ -157,16 +157,19 @@ const getIdFromProfileUrl = (uploadedProfile: {
             <table
               class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
             >
-              <tr>
-                <th>Type</th>
-                <th>Status</th>
-                <th>Name</th>
-                <th>Function</th>
-                <th>Address</th>
-                <th class="has-text-right pr-4">Gas</th>
-                <th>TransactionHash</th>
-              </tr>
-              <tr
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Status</th>
+                  <th>Name</th>
+                  <th>Function</th>
+                  <th>Address</th>
+                  <th class="has-text-right pr-4">Gas</th>
+                  <th>TransactionHash</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
                 v-for="deploymentEvent in profileDeploymentEvents"
                 :key="deploymentEvent.status"
                 :class="deploymentEvent.status"
@@ -234,7 +237,8 @@ const getIdFromProfileUrl = (uploadedProfile: {
                     {{ deploymentEvent?.transaction?.hash.substring(0, 16) }}...
                   </a>
                 </td>
-              </tr>
+                </tr>
+              </tbody>
             </table>
           </div>
         </div>

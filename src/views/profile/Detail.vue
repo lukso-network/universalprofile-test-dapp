@@ -126,11 +126,14 @@ watch(routeData.value, fetchData)
       v-if="!loading && profileData"
       class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
     >
-      <tr>
-        <th>Property</th>
-        <th>Value</th>
-      </tr>
-      <tr>
+      <thead>
+        <tr>
+          <th>Property</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
         <td>Name</td>
         <td>{{ profileData?.LSP3Profile?.name }}</td>
       </tr>
@@ -181,19 +184,22 @@ watch(routeData.value, fetchData)
         </td>
       </tr>
 
-      <tr>
-        <td>BackgroundImage(s)</td>
-        <div
-          v-for="(image, i) in profileData?.LSP3Profile?.backgroundImage"
-          :key="i"
-        >
-          <pre
-            >{{ image }}
-                </pre
-          >
-          <img :src="createIpfsLink(image.url)" :alt="image.url" />
-        </div>
-      </tr>
+        <tr>
+          <td>BackgroundImage(s)</td>
+          <td>
+            <div
+              v-for="(image, i) in profileData?.LSP3Profile?.backgroundImage"
+              :key="i"
+            >
+              <pre
+                >{{ image }}
+                    </pre
+              >
+              <img :src="createIpfsLink(image.url)" :alt="image.url" />
+            </div>
+          </td>
+        </tr>
+      </tbody>
     </table>
   </section>
 </template>

@@ -56,13 +56,16 @@ const deleteUploadedProfile = (url: string) => {
       <table
         class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
       >
-        <tr>
-          <th>Name</th>
-          <th>Identifier</th>
-          <th>Deploy</th>
-          <th></th>
-        </tr>
-        <tr v-for="(uploadedProfile, index) in uploadedProfiles" :key="index">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Identifier</th>
+            <th>Deploy</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(uploadedProfile, index) in uploadedProfiles" :key="index">
           <td>
             {{
               parseLspStringToJson(uploadedProfile.profile)?.json?.LSP3Profile
@@ -114,7 +117,8 @@ const deleteUploadedProfile = (url: string) => {
               Delete
             </button>
           </td>
-        </tr>
+          </tr>
+        </tbody>
       </table>
     </div>
   </section>
