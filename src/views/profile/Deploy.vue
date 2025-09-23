@@ -170,73 +170,78 @@ const getIdFromProfileUrl = (uploadedProfile: {
               </thead>
               <tbody>
                 <tr
-                v-for="deploymentEvent in profileDeploymentEvents"
-                :key="deploymentEvent.status"
-                :class="deploymentEvent.status"
-              >
-                <td>
-                  <span class="tag" :class="getTypeClass(deploymentEvent.type)">
-                    {{ deploymentEvent.type }}
-                  </span>
-                </td>
-                <td>
-                  <span
-                    class="tag"
-                    :class="getStatusClass(deploymentEvent.status)"
-                  >
-                    {{ deploymentEvent.status }}
-                  </span>
-                </td>
-                <td>{{ deploymentEvent.contractName }}</td>
-                <td>{{ deploymentEvent?.functionName }}</td>
-                <td>
-                  <code v-if="deploymentEvent?.receipt?.contractAddress">
-                    {{ deploymentEvent?.receipt?.contractAddress }}
-                  </code>
-                </td>
+                  v-for="deploymentEvent in profileDeploymentEvents"
+                  :key="deploymentEvent.status"
+                  :class="deploymentEvent.status"
+                >
+                  <td>
+                    <span
+                      class="tag"
+                      :class="getTypeClass(deploymentEvent.type)"
+                    >
+                      {{ deploymentEvent.type }}
+                    </span>
+                  </td>
+                  <td>
+                    <span
+                      class="tag"
+                      :class="getStatusClass(deploymentEvent.status)"
+                    >
+                      {{ deploymentEvent.status }}
+                    </span>
+                  </td>
+                  <td>{{ deploymentEvent.contractName }}</td>
+                  <td>{{ deploymentEvent?.functionName }}</td>
+                  <td>
+                    <code v-if="deploymentEvent?.receipt?.contractAddress">
+                      {{ deploymentEvent?.receipt?.contractAddress }}
+                    </code>
+                  </td>
 
-                <td class="has-text-right">
-                  {{
-                    deploymentEvent.receipt
-                      ? deploymentEvent.receipt.gasUsed?.hex
-                        ? formatNumber(+deploymentEvent.receipt.gasUsed?.hex)
-                        : formatNumber(+deploymentEvent.receipt.gasUsed)
-                      : ''
-                  }}
-                </td>
-                <td>
-                  <a
-                    v-if="deploymentEvent?.receipt"
-                    :href="
-                      createBlockScoutLink(
-                        deploymentEvent?.receipt?.transactionHash,
-                        true
-                      )
-                    "
-                    target="_blank"
-                    class="button is-small mb-1"
-                  >
+                  <td class="has-text-right">
                     {{
-                      deploymentEvent?.receipt?.transactionHash.substring(
-                        0,
-                        16
-                      )
-                    }}...
-                  </a>
-                  <a
-                    v-if="deploymentEvent?.transaction"
-                    :href="
-                      createBlockScoutLink(
-                        deploymentEvent?.transaction?.hash,
-                        true
-                      )
-                    "
-                    target="_blank"
-                    class="button is-small mb-1"
-                  >
-                    {{ deploymentEvent?.transaction?.hash.substring(0, 16) }}...
-                  </a>
-                </td>
+                      deploymentEvent.receipt
+                        ? deploymentEvent.receipt.gasUsed?.hex
+                          ? formatNumber(+deploymentEvent.receipt.gasUsed?.hex)
+                          : formatNumber(+deploymentEvent.receipt.gasUsed)
+                        : ''
+                    }}
+                  </td>
+                  <td>
+                    <a
+                      v-if="deploymentEvent?.receipt"
+                      :href="
+                        createBlockScoutLink(
+                          deploymentEvent?.receipt?.transactionHash,
+                          true
+                        )
+                      "
+                      target="_blank"
+                      class="button is-small mb-1"
+                    >
+                      {{
+                        deploymentEvent?.receipt?.transactionHash.substring(
+                          0,
+                          16
+                        )
+                      }}...
+                    </a>
+                    <a
+                      v-if="deploymentEvent?.transaction"
+                      :href="
+                        createBlockScoutLink(
+                          deploymentEvent?.transaction?.hash,
+                          true
+                        )
+                      "
+                      target="_blank"
+                      class="button is-small mb-1"
+                    >
+                      {{
+                        deploymentEvent?.transaction?.hash.substring(0, 16)
+                      }}...
+                    </a>
+                  </td>
                 </tr>
               </tbody>
             </table>

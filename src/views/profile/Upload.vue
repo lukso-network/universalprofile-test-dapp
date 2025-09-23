@@ -393,24 +393,24 @@ const removeBackgroundImage = () => {
                   v-for="(uploadedProfile, index) in uploadedProfiles"
                   :key="index"
                 >
-                <td>
-                  <router-link
-                    :to="`/profiles/${uploadedProfile.url.replace(uploadTarget, '')}`"
-                  >
-                    {{ uploadedProfile.url.replace(uploadTarget, '') }}
-                  </router-link>
-                </td>
-                <td>
-                  <pre class="pre">{{ uploadedProfile.profile }}</pre>
-                </td>
-                <td>
-                  <button
-                    class="button is-danger is-rounded mt-3"
-                    @click="deleteUploadedProfile(uploadedProfile.url)"
-                  >
-                    Delete
-                  </button>
-                </td>
+                  <td>
+                    <router-link
+                      :to="`/profiles/${uploadedProfile.url.replace(uploadTarget, '')}`"
+                    >
+                      {{ uploadedProfile.url.replace(uploadTarget, '') }}
+                    </router-link>
+                  </td>
+                  <td>
+                    <pre class="pre">{{ uploadedProfile.profile }}</pre>
+                  </td>
+                  <td>
+                    <button
+                      class="button is-danger is-rounded mt-3"
+                      @click="deleteUploadedProfile(uploadedProfile.url)"
+                    >
+                      Delete
+                    </button>
+                  </td>
                 </tr>
               </tbody>
             </table>
