@@ -79,7 +79,7 @@ const setupProvider = async (
 
       provider.value = createClientUPProvider({
         url: new URL('/keys', EMBEDDED_WALLET_URL).toString(),
-        mode: 'popup',
+        mode: 'iframe',
         get: async () => JSON.parse(localStorage.getItem(local) || '{}'),
         set: async (value: Record<string, unknown>) =>
           localStorage.setItem(local, JSON.stringify(value)),

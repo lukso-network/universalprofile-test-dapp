@@ -45,6 +45,10 @@ const connectExtension = async (meansOfConnection: string) => {
   clearNotification()
   try {
     provider.value = await setupProvider(meansOfConnection, true)
+    setNotification(
+      `Connected to address: ${getState('address') || '<pending>'}`,
+      'info'
+    )
   } catch (error) {
     setNotification((error as unknown as Error).message, 'danger')
   }

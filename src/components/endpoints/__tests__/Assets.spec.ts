@@ -19,11 +19,14 @@ jest.mock('@/helpers/env', () => ({
   PUBLIC_API_SHARED_SECRET: '123',
 }))
 
-jest.mock('@/helpers/tokenUtils', () => ({
+jest.mock('@/utils/uploadAssetData', () => ({
   uploadAssetData: jest.fn().mockResolvedValue({
     url: 'ipfs://test',
     hash: 'test',
   }),
+}))
+
+jest.mock('@/helpers/tokenUtils', () => ({
   encodeAssetMetadata: jest.fn().mockReturnValue('0x00006f357c6a0020test'),
   recalculateAssets: jest.fn(),
   addTokenToLocalStore: jest.fn(),

@@ -49,7 +49,7 @@ const encodePermissions = (permissions: Permissions) => {
 }
 
 const decodePermissions = (permissionHex: string) => {
-  return ERC725.decodePermissions(permissionHex)
+  return ERC725.decodePermissions(permissionHex as `0x${string}`)
 }
 
 export default function useErc725() {

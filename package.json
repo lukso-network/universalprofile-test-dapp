@@ -17,7 +17,7 @@
 		"lint:css": "stylelint \"**/*.{css,scss,vue}\"",
 		"lint:format": "prettier --check --log-level=warn .",
 		"lint:format:fix": "prettier --write --log-level=warn .",
-		"lint:types": "tsc --noEmit",
+		"lint:types": "tsc --noEmit --project tsconfig.lint.json",
 		"prepare": "husky install"
 	},
 	"dependencies": {
