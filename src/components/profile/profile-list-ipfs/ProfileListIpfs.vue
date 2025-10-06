@@ -56,65 +56,70 @@ const deleteUploadedProfile = (url: string) => {
       <table
         class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
       >
-        <tr>
-          <th>Name</th>
-          <th>Identifier</th>
-          <th>Deploy</th>
-          <th></th>
-        </tr>
-        <tr v-for="(uploadedProfile, index) in uploadedProfiles" :key="index">
-          <td>
-            {{
-              parseLspStringToJson(uploadedProfile.profile)?.json?.LSP3Profile
-                ?.name
-            }}
-          </td>
-          <td>
-            <a
-              @click="
-                () =>
-                  router.push(
-                    `/profiles/${getIdFromProfileUrl(uploadedProfile)}`
-                  )
-              "
-            >
-              {{ getIdFromProfileUrl(uploadedProfile) }}
-            </a>
-          </td>
-          <td>
-            <button
-              class="button is-primary is-rounded my-1"
-              :class="{
-                'is-loading':
-                  loading && currentUploadedProfileUrl === uploadedProfile.url,
-              }"
-              :disabled="
-                loading && currentUploadedProfileUrl === uploadedProfile.url
-              "
-              data-testid="deploy-button"
-              @click="createProfileOnChain(uploadedProfile)"
-            >
-              <span
-                v-if="
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Identifier</th>
+            <th>Deploy</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(uploadedProfile, index) in uploadedProfiles" :key="index">
+            <td>
+              {{
+                parseLspStringToJson(uploadedProfile.profile)?.json?.LSP3Profile
+                  ?.name
+              }}
+            </td>
+            <td>
+              <a
+                @click="
+                  () =>
+                    router.push(
+                      `/profiles/${getIdFromProfileUrl(uploadedProfile)}`
+                    )
+                "
+              >
+                {{ getIdFromProfileUrl(uploadedProfile) }}
+              </a>
+            </td>
+            <td>
+              <button
+                class="button is-primary is-rounded my-1"
+                :class="{
+                  'is-loading':
+                    loading &&
+                    currentUploadedProfileUrl === uploadedProfile.url,
+                }"
+                :disabled="
                   loading && currentUploadedProfileUrl === uploadedProfile.url
                 "
-                aria-hidden="true"
-                aria-label="loading..."
-                data-testid="aria-loading"
-              ></span>
-              Deploy
-            </button>
-          </td>
-          <td>
-            <button
-              class="button is-danger is-rounded my-1"
-              data-testid="delete-profile"
-              @click="deleteUploadedProfile(uploadedProfile.url)"
-            >
-              Delete
-            </button>
-          </td>
-        </tr>
+                data-testid="deploy-button"
+                @click="createProfileOnChain(uploadedProfile)"
+              >
+                <span
+                  v-if="
+                    loading && currentUploadedProfileUrl === uploadedProfile.url
+                  "
+                  aria-hidden="true"
+                  aria-label="loading..."
+                  data-testid="aria-loading"
+                ></span>
+                Deploy
+              </button>
+            </td>
+            <td>
+              <button
+                class="button is-danger is-rounded my-1"
+                data-testid="delete-profile"
+                @click="deleteUploadedProfile(uploadedProfile.url)"
+              >
+                Delete
+              </button>
+            </td>
+          </tr>
+        </tbody>
       </table>
     </div>
   </section>

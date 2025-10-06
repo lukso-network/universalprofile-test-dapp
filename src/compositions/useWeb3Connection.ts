@@ -1,5 +1,6 @@
 import { AbiItem, isAddress as baseIsAddress } from 'web3-utils'
 import {
+  EMBEDDED_WALLET,
   getSelectedNetworkConfig,
   UP_CONNECTED_ADDRESS,
   WALLET_CONNECT,
@@ -7,29 +8,50 @@ import {
 } from '@/helpers/config'
 import useWalletConnectV2 from './useWalletConnectV2'
 import useWeb3Onboard from './useWeb3Onboard'
-import { ref } from 'vue'
+import { ref, toRaw } from 'vue'
 import {
   TransactionConfig,
   TransactionReceipt,
   provider as ProviderType,
 } from 'web3-core'
 import { resetNetworkConfig, setNetworkConfig } from '@/helpers/config'
-import { getState, useState } from '@/stores'
+import { getState, setState, useState } from '@/stores'
 import EthereumProvider from '@walletconnect/ethereum-provider/dist/types/EthereumProvider'
 import Web3 from 'web3'
 import { ContractOptions, Contract } from 'web3-eth-contract'
+import {
+  createClientUPProvider,
+  type UPClientProvider,
+} from '@lukso/up-provider'
 import { EthereumProviderError } from 'eth-rpc-errors'
 
 const web3Onboard = useWeb3Onboard()
 const web3WalletConnectV2 = useWalletConnectV2()
 const { setConnected, setDisconnected } = useState()
 
-const provider = ref<EthereumProvider>()
+const provider = ref<EthereumProvider | UPClientProvider>()
 let web3: Web3
 
-const setupWeb3 = async (provider: EthereumProvider): Promise<void> => {
-  web3 = new Web3(provider as ProviderType)
+// Provider change callbacks
+type ProviderCallback = (
+  provider: EthereumProvider | UPClientProvider | undefined
+) => void
+const providerCallbacks: ProviderCallback[] = []
+
+const setupWeb3 = async (
+  newProvider: EthereumProvider | UPClientProvider
+): Promise<void> => {
+  if (!newProvider) {
+    provider.value = newProvider
+    resetNetworkConfig()
+    return
+  }
+  provider.value = newProvider
+  web3 = new Web3(toRaw(newProvider) as ProviderType)
   window.web3 = web3
+
+  // Notify all callbacks of the new provider
+  providerCallbacks.forEach(callback => callback(newProvider))
   web3.eth
     ?.getChainId()
     .then(chainId => {
@@ -48,9 +70,52 @@ const setupProvider = async (
   try {
     const isWalletConnectUsed = meansOfConnection === WALLET_CONNECT
     const isWeb3OnboardUsed = meansOfConnection === WEB3_ONBOARD
-
+    const isEmbeddedWalletUsed = meansOfConnection === EMBEDDED_WALLET
     let address = ''
-    if (isWalletConnectUsed) {
+    if (isEmbeddedWalletUsed) {
+      const local = 'up-provider'
+      // Import from env helper to make it testable
+      const { EMBEDDED_WALLET_URL } = await import('@/helpers/env')
+
+      provider.value = createClientUPProvider({
+        url: new URL('/keys', EMBEDDED_WALLET_URL).toString(),
+        mode: 'iframe',
+        get: async () => JSON.parse(localStorage.getItem(local) || '{}'),
+        set: async (value: Record<string, unknown>) =>
+          localStorage.setItem(local, JSON.stringify(value)),
+        name: 'UE Embedded Wallet',
+      })
+      await setupWeb3(provider.value)
+      try {
+        toRaw(provider.value).resume()
+      } catch {
+        // Ignore
+      }
+      let accounts = await web3.eth.getAccounts()
+      if (userOperation) {
+        const info = (await provider.value.request({
+          method: 'wallet_requestPermissions',
+          params: [{ eth_accounts: {} }],
+        })) as [
+          {
+            id: string
+            parentCapability: string
+            invoker: string
+            caveats: [{ type: string; value: string[] }]
+          },
+        ]
+        accounts = info[0]?.caveats?.[0]?.value || []
+        address = accounts[0]
+        setState('address', address)
+      } else {
+        address = accounts[0]
+        if (!address) {
+          accounts = await requestAccounts()
+          address = accounts[0]
+        }
+        setState('address', address)
+      }
+    } else if (isWalletConnectUsed) {
       provider.value = await web3WalletConnectV2.setupWCV2Provider()
       address = await provider.value.accounts[0]
       await setupWeb3(provider.value)
@@ -87,8 +152,15 @@ const setupProvider = async (
 }
 
 const disconnect = async () => {
-  if (getState('channel') === WALLET_CONNECT) {
-    await provider.value?.disconnect()
+  if (getState('channel') === EMBEDDED_WALLET) {
+    await toRaw(provider.value)?.request({
+      method: 'wallet_revokePermissions',
+      params: [],
+    })
+  } else if (getState('channel') === WALLET_CONNECT) {
+    // Use the wrapper instead, because disconnect() is not in the other
+    // provider types.
+    await web3WalletConnectV2?.resetWCV2Provider()
   } else if (getState('channel') === WEB3_ONBOARD) {
     await web3Onboard.disconnect()
   } else {
@@ -222,6 +294,23 @@ const isAddress = (address: string): boolean => {
   return baseIsAddress(address)
 }
 
+const onProvider = (callback: ProviderCallback): (() => void) => {
+  providerCallbacks.push(callback)
+
+  // If provider is already connected, call the callback immediately
+  if (provider.value) {
+    callback(provider.value)
+  }
+
+  // Return unsubscribe function
+  return () => {
+    const index = providerCallbacks.indexOf(callback)
+    if (index > -1) {
+      providerCallbacks.splice(index, 1)
+    }
+  }
+}
+
 export default function useWeb3Connection() {
   return {
     setupProvider,
@@ -245,5 +334,6 @@ export default function useWeb3Connection() {
     recoverRawTransaction,
     isAddress,
     sendRequest,
+    onProvider,
   }
 }

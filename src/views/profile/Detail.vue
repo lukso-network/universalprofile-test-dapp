@@ -126,74 +126,80 @@ watch(routeData.value, fetchData)
       v-if="!loading && profileData"
       class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
     >
-      <tr>
-        <th>Property</th>
-        <th>Value</th>
-      </tr>
-      <tr>
-        <td>Name</td>
-        <td>{{ profileData?.LSP3Profile?.name }}</td>
-      </tr>
+      <thead>
+        <tr>
+          <th>Property</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Name</td>
+          <td>{{ profileData?.LSP3Profile?.name }}</td>
+        </tr>
 
-      <tr>
-        <td>Description</td>
-        <td>{{ profileData?.LSP3Profile?.description }}</td>
-      </tr>
+        <tr>
+          <td>Description</td>
+          <td>{{ profileData?.LSP3Profile?.description }}</td>
+        </tr>
 
-      <tr>
-        <td>Links</td>
-        <td>
-          <ul class="list">
-            <li v-for="(link, i) in profileData?.LSP3Profile?.links" :key="i">
-              <a :href="link.url" target="_blank" rel="noopener noreferrer">{{
-                link.title ? link.title : link.url
-              }}</a>
-            </li>
-          </ul>
-        </td>
-      </tr>
+        <tr>
+          <td>Links</td>
+          <td>
+            <ul class="list">
+              <li v-for="(link, i) in profileData?.LSP3Profile?.links" :key="i">
+                <a :href="link.url" target="_blank" rel="noopener noreferrer">{{
+                  link.title ? link.title : link.url
+                }}</a>
+              </li>
+            </ul>
+          </td>
+        </tr>
 
-      <tr>
-        <td>Tags</td>
-        <td>
-          <span
-            v-for="tag in profileData?.LSP3Profile?.tags"
-            :key="tag"
-            class="tag"
-            >{{ tag }}</span
-          >
-        </td>
-      </tr>
-
-      <tr>
-        <td>ProfileImage(s)</td>
-        <td>
-          <div
-            v-for="(image, i) in profileData?.LSP3Profile?.profileImage"
-            :key="i"
-          >
-            <pre
-              >{{ image }}
-                </pre
+        <tr>
+          <td>Tags</td>
+          <td>
+            <span
+              v-for="tag in profileData?.LSP3Profile?.tags"
+              :key="tag"
+              class="tag"
+              >{{ tag }}</span
             >
-            <img :src="createIpfsLink(image.url)" :alt="image.url" />
-          </div>
-        </td>
-      </tr>
+          </td>
+        </tr>
 
-      <tr>
-        <td>BackgroundImage(s)</td>
-        <div
-          v-for="(image, i) in profileData?.LSP3Profile?.backgroundImage"
-          :key="i"
-        >
-          <pre
-            >{{ image }}
+        <tr>
+          <td>ProfileImage(s)</td>
+          <td>
+            <div
+              v-for="(image, i) in profileData?.LSP3Profile?.profileImage"
+              :key="i"
+            >
+              <pre
+                >{{ image }}
                 </pre
-          >
-          <img :src="createIpfsLink(image.url)" :alt="image.url" />
-        </div>
-      </tr>
+              >
+              <img :src="createIpfsLink(image.url)" :alt="image.url" />
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td>BackgroundImage(s)</td>
+          <td>
+            <div
+              v-for="(image, i) in profileData?.LSP3Profile?.backgroundImage"
+              :key="i"
+            >
+              <pre
+                >{{ image }}
+                    </pre
+              >
+              <img :src="createIpfsLink(image.url)" :alt="image.url" />
+            </div>
+          </td>
+        </tr>
+      </tbody>
     </table>
   </section>
 </template>

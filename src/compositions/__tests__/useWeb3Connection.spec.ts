@@ -5,6 +5,11 @@ jest.mock('@/compositions/useWeb3Onboard', () => ({
   default: () => ({}),
 }))
 
+jest.mock('@/helpers/env', () => ({
+  PUBLIC_API_SHARED_SECRET: '123',
+  EMBEDDED_WALLET_URL: 'http://localhost:9100',
+}))
+
 const mockIsAddress = jest.fn()
 
 jest.mock('web3-utils', () => {

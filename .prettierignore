@@ -12,3 +12,4 @@
 /.vscode
 
 /packages/tools-lukso-provider/docs/**/*.md
+/package.json

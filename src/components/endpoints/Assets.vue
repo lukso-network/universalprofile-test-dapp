@@ -137,7 +137,7 @@ const create = async () => {
         addTokenToLocalStore(deployedAsset.ERC20Token.address)
         break
       default:
-        console.log('Standard not supported')
+        console.warn('Standard not supported', token.value.type, token.value)
     }
     isTokenCreated.value = true
     await recalculateAssets()

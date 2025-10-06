@@ -24,7 +24,7 @@ async function mockDependencies(gateway = 'https://api.2eff.lukso.dev') {
   })
   // TODO: fix "is not assignable to type IDE error"
   file.arrayBuffer = async function () {
-    return Buffer.from('')
+    return Buffer.from('').buffer as ArrayBuffer
   }
 
   const addMock = jest.fn(async () => {

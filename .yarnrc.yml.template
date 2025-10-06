@@ -1,0 +1,10 @@
+compressionLevel: mixed
+
+enableGlobalCache: false
+
+nodeLinker: node-modules
+
+npmScopes:
+  lukso-network:
+    npmRegistryServer: "https://npm.pkg.github.com"
+    npmAuthToken: "${GITHUB_TOKEN}"

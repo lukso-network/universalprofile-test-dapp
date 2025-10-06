@@ -55,10 +55,13 @@ export class BaseFormDataUploader {
         meta = { 'content-type': assetBuffer.mimeType }
         dataContent.append(
           'file',
-          new (global.Blob || Blob)([assetBuffer.buffer])
+          new (global.Blob || Blob)([new Uint8Array(assetBuffer.buffer)])
         )
       } else if (Buffer.isBuffer(data)) {
-        dataContent.append('file', new (global.Blob || Blob)([data]))
+        dataContent.append(
+          'file',
+          new (global.Blob || Blob)([new Uint8Array(data)])
+        )
       } else if ('on' in data && 'pipe' in data) {
         dataContent.append('file', data)
       } else {

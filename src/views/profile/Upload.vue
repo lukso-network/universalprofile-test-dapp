@@ -381,34 +381,38 @@ const removeBackgroundImage = () => {
             <table
               class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
             >
-              <tr>
-                <th>Identifier</th>
-                <th>Code</th>
-                <th>Delete</th>
-              </tr>
-              <tr
-                v-for="(uploadedProfile, index) in uploadedProfiles"
-                :key="index"
-              >
-                <td>
-                  <router-link
-                    :to="`/profiles/${uploadedProfile.url.replace(uploadTarget, '')}`"
-                  >
-                    {{ uploadedProfile.url.replace(uploadTarget, '') }}
-                  </router-link>
-                </td>
-                <td>
-                  <pre class="pre">{{ uploadedProfile.profile }}</pre>
-                </td>
-                <td>
-                  <button
-                    class="button is-danger is-rounded mt-3"
-                    @click="deleteUploadedProfile(uploadedProfile.url)"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
+              <thead>
+                <tr>
+                  <th>Identifier</th>
+                  <th>Code</th>
+                  <th>Delete</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="(uploadedProfile, index) in uploadedProfiles"
+                  :key="index"
+                >
+                  <td>
+                    <router-link
+                      :to="`/profiles/${uploadedProfile.url.replace(uploadTarget, '')}`"
+                    >
+                      {{ uploadedProfile.url.replace(uploadTarget, '') }}
+                    </router-link>
+                  </td>
+                  <td>
+                    <pre class="pre">{{ uploadedProfile.profile }}</pre>
+                  </td>
+                  <td>
+                    <button
+                      class="button is-danger is-rounded mt-3"
+                      @click="deleteUploadedProfile(uploadedProfile.url)"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
             </table>
           </div>
         </section>

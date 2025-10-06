@@ -16,6 +16,7 @@ const mockRequestAccounts = jest.fn()
 jest.mock('@/compositions/useWeb3Connection', () => ({
   __esModule: true,
   default: () => ({
+    getProvider: () => null,
     setupProvider: () => mockSetupProvider(),
     getChainId: () => 22,
     accounts: () => mockAccounts(),

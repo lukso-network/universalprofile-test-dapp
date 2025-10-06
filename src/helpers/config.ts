@@ -14,6 +14,7 @@ export const MEANS_OF_CONNECTION = 'means-of-connection'
 export const WALLET_CONNECT = 'wallet-connect-v2'
 export const WINDOW_LUKSO = 'window-lukso'
 export const WEB3_ONBOARD = 'web3Onboard'
+export const EMBEDDED_WALLET = 'embedded-wallet'
 
 export const DEFAULT_GAS = '50000000000000000'
 export const DEFAULT_GAS_PRICE = '10000000000'
@@ -70,7 +71,7 @@ export const NETWORKS: { [K in NetworkType]: NetworkInfo } = {
     id: 'lukso-mainnet',
     name: 'lukso-mainnet',
     http: {
-      url: 'https://rpc.mainnet.lukso.network/',
+      url: 'http://34.32.202.105:8545/', // 'https://rpc.mainnet.lukso.network/',
     },
     cache: {
       url: 'https://erc725cache.mainnet.lukso.network/graphql',

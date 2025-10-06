@@ -11,7 +11,7 @@ export const store = reactive<Store>({
   address: '',
   chainId: 0,
   balance: 0,
-  channel: undefined,
+  channel: localStorage.getItem(MEANS_OF_CONNECTION) || undefined,
   tokenAddress: undefined,
   assets: [],
   lsp7: [],

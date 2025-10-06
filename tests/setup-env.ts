@@ -1,5 +1,10 @@
 import '@testing-library/jest-dom'
 import { TextEncoder, TextDecoder } from 'util'
+import { Duplex, Transform } from 'stream'
+
+// Polyfill for stream classes
+;(global as any).Duplex = Duplex
+;(global as any).Transform = Transform
 
 jest.mock('@lukso/lsp-smart-contracts', () => ({
   INTERFACE_IDS: {
@@ -88,6 +93,54 @@ jest.mock('@lukso/lsp-smart-contracts', () => ({
     },
   },
 }))
-
-global.TextEncoder = TextEncoder
+;(global as any).TextEncoder = TextEncoder
 ;(global as any).TextDecoder = TextDecoder
+
+// Polyfill fetch and Request for viem HTTP requests
+import fetch from 'isomorphic-fetch'
+;(global as any).fetch = fetch
+
+// Mock Request, Response, Headers for viem HTTP requests
+;(global as any).Request = class Request {
+  constructor(
+    public url: string,
+    public init?: RequestInit
+  ) {}
+}
+;(global as any).Response = class Response {
+  constructor(
+    public body?: any,
+    public init?: ResponseInit
+  ) {}
+}
+;(global as any).Headers = class Headers {
+  private headers = new Map()
+  constructor(init?: any) {
+    if (init) {
+      for (const [key, value] of Object.entries(init)) {
+        this.headers.set(key, value)
+      }
+    }
+  }
+  set(name: string, value: string) {
+    this.headers.set(name, value)
+  }
+  get(name: string) {
+    return this.headers.get(name)
+  }
+}
+
+// Mock import.meta for Jest
+;(global as any).import = {
+  meta: {
+    env: {
+      VITE_APP_NAME: 'test',
+      VITE_IPFS_GATEWAY: 'https://api.universalprofile.cloud/ipfs',
+      PUBLIC_API_SHARED_SECRET: process.env.VITE_APP_PUBLIC_API_SHARED_SECRET,
+      MODE: 'test',
+      DEV: false,
+      PROD: false,
+      SSR: false,
+    },
+  },
+}

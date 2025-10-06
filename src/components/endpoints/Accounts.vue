@@ -8,6 +8,7 @@ import {
   WALLET_CONNECT,
   WINDOW_LUKSO,
   WEB3_ONBOARD,
+  EMBEDDED_WALLET,
 } from '@/helpers/config'
 import { createBlockScoutLink } from '@/utils/createLinks'
 import Web3Utils from 'web3-utils'
@@ -44,7 +45,10 @@ const connectExtension = async (meansOfConnection: string) => {
   clearNotification()
   try {
     provider.value = await setupProvider(meansOfConnection, true)
-    setNotification(`Connected to address: ${getState('address')}`, 'info')
+    setNotification(
+      `Connected to address: ${getState('address') || '<pending>'}`,
+      'info'
+    )
   } catch (error) {
     setNotification((error as unknown as Error).message, 'danger')
   }
@@ -54,6 +58,15 @@ const handleRefresh = (e: Event) => {
   e.stopPropagation()
   recalculateAssets()
 }
+
+watch(
+  () => [getState('isConnected'), getState('address')],
+  ([isConnected, address]) => {
+    if (isConnected) {
+      setNotification(`Connected to address: ${address}`, 'info')
+    }
+  }
+)
 </script>
 
 <template>
@@ -105,6 +118,16 @@ const handleRefresh = (e: Event) => {
           @click="connectExtension(WEB3_ONBOARD)"
         >
           Web3-Onboard
+        </button>
+      </div>
+      <div class="field">
+        <button
+          class="button is-primary is-rounded mb-1"
+          data-testid="connect-w3onboard"
+          :disabled="getState('isConnected')"
+          @click="connectExtension(EMBEDDED_WALLET)"
+        >
+          Embedded Wallet
         </button>
       </div>
       <div class="field">

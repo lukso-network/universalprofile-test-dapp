@@ -1,0 +1,79 @@
+[tools]
+nodejs = "24.4.0"
+yarn = "4.9.2"
+python = "3.11.9"
+
+[hooks]
+postinstall = "[ -n \"$CI\" ] || mise run ensure-github-packages"
+
+[tasks.check-github-packages]
+description = "Check if GitHub Packages is configured"
+run = '''
+if [ ! -f .yarnrc.yml ] || [ ! -f .npmrc ]; then
+  exit 1
+fi
+if ! grep -q "@lukso-network" .npmrc; then
+  exit 1
+fi
+'''
+
+[tasks.setup-github-packages]
+description = "Configure npm for GitHub Packages using gh CLI"
+run = '''
+if ! command -v gh  >/dev/null 2>&1; then
+  echo "GitHub CLI (gh) is required but not installed"
+  exit 1
+fi
+
+if ! gh auth status >/dev/null 2>&1; then
+  echo "Please authenticate with GitHub CLI first: gh auth login"
+  exit 1
+fi
+
+# Check if read:packages or write:packages scope is present
+AUTH_STATUS=$(gh auth status 2>&1)
+if ! echo "$AUTH_STATUS" | grep -q "read:packages\|write:packages"; then
+  echo "⚠️  GitHub token missing required scope (read:packages or write:packages)"
+  echo "Refreshing token with read:packages scope..."
+  gh auth refresh -s read:packages
+  if [ $? -ne 0 ]; then
+    echo "❌ Failed to refresh token. Please run: gh auth refresh -s read:packages"
+    exit 1
+  fi
+  echo "✓ Token refreshed with read:packages scope"
+fi
+
+# Get token and configure npm/yarn
+GITHUB_TOKEN=$(gh auth token)
+
+# Generate .yarnrc.yml with embedded token
+cat > .yarnrc.yml <<EOF
+compressionLevel: mixed
+
+enableGlobalCache: false
+
+nodeLinker: node-modules
+
+npmScopes:
+  lukso-network:
+    npmRegistryServer: "https://npm.pkg.github.com"
+    npmAuthToken: "${GITHUB_TOKEN}"
+EOF
+
+# Generate .npmrc for compatibility
+echo "@lukso-network:registry=https://npm.pkg.github.com" > .npmrc
+echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc
+
+echo "✓ GitHub Packages configured for @lukso-network scope"
+'''
+
+[tasks.ensure-github-packages]
+description = "Ensure GitHub Packages is configured, setup if needed"
+run = '''
+if mise run check-github-packages 2>/dev/null; then
+  echo "✓ GitHub Packages already configured"
+else
+  echo "Setting up GitHub Packages..."
+  mise run setup-github-packages
+fi
+'''
