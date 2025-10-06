@@ -46,6 +46,7 @@ Branch: `main`
    ```
 
    Then authenticate:
+
    ```sh
    gh auth login
    ```
@@ -53,15 +54,19 @@ Branch: `main`
 2. **Install mise** (if not already installed):
 
    This project uses [mise](https://mise.jdx.dev/) to manage tools and environment setup.
+
    ```sh
    curl https://mise.run | sh
    ```
+
    See [mise installation docs](https://mise.jdx.dev/getting-started.html) for other installation methods.
 
 3. **Install tools and dependencies**:
+
    ```sh
    mise install
    ```
+
    This will:
    - Install Node.js, Yarn, and Python
    - Configure GitHub Packages access (if hooks are enabled)
@@ -70,6 +75,7 @@ Branch: `main`
 4. **Configure GitHub Packages** (if not done automatically):
 
    If you see "✓ GitHub Packages already configured", you're all set. Otherwise, run:
+
    ```sh
    mise run setup-github-packages
    ```

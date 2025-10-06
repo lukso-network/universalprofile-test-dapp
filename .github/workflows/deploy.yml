@@ -13,8 +13,8 @@ permissions:
   pull-requests: write
 
 env:
-  CF_PROJECT_NAME: "universalprofile-test-dapp"
-  PUBLIC_URL: "https://up-test-dapp.lukso.tech"
+  CF_PROJECT_NAME: 'universalprofile-test-dapp'
+  PUBLIC_URL: 'https://up-test-dapp.lukso.tech'
   VITE_APP_PUBLIC_API_SHARED_SECRET: ${{ secrets.VITE_APP_PUBLIC_API_SHARED_SECRET }}
   VITE_EMBEDDED_WALLET_URL: https://auth-simple.pages.dev
 jobs:
