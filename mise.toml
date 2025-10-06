@@ -4,7 +4,7 @@ yarn = "4.9.2"
 python = "3.11.9"
 
 [hooks]
-postinstall = "mise run ensure-github-packages"
+postinstall = "[ -n \"$CI\" ] || mise run ensure-github-packages"
 
 [tasks.check-github-packages]
 description = "Check if GitHub Packages is configured"
