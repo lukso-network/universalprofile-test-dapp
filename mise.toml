@@ -17,12 +17,12 @@ fi
 [tasks.setup-github-packages]
 description = "Configure npm for GitHub Packages using gh CLI"
 run = '''
-if ! command -v gh &> /dev/null; then
+if ! command -v gh  >/dev/null 2>&1; then
   echo "GitHub CLI (gh) is required but not installed"
   exit 1
 fi
 
-if ! gh auth status &> /dev/null; then
+if ! gh auth status >/dev/null 2>&1; then
   echo "Please authenticate with GitHub CLI first: gh auth login"
   exit 1
 fi
@@ -42,6 +42,7 @@ fi
 
 # Get token and configure npm
 GITHUB_TOKEN=$(gh auth token)
+echo "GITHUB_TOKEN=${GITHUB_TOKEN}" > .env.npm
 echo "@lukso-network:registry=https://npm.pkg.github.com" > .npmrc
 echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc
 echo "✓ GitHub Packages configured for @lukso-network scope"
@@ -57,18 +58,3 @@ else
   mise run setup-github-packages
 fi
 '''
-
-[tasks.install]
-description = "Install dependencies with GitHub Packages auto-setup"
-depends = ["ensure-github-packages"]
-run = "pnpm install"
-
-[tasks.dev]
-description = "Start development with auto-setup"
-depends = ["ensure-github-packages"]
-run = "pnpm dev"
-
-[tasks.build]
-description = "Build with auto-setup"
-depends = ["ensure-github-packages"]
-run = "pnpm build"

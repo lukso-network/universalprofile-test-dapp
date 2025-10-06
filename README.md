@@ -33,12 +33,55 @@ Branch: `main`
 
 ## 🧑🏻‍💻 Getting Started
 
-```sh
-yarn install
-yarn prepare
-```
+### Prerequisites
 
-Yarn prepare will correctly install husky and lint-staged to validate commits pre-commit.
+1. **Install GitHub CLI** (if not already installed):
+
+   ```sh
+   # macOS
+   brew install gh
+
+   # Linux
+   curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+   ```
+
+   Then authenticate:
+   ```sh
+   gh auth login
+   ```
+
+2. **Install mise** (if not already installed):
+
+   This project uses [mise](https://mise.jdx.dev/) to manage tools and environment setup.
+   ```sh
+   curl https://mise.run | sh
+   ```
+   See [mise installation docs](https://mise.jdx.dev/getting-started.html) for other installation methods.
+
+3. **Install tools and dependencies**:
+   ```sh
+   mise install
+   ```
+   This will:
+   - Install Node.js, Yarn, and Python
+   - Configure GitHub Packages access (if hooks are enabled)
+   - Install project dependencies
+
+4. **Configure GitHub Packages** (if not done automatically):
+
+   If you see "✓ GitHub Packages already configured", you're all set. Otherwise, run:
+   ```sh
+   mise run setup-github-packages
+   ```
+
+   Note: Mise hooks are experimental and may not run automatically on all systems. The setup script will:
+   - Check GitHub CLI authentication (run `gh auth login` if needed)
+   - Verify token has `read:packages` or `write:packages` scope
+   - Create `.npmrc` with GitHub Packages configuration
+
+### Post-Setup
+
+After mise install completes, husky and lint-staged will be configured to validate commits pre-commit.
 
 ### Development
 
