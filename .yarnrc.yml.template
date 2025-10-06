@@ -4,9 +4,6 @@ enableGlobalCache: false
 
 nodeLinker: node-modules
 
-injectEnvironmentFiles:
-  - '.env.npm'
-
 npmScopes:
   lukso-network:
     npmRegistryServer: "https://npm.pkg.github.com"

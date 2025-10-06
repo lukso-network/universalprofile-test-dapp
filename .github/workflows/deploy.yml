@@ -17,7 +17,6 @@ env:
   PUBLIC_URL: "https://up-test-dapp.lukso.tech"
   VITE_APP_PUBLIC_API_SHARED_SECRET: ${{ secrets.VITE_APP_PUBLIC_API_SHARED_SECRET }}
   VITE_EMBEDDED_WALLET_URL: https://auth-simple.pages.dev
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -56,6 +55,15 @@ jobs:
 
       - name: 🔐 Setup GitHub Packages
         run: |
+          cat > .yarnrc.yml <<EOF
+          compressionLevel: mixed
+          enableGlobalCache: false
+          nodeLinker: node-modules
+          npmScopes:
+            lukso-network:
+              npmRegistryServer: "https://npm.pkg.github.com"
+              npmAuthToken: "${{ secrets.GITHUB_TOKEN }}"
+          EOF
           echo "@lukso-network:registry=https://npm.pkg.github.com" > .npmrc
           echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> .npmrc
 

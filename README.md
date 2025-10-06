@@ -77,7 +77,10 @@ Branch: `main`
    Note: Mise hooks are experimental and may not run automatically on all systems. The setup script will:
    - Check GitHub CLI authentication (run `gh auth login` if needed)
    - Verify token has `read:packages` or `write:packages` scope
-   - Create `.npmrc` with GitHub Packages configuration
+   - Generate `.yarnrc.yml` with GitHub Packages configuration (token embedded directly)
+   - Generate `.npmrc` with GitHub Packages configuration
+
+   **Security Note**: `.yarnrc.yml` is not committed to the repository as it contains your GitHub token. A `.yarnrc.yml.template` file is provided to show the expected structure. The token is embedded directly in the file rather than exposed as an environment variable to prevent malicious postinstall scripts from accessing it.
 
 ### Post-Setup
 
