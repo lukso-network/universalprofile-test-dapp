@@ -7,6 +7,11 @@ on:
 
 concurrency: deployment-${{ github.ref }}
 
+permissions:
+  contents: read
+  packages: read
+  pull-requests: write
+
 env:
   CF_PROJECT_NAME: 'universalprofile-test-dapp'
   PUBLIC_URL: 'https://up-test-dapp.lukso.tech'
@@ -47,6 +52,11 @@ jobs:
           curl https://mise.run | sh
           mise install
           mise x -- corepack enable
+
+      - name: 🔐 Setup GitHub Packages
+        run: |
+          echo "@lukso:registry=https://npm.pkg.github.com" >> .npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> .npmrc
 
       - name: ⚙️ Install
         run: mise x -- yarn
