@@ -31,10 +31,11 @@ const setupWCV2Provider = async () => {
       url: document.location.origin,
       icons: [`${document.location.origin}/lukso.png`],
     },
-    rpcMap: {
-      42: 'https://rpc.mainnet.lukso.network',
-      4201: 'https://rpc.testnet.lukso.network',
-    },
+    // Setting RPC map disables wallet_switchEthereumChain method. It never reaches the mobile app.
+    // rpcMap: {
+    //   42: 'https://rpc.mainnet.lukso.network',
+    //   4201: 'https://rpc.testnet.lukso.network',
+    // },
     showQrModal: true,
     optionalChains: [0],
   })
