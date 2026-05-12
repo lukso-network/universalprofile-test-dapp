@@ -242,9 +242,7 @@ const nativeCurrencyFor = (network: NetworkInfo) => {
 const findNetwork = (targetChainId: number): NetworkInfo | undefined =>
   Object.values(NETWORKS).find(n => Number(n.chainId) === targetChainId)
 
-const syncUpModalTargetChain = async (
-  targetChainId: number
-): Promise<void> => {
+const syncUpModalTargetChain = async (targetChainId: number): Promise<void> => {
   try {
     const { default: useUpModal } = await import('./useUpModal')
     await useUpModal().setTargetChainId(targetChainId)
