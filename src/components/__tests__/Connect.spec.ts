@@ -1,31 +1,47 @@
 import Connect from '../Connect.vue'
 import { render, fireEvent, waitFor, screen } from '@testing-library/vue'
-import { useState } from '@/stores'
-import { WALLET_CONNECT, WINDOW_LUKSO } from '@/helpers/config'
+import { useState, getState } from '@/stores'
+import { UP_MODAL, getSelectedNetworkType } from '@/helpers/config'
+import { ref } from 'vue'
 
-window.lukso = {} as typeof window.lukso
+const fakeUpModalProvider = {
+  on: jest.fn(),
+  removeListener: jest.fn(),
+  request: jest.fn().mockResolvedValue(undefined),
+}
+
+const mockUpModalProvider = ref(fakeUpModalProvider)
+const mockInitUpModal = jest.fn()
+const mockOpenUpModal = jest.fn()
+
+jest.mock('@/compositions/useUpModal', () => ({
+  __esModule: true,
+  default: () => ({
+    initUpModal: () => mockInitUpModal(),
+    openUpModal: () => mockOpenUpModal(),
+    provider: mockUpModalProvider,
+  }),
+}))
 
 jest.mock('@/utils/isDesktop', () => ({
   isDesktop: jest.fn().mockReturnValue(true),
 }))
 
 const mockCall = jest.fn()
-const mockGetProvider = jest.fn()
-const mockSetupWeb3 = jest.fn()
-const mockAccounts = jest.fn()
 const mockGetBalance = jest.fn()
-const mockRequestAccounts = jest.fn()
 const mockDisconnect = jest.fn()
+const mockSetupProviderFromEip1193 = jest.fn()
+const mockSwitchNetwork = jest.fn()
 
 jest.mock('@/compositions/useWeb3Connection', () => ({
   __esModule: true,
   default: () => ({
     disconnect: () => mockDisconnect(),
-    setupProvider: (arg: string) => mockSetupWeb3(arg),
+    setupProviderFromEip1193: (provider: unknown, channel: string) =>
+      mockSetupProviderFromEip1193(provider, channel),
     getChainId: () => 22,
-    accounts: () => mockAccounts(),
     getBalance: () => mockGetBalance(),
-    requestAccounts: () => mockRequestAccounts(),
+    switchNetwork: (id: number) => mockSwitchNetwork(id),
     contract: () => ({
       methods: {
         owner: () => ({
@@ -39,42 +55,54 @@ jest.mock('@/compositions/useWeb3Connection', () => ({
 beforeEach(() => {
   const { setDisconnected } = useState()
   setDisconnected()
+  localStorage.clear()
+  localStorage.setItem(
+    'up:tokens',
+    JSON.stringify({ assets: [], lsp7: [], lsp8: [] })
+  )
   jest.resetAllMocks()
+  mockUpModalProvider.value = fakeUpModalProvider
+  fakeUpModalProvider.request.mockResolvedValue(undefined)
 })
 
-test('can connect to wallet connect V2', async () => {
-  mockGetProvider.mockReturnValue({
-    wc: {
-      connected: false,
-    },
-  })
-
+test('opens UP Modal from the navbar connect button', async () => {
   render(Connect)
 
-  expect(mockSetupWeb3).toBeCalledTimes(1)
+  await waitFor(() => {
+    expect(mockInitUpModal).toHaveBeenCalled()
+  })
 
-  await fireEvent.click(screen.getByTestId('connect-wc-v2'))
+  await fireEvent.click(screen.getByTestId('connect-up-modal'))
 
-  expect(mockSetupWeb3).toBeCalledTimes(2)
-  expect(mockSetupWeb3).toHaveBeenLastCalledWith(WALLET_CONNECT)
+  expect(mockOpenUpModal).toHaveBeenCalledTimes(1)
 })
 
-test('can disconnect from wallet connect V2', async () => {
-  mockGetProvider.mockReturnValue({
-    wc: {
-      connected: true,
-    },
-  })
+test('shows connected UP Modal account state', async () => {
   mockGetBalance.mockReturnValue('2')
   const { setConnected } = useState()
-  await setConnected(
-    '0x9967b05ac840324F8BB6F729eD74530866679B11',
-    WALLET_CONNECT
-  )
 
   render(Connect)
 
-  expect(mockSetupWeb3).toBeCalledTimes(1)
+  await setConnected('0x9967b05ac840324F8BB6F729eD74530866679B11', UP_MODAL)
+
+  await waitFor(() => {
+    expect(screen.getByTestId('address')).toHaveTextContent(
+      /.*0x9967b0\.\.\..*/,
+      {
+        normalizeWhitespace: true,
+      }
+    )
+  })
+  expect(screen.getByTestId('balance')).toHaveTextContent('2 LYX')
+})
+
+test('can disconnect from UP Modal', async () => {
+  mockGetBalance.mockReturnValue('2')
+  const { setConnected } = useState()
+  await setConnected('0x9967b05ac840324F8BB6F729eD74530866679B11', UP_MODAL)
+
+  render(Connect)
+
   expect(screen.getByTestId('address')).toHaveTextContent('0x9967b0...')
 
   await fireEvent.click(screen.getByTestId('disconnect'))
@@ -84,65 +112,22 @@ test('can disconnect from wallet connect V2', async () => {
   })
 })
 
-test('can connect to browser extension when authorized', async () => {
-  mockAccounts.mockResolvedValue('0xD8B0b80Fa7938f2F841b314d8b6052EAe97db826')
-  mockGetProvider.mockReturnValue({
-    wc: {
-      connected: false,
-    },
-  })
-  mockGetBalance.mockReturnValue('2')
-  const { setConnected } = useState()
-
-  render(Connect)
-
-  await fireEvent.click(screen.getByTestId('connect-extension'))
-
-  expect(mockSetupWeb3).toBeCalledTimes(2)
-  await setConnected('0x9967b05ac840324F8BB6F729eD74530866679B11', WINDOW_LUKSO)
-  await waitFor(() => {
-    expect(screen.getByTestId('address')).toHaveTextContent(
-      /.*0x9967b0\.\.\..*/,
-      {
-        normalizeWhitespace: true,
-      }
-    )
-  })
-  await waitFor(() => {
-    expect(screen.getByTestId('balance')).toHaveTextContent('2 LYX')
-  })
-})
-
-test('can connect to browser extension when not authorized', async () => {
-  mockAccounts.mockResolvedValue(undefined)
-  mockRequestAccounts.mockReturnValue([
-    '0x7367C96553Ed4C44E6962A38d8a0b5f4BE9F6298',
-  ])
-  mockGetProvider.mockReturnValue({
-    wc: {
-      connected: false,
-    },
-  })
-  mockGetBalance.mockReturnValue('3')
-  const { setConnected } = useState()
-
-  render(Connect)
-
-  await waitFor(
-    () => {
-      expect(screen.getByTestId('connect-extension')).toBeEnabled()
-    },
-    { timeout: 1000 }
+test('chainChanged updates store/localStorage without reloading', async () => {
+  const handlers: Record<string, (...args: any[]) => void> = {}
+  fakeUpModalProvider.on.mockImplementation(
+    (event: string, handler: (...args: any[]) => void) => {
+      handlers[event] = handler
+      return fakeUpModalProvider
+    }
   )
 
-  await fireEvent.click(screen.getByTestId('connect-extension'))
-  await setConnected('0x9967b05ac840324F8BB6F729eD74530866679B11', WINDOW_LUKSO)
+  render(Connect)
 
   await waitFor(() => {
-    expect(screen.getByTestId('address')).toHaveTextContent(
-      /.*0x9967b0\.\.\..*/,
-      { normalizeWhitespace: true }
-    )
-    expect(screen.getByTestId('balance')).toHaveTextContent('3 LYX')
+    expect(handlers.chainChanged).toBeDefined()
   })
-}, 5000)
+  await handlers.chainChanged('0x2a')
+
+  expect(getState('chainId')).toBe(42)
+  expect(getSelectedNetworkType()).toBe('lukso_mainnet')
+})

@@ -1,27 +1,29 @@
 import Accounts from '../Accounts.vue'
 import { render, fireEvent, screen, waitFor } from '@testing-library/vue'
 import { useState } from '@/stores'
-import { WINDOW_LUKSO } from '@/helpers/config'
+import { UP_MODAL } from '@/helpers/config'
+
+const mockOpenUpModal = jest.fn()
+
+jest.mock('@/compositions/useUpModal', () => ({
+  __esModule: true,
+  default: () => ({
+    openUpModal: () => mockOpenUpModal(),
+  }),
+}))
 
 const mockCall = jest.fn()
-const mockSetupProvider = jest.fn()
-const mockGetProvider = jest.fn()
-
-window.lukso = {} as any
-
-const mockAccounts = jest.fn()
+const mockDisconnect = jest.fn()
 const mockGetBalance = jest.fn()
-const mockRequestAccounts = jest.fn()
+const mockSwitchNetwork = jest.fn()
 
 jest.mock('@/compositions/useWeb3Connection', () => ({
   __esModule: true,
   default: () => ({
-    setupProvider: () => mockSetupProvider(),
     getChainId: () => 22,
-    accounts: () => mockAccounts(),
-    disconnect: jest.fn(),
+    disconnect: () => mockDisconnect(),
     getBalance: () => mockGetBalance(),
-    requestAccounts: () => mockRequestAccounts(),
+    switchNetwork: (id: number) => mockSwitchNetwork(id),
     contract: () => ({
       methods: {
         owner: () => ({
@@ -33,41 +35,34 @@ jest.mock('@/compositions/useWeb3Connection', () => ({
 }))
 
 beforeEach(() => {
+  const { setDisconnected } = useState()
+  setDisconnected()
+  localStorage.clear()
+  localStorage.setItem(
+    'up:tokens',
+    JSON.stringify({ assets: [], lsp7: [], lsp8: [] })
+  )
   jest.resetAllMocks()
 })
 
-test('can connect to wallet connect V2', async () => {
-  mockGetProvider.mockReturnValue({
-    wc: {
-      connected: false,
-    },
-  })
-
+test('opens UP Modal from the Accounts endpoint', async () => {
   render(Accounts)
 
-  await fireEvent.click(screen.getByTestId('connect-wc-v2'))
+  await fireEvent.click(screen.getByTestId('connect-up-modal'))
 
-  expect(mockSetupProvider).toBeCalledTimes(1)
+  expect(mockOpenUpModal).toBeCalledTimes(1)
   expect(await screen.findByTestId('notification')).toHaveTextContent(
-    'Connected to address'
+    'Open UP Modal to connect your wallet'
   )
 })
 
-test('can connect to browser extension when authorized', async () => {
-  mockRequestAccounts.mockReturnValue([
-    '0x83b21Ba5Cb73f4C17E82f2f7E37787b13d924306',
-  ])
-  mockGetProvider.mockReturnValue({
-    wc: {
-      connected: false,
-    },
-  })
+test('shows UP Modal connected account state', async () => {
+  mockGetBalance.mockReturnValue('2')
   const { setConnected } = useState()
 
   render(Accounts)
 
-  await fireEvent.click(screen.getByTestId('connect-extension'))
-  await setConnected('0x9967b05ac840324F8BB6F729eD74530866679B11', WINDOW_LUKSO)
+  await setConnected('0x9967b05ac840324F8BB6F729eD74530866679B11', UP_MODAL)
 
   await waitFor(() => {
     expect(screen.getByTestId('info')).toHaveTextContent(
@@ -77,22 +72,22 @@ test('can connect to browser extension when authorized', async () => {
   expect(screen.getByTestId('chain')).toHaveTextContent('22 (0x16)')
 })
 
-test('can disconnect from browser extension', async () => {
-  window.lukso = {} as any
+test('can disconnect from UP Modal', async () => {
+  mockGetBalance.mockReturnValue('2')
   const { setConnected, setDisconnected } = useState()
-  setConnected('0x517216362D594516c6f96Ee34b2c502d65B847E4', WINDOW_LUKSO)
+  await setConnected('0x517216362D594516c6f96Ee34b2c502d65B847E4', UP_MODAL)
 
   render(Accounts)
 
   await waitFor(() => {
-    expect(screen.getByTestId('connect-extension')).toBeDisabled()
+    expect(screen.getByTestId('connect-up-modal')).toBeDisabled()
     expect(screen.getByTestId('disconnect')).not.toBeDisabled()
   })
 
   await fireEvent.click(screen.getByTestId('disconnect'))
   setDisconnected()
   await waitFor(() => {
-    expect(screen.getByTestId('connect-extension')).not.toBeDisabled()
+    expect(screen.getByTestId('connect-up-modal')).not.toBeDisabled()
     expect(screen.getByTestId('disconnect')).toBeDisabled()
     expect(screen.getByTestId('notification')).toHaveTextContent('Disconnected')
   })

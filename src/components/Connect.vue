@@ -1,35 +1,28 @@
 <script setup lang="ts">
 import { getState, useState, setState } from '@/stores'
 import { ref, onMounted, onUnmounted, watch } from 'vue'
-import useDropdown from '@/compositions/useDropdown'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
-import { WALLET_CONNECT, WEB3_ONBOARD, WINDOW_LUKSO } from '@/helpers/config'
+import useUpModal from '@/compositions/useUpModal'
+import { setNetworkConfig } from '@/helpers/config'
+import { UP_MODAL } from '@/helpers/config'
 import { sliceAddress } from '@/utils/sliceAddress'
+import type { Eip1193Provider } from '@/types'
 
-const { setupProvider, disconnect } = useWeb3Connection()
+const { setupProviderFromEip1193, disconnect } = useWeb3Connection()
+const { initUpModal, openUpModal, provider: upModalProvider } = useUpModal()
 
-const { close, toggle } = useDropdown()
-const dropdown = ref()
-const hasExtension = ref(false)
-const provider = ref<any>()
+const provider = ref<Eip1193Provider>()
 
-watch(
-  () => !!window.lukso,
-  value => {
-    hasExtension.value = value
-  }
-)
-
-const connectExtension = async (meansOfConnection: string) => {
-  close(dropdown.value)
-  provider.value = await setupProvider(meansOfConnection, true)
+const connectUpModal = async () => {
+  await openUpModal()
 }
 
 const handleAccountsChanged = async (accounts: string[]) => {
-  console.log('Account changed', accounts)
-
-  if (accounts.length === 0 && getState('isConnected')) {
-    await disconnect()
+  if (!accounts || accounts.length === 0) {
+    if (getState('isConnected')) {
+      await disconnect()
+    }
+    return
   }
   const { setConnected } = useState()
   const [address] = accounts
@@ -37,50 +30,68 @@ const handleAccountsChanged = async (accounts: string[]) => {
   setConnected(address, meansOfConnection)
 }
 
-const handleChainChanged = async (chainId: string) => {
-  console.log('Chain changed', chainId)
-  await disconnect()
-  window.location.reload()
+const handleContextAccountsChanged = (accounts: string[]) => {
+  setState('contextAccounts', Array.isArray(accounts) ? accounts : [])
 }
 
-const handleConnect = async (error: any) => {
-  console.log('Connected')
-  if (error) {
-    throw error
+const handleChainChanged = async (chainId: number | string) => {
+  const next =
+    typeof chainId === 'string' ? parseInt(chainId, 16) : Number(chainId)
+  if (!Number.isFinite(next)) return
+  setNetworkConfig(next)
+  setState('chainId', next)
+}
+
+const handleConnect = async () => {
+  const activeProvider = provider.value ?? upModalProvider.value
+  if (activeProvider) {
+    await setupProviderFromEip1193(activeProvider, UP_MODAL, false)
   }
-  const meansOfConnection = getState('channel')
-  await setupProvider(meansOfConnection, true)
   setState('isConnected', true)
 }
 
 const handleDisconnect = async () => {
-  console.log('Disconnected')
   await disconnect()
   setState('isConnected', false)
 }
 
-const addEventListeners = () => {
-  provider.value?.on?.('accountsChanged', handleAccountsChanged)
-  provider.value?.on?.('chainChanged', handleChainChanged)
-  provider.value?.on?.('connect', handleConnect)
-  provider.value?.on?.('disconnect', handleDisconnect)
+const addEventListeners = (target = provider.value) => {
+  target?.on?.('accountsChanged', handleAccountsChanged)
+  target?.on?.('contextAccountsChanged', handleContextAccountsChanged)
+  target?.on?.('chainChanged', handleChainChanged)
+  target?.on?.('connect', handleConnect)
+  target?.on?.('disconnect', handleDisconnect)
 }
 
-const removeEventListeners = () => {
-  provider.value?.removeListener?.('accountsChanged', handleAccountsChanged)
-  provider.value?.removeListener?.('chainChanged', handleChainChanged)
-  provider.value?.removeListener?.('connect', handleConnect)
-  provider.value?.removeListener?.('disconnect', handleDisconnect)
+const removeEventListeners = (target = provider.value) => {
+  target?.removeListener?.('accountsChanged', handleAccountsChanged)
+  target?.removeListener?.(
+    'contextAccountsChanged',
+    handleContextAccountsChanged
+  )
+  target?.removeListener?.('chainChanged', handleChainChanged)
+  target?.removeListener?.('connect', handleConnect)
+  target?.removeListener?.('disconnect', handleDisconnect)
 }
 
 onMounted(async () => {
-  const meansOfConnection = getState('channel')
-  await setupProvider(meansOfConnection, false)
-  addEventListeners()
+  await initUpModal()
+  provider.value = upModalProvider.value
+  addEventListeners(provider.value)
 })
 
 onUnmounted(() => {
   removeEventListeners()
+})
+
+watch(upModalProvider, (nextProvider, previousProvider) => {
+  if (previousProvider) {
+    removeEventListeners(previousProvider)
+  }
+  provider.value = nextProvider
+  if (nextProvider) {
+    addEventListeners(nextProvider)
+  }
 })
 </script>
 
@@ -99,9 +110,7 @@ onUnmounted(() => {
         class="button is-static is-small is-rounded address"
         data-testid="address"
       >
-        <div
-          :class="`logo ${getState('channel') === WINDOW_LUKSO || getState('channel') === WEB3_ONBOARD ? 'browser-extension' : 'wallet-connect'}`"
-        />
+        <div class="logo up-modal" />
         <span>{{ sliceAddress(getState('address')) }}</span>
       </button>
     </p>
@@ -118,51 +127,16 @@ onUnmounted(() => {
     </p>
   </div>
 
-  <div v-else ref="dropdown" class="dropdown is-right">
-    <div class="dropdown-trigger">
-      <button
-        ref="dropdown"
-        class="button is-primary is-small is-rounded has-text-weight-bold"
-        aria-haspopup="true"
-        aria-controls="dropdown-menu"
-        data-testid="connect"
-        @click="toggle(dropdown)"
-      >
-        <span>Connect</span>
-      </button>
-    </div>
-    <div id="dropdown-menu" class="dropdown-menu" role="menu">
-      <div class="dropdown-content">
-        <button
-          class="dropdown-item has-text-weight-bold button is-text"
-          data-testid="connect-extension"
-          :disabled="getState('isConnected')"
-          @click="connectExtension(WINDOW_LUKSO)"
-        >
-          <div class="logo browser-extension" />
-          Browser Extension
-        </button>
-        <button
-          class="dropdown-item has-text-weight-bold button is-text"
-          data-testid="connect-wc-v2"
-          :disabled="getState('isConnected')"
-          @click="connectExtension(WALLET_CONNECT)"
-        >
-          <div class="logo wallet-connect" />
-          Wallet Connect V2
-        </button>
-        <button
-          class="dropdown-item has-text-weight-bold button is-text"
-          data-testid="connect-web3-onboard"
-          :disabled="getState('isConnected')"
-          @click="connectExtension(WEB3_ONBOARD)"
-        >
-          <div class="logo browser-extension" />
-          Web3 Onboard
-        </button>
-      </div>
-    </div>
-  </div>
+  <button
+    v-else
+    class="button is-primary is-small is-rounded has-text-weight-bold"
+    data-testid="connect-up-modal"
+    :disabled="getState('isConnected')"
+    @click="connectUpModal"
+  >
+    <div class="logo up-modal" />
+    <span>Connect</span>
+  </button>
 </template>
 
 <style scoped lang="scss">
@@ -176,18 +150,8 @@ onUnmounted(() => {
   position: relative;
   top: 3px;
 
-  &.wallet-connect {
-    background-image: url('/walletconnect-logo.svg');
-  }
-
-  &.browser-extension {
+  &.up-modal {
     background-image: url('/lukso.png');
-  }
-}
-
-.dropdown-item {
-  &.is-text {
-    text-decoration: none;
   }
 }
 

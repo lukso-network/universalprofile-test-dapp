@@ -1,6 +1,8 @@
-import { AbiItem, isAddress as baseIsAddress } from 'web3-utils'
+import { AbiItem, isAddress as baseIsAddress, numberToHex } from 'web3-utils'
 import {
   getSelectedNetworkConfig,
+  NETWORKS,
+  UP_MODAL,
   UP_CONNECTED_ADDRESS,
   WALLET_CONNECT,
   WEB3_ONBOARD,
@@ -14,21 +16,29 @@ import {
   provider as ProviderType,
 } from 'web3-core'
 import { resetNetworkConfig, setNetworkConfig } from '@/helpers/config'
-import { getState, useState } from '@/stores'
-import EthereumProvider from '@walletconnect/ethereum-provider/dist/types/EthereumProvider'
+import { getState, setState, useState } from '@/stores'
 import Web3 from 'web3'
 import { ContractOptions, Contract } from 'web3-eth-contract'
 import { EthereumProviderError } from 'eth-rpc-errors'
+import { NetworkInfo } from '@/interfaces/network'
+import type { Channel, Eip1193Provider } from '@/types'
 
 const web3Onboard = useWeb3Onboard()
 const web3WalletConnectV2 = useWalletConnectV2()
 const { setConnected, setDisconnected } = useState()
 
-const provider = ref<EthereumProvider>()
+const provider = ref<Eip1193Provider>()
 let web3: Web3
+const dummy = new Web3()
 
-const setupWeb3 = async (provider: EthereumProvider): Promise<void> => {
-  web3 = new Web3(provider as ProviderType)
+const setupWeb3 = async (nextProvider?: Eip1193Provider): Promise<void> => {
+  if (!nextProvider) {
+    web3 = dummy
+    window.web3 = web3
+    return
+  }
+
+  web3 = new Web3(nextProvider as ProviderType)
   window.web3 = web3
   web3.eth
     ?.getChainId()
@@ -41,6 +51,43 @@ const setupWeb3 = async (provider: EthereumProvider): Promise<void> => {
     })
 }
 
+const setupProviderFromEip1193 = async (
+  nextProvider: Eip1193Provider,
+  meansOfConnection: Channel,
+  userOperation = false,
+  preferredAddress?: string
+): Promise<ProviderType | undefined> => {
+  provider.value = nextProvider
+  await setupWeb3(provider.value)
+
+  let address = preferredAddress ?? ''
+  let accounts: string[] = []
+  if (!address) {
+    try {
+      accounts = await web3.eth.getAccounts()
+    } catch {
+      const providerAccounts = await provider.value.request({
+        method: 'eth_accounts',
+      })
+      accounts = Array.isArray(providerAccounts)
+        ? (providerAccounts as string[])
+        : []
+    }
+    address = accounts[0]
+  }
+
+  if (!address && userOperation) {
+    accounts = await requestAccounts()
+    address = accounts[0]
+  }
+
+  if (address) {
+    setConnected(address, meansOfConnection)
+    localStorage.setItem(UP_CONNECTED_ADDRESS, address)
+  }
+  return provider.value as ProviderType
+}
+
 const setupProvider = async (
   meansOfConnection: string,
   userOperation: boolean
@@ -48,20 +95,34 @@ const setupProvider = async (
   try {
     const isWalletConnectUsed = meansOfConnection === WALLET_CONNECT
     const isWeb3OnboardUsed = meansOfConnection === WEB3_ONBOARD
+    const isUpModalUsed = meansOfConnection === UP_MODAL
 
     let address = ''
-    if (isWalletConnectUsed) {
-      provider.value = await web3WalletConnectV2.setupWCV2Provider()
-      address = await provider.value.accounts[0]
-      await setupWeb3(provider.value)
+    if (isUpModalUsed) {
+      const { default: useUpModal } = await import('./useUpModal')
+      const upModal = useUpModal()
+      const upModalProvider = await upModal.getConnectedProvider()
+      if (!upModalProvider) return undefined
+      return setupProviderFromEip1193(
+        upModalProvider,
+        UP_MODAL,
+        userOperation,
+        upModal.address.value
+      )
+    } else if (isWalletConnectUsed) {
+      const walletConnectProvider =
+        (await web3WalletConnectV2.setupWCV2Provider()) as Eip1193Provider
+      provider.value = walletConnectProvider
+      address = walletConnectProvider.accounts?.[0] ?? ''
+      await setupWeb3(walletConnectProvider)
     } else if (isWeb3OnboardUsed) {
       const primaryWallet = await web3Onboard.setupWeb3Onboard()
-      provider.value = primaryWallet.provider as EthereumProvider
+      provider.value = primaryWallet.provider as Eip1193Provider
       address = primaryWallet.accounts[0].address
       await setupWeb3(provider.value)
     } else {
       provider.value = window.lukso
-      await setupWeb3(provider.value as EthereumProvider)
+      await setupWeb3(provider.value)
       let accounts = await web3.eth.getAccounts()
 
       address = accounts[0]
@@ -71,7 +132,7 @@ const setupProvider = async (
       }
     }
     if (address) {
-      setConnected(address, meansOfConnection)
+      setConnected(address, meansOfConnection as Channel)
       localStorage.setItem(UP_CONNECTED_ADDRESS, address)
     }
     return provider.value as ProviderType
@@ -80,7 +141,7 @@ const setupProvider = async (
 
     if (epError.code === 4100 && userOperation) {
       const address = (await requestAccounts())[0]
-      setConnected(address, meansOfConnection)
+      setConnected(address, meansOfConnection as Channel)
       localStorage.setItem(UP_CONNECTED_ADDRESS, address)
     }
   }
@@ -88,21 +149,24 @@ const setupProvider = async (
 
 const disconnect = async () => {
   if (getState('channel') === WALLET_CONNECT) {
-    await provider.value?.disconnect()
+    await provider.value?.disconnect?.()
   } else if (getState('channel') === WEB3_ONBOARD) {
     await web3Onboard.disconnect()
+  } else if (getState('channel') === UP_MODAL) {
+    const { default: useUpModal } = await import('./useUpModal')
+    await useUpModal().disconnectUpModal()
   } else {
     localStorage.removeItem(UP_CONNECTED_ADDRESS)
   }
-  await setupWeb3(undefined as unknown as EthereumProvider)
+  localStorage.removeItem(UP_CONNECTED_ADDRESS)
+  provider.value = undefined
+  await setupWeb3()
   setDisconnected()
 }
 
 const getProvider = () => {
-  return provider.value as EthereumProvider
+  return provider.value as Eip1193Provider
 }
-
-const dummy = new Web3()
 
 const getWeb3 = (): Web3 => {
   return web3 || dummy
@@ -161,6 +225,78 @@ const sendRequest = (request: any): Promise<any> => {
   }
   console.warn('Provider is not set up or not connected.')
   return Promise.resolve(null)
+}
+
+const nativeCurrencyFor = (network: NetworkInfo) => {
+  const isLukso = network.chainId === 42 || network.chainId === 4201
+  if (isLukso) {
+    return {
+      name: network.chainId === 42 ? 'LYX' : 'Testnet LYX',
+      symbol: network.chainId === 42 ? 'LYX' : 'LYXt',
+      decimals: 18,
+    }
+  }
+  return { name: 'Ether', symbol: 'ETH', decimals: 18 }
+}
+
+const findNetwork = (targetChainId: number): NetworkInfo | undefined =>
+  Object.values(NETWORKS).find(n => Number(n.chainId) === targetChainId)
+
+const syncUpModalTargetChain = async (
+  targetChainId: number
+): Promise<void> => {
+  try {
+    const { default: useUpModal } = await import('./useUpModal')
+    await useUpModal().setTargetChainId(targetChainId)
+  } catch (error) {
+    console.warn('Failed to sync UP Modal target chain', error)
+  }
+}
+
+const switchNetwork = async (targetChainId: number): Promise<void> => {
+  const target = findNetwork(targetChainId)
+  if (!target) {
+    throw new Error(`Unknown network for chainId ${targetChainId}`)
+  }
+  const hexChainId = numberToHex(targetChainId)
+  if (!provider.value) {
+    setNetworkConfig(targetChainId)
+    setState('chainId', targetChainId)
+    await syncUpModalTargetChain(targetChainId)
+    return
+  }
+  try {
+    await provider.value.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId: hexChainId }],
+    })
+  } catch (error) {
+    const epError = error as EthereumProviderError<{
+      originalError?: { code?: number }
+    }>
+    const code = epError?.code
+    if (code === 4902) {
+      await provider.value.request({
+        method: 'wallet_addEthereumChain',
+        params: [
+          {
+            chainId: hexChainId,
+            chainName: target.name,
+            rpcUrls: [target.http.url],
+            blockExplorerUrls: target.explorer?.url
+              ? [target.explorer.url]
+              : undefined,
+            nativeCurrency: nativeCurrencyFor(target),
+          },
+        ],
+      })
+    } else {
+      throw error
+    }
+  }
+  setNetworkConfig(targetChainId)
+  setState('chainId', targetChainId)
+  await syncUpModalTargetChain(targetChainId)
 }
 
 const accounts = async () => {
@@ -225,6 +361,7 @@ const isAddress = (address: string): boolean => {
 export default function useWeb3Connection() {
   return {
     setupProvider,
+    setupProviderFromEip1193,
     getProvider,
     disconnect,
     getWeb3,
@@ -245,5 +382,6 @@ export default function useWeb3Connection() {
     recoverRawTransaction,
     isAddress,
     sendRequest,
+    switchNetwork,
   }
 }

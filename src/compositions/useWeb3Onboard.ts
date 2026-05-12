@@ -26,16 +26,22 @@ const wallets = [injected]
 
 const chains = [
   {
-    id: 1,
+    id: 42,
     token: 'LYX',
     label: 'LUKSO Mainnet',
     rpcUrl: 'https://rpc.mainnet.lukso.network/',
   },
   {
-    id: 2,
+    id: 4201,
     token: 'LYXt',
     label: 'LUKSO Testnet',
     rpcUrl: 'https://rpc.testnet.lukso.network',
+  },
+  {
+    id: 8453,
+    token: 'ETH',
+    label: 'Base',
+    rpcUrl: 'https://base-rpc.publicnode.com/',
   },
 ]
 

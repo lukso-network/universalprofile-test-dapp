@@ -16,6 +16,7 @@ export const store = reactive<Store>({
   assets: [],
   lsp7: [],
   lsp8: [],
+  contextAccounts: [],
 })
 
 window.store = store

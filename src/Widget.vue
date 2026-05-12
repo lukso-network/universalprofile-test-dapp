@@ -4,6 +4,7 @@ import { BigNumber } from 'ethers'
 import { parseUnits } from 'ethers/lib/utils'
 import { ref, watch } from 'vue'
 import Web3 from 'web3'
+import type { Eip1193Provider } from '@/types'
 
 const chainId = ref<number | null>(null)
 const accounts = ref<string[]>([])
@@ -11,9 +12,10 @@ const contextAccounts = ref<string[]>([])
 const errors = ref<Error[]>([])
 const web3 = ref<Web3>()
 
-window.lukso = createClientUPProvider()
+const upProvider = createClientUPProvider() as unknown as Eip1193Provider
+window.lukso = upProvider
 
-web3.value = new Web3(window.lukso)
+web3.value = new Web3(upProvider as any)
 window.web3 = web3.value
 web3.value.eth
   ?.getChainId()
@@ -33,16 +35,16 @@ web3.value.eth
     // Ignore error
     errors.value.push(error)
   })
-window.lukso?.on('accountsChanged', (_accounts: (`0x${string}` | '')[]) => {
+upProvider.on?.('accountsChanged', (_accounts: (`0x${string}` | '')[]) => {
   accounts.value = _accounts
 })
-window.lukso?.on(
+upProvider.on?.(
   'contextAccountsChanged',
   (_accounts: (`0x${string}` | '')[]) => {
     contextAccounts.value = _accounts
   }
 )
-window.lukso?.on('chainChanged', (_chainId: number) => {
+upProvider.on?.('chainChanged', (_chainId: number) => {
   chainId.value = _chainId
 })
 const amountText = ref<string>()

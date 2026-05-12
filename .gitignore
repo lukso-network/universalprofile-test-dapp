@@ -35,3 +35,4 @@ tmp
 !.yarn/sdks
 !.yarn/versions
 /vite.config.ts.timestamp-*
+.gitnexus

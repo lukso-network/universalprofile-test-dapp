@@ -1,34 +1,32 @@
 <script setup lang="ts">
 import Notifications from '@/components/Notification.vue'
+import NetworkSwitcher from '@/components/NetworkSwitcher.vue'
 import useNotifications from '@/compositions/useNotifications'
 import { getState, useState } from '@/stores'
 
-import {
-  getSelectedNetworkConfig,
-  WALLET_CONNECT,
-  WINDOW_LUKSO,
-  WEB3_ONBOARD,
-} from '@/helpers/config'
+import { getSelectedNetworkConfig, NETWORKS } from '@/helpers/config'
 import { createBlockScoutLink } from '@/utils/createLinks'
 import Web3Utils from 'web3-utils'
-import { computed, ref, watch } from 'vue'
-import { provider as Provider } from 'web3-core'
+import { computed } from 'vue'
 import { NetworkInfo } from '@/interfaces/network'
 import useWeb3Connection from '@/compositions/useWeb3Connection'
+import useUpModal from '@/compositions/useUpModal'
 
 const { notification, clearNotification, hasNotification, setNotification } =
   useNotifications()
 const { recalculateAssets } = useState()
-const provider = ref<Provider>()
-const { setupProvider, disconnect } = useWeb3Connection()
-const selectedNetworkConfig = ref<NetworkInfo>(getSelectedNetworkConfig())
-
-watch(
-  () => getSelectedNetworkConfig(),
-  value => {
-    selectedNetworkConfig.value = value
+const { disconnect } = useWeb3Connection()
+const { openUpModal } = useUpModal()
+const selectedNetworkConfig = computed<NetworkInfo>(() => {
+  const chainId = getState('chainId')
+  if (chainId) {
+    const match = Object.values(NETWORKS).find(
+      n => Number(n.chainId) === chainId
+    )
+    if (match) return match
   }
-)
+  return getSelectedNetworkConfig()
+})
 
 const hexChainId = computed(() => {
   return Web3Utils.numberToHex(getState('chainId'))
@@ -36,15 +34,20 @@ const hexChainId = computed(() => {
 
 const disconnectWallet = async () => {
   clearNotification()
+  const channel = getState('channel')
   await disconnect()
-  setNotification(`Disconnected ${getState('channel')} channel`, 'info')
+  setNotification(`Disconnected ${channel ?? 'wallet'} channel`, 'info')
 }
 
-const connectExtension = async (meansOfConnection: string) => {
+const connectUpModal = async () => {
   clearNotification()
   try {
-    provider.value = await setupProvider(meansOfConnection, true)
-    setNotification(`Connected to address: ${getState('address')}`, 'info')
+    await openUpModal()
+    if (getState('address')) {
+      setNotification(`Connected to address: ${getState('address')}`, 'info')
+    } else {
+      setNotification('Open UP Modal to connect your wallet', 'info')
+    }
   } catch (error) {
     setNotification((error as unknown as Error).message, 'danger')
   }
@@ -60,51 +63,23 @@ const handleRefresh = (e: Event) => {
   <div class="tile is-4 is-parent">
     <div class="tile is-child box">
       <p class="is-size-5 has-text-weight-bold mb-1">Connect</p>
-      <div style="padding-top: 8px; padding-bottom: 8px">
-        DApp uses <b>{{ selectedNetworkConfig.name }}</b> network.
-      </div>
-      <div class="field">
-        <button
-          class="button is-primary is-rounded mb-1"
-          :disabled="getState('isConnected')"
-          data-testid="connect-extension"
-          @click="connectExtension(WINDOW_LUKSO)"
-        >
-          Browser Extension
-        </button>
+      <div
+        class="is-flex is-align-items-center"
+        style="gap: 8px; padding-top: 8px; padding-bottom: 8px"
+      >
         <span
-          v-if="getState('channel') === WINDOW_LUKSO && getState('isConnected')"
-          class="icon ml-3 mt-1 has-text-primary"
+          >DApp uses <b>{{ selectedNetworkConfig.name }}</b> network.</span
         >
-          <i class="fas fa-check"></i>
-        </span>
+        <NetworkSwitcher />
       </div>
       <div class="field">
         <button
           class="button is-primary is-rounded mb-1"
           :disabled="getState('isConnected')"
-          data-testid="connect-wc-v2"
-          @click="connectExtension(WALLET_CONNECT)"
+          data-testid="connect-up-modal"
+          @click="connectUpModal"
         >
-          Wallet Connect V2
-        </button>
-        <span
-          v-if="
-            getState('channel') === WALLET_CONNECT && getState('isConnected')
-          "
-          class="icon ml-3 mt-4 has-text-primary"
-        >
-          <i class="fas fa-check"></i>
-        </span>
-      </div>
-      <div class="field">
-        <button
-          class="button is-primary is-rounded mb-1"
-          data-testid="connect-w3onboard"
-          :disabled="getState('isConnected')"
-          @click="connectExtension(WEB3_ONBOARD)"
-        >
-          Web3-Onboard
+          Connect
         </button>
       </div>
       <div class="field">
