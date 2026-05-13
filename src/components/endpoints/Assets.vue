@@ -75,9 +75,9 @@ const create = async () => {
   const erc725AccountAddress = getState('address')
   isTokenPending.value = true
 
-  const assetMetadata = await uploadAssetData(lsp4Metadata.value)
-  const metadataJsonUrl = encodeAssetMetadata(assetMetadata)
   try {
+    const assetMetadata = await uploadAssetData(lsp4Metadata.value)
+    const metadataJsonUrl = encodeAssetMetadata(assetMetadata)
     const { deployLSP7DigitalAsset, deployLSP8IdentifiableDigitalAsset } =
       useLspFactory()
     const { deployERC20Token } = useERC20()

@@ -31,10 +31,9 @@ const setupWCV2Provider = async () => {
       url: document.location.origin,
       icons: [`${document.location.origin}/lukso.png`],
     },
-    rpcMap: {
-      42: 'https://rpc.mainnet.lukso.network',
-      4201: 'https://rpc.testnet.lukso.network',
-    },
+    rpcMap: Object.fromEntries(
+      Object.values(NETWORKS).map(n => [n.chainId, n.http.url])
+    ),
     showQrModal: true,
     optionalChains: [0],
   })
