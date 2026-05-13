@@ -94,27 +94,41 @@ const resolveProvider = async (
   const candidates = [eventConnector, connection?.connector]
   for (const candidate of candidates) {
     if (!candidate?.getProvider) continue
-    const nextProvider = await candidate.getProvider()
-    if (isEip1193Provider(nextProvider)) {
-      return nextProvider
+    try {
+      const nextProvider = await candidate.getProvider()
+      if (isEip1193Provider(nextProvider)) {
+        return nextProvider
+      }
+    } catch {
+      // Some UP Modal connectors expose only wagmi connection state and no
+      // EIP-1193 provider. Keep the connection usable in read-only mode.
     }
   }
 }
 
-const connectProviderToWeb3Facade = async (
-  nextProvider: Eip1193Provider,
-  nextAddress?: string
+const connectToWeb3Facade = async (
+  connection: WagmiConnection,
+  nextProvider?: Eip1193Provider
 ) => {
-  if (syncInProgress) return
+  if (syncInProgress || !connection.address) return
   syncInProgress = true
   try {
     const { default: useWeb3Connection } = await import('./useWeb3Connection')
-    await useWeb3Connection().setupProviderFromEip1193(
-      nextProvider,
-      UP_MODAL,
-      false,
-      nextAddress
-    )
+    const web3Connection = useWeb3Connection()
+    if (nextProvider) {
+      await web3Connection.setupProviderFromEip1193(
+        nextProvider,
+        UP_MODAL,
+        false,
+        connection.address
+      )
+    } else {
+      await web3Connection.setupProviderlessConnection(
+        UP_MODAL,
+        connection.address,
+        connection.chainId
+      )
+    }
   } finally {
     syncInProgress = false
   }
@@ -133,19 +147,13 @@ const handleConnectionChange = async (
   }
 
   const nextProvider = await resolveProvider(connection, eventConnector)
-  if (!nextProvider) {
-    error.value = new Error(
-      'UP Modal connected, but no EIP-1193 provider was exposed by the selected connector.'
-    )
-    return
-  }
 
   provider.value = nextProvider
   address.value = connection.address ?? ''
   chainId.value = connection.chainId
   error.value = null
 
-  await connectProviderToWeb3Facade(nextProvider, connection.address)
+  await connectToWeb3Facade(connection, nextProvider)
 }
 
 const getWagmiConnection = async (): Promise<WagmiConnection | undefined> => {

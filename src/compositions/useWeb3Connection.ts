@@ -31,6 +31,20 @@ const provider = ref<Eip1193Provider>()
 let web3: Web3
 const dummy = new Web3()
 
+const findNetwork = (targetChainId: number): NetworkInfo | undefined =>
+  Object.values(NETWORKS).find(n => Number(n.chainId) === targetChainId)
+
+const setupReadOnlyWeb3 = (targetChainId?: number): void => {
+  const network = targetChainId ? findNetwork(targetChainId) : undefined
+  const selectedNetwork = network ?? getSelectedNetworkConfig()
+  web3 = selectedNetwork.http?.url ? new Web3(selectedNetwork.http.url) : dummy
+  window.web3 = web3
+
+  if (targetChainId) {
+    setNetworkConfig(targetChainId)
+  }
+}
+
 const setupWeb3 = async (nextProvider?: Eip1193Provider): Promise<void> => {
   if (!nextProvider) {
     web3 = dummy
@@ -86,6 +100,20 @@ const setupProviderFromEip1193 = async (
     localStorage.setItem(UP_CONNECTED_ADDRESS, address)
   }
   return provider.value as ProviderType
+}
+
+const setupProviderlessConnection = async (
+  meansOfConnection: Channel,
+  address: string,
+  targetChainId?: number
+): Promise<void> => {
+  provider.value = undefined
+  setupReadOnlyWeb3(targetChainId)
+
+  if (address) {
+    await setConnected(address, meansOfConnection)
+    localStorage.setItem(UP_CONNECTED_ADDRESS, address)
+  }
 }
 
 const setupProvider = async (
@@ -239,9 +267,6 @@ const nativeCurrencyFor = (network: NetworkInfo) => {
   return { name: 'Ether', symbol: 'ETH', decimals: 18 }
 }
 
-const findNetwork = (targetChainId: number): NetworkInfo | undefined =>
-  Object.values(NETWORKS).find(n => Number(n.chainId) === targetChainId)
-
 const syncUpModalTargetChain = async (targetChainId: number): Promise<void> => {
   try {
     const { default: useUpModal } = await import('./useUpModal')
@@ -360,6 +385,7 @@ export default function useWeb3Connection() {
   return {
     setupProvider,
     setupProviderFromEip1193,
+    setupProviderlessConnection,
     getProvider,
     disconnect,
     getWeb3,

@@ -12,6 +12,7 @@ const mockCloseModal = jest.fn()
 const mockDestroyModal = jest.fn()
 const mockUnwatchConnection = jest.fn()
 const mockSetupProviderFromEip1193 = jest.fn()
+const mockSetupProviderlessConnection = jest.fn()
 const mockSetupLuksoConnector = jest.fn().mockResolvedValue({
   wagmiConfig: mockWagmiConfig,
   showSignInModal: mockShowSignInModal,
@@ -51,6 +52,7 @@ jest.mock('@/compositions/useWeb3Connection', () => ({
   __esModule: true,
   default: () => ({
     setupProviderFromEip1193: mockSetupProviderFromEip1193,
+    setupProviderlessConnection: mockSetupProviderlessConnection,
   }),
 }))
 
@@ -170,6 +172,25 @@ describe('useUpModal', () => {
       UP_MODAL,
       false,
       mockAddress
+    )
+    expect(mockSetupProviderlessConnection).not.toHaveBeenCalled()
+  })
+
+  it('keeps UP Modal connections usable when no EIP-1193 provider is exposed', async () => {
+    mockGetProvider.mockResolvedValue(undefined)
+    const upModal = useUpModal()
+
+    await upModal.initUpModal()
+
+    expect(upModal.provider.value).toBeUndefined()
+    expect(upModal.address.value).toBe(mockAddress)
+    expect(upModal.chainId.value).toBe(NETWORKS.lukso_mainnet.chainId)
+    expect(upModal.error.value).toBeNull()
+    expect(mockSetupProviderFromEip1193).not.toHaveBeenCalled()
+    expect(mockSetupProviderlessConnection).toHaveBeenCalledWith(
+      UP_MODAL,
+      mockAddress,
+      NETWORKS.lukso_mainnet.chainId
     )
   })
 
