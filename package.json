@@ -86,7 +86,8 @@
     "util": "0.12.5",
     "vite": "^4.4.9",
     "vue-loader": "17.2.2",
-    "vue-tsc": "^2.0.7"
+    "vue-tsc": "^2.0.7",
+    "wrangler": "^4.90.1"
   },
   "lint-staged": {
     "*.{ts,js,vue}": [
@@ -101,7 +102,7 @@
     ]
   },
   "engines": {
-    "node": "18.12.1"
+    "node": "22.22.2"
   },
   "packageManager": "yarn@3.3.0"
 }
