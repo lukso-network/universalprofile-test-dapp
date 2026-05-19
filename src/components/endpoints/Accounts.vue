@@ -57,6 +57,12 @@ const handleRefresh = (e: Event) => {
   e.stopPropagation()
   recalculateAssets()
 }
+
+const openMobileApp = () => {
+  const testDappUrl = 'https://up-test-dapp.lukso.tech'
+  const deeplink = `io.universaleverything.universalprofiles://browser?url=${encodeURIComponent(testDappUrl)}`
+  window.location.href = deeplink
+}
 </script>
 
 <template>
@@ -80,6 +86,15 @@ const handleRefresh = (e: Event) => {
           @click="connectUpModal"
         >
           Connect
+        </button>
+      </div>
+      <div class="field">
+        <button
+          class="button is-info is-rounded mb-1"
+          data-testid="open-mobile-app"
+          @click="openMobileApp"
+        >
+          Open in Mobile App
         </button>
       </div>
       <div class="field">
