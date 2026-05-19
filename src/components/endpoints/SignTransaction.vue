@@ -408,7 +408,8 @@ const hasRemove = computed<boolean>(() => {
       </div>
       <div class="field">
         How to
-        <a href="https://docs.lukso.tech/guides/universal-profile/transfer-lyx"
+        <a
+          href="https://docs.lukso.tech/learn/universal-profile/interactions/transfer-lyx/"
           >transfer LYX tutorial</a
         >.
       </div>

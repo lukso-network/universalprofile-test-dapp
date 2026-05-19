@@ -422,7 +422,7 @@ const toggleShow = () => {
       </div>
       <div class="field">
         Test <code>personal_sign</code> RPC call [<a
-          href="https://docs.constellationnetwork.io/stargazer/apireference/ethereumrpcapi/personal_sign/"
+          href="https://docs.constellationnetwork.io/stargazer-wallet/ethereum-rpc-api/personal_sign"
           >documentation ex. 1</a
         >,
         <a href="https://docs.metamask.io/wallet/reference/personal_sign/"
@@ -432,7 +432,7 @@ const toggleShow = () => {
       <div class="field">
         How to implement
         <a
-          href="https://docs.lukso.tech/guides/browser-extension/sign-in-with-ethereum"
+          href="https://docs.lukso.tech/learn/universal-profile/connect-profile/siwe/"
           >Sign In With Ethereum tutorial</a
         >.
       </div>

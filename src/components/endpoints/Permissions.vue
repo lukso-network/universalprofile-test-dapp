@@ -221,7 +221,8 @@ const allPermissionsSelected = computed(() => {
       </div>
 
       <div class="field">
-        <a href="https://docs.lukso.tech/guides/key-manager/give-permissions"
+        <a
+          href="https://docs.lukso.tech/learn/universal-profile/key-manager/grant-permissions/"
           >Key Manager permissions tutorial</a
         >.
       </div>
