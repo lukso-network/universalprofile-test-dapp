@@ -2775,9 +2775,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lukso/core@npm:1.10.3, @lukso/core@npm:^1.7.0":
-  version: 1.10.3
-  resolution: "@lukso/core@npm:1.10.3"
+"@lukso/core@npm:1.10.4, @lukso/core@npm:^1.7.0":
+  version: 1.10.4
+  resolution: "@lukso/core@npm:1.10.4"
   dependencies:
     "@formatjs/intl": ^4.1.2
     "@lukso/lsp-smart-contracts": 0.16.7
@@ -2789,7 +2789,7 @@ __metadata:
   peerDependenciesMeta:
     viem:
       optional: true
-  checksum: ae52044d9bcfdbaf0bc50853ac1a2ef897c6db8a08d2e402d5dbc2cb13fe55a39ed61129e3c3c63a59654c89d98ab684744777fe4f5858545c69515dc6cf335e
+  checksum: bee15650ecb04a90bf7ac7b873b27a4b007362f358b80ea4da04dab65fcaaec5aecc0b15a6718424a6a6bf5bbbc2dc1f90b6a3cc3bdb0779073a2f0f4a67d9ab
   languageName: node
   linkType: hard
 
@@ -3376,12 +3376,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lukso/up-modal@npm:1.0.0":
-  version: 1.0.0
-  resolution: "@lukso/up-modal@npm:1.0.0"
+"@lukso/up-modal@npm:1.0.1":
+  version: 1.0.1
+  resolution: "@lukso/up-modal@npm:1.0.1"
   dependencies:
     "@lit/task": ^1.0.3
-    "@lukso/core": 1.10.3
+    "@lukso/core": 1.10.4
     "@lukso/transaction-view-headless": 0.5.3
     "@lukso/up-provider": 0.3.7
     "@lukso/web-components": ^1.181.0
@@ -3399,7 +3399,7 @@ __metadata:
       optional: true
     viem:
       optional: true
-  checksum: 8346f27bd00ebbf87cddbaf833bdd14991c3e060dd6834a48c7243b4d5df1ef69fbd99b3cda727460452b2a12639ca13774452184a1b8984ca6bf52fce9e3c13
+  checksum: 297dca7022b684ed7b7f89474b9650ee75acdc7d276ea249fc935864e819332e732265c1990c85fdf5d6cb6ac806220181355f456499027878514afe6dafe10c
   languageName: node
   linkType: hard
 
@@ -19073,7 +19073,7 @@ __metadata:
     "@erc725/erc725.js": 0.24.2
     "@lukso/lsp-factory.js": ^3.3.1
     "@lukso/lsp-smart-contracts": ^0.15.0
-    "@lukso/up-modal": 1.0.0
+    "@lukso/up-modal": 1.0.1
     "@lukso/up-provider": ^0.3.7
     "@lukso/web3-onboard-config": 1.1.2
     "@pinata/sdk": ^2.1.0
