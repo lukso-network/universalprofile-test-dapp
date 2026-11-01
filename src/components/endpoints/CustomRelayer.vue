@@ -40,7 +40,7 @@ const addCustomRelayer = async () => {
 
   try {
     const request = {
-      method: 'up_addTransactionRelayer', // https://docs.lukso.tech/standards/rpc-api#up_addtransactionrelayer
+      method: 'up_addTransactionRelayer', // https://docs.lukso.tech/tools/apis/up-rpc-api/#up_addtransactionrelayer
       params: [
         {
           name: name.value,
@@ -127,7 +127,7 @@ const addCustomRelayer = async () => {
       </div>
       <div>
         Test <code>up_addTransactionRelayer</code> RPC call [<a
-          href="https://docs.lukso.tech/standards/rpc-api#up_addtransactionrelayer"
+          href="https://docs.lukso.tech/tools/apis/up-rpc-api/#up_addtransactionrelayer"
           >documentation</a
         >].
       </div>

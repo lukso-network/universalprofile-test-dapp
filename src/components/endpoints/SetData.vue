@@ -70,7 +70,8 @@ const setData = async () => {
 
       <div class="field">
         How to
-        <a href="https://docs.lukso.tech/guides/universal-profile/edit-profile"
+        <a
+          href="https://docs.lukso.tech/learn/universal-profile/metadata/edit-profile/"
           >edit a Universal Profile tutorial</a
         >.
       </div>
